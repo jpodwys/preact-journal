@@ -1,0 +1,57 @@
+{
+  "name": "riot-progressive-enhancement",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpodwys/riot-progressive-enhancement.git"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "postinstall": "npm run build-js & npm run build-debug-js",
+    "build-js": "browserify -t riotify -g uglifyify assets/js/app.js -o assets/js/bundle.js",
+    "build-debug-js": "browserify -t riotify assets/js/app.js -o assets/js/debug-bundle.js",
+    "local": "npm run watch-js & npm run watch-debug-js & nodemon app.js",
+    "watch-js": "watchify -t riotify -g uglifyify assets/js/app.js -o assets/js/bundle.js",
+    "watch-debug-js": "watchify -t riotify assets/js/app.js -o assets/js/debug-bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "1.14.2",
+    "browserify": "12.0.1",
+    "compression": "1.6.0",
+    "cookie-parser": "1.4.1",
+    "dotenv": "1.2.0",
+    "ejs": "2.3.3",
+    "express": "4.13.1",
+    "express-jwt": "3.3.0",
+    "fastclick": "1.0.6",
+    "fg-loadcss": "^1.2.0",
+    "force-ssl-heroku": "1.0.2",
+    "jsonwebtoken": "5.5.4",
+    "method-override": "2.3.5",
+    "mysql": "2.5.5",
+    "page": "1.6.4",
+    "prefetch": "0.2.1",
+    "riot": "2.3.13",
+    "riotify": "0.1.2",
+    "sequelize": "3.19.3",
+    "superagent-cache": "1.7.0",
+    "uglifyify": "3.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "1.8.1",
+    "watchify": "3.7.0"
+  },
+  "engines": {
+    "node": "6.x"
+  },
+  "author": "jpodwys",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jpodwys/riot-progressive-enhancement/issues"
+  },
+  "homepage": "https://github.com/jpodwys/riot-progressive-enhancement#readme"
+}
