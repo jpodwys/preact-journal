@@ -20,15 +20,6 @@ module.exports = function(app){
   /* Routes only accessible via AJAX calls */
   app.get('/getAllEntryIdsByOwnerId', app.restrict, entry.getAllEntryIdsByOwnerId);
 
-  /* Routes used for the old-school HTML5 Application Cache view */
-  app.get('/manifest/appcache', function (req, res){
-    fs.readFile('./assets/manifest/appcache.manifest', function (err, data){
-      res.set('mime-type', 'text/cache-manifest');
-      res.send(data);
-      res.end();
-    }); 
-  });
-
   /* Convenience routes for development and metrics */
   app.get('/baseline', function (req, res){ res.send(200); });
   app.get('/user-count', user.getUserCount);
