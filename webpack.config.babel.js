@@ -4,13 +4,8 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?/i,
-        loader: 'babel-loader',
-        options: {
-          presets: ['env'],
-          plugins: [
-            ['transform-react-jsx', { pragma: 'h' }]
-          ]
-        }
+        exclude: /node_modules/,
+        use: 'babel-loader'
       }
     ]
   },
@@ -19,3 +14,6 @@ module.exports = {
     path: __dirname + '/dist'
   }
 }
+
+
+
