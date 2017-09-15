@@ -1,0 +1,38 @@
+import { h, Component } from 'preact';
+import { Router } from 'preact-router';
+
+import Header from '../header';
+import Login from '../login';
+import Home from '../home';
+
+import freedux from '../../js/freedux';
+import appState from '../../js/app-state';
+import actions from '../../js/actions';
+
+export default class App extends Component {
+  state = appState;
+  
+  componentWillMount() {
+    freedux(this, actions);
+  }
+
+  /** Gets fired when the route changes.
+   *  @param {Object} event   "change" event from [preact-router](http://git.io/preact-router)
+   *  @param {string} event.url The newly routed URL
+   */
+  handleRoute = e => {
+    this.currentUrl = e.url;
+  };
+
+  render(props, { loading, items }) {
+    return (
+      <div id="app">
+        <Header />
+        <Router onChange={this.handleRoute}>
+          <Login path="/" loading={loading} items={items}/>
+          <Home path="/profile" loading={loading} items={items}/>
+        </Router>
+      </div>
+    );
+  }
+}

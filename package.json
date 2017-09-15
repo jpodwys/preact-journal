@@ -8,7 +8,7 @@
     "url": "git+https://github.com/jpodwys/riot-progressive-enhancement.git"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "webpack --watch",
     "postinstall": "npm run build-js & npm run build-debug-js",
     "build-js": "browserify -t riotify -g uglifyify assets/js/app.js -o assets/js/bundle.js",
     "build-debug-js": "browserify -t riotify assets/js/app.js -o assets/js/debug-bundle.js",
@@ -20,7 +20,6 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "1.14.2",
-    "browserify": "12.0.1",
     "compression": "1.6.0",
     "cookie-parser": "1.4.1",
     "dotenv": "1.2.0",
@@ -29,12 +28,18 @@
     "force-ssl-heroku": "1.0.2",
     "jsonwebtoken": "5.5.4",
     "mysql": "2.5.5",
-    "sequelize": "3.19.3",
-    "uglifyify": "3.0.1"
+    "preact": "^8.2.5",
+    "preact-router": "^2.5.7",
+    "sequelize": "3.19.3"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-plugin-transform-react-jsx": "^6.4.0",
     "nodemon": "1.8.1",
-    "watchify": "3.7.0"
+    "watchify": "3.7.0",
+    "webpack": "^3.6.0"
   },
   "engines": {
     "node": "6.x"

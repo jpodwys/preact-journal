@@ -18,6 +18,7 @@ var express = require('express'),
 // }, 900000); // Every 15 minutes
 
 app.disable('x-powered-by');
+app.use(express.static('dist'));
 app.use(compress({threshold: '1.4kb'}));
 app.use(strictTransportSecurity);
 app.use(forceSsl);
