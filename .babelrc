@@ -1,8 +1,5 @@
 {
-  "sourceMaps": true,
-  "presets": [
-    "babel-preset-env"
-  ],
+  "presets": ["es2015", "stage-0"],
   "plugins": [
     ["transform-react-jsx", { "pragma": "h" }]
   ]

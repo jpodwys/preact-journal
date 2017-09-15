@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import style from './style';
 import Main from '../main'
 
 export default class Home extends Component {

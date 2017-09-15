@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import fire from '../../assets/js/fire';
+import fire from '../../js/fire';
 
 const Item = ({ children, ...props }) => (
   <item>

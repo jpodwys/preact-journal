@@ -6,7 +6,12 @@ var Sequelize = require('sequelize'),
 
 module.exports = function(app){
   /* Main routes--accessible via both form submission and AJAX calls */
-  // app.get('/', handlers.getIndex, handlers.execute);
+  app.get('/', function (req, res){
+    fs.readFile('./views/index.html', function (err, data){
+      res.send(data);
+      res.end();
+    }); 
+  });
   app.post('/user/authenticate', user.attemptLogin);
   app.post('/user', user.createAccount);
   // app.put('/user/:id');

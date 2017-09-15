@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import linkState from 'linkstate';
-import fire from '../../assets/js/fire';
-// import user from '../../assets/js/user-service';
+import fire from '../../js/fire';
 
 export default class Login extends Component {
   state = {

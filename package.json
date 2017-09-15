@@ -8,18 +8,18 @@
     "url": "git+https://github.com/jpodwys/riot-progressive-enhancement.git"
   },
   "scripts": {
-    "start": "webpack --watch",
-    "postinstall": "npm run build-js & npm run build-debug-js",
-    "build-js": "browserify -t riotify -g uglifyify assets/js/app.js -o assets/js/bundle.js",
-    "build-debug-js": "browserify -t riotify assets/js/app.js -o assets/js/debug-bundle.js",
-    "local": "npm run watch-js & npm run watch-debug-js & nodemon app.js",
-    "watch-js": "watchify -t riotify -g uglifyify assets/js/app.js -o assets/js/bundle.js",
-    "watch-debug-js": "watchify -t riotify assets/js/app.js -o assets/js/debug-bundle.js",
+    "start": "node app.js & npm run build-js",
+    "build-js": "webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babelify": "^7.3.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "1.14.2",
+    "browserify": "^14.4.0",
     "compression": "1.6.0",
     "cookie-parser": "1.4.1",
     "dotenv": "1.2.0",
@@ -27,10 +27,12 @@
     "express-jwt": "3.3.0",
     "force-ssl-heroku": "1.0.2",
     "jsonwebtoken": "5.5.4",
+    "linkstate": "^1.1.0",
     "mysql": "2.5.5",
     "preact": "^8.2.5",
     "preact-router": "^2.5.7",
-    "sequelize": "3.19.3"
+    "sequelize": "3.19.3",
+    "uglifyjs-webpack-plugin": "^0.4.6"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
