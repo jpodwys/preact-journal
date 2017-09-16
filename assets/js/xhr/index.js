@@ -4,9 +4,9 @@ export default function(config) {
   return new Promise(function(resolve, reject) {
     if(!config.url) return reject('No URL provided');
 
-    var url = 'https://riot-demo.herokuapp.com' + config.url;
+    var url = config.url;
     var method = (config.method) ? config.method.toUpperCase() : 'GET';
-    var body = config.body || '';
+    var body = !!config.body ? JSON.stringify(config.body) : '';
     config.query = config.query || {};
     url = url + appendParams(url, config.query).split(url)[1];
     var xhr = new XMLHttpRequest();

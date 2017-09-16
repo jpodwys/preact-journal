@@ -3,6 +3,7 @@ import { Router } from 'preact-router';
 
 import Header from '../header';
 import Login from '../login';
+import Entries from '../entries';
 import Home from '../home';
 
 import freedux from '../../js/freedux';
@@ -30,6 +31,7 @@ export default class App extends Component {
         <Header />
         <Router onChange={this.handleRoute}>
           <Login path="/" loading={loading} items={items}/>
+          <Entries path="/entries" loading={loading} items={items}/>
           <Home path="/profile" loading={loading} items={items}/>
         </Router>
       </div>
