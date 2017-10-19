@@ -16,6 +16,10 @@ const login = function(user) {
   });
 };
 
+const logout = function() {
+
+};
+
 // const update = function(user) {
 //   return xhr({
 //     url: '/user/' + data.id,
@@ -31,4 +35,4 @@ const login = function(user) {
 //   });
 // };
 
-export default { create, login };
+export default { create, login, logout };

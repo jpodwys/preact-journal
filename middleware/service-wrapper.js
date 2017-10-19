@@ -9,14 +9,7 @@ var handlers = require('./handlers');
 function serviceWrapper(service){
   Object.keys(service).forEach(func => {
     this[func] = function (req, res){
-
-      var data = {
-        body: req.body,
-        query: req.query,
-        user: req.user
-      };
-
-      service[func](data).then(response => {
+      service[func](req).then(response => {
         handlers[func](req, res, response);
       }).catch(handlers.handleError.bind(this, req, res));
     }
