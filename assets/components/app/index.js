@@ -25,13 +25,13 @@ export default class App extends Component {
     this.currentUrl = e.url;
   };
 
-  render(props, { loading, items }) {
+  render(props, { loading, items, entries }) {
     return (
       <div id="app">
         <Header />
         <Router onChange={this.handleRoute}>
           <Login path="/" loading={loading} items={items}/>
-          <Entries path="/entries" loading={loading} items={items}/>
+          <Entries path="/entries" loading={loading} entries={entries}/>
           <Home path="/profile" loading={loading} items={items}/>
         </Router>
       </div>

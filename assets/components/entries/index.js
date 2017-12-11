@@ -1,8 +1,17 @@
 import { h, Component } from 'preact';
+import linkState from 'linkstate';
 import fire from '../../js/fire';
 
-const Entries = ({ children, ...props }) => (
-  <h1>Entries</h1>
-);
+export default class Entries extends Component {
+  componentWillMount = () => {
+    fire('getForUser')();
+  };
 
-export default Entries;
+  render(props) {
+    return (
+      <ul>
+        { props.entries.map( entry => ( <li><h1>{entry.text}</h1></li> )) }
+      </ul>
+    );
+  }
+}

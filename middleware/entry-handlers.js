@@ -1,4 +1,4 @@
-exports.getEntries = function(req, res, entries){
+exports.getEntries = function(req, res, resp){
   res.send({
     entries: resp.rows,
     ids: resp.ids,

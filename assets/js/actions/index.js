@@ -1,3 +1,4 @@
 import User from './user-actions';
+import Entry from './entry-actions';
 
-export default User;
+export default Object.assign(User, Entry);

@@ -16,17 +16,23 @@ const get = function(id) {
 
 const update = function(entry) {
   return xhr({
-    url: '/user/' + entry.id,
+    url: '/entry/' + entry.id,
     method: 'PUT',
     body: entry
   });
 };
 
-const delete = function(id) {
+const del = function(id) {
   return xhr({
-    url: '/user/' + id,
+    url: '/entry/' + id,
     method: 'DELETE'
   });
 };
 
-export default { create, get, update, delete };
+const getForUser = function() {
+  return xhr({
+    url: '/entries'
+  });
+};
+
+export default { create, get, update, del, getForUser };
