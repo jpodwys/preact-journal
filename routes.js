@@ -24,6 +24,7 @@ module.exports = function(app){
 
   /* Routes only accessible via AJAX calls */
   app.get('/getAllEntryIdsByOwnerId', app.restrict, entry.getAllEntryIdsByOwnerId);
+  // app.get('/getAllEntriesByOwnerId', app.restrict, entry.getAllEntriesByOwnerId);
 
   /* Convenience routes for development and metrics */
   app.get('/baseline', function (req, res){ res.send(200); });

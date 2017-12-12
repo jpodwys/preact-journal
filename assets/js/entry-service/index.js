@@ -35,4 +35,10 @@ const getForUser = function() {
   });
 };
 
-export default { create, get, update, del, getForUser };
+const getAllForUser = function() {
+  return xhr({
+    url: '/getAllEntriesByOwnerId'
+  });
+};
+
+export default { create, get, update, del, getForUser, getAllForUser };

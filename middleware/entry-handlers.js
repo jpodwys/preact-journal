@@ -12,6 +12,10 @@ exports.getAllEntryIdsByOwnerId = function(req, res, ids){
   res.send({ids: ids});
 }
 
+exports.getAllEntriesByOwnerId = function(req, res, entries){
+  res.send({entries: entries});
+}
+
 exports.getEntryById = function(req, res, entry){
   res.send({entry: entry});
 }

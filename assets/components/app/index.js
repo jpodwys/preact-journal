@@ -1,10 +1,9 @@
 import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 
-import Header from '../header';
+// import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
-import Home from '../home';
 
 import freedux from '../../js/freedux';
 import appState from '../../js/app-state';
@@ -28,11 +27,10 @@ export default class App extends Component {
   render(props, { loading, items, entries }) {
     return (
       <div id="app">
-        <Header />
+        {/* <Header /> */}
         <Router onChange={this.handleRoute}>
           <Login path="/" loading={loading} items={items}/>
           <Entries path="/entries" loading={loading} entries={entries}/>
-          <Home path="/profile" loading={loading} items={items}/>
         </Router>
       </div>
     );

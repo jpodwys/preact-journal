@@ -18,15 +18,15 @@ var express = require('express'),
 // }, 900000); // Every 15 minutes
 
 app.disable('x-powered-by');
-app.use(express.static('dist'));
 app.use(compress({threshold: '1.4kb'}));
 app.use(strictTransportSecurity);
 app.use(forceSsl);
+app.use(express.static('dist'));
+// app.use(express.static('assets', {maxAge: maxAge}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(resMods.vary);
-// app.use(express.static('assets', {maxAge: maxAge}));
 app.use(jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,

@@ -46,4 +46,16 @@ const getForUser = function(el){
   });
 };
 
-export default { create, get, update, del, getForUser };
+const getAllForUser = function(el){
+  el.setState({loading: el.state.loading + 1});
+  Entry.getAllForUser().then(response => {
+    el.setState(Object.assign(el.state, {
+      entries: response.entries,
+      loading: el.state.loading - 1
+    }));
+  }).catch(e => {
+    console.log('error', e);
+  });
+};
+
+export default { create, get, update, del, getForUser, getAllForUser };

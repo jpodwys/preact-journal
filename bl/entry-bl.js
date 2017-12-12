@@ -49,6 +49,17 @@ module.exports = function(Entry){
     });
   }
 
+  self.getAllEntriesByOwnerId = function({body, query, user}){
+    return new Promise(function (resolve, reject){
+      Entry.getAllEntriesByOwnerId(user.id).then(function (entries){
+        if(entries && entries.rows) return resolve(entries.rows);
+        return reject({status: 500, message: 'There was an error.'});
+      }, function (err){
+        return reject({status: 500, message: err});
+      });
+    });
+  }
+
   self.getEntryById = function({body, query, user}){
     return new Promise(function (resolve, reject){
       Entry.getEntryById(body.entryId).then(function (entry){

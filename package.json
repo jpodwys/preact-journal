@@ -1,11 +1,11 @@
 {
-  "name": "riot-progressive-enhancement",
+  "name": "preact-journal",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jpodwys/riot-progressive-enhancement.git"
+    "url": "git+https://github.com/jpodwys/preact-journal.git"
   },
   "scripts": {
     "start": "node app.js & npm run build-js",
@@ -31,6 +31,7 @@
     "mysql": "2.5.5",
     "preact": "^8.2.5",
     "preact-router": "^2.5.7",
+    "preact-virtual-list": "^0.3.1",
     "sequelize": "3.19.3",
     "uglifyjs-webpack-plugin": "^0.4.6"
   },
@@ -49,7 +50,7 @@
   "author": "jpodwys",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jpodwys/riot-progressive-enhancement/issues"
+    "url": "https://github.com/jpodwys/preact-journal/issues"
   },
-  "homepage": "https://github.com/jpodwys/riot-progressive-enhancement#readme"
+  "homepage": "https://github.com/jpodwys/preact-journal#readme"
 }
