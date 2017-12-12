@@ -2,7 +2,7 @@ import xhr from '../xhr';
 
 const create = function(entry) {
   return xhr({
-    url: '/entry',
+    url: '/api/entry',
     method: 'POST',
     body: entry
   });
@@ -10,13 +10,13 @@ const create = function(entry) {
 
 const get = function(id) {
   return xhr({
-    url: '/entry/' + entry.id
+    url: '/api/entry/' + entry.id
   });
 };
 
 const update = function(entry) {
   return xhr({
-    url: '/entry/' + entry.id,
+    url: '/api/entry/' + entry.id,
     method: 'PUT',
     body: entry
   });
@@ -24,20 +24,20 @@ const update = function(entry) {
 
 const del = function(id) {
   return xhr({
-    url: '/entry/' + id,
+    url: '/api/entry/' + id,
     method: 'DELETE'
   });
 };
 
 const getForUser = function() {
   return xhr({
-    url: '/entries'
+    url: '/api/entries'
   });
 };
 
 const getAllForUser = function() {
   return xhr({
-    url: '/getAllEntriesByOwnerId'
+    url: '/api/getAllEntriesByOwnerId'
   });
 };
 

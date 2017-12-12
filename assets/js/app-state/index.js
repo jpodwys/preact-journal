@@ -1,8 +1,8 @@
 var appState = {
   loggedIn: false,
   loading: 0,
-  items: [1,2,3,4],
-  entries: []
+  entry: {},
+  entries: JSON.parse(localStorage.getItem('entries')) || []
 };
 
 export default appState;

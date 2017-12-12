@@ -47,15 +47,25 @@ const getForUser = function(el){
 };
 
 const getAllForUser = function(el){
+  if(el.state.entries.length) return;
   el.setState({loading: el.state.loading + 1});
   Entry.getAllForUser().then(response => {
     el.setState(Object.assign(el.state, {
       entries: response.entries,
       loading: el.state.loading - 1
     }));
+    localStorage.setItem('entries', JSON.stringify(response.entries));
   }).catch(e => {
     console.log('error', e);
   });
 };
 
-export default { create, get, update, del, getForUser, getAllForUser };
+const setEntry = function(el, e){
+  if(!e || !e.detail || !e.detail.id) return;
+  let entry = el.state.entries.filter(function(item) {
+    return item.id.toString() === e.detail.id.toString();
+  });
+  el.setState({entry: entry});
+};
+
+export default { create, get, update, del, getForUser, getAllForUser, setEntry };
