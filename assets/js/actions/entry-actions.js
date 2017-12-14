@@ -64,7 +64,7 @@ const setEntry = function(el, e){
   if(!e || !e.detail || !e.detail.id) return;
   let entry = el.state.entries.filter(function(item) {
     return item.id.toString() === e.detail.id.toString();
-  });
+  })[0];
   el.setState({entry: entry});
 };
 

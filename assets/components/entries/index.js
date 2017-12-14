@@ -14,9 +14,9 @@ export default class Entries extends Component {
 
   render({ entries }) {
     return (
-      <div style="margin:auto;max-width:850px;font-size:22px;line-height:32px;font-family:'Trebuchet MS', Helvetica, sans-serif
+      <div style="height:100vh;margin:auto;max-width:850px;font-size:22px;line-height:32px;font-family:'Trebuchet MS', Helvetica, sans-serif
 ">
-        <VirtualList data={entries} rowHeight={105} renderRow={this.renderRow} />
+        <VirtualList style="height:100%;overflow:auto;-webkit-overflow-scrolling:touch;" data={entries} rowHeight={105} renderRow={this.renderRow} />
       </div>
     );
   }
