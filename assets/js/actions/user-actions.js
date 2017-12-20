@@ -11,9 +11,11 @@ const login = function(el, e){
   let user = e.detail.user;
   User.login(user).then(user => {
     el.setState(Object.assign(el.state, {
+      loggedIn: true,
       loading: el.state.loading - 1
-    }));
-    route('/entries');
+    }), function(){
+      route('/entries');
+    });
   }).catch(e => {
     console.log('error', e);
   });

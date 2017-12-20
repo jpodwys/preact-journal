@@ -1,23 +1,28 @@
 import { h, Component } from 'preact';
-import VirtualList from 'preact-virtual-list';
+import { route } from 'preact-router';
 import EntryPreview from '../entry-preview';
 import fire from '../../js/fire';
 
 export default class Entries extends Component {
   componentWillMount = () => {
+    if(!this.props.loggedIn) return route('/');
     fire('getAllForUser')();
   };
 
   renderRow(entry) {
-    return <EntryPreview entry={entry} />
+    return (
+      <div class="entry-preview">
+        <a class="entry-link" href={"/entry/" + entry.id}>{entry.date}</a>
+        <p class="entry-text">{entry.text.substr(0, 140)}</p>
+      </div>
+    );
   }
 
   render({ entries }) {
     return (
-      <div style="height:100vh;margin:auto;max-width:850px;font-size:22px;line-height:32px;font-family:'Trebuchet MS', Helvetica, sans-serif
-">
-        <VirtualList style="height:100%;overflow:auto;-webkit-overflow-scrolling:touch;" data={entries} rowHeight={105} renderRow={this.renderRow} />
-      </div>
+      <entry-list>
+        {entries.map(this.renderRow)}
+      </entry-list>
     );
   }
 }

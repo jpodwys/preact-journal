@@ -22,6 +22,7 @@
     "browserify": "^14.4.0",
     "compression": "1.6.0",
     "cookie-parser": "1.4.1",
+    "dlv": "^1.1.0",
     "dotenv": "1.2.0",
     "express": "4.13.1",
     "express-jwt": "3.3.0",
@@ -31,7 +32,6 @@
     "mysql": "2.5.5",
     "preact": "^8.2.5",
     "preact-router": "^2.5.7",
-    "preact-virtual-list": "^0.3.1",
     "sequelize": "3.19.3",
     "uglifyjs-webpack-plugin": "^0.4.6"
   },
