@@ -22,7 +22,6 @@
     "browserify": "^14.4.0",
     "compression": "1.6.0",
     "cookie-parser": "1.4.1",
-    "dlv": "^1.1.0",
     "dotenv": "1.2.0",
     "express": "4.13.1",
     "express-jwt": "3.3.0",

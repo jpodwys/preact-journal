@@ -9,19 +9,10 @@ export default class Entries extends Component {
     fire('getAllForUser')();
   };
 
-  renderRow(entry) {
-    return (
-      <div class="entry-preview">
-        <a class="entry-link" href={"/entry/" + entry.id}>{entry.date}</a>
-        <p class="entry-text">{entry.text.substr(0, 140)}</p>
-      </div>
-    );
-  }
-
   render({ entries }) {
     return (
       <entry-list>
-        {entries.map(this.renderRow)}
+        {entries.map(entry => <EntryPreview entry={entry}/>)}
       </entry-list>
     );
   }

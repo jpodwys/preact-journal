@@ -156,11 +156,10 @@ module.exports = function(Entry, sequelize){
   }
 
   self.updateEntry = function(data){
-    return Entry.update({
-      date: data.date,
-      text: data.text,
-      isPublic: (!!data.isPublic) ? 1 : 0
-    }, {
+    if(data.isPublic !== undefined){
+      data.isPublic = (!!data.isPublic) ? 1 : 0;
+    }
+    return Entry.update(data, {
       where: {id: data.id}
     });
   }

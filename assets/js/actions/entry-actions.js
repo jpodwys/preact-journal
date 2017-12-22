@@ -1,5 +1,6 @@
 import Entry from '../entry-service';
 import { route } from 'preact-router';
+import debounce from '../debounce';
 
 const create = function(el, e){
   // el.setState({loading: el.state.loading + 1});
@@ -18,14 +19,23 @@ const get = function(el, e){
   
 };
 
-const update = function(el){
-  // var length = el.state.items.length;
-  // var last = 0;
-  // if(length) last = el.state.items[length - 1];
-  // el.setState({
-  //   items: el.state.items.concat(last + 1)
-  // });
+const slowUpdate = function(el, e){
+  var d = e.detail;
+  el.state.entries[d.entryIndex][d.property] = d.entry[d.property];
+  el.setState({
+    entries: [].concat(el.state.entries)
+  }, function(){
+    localStorage.setItem('entries', JSON.stringify(el.state.entries));
+  });
+
+  Entry.update(d.entry).then(function(){
+
+  }).catch(function(err){
+
+  });
 };
+
+const update = debounce(slowUpdate, 500);
 
 const del = function(el, e){
   // let item = e.detail.item;
@@ -62,10 +72,18 @@ const getAllForUser = function(el){
 
 const setEntry = function(el, e){
   if(!e || !e.detail || !e.detail.id) return;
-  let entry = el.state.entries.filter(function(item) {
-    return item.id.toString() === e.detail.id.toString();
-  })[0];
-  el.setState({entry: entry});
+  var entries = el.state.entries;
+  var index = 0;
+  while(index < entries.length){
+    if(entries[index].id.toString() === e.detail.id.toString()){
+      break;
+    }
+    index++
+  }
+  el.setState({
+    entryIndex: index,
+    entry: entries[index]
+  });
 };
 
 export default { create, get, update, del, getForUser, getAllForUser, setEntry };
