@@ -33,13 +33,13 @@
     "preact-router": "^2.5.7",
     "sequelize": "3.19.3",
     "uglifyjs-webpack-plugin": "^0.4.6",
-    "webpack": "^3.6.0"
-  },
-  "devDependencies": {
+    "webpack": "^3.6.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
-    "babel-plugin-transform-react-jsx": "^6.4.0",
+    "babel-plugin-transform-react-jsx": "^6.4.0"
+  },
+  "devDependencies": {
     "nodemon": "1.8.1",
     "watchify": "3.7.0"
   },
