@@ -32,7 +32,8 @@
     "preact": "^8.2.5",
     "preact-router": "^2.5.7",
     "sequelize": "3.19.3",
-    "uglifyjs-webpack-plugin": "^0.4.6"
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.6.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -40,8 +41,7 @@
     "babel-preset-env": "^1.6.0",
     "babel-plugin-transform-react-jsx": "^6.4.0",
     "nodemon": "1.8.1",
-    "watchify": "3.7.0",
-    "webpack": "^3.6.0"
+    "watchify": "3.7.0"
   },
   "engines": {
     "node": "6.x"
