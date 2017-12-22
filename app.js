@@ -22,7 +22,7 @@ app.use(forceSsl);
 app.use(strictTransportSecurity);
 app.use(compress({threshold: '1.4kb'}));
 var maxAge = (process.env.NODE_ENV === 'production') ? '30d' : '0h';
-app.use(express.static('dist'), {maxAge: maxAge});
+app.use(express.static('dist', {maxAge: maxAge}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
