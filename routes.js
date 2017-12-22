@@ -12,7 +12,7 @@ module.exports = function(app){
   app.get('/api/entries', app.restrict, entry.getEntries);
   app.get('/api/entry/:id', entry.getEntryById);
   app.post('/api/entry', app.restrict, entry.createEntry);
-  app.put('/api/entry/:id', app.restrict, entry.updateEntry);
+  app.patch('/api/entry/:id', app.restrict, entry.updateEntry);
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
 
   /* Routes only accessible via AJAX calls */

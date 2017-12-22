@@ -8,10 +8,6 @@ export default class Entry extends Component {
     if(this.props.id) fire('setEntry', {id: this.props.id})();
   }
 
-  shouldComponentUpdate(p, s) {
-    console.log(this.props, p)
-  }
-
   getIcons(entry) {
     // if(!entry.isOwner) return '';
     return !entry.isPublic ? '🔐' : '🔓'

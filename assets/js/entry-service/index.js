@@ -17,7 +17,7 @@ const get = function(id) {
 const update = function(entry) {
   return xhr({
     url: '/api/entry/' + entry.id,
-    method: 'PUT',
+    method: 'PATCH',
     body: entry
   });
 };
