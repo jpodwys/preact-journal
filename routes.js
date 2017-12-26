@@ -25,6 +25,6 @@ module.exports = function(app){
   app.get('/entry-count', entry.getEntryCount);
 
   app.get('/*', function(req, res){
-    res.sendFile('index.html', {root: './dist', maxAge: 2592000});
+    res.sendFile('index.html', {root: './dist', maxAge: '30d'});
   });
 }
