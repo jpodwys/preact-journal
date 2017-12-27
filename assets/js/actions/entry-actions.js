@@ -21,6 +21,12 @@ const get = function(el, e){
 
 const slowUpdate = function(el, e){
   var d = e.detail;
+
+  d.entry[d.property] = d.entry[d.property].trim();
+  var current = el.state.entries[d.entryIndex][d.property];
+  var next = d.entry[d.property];
+  if(current === next) return;
+
   el.state.entries[d.entryIndex][d.property] = d.entry[d.property];
   el.setState({
     entries: [].concat(el.state.entries)

@@ -8,6 +8,15 @@ export default class Entry extends Component {
     if(this.props.id) fire('setEntry', {id: this.props.id})();
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    var oe = this.props.entry;
+    var ne = nextProps.entry;
+    if(ne.date === oe.date
+      && ne.text === oe.text.trim()
+      && ne.isPublic === oe.isPublic) return false;
+    return true;
+  }
+
   getIcons(entry) {
     // if(!entry.isOwner) return '';
     return !entry.isPublic ? '🔐' : '🔓'
@@ -48,8 +57,6 @@ export default class Entry extends Component {
         </h1>
         <span>{ this.getIcons(entry) }</span>✖
         <pre contenteditable onInput={this.update} class="entry-text">{entry.text}</pre>
-        {/*  <pre contenteditable onInput={fire('update', {id: entry.id, entryIndex: entryIndex, text: })} class="entry-text">{entry.text}</pre> */}
-        {/* <pre contenteditable onInput={linkState(app, 'entries.' + entryIndex + '.text', 'target.innerText')} class="entry-text">{entry.text}</pre> */}
       </entry-view>
     );
   }

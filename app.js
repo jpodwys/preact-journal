@@ -26,7 +26,7 @@ app.use(express.static('dist', {maxAge: maxAge}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(resMods.vary);
+// app.use(resMods.vary);
 app.use(jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,
