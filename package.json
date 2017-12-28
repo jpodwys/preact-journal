@@ -37,10 +37,10 @@
     "preact-router": "^2.5.7",
     "sequelize": "3.19.3",
     "uglifyjs-webpack-plugin": "^0.4.6",
-    "webpack": "^3.6.0"
+    "webpack": "^3.6.0",
+    "nodemon": "1.8.1",
   },
   "devDependencies": {
-    "nodemon": "1.8.1",
     "watchify": "3.7.0"
   },
   "engines": {
