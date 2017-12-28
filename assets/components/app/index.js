@@ -22,15 +22,17 @@ export default class App extends Component {
   render(props, { loggedIn, loading, entryIndex, entry, entries }) {
     return (
       <div id="main-wrapper">
-        <main id="app">
-          {/* <Header /> */}
-          <Router>
-            <Login path="/" loggedIn={loggedIn} loading={loading}/>
-            <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
-            <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry}/>
-            <FourOhFour default/>
-          </Router>
-        </main>
+        <div id="view-wrapper">
+          <main id="main">
+            {/* <Header /> */}
+            <Router>
+              <Login path="/" loggedIn={loggedIn} loading={loading}/>
+              <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
+              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry}/>
+              <FourOhFour default/>
+            </Router>
+          </main>
+        </div>
       </div>
     );
   }
