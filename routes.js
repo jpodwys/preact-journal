@@ -5,6 +5,7 @@ var Sequelize = require('sequelize'),
   fs = require('fs');
 
 module.exports = function(app){
+  /* REST endpoints */
   app.post('/api/user/authenticate', user.attemptLogin);
   app.post('/api/user', user.createAccount);
   // app.put('/user/:id');
@@ -14,8 +15,6 @@ module.exports = function(app){
   app.post('/api/entry', app.restrict, entry.createEntry);
   app.patch('/api/entry/:id', app.restrict, entry.updateEntry);
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
-
-  /* Routes only accessible via AJAX calls */
   app.get('/api/getAllEntryIdsByOwnerId', app.restrict, entry.getAllEntryIdsByOwnerId);
   app.get('/api/getAllEntriesByOwnerId', app.restrict, entry.getAllEntriesByOwnerId);
 
@@ -24,6 +23,7 @@ module.exports = function(app){
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
 
+  /* Catch-all view route */
   app.get('/*', function(req, res){
     res.sendFile('index.html', {root: './dist', maxAge: '30d'});
   });
