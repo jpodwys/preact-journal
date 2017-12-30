@@ -21,6 +21,7 @@ export default class App extends Component {
     window.app.route = route;
     freedux(this, actions);
 
+    if(!this.state.loggedIn) return;
     var timestamp = localStorage.getItem('timestamp');
     if(timestamp){
       fire('syncForUser', {timestamp: timestamp})();
