@@ -37,7 +37,7 @@ const getAllForUser = function() {
 
 const syncForUser = function(timestamp) {
   return xhr({
-    url: 'api/entries/sync',
+    url: '/api/entries/sync',
     query: {timestamp: timestamp}
   });
 };
