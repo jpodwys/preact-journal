@@ -5,6 +5,7 @@ import { Router, route } from 'preact-router';
 import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
+import NewEntry from '../new-entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
@@ -16,6 +17,7 @@ export default class App extends Component {
   
   componentWillMount() {
     window.app = this;
+    window.app.route = route;
     freedux(this, actions);
   }
 
@@ -28,6 +30,7 @@ export default class App extends Component {
             <Router>
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
+              <NewEntry path="/entry/new" loggedIn={loggedIn} loading={loading} />
               <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry}/>
               <FourOhFour default/>
             </Router>

@@ -10,13 +10,12 @@ module.exports = function(app){
   app.post('/api/user', user.createAccount);
   // app.put('/user/:id');
   // app.delete('/user/:id')
-  app.get('/api/entries', app.restrict, entry.getEntries);
+  app.get('/api/entries/sync', app.restrict, entry.getUpdatesSinceTimestamp);
+  app.get('/api/entries', app.restrict, entry.getAllEntriesByOwnerId);
   app.get('/api/entry/:id', entry.getEntryById);
   app.post('/api/entry', app.restrict, entry.createEntry);
   app.patch('/api/entry/:id', app.restrict, entry.updateEntry);
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
-  app.get('/api/getAllEntryIdsByOwnerId', app.restrict, entry.getAllEntryIdsByOwnerId);
-  app.get('/api/getAllEntriesByOwnerId', app.restrict, entry.getAllEntriesByOwnerId);
 
   /* Convenience routes for development and metrics */
   app.get('/baseline', function (req, res){ res.send(200); });

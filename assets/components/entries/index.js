@@ -6,7 +6,12 @@ import fire from '../../js/fire';
 export default class Entries extends Component {
   componentWillMount = () => {
     if(!this.props.loggedIn) return route('/');
-    fire('getAllForUser')();
+    var timestamp = localStorage.getItem('timestamp');
+    if(timestamp){
+      fire('syncForUser', {timestamp: timestamp})();
+    } else {
+      fire('getAllForUser')();
+    }
   };
 
   render({ entries }) {

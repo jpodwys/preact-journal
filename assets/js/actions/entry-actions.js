@@ -2,17 +2,27 @@ import Entry from '../entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
 
+var findObjectIndexById = function(id, list) {
+  return list.map(function(obj){ return obj.id; }).indexOf(id);
+};
+
+var removeObjectByIndex = function(index, list) {
+  return list.splice(index, 1);
+};
+
 const create = function(el, e){
-  // el.setState({loading: el.state.loading + 1});
-  // let entry = e.detail.entry;
-  // Entry.create(entry).then(entry => {
-  //   el.setState(Object.assign(el.state, {
-  //     loading: el.state.loading - 1
-  //   }));
-  //   route('/entries');
-  // }).catch(e => {
-  //   console.log('error', e);
-  // });
+  el.setState({loading: el.state.loading + 1});
+  let entry = e.detail.entry;
+  Entry.create(entry).then(response => {
+    entry.id = response.id;
+    el.setState({
+      loading: el.state.loading - 1,
+      entries: [entry].concat(el.state.entries)
+    });
+    route('/entries');
+  }).catch(e => {
+    console.log('error', e);
+  });
 };
 
 const get = function(el, e){
@@ -50,18 +60,6 @@ const del = function(el, e){
   // });
 };
 
-const getForUser = function(el){
-  el.setState({loading: el.state.loading + 1});
-  Entry.getForUser().then(response => {
-    el.setState(Object.assign(el.state, {
-      entries: response.entries,
-      loading: el.state.loading - 1
-    }));
-  }).catch(e => {
-    console.log('error', e);
-  });
-};
-
 const getAllForUser = function(el){
   if(el.state.entries.length) return;
   el.setState({loading: el.state.loading + 1});
@@ -71,6 +69,40 @@ const getAllForUser = function(el){
       loading: el.state.loading - 1
     }));
     localStorage.setItem('entries', JSON.stringify(response.entries));
+    localStorage.setItem('timestamp', response.timestamp);
+  }).catch(e => {
+    console.log('error', e);
+  });
+};
+
+const syncForUser = function(el, e){
+  el.setState({loading: el.state.loading + 1});
+  Entry.syncForUser(e.detail.timestamp).then(response => {
+
+    if(response.entries.length === 0){
+      el.setState({
+        loading: el.state.loading - 1,
+      });
+      localStorage.setItem('timestamp', response.timestamp);
+      return;
+    }
+
+    response.entries.forEach((entry, i) => {
+      var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+      if(entryIndex > -1){
+        if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
+        else el.state.entries[entryIndex] = entry;
+      } else {
+        el.state.entries.unshift(entry);
+      }
+    });
+
+    el.setState({
+      loading: el.state.loading - 1,
+      entries: [].concat(el.state.entries)
+    });
+    localStorage.setItem('entries', JSON.stringify(el.state.entries));
+    localStorage.setItem('timestamp', response.timestamp);
   }).catch(e => {
     console.log('error', e);
   });
@@ -92,4 +124,4 @@ const setEntry = function(el, e){
   });
 };
 
-export default { create, get, update, del, getForUser, getAllForUser, setEntry };
+export default { create, get, update, del, getAllForUser, syncForUser, setEntry };

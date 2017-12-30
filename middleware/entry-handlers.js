@@ -1,19 +1,24 @@
-exports.getEntries = function(req, res, resp){
+var date = require('../utils/date');
+
+exports.getAllEntriesByOwnerId = function(req, res, entries){
   res.send({
-    entries: resp.rows,
-    ids: resp.ids,
-    entryCount: resp.ids.length,
-    offset: resp.offset,
-    query: req.query
+    entries: entries,
+    timestamp: date.getUtcZeroTimestamp()
   });
 }
 
-exports.getAllEntryIdsByOwnerId = function(req, res, ids){
-  res.send({ids: ids});
-}
-
-exports.getAllEntriesByOwnerId = function(req, res, entries){
-  res.send({entries: entries});
+exports.getUpdatesSinceTimestamp = function(req, res, entries){
+  entries = entries.map(function(entry){
+    if(!entry.deleted) return entry;
+    return {
+      id: entry.id,
+      deleted: 1
+    };
+  });
+  res.send({
+    entries: entries,
+    timestamp: date.getUtcZeroTimestamp()
+  });
 }
 
 exports.getEntryById = function(req, res, entry){

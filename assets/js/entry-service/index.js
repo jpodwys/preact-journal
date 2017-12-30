@@ -29,16 +29,17 @@ const del = function(id) {
   });
 };
 
-const getForUser = function() {
+const getAllForUser = function() {
   return xhr({
     url: '/api/entries'
   });
 };
 
-const getAllForUser = function() {
+const syncForUser = function(timestamp) {
   return xhr({
-    url: '/api/getAllEntriesByOwnerId'
+    url: 'api/entries/sync',
+    query: {timestamp: timestamp}
   });
 };
 
-export default { create, get, update, del, getForUser, getAllForUser };
+export default { create, get, update, del, getAllForUser, syncForUser };

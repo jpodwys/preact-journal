@@ -1,59 +1,23 @@
-var LIMIT = 10;
-
 module.exports = function(Entry){
   var self = this;
-
-  self.getEntries = function(data){
-    if(data.query && data.query.q){
-      return self.getEntriesByTextSearch(data);
-    }
-    else{
-      return self.getEntriesByOwnerId(data);
-    }
-  }
-
-  self.getEntriesByOwnerId = function({body, query, user}){
-    return new Promise(function (resolve, reject){
-      var offset = (query.p) ? parseInt(query.p, 10) - 1 : 0;
-      offset *= LIMIT;
-      Entry.getEntriesByOwnerId(user.id, LIMIT, offset).then(function (entries){
-        entries.offset = LIMIT;
-        return resolve(entries);
-      }, function (err){
-        return reject({status: 500, message: err});
-      });
-    });
-  }
-
-  self.getEntriesByTextSearch = function({body, query, user}){
-    return new Promise(function (resolve, reject){
-      var index = (query.p) ? parseInt(query.p, 10) - 1 : 0;
-      index *= LIMIT;
-      var text = query.q.toLowerCase();
-      Entry.getEntriesByTextSearch(text, user.id, index, LIMIT).then(function (entries){
-        entries.offset = LIMIT;
-        return resolve(entries);
-      }, function (err){
-        return reject({status: 500, message: err});
-      });
-    });
-  }
-
-  self.getAllEntryIdsByOwnerId = function({body, query, user}){
-    return new Promise(function (resolve, reject){
-      Entry.getAllEntryIdsByOwnerId(user.id).then(function (ids){
-        return resolve(ids);
-      }, function (err){
-        return reject({status: 500, message: err});
-      });
-    });
-  }
 
   self.getAllEntriesByOwnerId = function({body, query, user}){
     return new Promise(function (resolve, reject){
       Entry.getAllEntriesByOwnerId(user.id).then(function (entries){
         if(entries && entries.rows) return resolve(entries.rows);
         return reject({status: 500, message: 'There was an error.'});
+      }, function (err){
+        return reject({status: 500, message: err});
+      });
+    });
+  }
+
+  self.getUpdatesSinceTimestamp = function({body, query, user}){
+    return new Promise(function (resolve, reject){
+      if(!query.timestamp) return reject({status: 400, message: 'Timestamp is required.'});
+      Entry.getUpdatesSinceTimestamp(user.id, parseInt(query.timestamp, 10), user.deviceId).then(function (entries){
+        if(!entries) return reject({status: 500, message: 'There was an error.'});
+        return resolve(entries);
       }, function (err){
         return reject({status: 500, message: err});
       });
@@ -78,7 +42,7 @@ module.exports = function(Entry){
 
   self.createEntry = function({body, query, user}){
     return new Promise(function (resolve, reject){
-      Entry.createEntry(body, user.id).then(function (entry){
+      Entry.createEntry(body, user.id, user.deviceId).then(function (entry){
         return resolve(entry.id);
       }, function (err){
         return reject({status: 500, message: err});
@@ -91,7 +55,7 @@ module.exports = function(Entry){
       Entry.getEntryById(body.id).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
         if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
-        Entry.updateEntry(body).then(function (response){
+        Entry.updateEntry(body, user.deviceId).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);
@@ -107,7 +71,7 @@ module.exports = function(Entry){
       Entry.getEntryById(entryId).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
         if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
-        Entry.deleteEntry(entryId).then(function (response){
+        Entry.deleteEntry(entryId, user.deviceId).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);

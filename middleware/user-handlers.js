@@ -1,8 +1,10 @@
 var jwt = require('jsonwebtoken'),
-  AES = require('../utils/aes');
+  AES = require('../utils/aes'),
+  date = require('../utils/date');
 
 var loginOrCreate = function(req, res, user) {
   var expiration = (new Date((new Date()).getTime() + (60 * 60 * 1000 * 24 * 30))); // One month
+  user.deviceId = date.getLastFiveFromTimestamp();
   var token = jwt.sign(user, process.env.JWT_KEY, {expiresIn: '30d'});
   if(user.id) delete user.id;
   // This cookie proves a user is logged in and contains JWT claims
