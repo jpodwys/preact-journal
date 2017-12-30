@@ -11,6 +11,7 @@ import FourOhFour from '../four-oh-four';
 import freedux from '../../js/freedux';
 import appState from '../../js/app-state';
 import actions from '../../js/actions';
+import fire from '../../js/fire';
 
 export default class App extends Component {
   state = appState;
@@ -19,6 +20,13 @@ export default class App extends Component {
     window.app = this;
     window.app.route = route;
     freedux(this, actions);
+
+    var timestamp = localStorage.getItem('timestamp');
+    if(timestamp){
+      fire('syncForUser', {timestamp: timestamp})();
+    } else {
+      fire('getAllForUser')();
+    }
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries }) {
