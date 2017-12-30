@@ -100,16 +100,18 @@ const syncForUser = function(el, e){
     el.setState({
       loading: el.state.loading - 1,
       entries: [].concat(el.state.entries)
+    }, function(){
+      setEntry(el, {detail: {id: el.state.entry.id}});
+      localStorage.setItem('entries', JSON.stringify(el.state.entries));
+      localStorage.setItem('timestamp', response.timestamp);
     });
-    localStorage.setItem('entries', JSON.stringify(el.state.entries));
-    localStorage.setItem('timestamp', response.timestamp);
   }).catch(e => {
     console.log('error', e);
   });
 };
 
 const setEntry = function(el, e){
-  if(!e || !e.detail || !e.detail.id) return;
+  if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
   var entries = el.state.entries;
   var index = 0;
   while(index < entries.length){
