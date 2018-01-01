@@ -103,7 +103,7 @@ const syncForUser = function(el, e){
       loading: el.state.loading - 1,
       entries: [].concat(el.state.entries)
     }, function(){
-      if(el.route === '/entry' && el.state.entryId){
+      if(el.view === '/entry' && el.state.entryId){
         setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
       }
       localStorage.setItem('entries', JSON.stringify(el.state.entries));

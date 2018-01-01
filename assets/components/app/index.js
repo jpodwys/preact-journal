@@ -28,6 +28,10 @@ export default class App extends Component {
     window.app.route = route;
   }
 
+  componentWillUpdate(nextProps, nextState) {
+    this.fetchData();
+  }
+
   fetchData() {
     if(!this.state.loggedIn) return;
     if(fetched) return;
@@ -41,16 +45,16 @@ export default class App extends Component {
   }
 
   handleRouteChange = e => {
-    var route = e.url.length > 1
+    var view = e.url.length > 1
       ? e.url.substring(0, e.url.lastIndexOf('/'))
       : e.url;
-    this.route = route;
-    if(route !== '/entry' && route !== '/' && !this.state.loggedIn) return route('/');
-    this.handleRoute(route, e);
+    this.view = view;
+    if(view !== '/entry' && view !== '/' && !this.state.loggedIn) return route('/');
+    this.handleRoute(view, e);
   }
 
-  handleRoute(route, e) {
-    switch(route) {
+  handleRoute(view, e) {
+    switch(view) {
       case '/':         this.handleLoginView(e);    break;
       // case '/entries':  this.handleEntriesView(e);  break;
       case '/entry':    this.handleEntryView(e);    break;

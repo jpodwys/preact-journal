@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { route } from 'preact-router';
 import linkState from 'linkstate';
 import fire from '../../js/fire';
 
@@ -10,10 +9,6 @@ export default class Login extends Component {
     loginUser: '',
     loginPass: ''
   }
-
-  // componentWillMount() {
-  //   if(this.props.loggedIn) return route('/entries');
-  // }
 
   join = () => {
 

@@ -3,10 +3,10 @@ import { route } from 'preact-router';
 
 const login = function(el, e){
   localStorage.clear();
-  el.setState(Object.assign(el.state, {
-    entries: [],
+  el.setState({
+    entries: undefined,
     loading: el.state.loading - 1
-  }));
+  });
   el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.login(user).then(user => {
@@ -22,10 +22,10 @@ const login = function(el, e){
 };
 
 const logout = function(el, e){
-  el.setState(Object.assign(el.state, {
-    entries: [],
+  el.setState({
+    entries: undefined,
     loading: el.state.loading - 1
-  }));
+  });
 };
 
 export default { login, logout };
