@@ -24,6 +24,8 @@ export default class App extends Component {
   componentWillMount() {
     freedux(this, actions);
     this.fetchData();
+
+    //For debugging
     window.app = this;
     window.app.route = route;
   }
