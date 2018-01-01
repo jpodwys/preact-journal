@@ -18,22 +18,14 @@ var findObjectIndexById = function(id, list) {
   return list.map(function(obj){ return obj.id; }).indexOf(id);
 };
 
-var removeObjectByIndex = function(index, list) {
-  return list.splice(index, 1);
-};
-
 export default class App extends Component {
   state = appState;
   
   componentWillMount() {
-    window.app = this;
-    window.app.route = route;
     freedux(this, actions);
     this.fetchData();
-  }
-
-  componentWillUpdate(nextProps, nextState) {
-    this.fetchData();
+    window.app = this;
+    window.app.route = route;
   }
 
   fetchData() {
@@ -49,17 +41,18 @@ export default class App extends Component {
   }
 
   handleRouteChange = e => {
-    var view = e.url.length > 1
+    var route = e.url.length > 1
       ? e.url.substring(0, e.url.lastIndexOf('/'))
       : e.url;
-    this.route = view;
-    this.handleRoute(view, e);
+    this.route = route;
+    if(route !== '/entry' && route !== '/' && !this.state.loggedIn) return route('/');
+    this.handleRoute(route, e);
   }
 
-  handleRoute(view, e) {
-    switch(view) {
+  handleRoute(route, e) {
+    switch(route) {
       case '/':         this.handleLoginView(e);    break;
-      case '/entries':  this.handleEntriesView(e);  break;
+      // case '/entries':  this.handleEntriesView(e);  break;
       case '/entry':    this.handleEntryView(e);    break;
     }
   }
@@ -68,26 +61,26 @@ export default class App extends Component {
     if(this.state.loggedIn) route('/entries');
   }
 
-  handleEntriesView(e) {
-    if(!this.state.loggedIn) route('/');
-  }
+  // handleEntriesView(e) {}
 
   handleEntryView = e => {
     var id;
     try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
-    if(id) fire('setEntry', {id: id})();
+    if(!id) return;
 
-    if(id){
-      var state = { entryId: id };
-      if(this.state.entries){
-        var entryIndex = findObjectIndexById(id, this.state.entries);
-        if(entryIndex > -1){
-          state.entryIndex = entryIndex;
-          state.entry = this.state.entries[entryIndex];
-        }
-      }
-      this.setState(state);
-    }
+    this.setState({entryId: id});
+    fire('setEntry', {id: id})();
+
+    // var state = { entryId: id };
+    // if(this.state.entries){
+    //   var entryIndex = findObjectIndexById(parseInt(id, 10), this.state.entries);
+    //   if(entryIndex > -1){
+    //     state.entryIndex = entryIndex;
+    //     state.entry = this.state.entries[entryIndex];
+    //     state.entryReady = true;
+    //   }
+    // }
+    // this.setState(state);
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
