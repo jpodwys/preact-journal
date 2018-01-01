@@ -14,9 +14,6 @@ import actions from '../../js/actions';
 import fire from '../../js/fire';
 
 var fetched = false;
-var findObjectIndexById = function(id, list) {
-  return list.map(function(obj){ return obj.id; }).indexOf(id);
-};
 
 export default class App extends Component {
   state = appState;
@@ -76,17 +73,6 @@ export default class App extends Component {
 
     this.setState({entryId: id});
     fire('setEntry', {id: id})();
-
-    // var state = { entryId: id };
-    // if(this.state.entries){
-    //   var entryIndex = findObjectIndexById(parseInt(id, 10), this.state.entries);
-    //   if(entryIndex > -1){
-    //     state.entryIndex = entryIndex;
-    //     state.entry = this.state.entries[entryIndex];
-    //     state.entryReady = true;
-    //   }
-    // }
-    // this.setState(state);
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {

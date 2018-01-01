@@ -1,14 +1,7 @@
 import Entry from '../entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
-
-var findObjectIndexById = function(id, list) {
-  return list.map(function(obj){ return obj.id; }).indexOf(id);
-};
-
-var removeObjectByIndex = function(index, list) {
-  return list.splice(index, 1);
-};
+import { findObjectIndexById, removeObjectByIndex } from '../utils';
 
 const create = function(el, e){
   el.setState({loading: el.state.loading + 1});
