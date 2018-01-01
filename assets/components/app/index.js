@@ -14,6 +14,13 @@ import actions from '../../js/actions';
 import fire from '../../js/fire';
 
 var fetched = false;
+var findObjectIndexById = function(id, list) {
+  return list.map(function(obj){ return obj.id; }).indexOf(id);
+};
+
+var removeObjectByIndex = function(index, list) {
+  return list.splice(index, 1);
+};
 
 export default class App extends Component {
   state = appState;
@@ -65,10 +72,22 @@ export default class App extends Component {
     if(!this.state.loggedIn) route('/');
   }
 
-  handleEntryView(e) {
+  handleEntryView = e => {
     var id;
     try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
     if(id) fire('setEntry', {id: id})();
+
+    if(id){
+      var state = { entryId: id };
+      if(this.state.entries){
+        var entryIndex = findObjectIndexById(id, this.state.entries);
+        if(entryIndex > -1){
+          state.entryIndex = entryIndex;
+          state.entry = this.state.entries[entryIndex];
+        }
+      }
+      this.setState(state);
+    }
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
@@ -81,7 +100,7 @@ export default class App extends Component {
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
               <NewEntry path="/entry/new" loggedIn={loggedIn} loading={loading} />
-              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entries[entryIndex]} entryReady={entryReady}/>
+              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
               <FourOhFour default/>
             </Router>
           </main>

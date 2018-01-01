@@ -1650,6 +1650,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var fetched = false;
+var findObjectIndexById = function findObjectIndexById(id, list) {
+  return list.map(function (obj) {
+    return obj.id;
+  }).indexOf(id);
+};
+
+var removeObjectByIndex = function removeObjectByIndex(index, list) {
+  return list.splice(index, 1);
+};
 
 var App = function (_Component) {
   _inherits(App, _Component);
@@ -1669,6 +1678,24 @@ var App = function (_Component) {
       var view = e.url.length > 1 ? e.url.substring(0, e.url.lastIndexOf('/')) : e.url;
       _this.route = view;
       _this.handleRoute(view, e);
+    }, _this.handleEntryView = function (e) {
+      var id;
+      try {
+        id = e.current.attributes.id;
+      } catch (err) {/*Do nothing*/}
+      if (id) (0, _fire2.default)('setEntry', { id: id })();
+
+      if (id) {
+        var state = { entryId: id };
+        if (_this.state.entries) {
+          var entryIndex = findObjectIndexById(id, _this.state.entries);
+          if (entryIndex > -1) {
+            state.entryIndex = entryIndex;
+            state.entry = _this.state.entries[entryIndex];
+          }
+        }
+        _this.setState(state);
+      }
     }, _temp), _possibleConstructorReturn(_this, _ret);
   }
 
@@ -1721,15 +1748,6 @@ var App = function (_Component) {
       if (!this.state.loggedIn) (0, _preactRouter.route)('/');
     }
   }, {
-    key: 'handleEntryView',
-    value: function handleEntryView(e) {
-      var id;
-      try {
-        id = e.current.attributes.id;
-      } catch (err) {/*Do nothing*/}
-      if (id) (0, _fire2.default)('setEntry', { id: id })();
-    }
-  }, {
     key: 'render',
     value: function render(props, _ref2) {
       var loggedIn = _ref2.loggedIn,
@@ -1754,7 +1772,7 @@ var App = function (_Component) {
               (0, _preact.h)(_login2.default, { path: '/', loggedIn: loggedIn, loading: loading }),
               (0, _preact.h)(_entries2.default, { path: '/entries', loggedIn: loggedIn, loading: loading, entries: entries }),
               (0, _preact.h)(_newEntry2.default, { path: '/entry/new', loggedIn: loggedIn, loading: loading }),
-              (0, _preact.h)(_entry2.default, { path: '/entry/:id', loggedIn: loggedIn, loading: loading, entryIndex: entryIndex, entry: entries[entryIndex], entryReady: entryReady }),
+              (0, _preact.h)(_entry2.default, { path: '/entry/:id', loggedIn: loggedIn, loading: loading, entryIndex: entryIndex, entry: entry, entryReady: entryReady }),
               (0, _preact.h)(_fourOhFour2.default, { 'default': true })
             )
           )
@@ -2126,7 +2144,6 @@ var Entry = function (_Component) {
           entry = _ref2.entry,
           entryReady = _ref2.entryReady;
 
-      console.log(entryReady, entry);
       if (!entryReady) return;
       if (!entry) return (0, _preact.h)(_fourOhFour2.default, null);
       return (0, _preact.h)(
@@ -2299,8 +2316,8 @@ var appState = {
   loggedIn: loggedIn,
   loading: 0,
   entryIndex: -1,
-  entry: {},
-  entries: JSON.parse(localStorage.getItem('entries')) || []
+  entry: undefined,
+  entries: JSON.parse(localStorage.getItem('entries')) || undefined
 };
 
 exports.default = appState;
@@ -2593,13 +2610,14 @@ var del = function del(el, e) {
 };
 
 var getAllForUser = function getAllForUser(el) {
-  if (el.state.entries.length) return;
+  if (el.state.entries) return;
   el.setState({ loading: el.state.loading + 1 });
   _entryService2.default.getAllForUser().then(function (response) {
     el.setState({
       entries: response.entries,
       loading: el.state.loading - 1
     }, function () {
+      setEntry(el, { detail: { id: el.state.entryId } });
       localStorage.setItem('entries', JSON.stringify(response.entries));
       localStorage.setItem('timestamp', response.timestamp);
     });
@@ -2643,7 +2661,7 @@ var syncForUser = function syncForUser(el, e) {
 };
 
 var setEntry = function setEntry(el, e) {
-  if (!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
+  if (!el.state.entries || !e || !e.detail || !e.detail.id || e.detail.id === -1) return;
   var entries = el.state.entries;
   var index = 0;
   while (index < entries.length) {

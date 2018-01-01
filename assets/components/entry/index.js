@@ -50,7 +50,6 @@ export default class Entry extends Component {
   }
 
   render({ entryIndex, entry, entryReady }) {
-    console.log(entryReady, entry);
     if(!entryReady) return;
     if(!entry) return <FourOhFour/>
     return (

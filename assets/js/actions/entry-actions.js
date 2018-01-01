@@ -61,13 +61,14 @@ const del = function(el, e){
 };
 
 const getAllForUser = function(el){
-  if(el.state.entries.length) return;
+  if(el.state.entries) return;
   el.setState({loading: el.state.loading + 1});
   Entry.getAllForUser().then(response => {
     el.setState({
       entries: response.entries,
       loading: el.state.loading - 1
     }, function(){
+      setEntry(el, {detail: {id: el.state.entryId}});
       localStorage.setItem('entries', JSON.stringify(response.entries));
       localStorage.setItem('timestamp', response.timestamp);
     });
@@ -112,7 +113,7 @@ const syncForUser = function(el, e){
 };
 
 const setEntry = function(el, e){
-  if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
+  if(!el.state.entries || !e || !e.detail || !e.detail.id || e.detail.id === -1) return;
   var entries = el.state.entries;
   var index = 0;
   while(index < entries.length){

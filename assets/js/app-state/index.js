@@ -8,8 +8,8 @@ let appState = {
   loggedIn: loggedIn,
   loading: 0,
   entryIndex: -1,
-  entry: {},
-  entries: JSON.parse(localStorage.getItem('entries')) || []
+  entry: undefined,
+  entries: JSON.parse(localStorage.getItem('entries')) || undefined
 };
 
 export default appState;
