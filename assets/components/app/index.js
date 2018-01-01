@@ -9,14 +9,14 @@ import NewEntry from '../new-entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
-import appState from '../../js/app-state';
+import setInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
 
 var fetched = false;
 
 export default class App extends Component {
-  state = appState;
+  state = setInitialState();
   
   componentWillMount() {
     freedux(this, actions);

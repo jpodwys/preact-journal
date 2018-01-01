@@ -1,10 +1,10 @@
 import User from '../user-service';
 import { route } from 'preact-router';
+import setInitialState from '../../js/app-state';
 
 const login = function(el, e){
   localStorage.clear();
   el.setState({
-    entries: undefined,
     loading: el.state.loading - 1
   });
   el.setState({loading: el.state.loading + 1});
@@ -22,10 +22,7 @@ const login = function(el, e){
 };
 
 const logout = function(el, e){
-  el.setState({
-    entries: undefined,
-    loading: el.state.loading - 1
-  });
+  el.setState(setInitialState());
 };
 
 export default { login, logout };
