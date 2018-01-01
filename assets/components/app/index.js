@@ -41,17 +41,47 @@ export default class App extends Component {
     }
   }
 
-  render(props, { loggedIn, loading, entryIndex, entry, entries }) {
+  handleRouteChange = e => {
+    var view = e.url.length > 1
+      ? e.url.substring(0, e.url.lastIndexOf('/'))
+      : e.url;
+    this.route = view;
+    this.handleRoute(view, e);
+  }
+
+  handleRoute(view, e) {
+    switch(view) {
+      case '/':         this.handleLoginView(e);    break;
+      case '/entries':  this.handleEntriesView(e);  break;
+      case '/entry':    this.handleEntryView(e);    break;
+    }
+  }
+
+  handleLoginView(e) {
+    if(this.state.loggedIn) route('/entries');
+  }
+
+  handleEntriesView(e) {
+    if(!this.state.loggedIn) route('/');
+  }
+
+  handleEntryView(e) {
+    var id;
+    try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
+    if(id) fire('setEntry', {id: id})();
+  }
+
+  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
     return (
       <div id="main-wrapper">
         <div id="view-wrapper">
           <main id="main">
             {/* <Header /> */}
-            <Router>
+            <Router onChange={this.handleRouteChange}>
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
               <NewEntry path="/entry/new" loggedIn={loggedIn} loading={loading} />
-              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry}/>
+              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entries[entryIndex]} entryReady={entryReady}/>
               <FourOhFour default/>
             </Router>
           </main>

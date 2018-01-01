@@ -11,9 +11,9 @@ export default class Login extends Component {
     loginPass: ''
   }
 
-  componentWillMount() {
-    if(this.props.loggedIn) return route('/entries');
-  }
+  // componentWillMount() {
+  //   if(this.props.loggedIn) return route('/entries');
+  // }
 
   join = () => {
 

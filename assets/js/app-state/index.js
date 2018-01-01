@@ -4,6 +4,7 @@ let loggedIn = !!cookie.get('logged_in');
 if(!loggedIn) localStorage.clear();
 
 let appState = {
+  entryReady: false,
   loggedIn: loggedIn,
   loading: 0,
   entryIndex: -1,

@@ -64,12 +64,13 @@ const getAllForUser = function(el){
   if(el.state.entries.length) return;
   el.setState({loading: el.state.loading + 1});
   Entry.getAllForUser().then(response => {
-    el.setState(Object.assign(el.state, {
+    el.setState({
       entries: response.entries,
       loading: el.state.loading - 1
-    }));
-    localStorage.setItem('entries', JSON.stringify(response.entries));
-    localStorage.setItem('timestamp', response.timestamp);
+    }, function(){
+      localStorage.setItem('entries', JSON.stringify(response.entries));
+      localStorage.setItem('timestamp', response.timestamp);
+    });
   }).catch(e => {
     console.log('error', e);
   });
@@ -121,6 +122,7 @@ const setEntry = function(el, e){
     index++
   }
   el.setState({
+    entryReady: true,
     entryIndex: index,
     entry: entries[index]
   });
