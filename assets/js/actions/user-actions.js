@@ -1,12 +1,12 @@
 import User from '../user-service';
 import { route } from 'preact-router';
+import setInitialState from '../../js/app-state';
 
 const login = function(el, e){
   localStorage.clear();
-  el.setState(Object.assign(el.state, {
-    entries: [],
+  el.setState({
     loading: el.state.loading - 1
-  }));
+  });
   el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.login(user).then(user => {
@@ -22,10 +22,7 @@ const login = function(el, e){
 };
 
 const logout = function(el, e){
-  el.setState(Object.assign(el.state, {
-    entries: [],
-    loading: el.state.loading - 1
-  }));
+  el.setState(setInitialState());
 };
 
 export default { login, logout };

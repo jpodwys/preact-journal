@@ -1,14 +1,7 @@
 import Entry from '../entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
-
-var findObjectIndexById = function(id, list) {
-  return list.map(function(obj){ return obj.id; }).indexOf(id);
-};
-
-var removeObjectByIndex = function(index, list) {
-  return list.splice(index, 1);
-};
+import { findObjectIndexById, removeObjectByIndex } from '../utils';
 
 const create = function(el, e){
   el.setState({loading: el.state.loading + 1});
@@ -61,15 +54,17 @@ const del = function(el, e){
 };
 
 const getAllForUser = function(el){
-  if(el.state.entries.length) return;
+  if(el.state.entries) return;
   el.setState({loading: el.state.loading + 1});
   Entry.getAllForUser().then(response => {
-    el.setState(Object.assign(el.state, {
+    el.setState({
       entries: response.entries,
       loading: el.state.loading - 1
-    }));
-    localStorage.setItem('entries', JSON.stringify(response.entries));
-    localStorage.setItem('timestamp', response.timestamp);
+    }, function(){
+      setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+      localStorage.setItem('entries', JSON.stringify(response.entries));
+      localStorage.setItem('timestamp', response.timestamp);
+    });
   }).catch(e => {
     console.log('error', e);
   });
@@ -101,7 +96,9 @@ const syncForUser = function(el, e){
       loading: el.state.loading - 1,
       entries: [].concat(el.state.entries)
     }, function(){
-      setEntry(el, {detail: {id: el.state.entry.id}});
+      if(el.view === '/entry' && el.state.entryId){
+        setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+      }
       localStorage.setItem('entries', JSON.stringify(el.state.entries));
       localStorage.setItem('timestamp', response.timestamp);
     });
@@ -111,18 +108,16 @@ const syncForUser = function(el, e){
 };
 
 const setEntry = function(el, e){
-  if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
-  var entries = el.state.entries;
-  var index = 0;
-  while(index < entries.length){
-    if(entries[index].id.toString() === e.detail.id.toString()){
-      break;
-    }
-    index++
-  }
+  if(!el.state.entries || !e || !e.detail || !e.detail.id || e.detail.id === -1) return;
+
+  var entryIndex = findObjectIndexById(parseInt(e.detail.id, 10), el.state.entries);
+  var entry = el.state.entries[entryIndex];
+  var entryReady = !!entry || !!e.detail.entryReady;
+
   el.setState({
-    entryIndex: index,
-    entry: entries[index]
+    entry: entry,
+    entryIndex: entryIndex,
+    entryReady: entryReady
   });
 };
 

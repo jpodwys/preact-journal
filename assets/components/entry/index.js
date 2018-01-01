@@ -4,13 +4,10 @@ import fire from '../../js/fire';
 import FourOhFour from '../four-oh-four';
 
 export default class Entry extends Component {
-  componentWillMount() {
-    if(this.props.id) fire('setEntry', {id: this.props.id})();
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     var oe = this.props.entry;
     var ne = nextProps.entry;
+    if(!oe || !ne) return true;
     if(ne.date === oe.date
       && ne.text === oe.text.trim()
       && ne.isPublic === oe.isPublic) return false;
@@ -48,7 +45,8 @@ export default class Entry extends Component {
     fire('update', obj)();
   }
 
-  render({ entryIndex, entry }) {
+  render({ entryIndex, entry, entryReady }) {
+    if(!entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
       <entry-view>
