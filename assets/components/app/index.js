@@ -20,7 +20,7 @@ export default class App extends Component {
   
   componentWillMount() {
     freedux(this, actions);
-    this.fetchData();
+    fire('fetchData')();
 
     //For debugging
     window.app = this;
@@ -28,19 +28,7 @@ export default class App extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    this.fetchData();
-  }
-
-  fetchData() {
-    if(!this.state.loggedIn) return;
-    if(fetched) return;
-    fetched = true;
-    var timestamp = localStorage.getItem('timestamp');
-    if(timestamp){
-      fire('syncForUser', {timestamp: timestamp})();
-    } else {
-      fire('getAllForUser')();
-    }
+    fire('fetchData')();
   }
 
   handleRouteChange = e => {

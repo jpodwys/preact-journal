@@ -3,6 +3,20 @@ import { route } from 'preact-router';
 import debounce from '../debounce';
 import { findObjectIndexById, removeObjectByIndex } from '../utils';
 
+let fetched = false;
+
+const fetchData = function(el, e){
+  if(!el.state.loggedIn) return;
+  if(fetched) return;
+  fetched = true;
+  let timestamp = localStorage.getItem('timestamp');
+  if(timestamp){
+    syncForUser(el, {detail: {timestamp: timestamp}});
+  } else {
+    getAllForUser(el);
+  }
+};
+
 const create = function(el, e){
   el.setState({loading: el.state.loading + 1});
   let entry = e.detail.entry;
@@ -121,4 +135,4 @@ const setEntry = function(el, e){
   });
 };
 
-export default { create, get, update, del, getAllForUser, syncForUser, setEntry };
+export default { fetchData, create, get, update, del, getAllForUser, syncForUser, setEntry };
