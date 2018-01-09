@@ -10,6 +10,8 @@ const setInitialState = function() {
     loading: 0,
     entryIndex: -1,
     entry: undefined,
+    newEntry: undefined,
+    newEntryPostPending: false,
     entries: JSON.parse(localStorage.getItem('entries')) || undefined
   };
 };

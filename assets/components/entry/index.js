@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import linkState from 'linkstate';
 import fire from '../../js/fire';
 import FourOhFour from '../four-oh-four';
 

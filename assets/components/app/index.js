@@ -12,11 +12,16 @@ import freedux from '../../js/freedux';
 import setInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
+import { handleRouteChange } from '../../js/route-handlers';
 
 var fetched = false;
 
 export default class App extends Component {
   state = setInitialState();
+  // constructor(props) {
+  //   super(props);
+  //   this.state = setInitialState();
+  // }
   
   componentWillMount() {
     freedux(this, actions);
@@ -24,43 +29,11 @@ export default class App extends Component {
 
     //For debugging
     window.app = this;
-    window.app.route = route;
+    window.route = route;
   }
 
   componentWillUpdate(nextProps, nextState) {
     fire('fetchData')();
-  }
-
-  handleRouteChange = e => {
-    var view = e.url.length > 1
-      ? e.url.substring(0, e.url.lastIndexOf('/'))
-      : e.url;
-    this.view = view;
-    if(view !== '/entry' && view !== '/' && !this.state.loggedIn) return route('/');
-    this.handleRoute(view, e);
-  }
-
-  handleRoute(view, e) {
-    switch(view) {
-      case '/':         this.handleLoginView(e);    break;
-      // case '/entries':  this.handleEntriesView(e);  break;
-      case '/entry':    this.handleEntryView(e);    break;
-    }
-  }
-
-  handleLoginView(e) {
-    if(this.state.loggedIn) route('/entries');
-  }
-
-  // handleEntriesView(e) {}
-
-  handleEntryView = e => {
-    var id;
-    try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
-    if(!id) return;
-
-    this.setState({entryId: id});
-    fire('setEntry', {id: id})();
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
@@ -69,7 +42,7 @@ export default class App extends Component {
         <div id="view-wrapper">
           <main id="main">
             {/* <Header /> */}
-            <Router onChange={this.handleRouteChange}>
+            <Router onChange={handleRouteChange.bind(this)}>
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
               <NewEntry path="/entry/new" loggedIn={loggedIn} loading={loading} />
