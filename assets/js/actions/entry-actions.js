@@ -17,20 +17,36 @@ const fetchData = function(el, e){
   }
 };
 
-const create = function(el, e){
-  el.setState({loading: el.state.loading + 1});
+const slowCreate = function(el, e){
   let entry = e.detail.entry;
+  if(entry.postPending) return;
+
+  el.state.entries[e.detail.entryIndex].postPending = true;
+
+  el.setState({
+    loading: el.state.loading + 1,
+    entry: entry,
+    entries: [].concat(el.state.entries)
+  });
+
   Entry.create(entry).then(response => {
-    entry.id = response.id;
+    el.state.entry.id = response.id;
+    el.state.entries[0].id = response.id;
+    delete el.state.entries[0].postPending;
+    delete el.state.entries[0].newEntry;
+    delete el.state.entries[0].needsSync;
+
     el.setState({
       loading: el.state.loading - 1,
-      entries: [entry].concat(el.state.entries)
+      entry: Object.assign({}, el.state.entry),
+      entries: [].concat(el.state.entries)
     });
-    route('/entries');
   }).catch(e => {
     console.log('error', e);
   });
 };
+
+const create = debounce(slowCreate, 500);
 
 const get = function(el, e){
   
@@ -38,24 +54,42 @@ const get = function(el, e){
 
 const slowUpdate = function(el, e){
   var d = e.detail;
+  var val = d.entry[d.property];
+  if(typeof val === 'string'){
+    val = val.trim();
+  }
 
-  d.entry[d.property] = d.entry[d.property].trim();
+  d.entry[d.property] = d.entry[d.property];
   var current = el.state.entries[d.entryIndex][d.property];
   var next = d.entry[d.property];
   if(current === next) return;
 
   el.state.entries[d.entryIndex][d.property] = d.entry[d.property];
+  // el.state.entries[d.entryIndex].needsSync = true;
   el.setState({
     entries: [].concat(el.state.entries)
   }, function(){
     localStorage.setItem('entries', JSON.stringify(el.state.entries));
   });
 
-  Entry.update(d.entry).then(function(){
+  el.state.entries[d.entryIndex].needsSync = true;
 
-  }).catch(function(err){
+  if(d.entry.newEntry){
+    if(d.entry.postPending) return;
+    el.state.entries[d.entryIndex].postPending = true;
 
-  });
+    Entry.create(d.entry).then(function(response){
+      console.log(response)
+    }).catch(function(err){
+
+    });
+  } else {
+    Entry.update(d.entry).then(function(){
+      
+    }).catch(function(err){
+
+    });
+  }
 };
 
 const update = debounce(slowUpdate, 500);
@@ -135,4 +169,24 @@ const setEntry = function(el, e){
   });
 };
 
-export default { fetchData, create, get, update, del, getAllForUser, syncForUser, setEntry };
+const newEntry = function(el){
+  var newEntry = {
+    id: Date.now(),
+    date: new Date().toISOString().slice(0, 10),
+    text: '',
+    isPublic: 0,
+    // isOwner: true,
+    needsSync: true,
+    newEntry: true
+  };
+
+  el.setState({
+    entryIndex: 0,
+    entries: [newEntry].concat(el.state.entries)
+  }, function(){
+    setEntry(el, {detail: {id: newEntry.id, entryReady: true}});
+    // route('/entry/' + newEntry.id);
+  });
+};
+
+export default { fetchData, create, get, update, del, getAllForUser, syncForUser, setEntry, newEntry };

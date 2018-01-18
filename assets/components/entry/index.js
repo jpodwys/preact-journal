@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import linkState from 'linkstate';
 import fire from '../../js/fire';
 import FourOhFour from '../four-oh-four';
 
@@ -14,15 +13,29 @@ export default class Entry extends Component {
     return true;
   }
 
-  getIcons(entry) {
+  // getIcons(entry) {
     // if(!entry.isOwner) return '';
-    return !entry.isPublic ? '🔐' : '🔓'
-  }
+    // return !entry.isPublic ? '🔐' : '🔓'
+    // var isPublic = entry.isPublic ? 'Public' : 'Private';
+    // return <span id="isPublic" data-val={entry.isPublic}>{isPublic}</span>
+  // }
 
-  getEntry(entry) {
-    return {
-      id: entry.id,
+  upsert = e => {
+    var entry = this.props.entry;
 
+    if(entry.newEntry){
+      if(entry.postPending) return;
+
+      entry.date = this.base.querySelector('#entryDate').innerText;
+      entry.text = this.base.querySelector('#entryText').innerText;
+      entry.isPublic = this.base.querySelector('#isPublic').checked;
+
+      fire('create', {
+        entry: entry,
+        entryIndex: this.props.entryIndex
+      })();
+    } else {
+      this.update(e);
     }
   }
 
@@ -45,16 +58,29 @@ export default class Entry extends Component {
     fire('update', obj)();
   }
 
+  togglePublic = e => {
+    var obj = {
+      entryIndex: this.props.entryIndex,
+      property: 'isPublic',
+      entry: {
+        id: this.props.entry.id,
+        isPublic: this.base.querySelector('#isPublic').checked
+      }
+    }
+
+    fire('update', obj)();
+  }
+
   render({ entryIndex, entry, entryReady }) {
     if(!entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
       <entry-view>
-        <h1 contenteditable onInput={this.update}>
+        <h1 id="entryDate" contenteditable onInput={this.upsert}>
           {entry.date}
         </h1>
-        <span>{ this.getIcons(entry) }</span>✖
-        <pre contenteditable onInput={this.update} class="entry-text">{entry.text}</pre>
+        Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
+        <pre id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</pre>        
       </entry-view>
     );
   }

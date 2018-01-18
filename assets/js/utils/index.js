@@ -3,7 +3,8 @@ const findObjectIndexById = function(id, list) {
 };
 
 const removeObjectByIndex = function(index, list) {
-  return list.splice(index, 1);
+  list.splice(index, 1);
+  return list;
 };
 
 export { findObjectIndexById, removeObjectByIndex };

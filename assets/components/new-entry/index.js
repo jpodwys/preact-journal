@@ -2,6 +2,17 @@ import { h, Component } from 'preact';
 import fire from '../../js/fire';
 
 export default class Entry extends Component {
+  // componentDidMount() {
+  //   this.interval = setInterval(() => {
+  //     if(entryHasChanged()){
+  //       this.upsert({isBackgroundUpsert: true});
+  //     }
+  //   }, 5000);
+  // }
+
+  // componentWillUnmount() {
+  //   clearInterval(this.interval);
+  // }
 
   getDate() {
     return new Date().toISOString().slice(0, 10);
@@ -9,17 +20,23 @@ export default class Entry extends Component {
 
   upsert = e => {
     e.preventDefault();
-    fire('create', {entry: {date: this.getDate(), text: 'programmatically', isPublic: false}})();
+
+    var entry = {
+      date: this.base.querySelector('[name="date"]').innerText,
+      text: this.base.querySelector('[name="text"]').innerText,
+      isPublic: this.base.querySelector('[name="isPublic"]').checked,
+    };
+    fire('create', {entry: entry})();
   }
 
   render({ entryIndex, entry }) {
     return (
       <new-entry>
-        <form method="post" action="/api/entry" onsubmit={this.upsert} class="pure-form pure-form-stacked">
+        <form class="pure-form pure-form-stacked">
           <fieldset>
-            <input name="date" value={this.getDate()} class="needsclick"/>
-            <textarea name="text" class="entry-text needsclick"></textarea>
-            Is Public: <input type="checkbox" name="isPublic" checked="{opts.entry.isPublic}"/>
+            <input name="date" onInput={this.upsert} value={this.getDate()} class="needsclick"/>
+            <textarea name="text" onInput={this.upsert} class="entry-text needsclick"></textarea>
+            Is Public: <input onInput={this.upsert} type="checkbox" name="isPublic" checked="{opts.entry.isPublic}"/>
             <div class="entry-actions">
               <a href="/entries" onclick="{back}" class="pure-button button-round entry-action--left">Cancel</a>
               <input type="submit" class="pure-button pure-button-primary button-round entry-action--right"/>

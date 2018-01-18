@@ -13,9 +13,9 @@ export default function(config) {
     xhr.open(method, url, true);
 
     xhr.onload = function() {
-      if (this.status === 401) {
-        return window.location.reload();
-      }
+      // if (this.status === 401) {
+      //   return window.location.reload();
+      // }
       if (this.status >= 300){
         return reject(this.response);
       }
