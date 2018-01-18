@@ -7,7 +7,8 @@ export default class Header extends Component {
 			<header>
 				<h1>Journalize</h1>
 				<nav>
-					<Link href="/">Entries</Link>
+					<Link href="/entries">Entries</Link>
+					<Link href="/entry/new">Create</Link>
 				</nav>
 			</header>
 		);
