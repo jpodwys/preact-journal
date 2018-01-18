@@ -1,10 +1,11 @@
 import cookie from '../cookie';
 
-const setInitialState = function() {
+const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) localStorage.clear();
 
   return {
+    dataFetched: false,
     entryReady: false,
     loggedIn: loggedIn,
     loading: 0,
@@ -14,4 +15,4 @@ const setInitialState = function() {
   };
 };
 
-export default setInitialState;
+export default getInitialState;

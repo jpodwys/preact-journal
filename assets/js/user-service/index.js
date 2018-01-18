@@ -10,14 +10,17 @@ const create = function(user) {
 
 const login = function(user) {
   return xhr({
-    url: '/api/user/authenticate',
+    url: '/api/user/login',
     method: 'POST',
     body: user
   });
 };
 
 const logout = function() {
-  localStorage.clear();
+  return xhr({
+    url: '/api/user/logout',
+    method: 'POST'
+  });
 };
 
 // const update = function(user) {

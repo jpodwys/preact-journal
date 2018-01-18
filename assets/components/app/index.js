@@ -9,19 +9,13 @@ import Entry from '../entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
-import setInitialState from '../../js/app-state';
+import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
 import { handleRouteChange } from '../../js/route-handlers';
 
-var fetched = false;
-
 export default class App extends Component {
-  state = setInitialState();
-  // constructor(props) {
-  //   super(props);
-  //   this.state = setInitialState();
-  // }
+  state = getInitialState();
   
   componentWillMount() {
     freedux(this, actions);

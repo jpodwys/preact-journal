@@ -1,6 +1,6 @@
 import User from '../user-service';
 import { route } from 'preact-router';
-import setInitialState from '../../js/app-state';
+import getInitialState from '../../js/app-state';
 
 const login = function(el, e){
   localStorage.clear();
@@ -22,7 +22,13 @@ const login = function(el, e){
 };
 
 const logout = function(el, e){
-  el.setState(setInitialState());
+  User.logout().then(() => {
+    localStorage.clear();
+    el.setState(getInitialState());
+    route('/');
+  }).catch(e => {
+
+  });
 };
 
 export default { login, logout };

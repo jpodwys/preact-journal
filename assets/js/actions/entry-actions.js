@@ -3,12 +3,10 @@ import { route } from 'preact-router';
 import debounce from '../debounce';
 import { findObjectIndexById, removeObjectByIndex } from '../utils';
 
-let fetched = false;
-
 const fetchData = function(el, e){
   if(!el.state.loggedIn) return;
-  if(fetched) return;
-  fetched = true;
+  if(el.state.dataFetched) return;
+  el.setState({dataFetched: true});
   let timestamp = localStorage.getItem('timestamp');
   if(timestamp){
     syncForUser(el, {detail: {timestamp: timestamp}});

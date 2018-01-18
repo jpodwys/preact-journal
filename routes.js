@@ -6,7 +6,12 @@ var Sequelize = require('sequelize'),
 
 module.exports = function(app){
   /* REST endpoints */
-  app.post('/api/user/authenticate', user.attemptLogin);
+  app.post('/api/user/login', user.attemptLogin);
+  app.post('/api/user/logout', function(req, res) {
+    res.clearCookie('auth_token');
+    res.clearCookie('logged_in');
+    res.send(204);
+  });
   app.post('/api/user', user.createAccount);
   // app.put('/user/:id');
   // app.delete('/user/:id')

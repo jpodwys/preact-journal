@@ -28,6 +28,11 @@ exports.attemptLogin = loginOrCreate;
 
 exports.createAccount = loginOrCreate;
 
+exports.logout = function(req, res) {
+  res.clearCookie('auth_token');
+  res.clearCookie('logged_in');
+}
+
 exports.getUserCount = function(req, res, total) {
   res.send({userCount: total});
 }
