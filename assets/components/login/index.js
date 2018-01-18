@@ -8,11 +8,10 @@ export default class Login extends Component {
 
   login = (e) => {
     e.preventDefault();
-    
     fire('login', {
       user: {
-        username: this.base.querySelector('#lusername').innerText,
-        password: this.base.querySelector('#lpassword').innerText
+        username: this.base.querySelector('#lusername').value,
+        password: this.base.querySelector('#lpassword').value
       }
     })();
   }

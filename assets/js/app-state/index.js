@@ -5,7 +5,6 @@ const getInitialState = function() {
   if(!loggedIn) localStorage.clear();
 
   return {
-    dataFetched: false,
     entryReady: false,
     loggedIn: loggedIn,
     loading: 0,
