@@ -18,8 +18,6 @@ const fetchData = function(el, e){
 };
 
 const slowCreate = function(el, e){
-  // return console.log(e.detail);
-
   let entry = e.detail.entry;
   if(entry.postPending) return;
 
@@ -164,13 +162,6 @@ const setEntry = function(el, e){
   var entry = el.state.entries[entryIndex];
   var entryReady = !!entry || !!e.detail.entryReady;
 
-  // console.log('e', e)
-  // console.log('id', e.detail.id)
-  // console.log('entryIndex', entryIndex)
-  // console.log('entry', entry)
-  // console.log('entries', el.state.entries)
-  // console.log('entryReady', entryReady)
-
   el.setState({
     entry: entry,
     entryIndex: entryIndex,
@@ -179,11 +170,6 @@ const setEntry = function(el, e){
 };
 
 const newEntry = function(el){
-  /*
-    Generate a new empty entry object
-    Unshift it onto entries
-    Set entryIndex to 0
-  */
   var newEntry = {
     id: Date.now(),
     date: new Date().toISOString().slice(0, 10),
