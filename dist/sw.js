@@ -6,6 +6,7 @@ self.addEventListener('install', function(event) {
 })
 
 self.addEventListener('fetch', function(event) {
+  if(event.request.url.indexOf('/api') > -1) return;
   event.respondWith(
     caches.match(event.request)
     .then(response => response
