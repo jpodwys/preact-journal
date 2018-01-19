@@ -2,6 +2,7 @@ import Entry from '../entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
 import { findObjectIndexById, removeObjectByIndex } from '../utils';
+import persist from '../persist';
 
 let dataFetched = false;
 
@@ -66,10 +67,8 @@ const slowUpdate = function(el, e){
 
   el.state.entries[d.entryIndex][d.property] = d.entry[d.property];
   // el.state.entries[d.entryIndex].needsSync = true;
-  el.setState({
+  persist(el, {
     entries: [].concat(el.state.entries)
-  }, function(){
-    localStorage.setItem('entries', JSON.stringify(el.state.entries));
   });
 
   el.state.entries[d.entryIndex].needsSync = true;
@@ -84,7 +83,7 @@ const slowUpdate = function(el, e){
 
     });
   } else {
-    Entry.update(d.entry).then(function(){
+    Entry.update(d.entryId, d.entry).then(function(){
       
     }).catch(function(err){
 
@@ -95,22 +94,31 @@ const slowUpdate = function(el, e){
 const update = debounce(slowUpdate, 500);
 
 const del = function(el, e){
-  // let item = e.detail.item;
-  // el.setState({
-  //   items: el.state.items.filter( i => i !== item )
-  // });
+  el.setState({loading: el.state.loading + 1});
+  // if(isNaN(entryIndex)) return;
+
+  Entry.del(e.detail.id).then(function(){
+    var entryIndex = findObjectIndexById(e.detail.id, el.state.entries);
+    persist(el, {
+      loading: el.state.loading - 1,
+      entries: removeObjectByIndex(entryIndex, el.state.entries)
+    }, function(){
+      route('/entries');
+    });
+  }).catch(e => {
+    console.log('error', e);
+  });
 };
 
 const getAllForUser = function(el){
   if(el.state.entries) return;
   el.setState({loading: el.state.loading + 1});
   Entry.getAllForUser().then(response => {
-    el.setState({
+    persist(el, {
       entries: response.entries,
       loading: el.state.loading - 1
     }, function(){
       setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
-      localStorage.setItem('entries', JSON.stringify(response.entries));
       localStorage.setItem('timestamp', response.timestamp);
     });
   }).catch(e => {
@@ -121,7 +129,6 @@ const getAllForUser = function(el){
 const syncForUser = function(el, e){
   el.setState({loading: el.state.loading + 1});
   Entry.syncForUser(e.detail.timestamp).then(response => {
-
     if(response.entries.length === 0){
       el.setState({
         loading: el.state.loading - 1,
@@ -140,14 +147,13 @@ const syncForUser = function(el, e){
       }
     });
 
-    el.setState({
+    persist(el, {
       loading: el.state.loading - 1,
       entries: [].concat(el.state.entries)
     }, function(){
       if(el.view === '/entry' && el.state.entryId){
         setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
       }
-      localStorage.setItem('entries', JSON.stringify(el.state.entries));
       localStorage.setItem('timestamp', response.timestamp);
     });
   }).catch(e => {

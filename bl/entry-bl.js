@@ -24,9 +24,10 @@ module.exports = function(Entry){
     });
   }
 
-  self.getEntryById = function({body, query, user}){
+  self.getEntryById = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      Entry.getEntryById(body.entryId).then(function (entry){
+      var entryId = parseInt(params.id, 10);
+      Entry.getEntryById(entryId).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
         if(!entry.isPublic && (!user || (user.id !== entry.ownerId))){
           return reject({status: 404, message: 'Entry not found.'});
@@ -50,12 +51,13 @@ module.exports = function(Entry){
     });
   }
 
-  self.updateEntry = function({body, query, user}){
+  self.updateEntry = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      Entry.getEntryById(body.id).then(function (entry){
+      var entryId = parseInt(params.id, 10);
+      Entry.getEntryById(entryId).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
         if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
-        Entry.updateEntry(body, user.deviceId).then(function (response){
+        Entry.updateEntry(entryId, body, user.deviceId).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);
@@ -66,12 +68,13 @@ module.exports = function(Entry){
     });
   }
 
-  self.deleteEntry = function({body, query, user}){
+  self.deleteEntry = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
+      var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
         if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
-        Entry.deleteEntry(entryId, user.deviceId).then(function (response){
+        Entry.deleteEntry(params.id, user.deviceId).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);

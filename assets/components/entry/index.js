@@ -49,9 +49,8 @@ export default class Entry extends Component {
     var obj = {
       entryIndex: this.props.entryIndex,
       property: property,
-      entry: {
-        id: this.props.entry.id
-      }
+      entryId: this.props.entry.id,
+      entry: {}
     }
     obj.entry[property] = e.target.innerText;
 
@@ -62,8 +61,8 @@ export default class Entry extends Component {
     var obj = {
       entryIndex: this.props.entryIndex,
       property: 'isPublic',
+      entryId: this.props.entry.id,
       entry: {
-        id: this.props.entry.id,
         isPublic: this.base.querySelector('#isPublic').checked
       }
     }
@@ -80,6 +79,7 @@ export default class Entry extends Component {
           {entry.date}
         </h1>
         Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
+        <button onClick={fire('del', {id: entry.id})}>Delete</button>
         <pre id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</pre>        
       </entry-view>
     );

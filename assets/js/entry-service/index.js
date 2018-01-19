@@ -14,9 +14,9 @@ const get = function(id) {
   });
 };
 
-const update = function(entry) {
+const update = function(entryId, entry) {
   return xhr({
-    url: '/api/entry/' + entry.id,
+    url: '/api/entry/' + entryId,
     method: 'PATCH',
     body: entry
   });

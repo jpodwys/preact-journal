@@ -29,7 +29,7 @@ module.exports = function(Entry, sequelize){
         deviceId: { $ne: deviceId }
       },
       attributes: [
-        'id', 'date', 'text', 'isPublic',
+        'id', 'date', 'text', 'isPublic', 'deleted',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       order: [
@@ -68,7 +68,7 @@ module.exports = function(Entry, sequelize){
     });
   }
 
-  self.updateEntry = function(data, deviceId){
+  self.updateEntry = function(entryId, data, deviceId){
     if(data.isPublic !== undefined){
       data.isPublic = (!!data.isPublic) ? 1 : 0;
     }
@@ -76,7 +76,7 @@ module.exports = function(Entry, sequelize){
     data.deviceId = deviceId;
 
     return Entry.update(data, {
-      where: {id: data.id}
+      where: {id: entryId}
     });
   }
 
@@ -84,7 +84,7 @@ module.exports = function(Entry, sequelize){
     var data = {
       text: '',
       isPublic: 0,
-      // date: '1800-01-01',
+      deleted: 1,
       updatedAt: date.getUtcZeroTimestamp(),
       deviceId: deviceId
     };
