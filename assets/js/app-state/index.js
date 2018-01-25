@@ -8,6 +8,7 @@ const getInitialState = function() {
     entryReady: false,
     loggedIn: loggedIn,
     loading: 0,
+    syncing: 0,
     entryIndex: -1,
     entry: undefined,
     entries: JSON.parse(localStorage.getItem('entries')) || undefined

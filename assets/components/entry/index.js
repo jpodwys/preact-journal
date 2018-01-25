@@ -30,7 +30,7 @@ export default class Entry extends Component {
       entry.text = this.base.querySelector('#entryText').innerText;
       entry.isPublic = this.base.querySelector('#isPublic').checked;
 
-      fire('create', {
+      fire('createEntry', {
         entry: entry,
         entryIndex: this.props.entryIndex
       })();
@@ -54,7 +54,7 @@ export default class Entry extends Component {
     }
     obj.entry[property] = e.target.innerText;
 
-    fire('update', obj)();
+    fire('updateEntry', obj)();
   }
 
   togglePublic = e => {
@@ -67,7 +67,7 @@ export default class Entry extends Component {
       }
     }
 
-    fire('update', obj)();
+    fire('updateEntry', obj)();
   }
 
   render({ entryIndex, entry, entryReady }) {
@@ -79,7 +79,7 @@ export default class Entry extends Component {
           {entry.date}
         </h1>
         Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
-        <button onClick={fire('del', {id: entry.id})}>Delete</button>
+        <button onClick={fire('deleteEntry', {id: entry.id})}>Delete</button>
         <pre id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</pre>        
       </entry-view>
     );

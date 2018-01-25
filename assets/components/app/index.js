@@ -19,7 +19,7 @@ export default class App extends Component {
   
   componentWillMount() {
     freedux(this, actions);
-    fire('fetchData')();
+    fire('getEntries')();
 
     //For debugging
     window.app = this;
@@ -27,7 +27,7 @@ export default class App extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    fire('fetchData')();
+    fire('getEntries')();
   }
 
   render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
