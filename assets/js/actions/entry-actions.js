@@ -85,7 +85,7 @@ const persistSyncPatch = function(el, timestamp){
     if(el.view === '/entry' && el.state.entryId){
       setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
     }
-    localStorage.setItem('timestamp', response.timestamp);
+    localStorage.setItem('timestamp', timestamp);
   });
 };
 
