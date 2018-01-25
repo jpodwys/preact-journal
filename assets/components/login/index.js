@@ -3,7 +3,13 @@ import fire from '../../js/fire';
 
 export default class Login extends Component {
   join = (e) => {
-
+    e.preventDefault();
+    fire('createAccount', {
+      user: {
+        username: this.base.querySelector('#cusername').value,
+        password: this.base.querySelector('#cpassword').value
+      }
+    })();
   }
 
   login = (e) => {
@@ -24,16 +30,16 @@ export default class Login extends Component {
           <form action="javscript:" onSubmit={this.join} class="join-form pure-form pure-form-stacked full-width">
             <fieldset>
               <legend>Create an Account</legend>
-              <input placeholder="username" autocapitalize="off" class="needsclick"/>
-              <input type="password" placeholder="password" class="needsclick"/>
+              <input id="cusername" placeholder="username" autocapitalize="off"/>
+              <input id="cpassword" type="password" placeholder="password"/>
               <input type="submit" class="pure-button pure-button-primary"/>
             </fieldset>
           </form>
           <form action="javascript:" onSubmit={this.login} class="login-form pure-form pure-form-stacked full-width">
             <fieldset>
               <legend>or Login</legend>
-              <input id="lusername" placeholder="username" autocapitalize="off" class="needsclick"/>
-              <input id="lpassword" type="password" placeholder="password" class="needsclick"/>
+              <input id="lusername" placeholder="username" autocapitalize="off"/>
+              <input id="lpassword" type="password" placeholder="password"/>
               <input type="submit" class="pure-button pure-button-primary"/>
             </fieldset>
           </form>

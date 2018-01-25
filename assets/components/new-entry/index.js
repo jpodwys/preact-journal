@@ -26,7 +26,7 @@ export default class Entry extends Component {
       text: this.base.querySelector('[name="text"]').innerText,
       isPublic: this.base.querySelector('[name="isPublic"]').checked,
     };
-    fire('create', {entry: entry})();
+    fire('createEntry', {entry: entry})();
   }
 
   render({ entryIndex, entry }) {

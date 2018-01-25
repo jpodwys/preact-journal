@@ -6,16 +6,96 @@ import persist from '../persist';
 
 let dataFetched = false;
 
-const fetchData = function(el, e){
+const getEntries = function(el, e){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
   let timestamp = localStorage.getItem('timestamp');
   if(timestamp){
-    syncForUser(el, {detail: {timestamp: timestamp}});
+    syncEntries(el, {detail: {timestamp: timestamp}});
   } else {
-    getAllForUser(el);
+    getAllEntries(el);
   }
+};
+
+const getAllEntries = function(el){
+  if(el.state.entries) return;
+  el.setState({loading: el.state.loading + 1});
+  Entry.getAll().then(response => {
+    getAllEntriesSuccess(el, response);
+  }).catch(err => {
+    getAllEntriesError(el, err);
+  });
+};
+
+const getAllEntriesSuccess = function(el, response){
+  persist(el, {
+    entries: response.entries,
+    loading: el.state.loading - 1
+  }, function(){
+    setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+    localStorage.setItem('timestamp', response.timestamp);
+  });
+};
+
+const getAllEntriesError = function(el, err){
+  el.setState({loading: el.state.loading - 1});
+  console.log('getAllEntriesError', err)
+};
+
+const syncEntries = function(el, e){
+  el.setState({loading: el.state.loading + 1});
+  Entry.sync(e.detail.timestamp).then(response => {
+    syncEntriesSuccess(el, response);
+  }).catch(err => {
+    syncEntriesFailure(el, err);
+  });
+};
+
+const syncEntriesSuccess = function(el, response){
+  if(response.entries.length === 0){
+    el.setState({
+      loading: el.state.loading - 1,
+    });
+    localStorage.setItem('timestamp', response.timestamp);
+    return;
+  }
+
+  applySyncPatch(el, response.entries);
+  persistSyncPatch(el, response.timestamp);
+};
+
+const applySyncPatch = function(el, entries){
+  entries.forEach((entry, i) => {
+    var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+    if(entryIndex > -1){
+      if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
+      else el.state.entries[entryIndex] = entry;
+    } else {
+      el.state.entries.unshift(entry);
+    }
+  });
+};
+
+const persistSyncPatch = function(el, timestamp){
+  persist(el, {
+    loading: el.state.loading - 1,
+    entries: [].concat(el.state.entries)
+  }, function(){
+    if(el.view === '/entry' && el.state.entryId){
+      setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+    }
+    localStorage.setItem('timestamp', response.timestamp);
+  });
+};
+
+const syncEntriesFailure = function(el, err){
+  el.setState({loading: el.state.loading - 1});
+  console.log('syncEntriesFailure', err)
+};
+
+const getEntry = function(el, e){
+  
 };
 
 const slowCreate = function(el, e){
@@ -31,26 +111,30 @@ const slowCreate = function(el, e){
   });
 
   Entry.create(entry).then(response => {
-    el.state.entry.id = response.id;
-    el.state.entries[0].id = response.id;
-    delete el.state.entries[0].postPending;
-    delete el.state.entries[0].newEntry;
-    delete el.state.entries[0].needsSync;
-
-    el.setState({
-      loading: el.state.loading - 1,
-      entry: Object.assign({}, el.state.entry),
-      entries: [].concat(el.state.entries)
-    });
-  }).catch(e => {
-    console.log('error', e);
+    slowCreateSuccess(el, response);
+  }).catch(err => {
+    slowCreateFailure(el, err);
   });
 };
 
-const create = debounce(slowCreate, 500);
+const createEntry = debounce(slowCreate, 500);
 
-const get = function(el, e){
-  
+const slowCreateSuccess = function(el, response){
+  el.state.entry.id = response.id;
+  el.state.entries[0].id = response.id;
+  delete el.state.entries[0].postPending;
+  delete el.state.entries[0].newEntry;
+  delete el.state.entries[0].needsSync;
+
+  el.setState({
+    loading: el.state.loading - 1,
+    entry: Object.assign({}, el.state.entry),
+    entries: [].concat(el.state.entries)
+  });
+};
+
+const slowCreateFailure = function(el, err){
+  console.log('slowCreateFailure', err);
 };
 
 const slowUpdate = function(el, e){
@@ -72,93 +156,46 @@ const slowUpdate = function(el, e){
   });
 
   el.state.entries[d.entryIndex].needsSync = true;
-
-  if(d.entry.newEntry){
-    if(d.entry.postPending) return;
-    el.state.entries[d.entryIndex].postPending = true;
-
-    Entry.create(d.entry).then(function(response){
-      console.log(response)
-    }).catch(function(err){
-
-    });
-  } else {
-    Entry.update(d.entryId, d.entry).then(function(){
-      
-    }).catch(function(err){
-
-    });
-  }
+  Entry.update(d.entryId, d.entry).then(function(){
+    slowUpdateSuccess(el, d.entryId);
+  }).catch(function(err){
+    slowUpdateFailure(el, err);
+  });
 };
 
-const update = debounce(slowUpdate, 500);
+const updateEntry = debounce(slowUpdate, 500);
 
-const del = function(el, e){
+const slowUpdateSuccess = function(el, id){
+  // Remove entry's needsSync property
+};
+
+const slowUpdateFailure = function(el, err){
+  console.log('slowUpdateFailure', err);
+};
+
+const deleteEntry = function(el, e){
   el.setState({loading: el.state.loading + 1});
   // if(isNaN(entryIndex)) return;
 
   Entry.del(e.detail.id).then(function(){
-    var entryIndex = findObjectIndexById(e.detail.id, el.state.entries);
-    persist(el, {
-      loading: el.state.loading - 1,
-      entries: removeObjectByIndex(entryIndex, el.state.entries)
-    }, function(){
-      route('/entries');
-    });
-  }).catch(e => {
-    console.log('error', e);
+    deleteEntrySuccess(el, e.detail.id);
+  }).catch(err => {
+    deleteEntryFailure(el, err);
   });
 };
 
-const getAllForUser = function(el){
-  if(el.state.entries) return;
-  el.setState({loading: el.state.loading + 1});
-  Entry.getAllForUser().then(response => {
-    persist(el, {
-      entries: response.entries,
-      loading: el.state.loading - 1
-    }, function(){
-      setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
-      localStorage.setItem('timestamp', response.timestamp);
-    });
-  }).catch(e => {
-    console.log('error', e);
+const deleteEntrySuccess = function(el, id){
+  var entryIndex = findObjectIndexById(id, el.state.entries);
+  persist(el, {
+    loading: el.state.loading - 1,
+    entries: removeObjectByIndex(entryIndex, el.state.entries)
+  }, function(){
+    route('/entries');
   });
 };
 
-const syncForUser = function(el, e){
-  el.setState({loading: el.state.loading + 1});
-  Entry.syncForUser(e.detail.timestamp).then(response => {
-    if(response.entries.length === 0){
-      el.setState({
-        loading: el.state.loading - 1,
-      });
-      localStorage.setItem('timestamp', response.timestamp);
-      return;
-    }
-
-    response.entries.forEach((entry, i) => {
-      var entryIndex = findObjectIndexById(entry.id, el.state.entries);
-      if(entryIndex > -1){
-        if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
-        else el.state.entries[entryIndex] = entry;
-      } else {
-        el.state.entries.unshift(entry);
-      }
-    });
-
-    persist(el, {
-      loading: el.state.loading - 1,
-      entries: [].concat(el.state.entries)
-    }, function(){
-      if(el.view === '/entry' && el.state.entryId){
-        setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
-      }
-      localStorage.setItem('timestamp', response.timestamp);
-    });
-  }).catch(e => {
-    console.log('error', e);
-  });
+const deleteEntryFailure = function(el, err){
+  console.log('deleteEntryFailure', err);
 };
 
 const setEntry = function(el, e){
@@ -195,4 +232,4 @@ const newEntry = function(el){
   });
 };
 
-export default { fetchData, create, get, update, del, getAllForUser, syncForUser, setEntry, newEntry };
+export default { getEntries, createEntry, getEntry, updateEntry, deleteEntry, setEntry, newEntry };
