@@ -1,5 +1,3 @@
-var duplicateEntries = ['/entries', '/entry/new'];
-
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open('preact-journal').then(function(cache) {
