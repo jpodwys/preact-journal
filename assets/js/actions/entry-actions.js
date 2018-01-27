@@ -43,6 +43,7 @@ const getAllEntriesError = function(el, err){
   console.log('getAllEntriesError', err)
 };
 
+// Sync entries to the server that were updated while
 const syncClientEntries = function(el){
   var entries = el.state.entries;
   entries.forEach(entry => {
@@ -58,6 +59,7 @@ const syncClientEntries = function(el){
   });
 };
 
+// Sync entries with newer versions from the serrver
 const syncEntries = function(el, e){
   el.setState({loading: el.state.loading + 1});
   Entry.sync(e.detail.timestamp).then(response => {
@@ -116,14 +118,20 @@ const getEntry = function(el, e){
 
 const slowCreate = function(el, e){
   let entry = e.detail.entry;
-  if(!e.detail.clientSync && entry.postPending) return;
 
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
-  el.state.entries[entryIndex].postPending = true;
+  el.state.entries[entryIndex] = entry;
 
   persist(el, {
     loading: el.state.loading + 1,
     entry: entry,
+    entries: [].concat(el.state.entries)
+  });
+
+  if(!e.detail.clientSync && entry.postPending) return;
+
+  el.state.entries[entryIndex].postPending = true;
+  persist(el, {
     entries: [].concat(el.state.entries)
   });
 
@@ -138,16 +146,18 @@ const createEntry = debounce(slowCreate, 500);
 
 const slowCreateSuccess = function(el, oldId, response){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
-  // THIS PROBABLY WON'T WORK. I NEED TO LOOK IT'S UNDEX UP BY ITS OLD ID
-  // el.state.entry.id = response.id;
-  // el.state.entries[0].id = response.id;
+
+  if(el.state.entry.id === oldId){
+    el.state.entry.id = response.id;
+  }
+  el.state.entries[entryIndex].id = response.id;
   delete el.state.entries[entryIndex].postPending;
   delete el.state.entries[entryIndex].newEntry;
   delete el.state.entries[entryIndex].needsSync;
 
   persist(el, {
     loading: el.state.loading - 1,
-    // entry: Object.assign({}, el.state.entry),
+    entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
 };

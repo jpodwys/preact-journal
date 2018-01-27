@@ -6,7 +6,7 @@ export function handleRouteChange(e) {
     ? e.url.substr(0, e.url.lastIndexOf('/'))
     : e.url;
   this.view = view;
-  if(view !== '/entry' && view !== '/' && !this.state.loggedIn) return route('/');
+  if(view !== '/' && !this.state.loggedIn) return route('/');
   handleRoute.call(this, view, e);
 }
 

@@ -24,15 +24,12 @@ export default class Entry extends Component {
     var entry = this.props.entry;
 
     if(entry.newEntry){
-      if(entry.postPending) return;
-
       entry.date = this.base.querySelector('#entryDate').innerText;
       entry.text = this.base.querySelector('#entryText').innerText;
       entry.isPublic = this.base.querySelector('#isPublic').checked;
 
       fire('createEntry', {
         entry: entry,
-        // entryIndex: this.props.entryIndex
       })();
     } else {
       this.update(e);
@@ -47,7 +44,6 @@ export default class Entry extends Component {
     }
 
     var obj = {
-      // entryIndex: this.props.entryIndex,
       property: property,
       entryId: this.props.entry.id,
       entry: {}
@@ -59,7 +55,6 @@ export default class Entry extends Component {
 
   togglePublic = e => {
     var obj = {
-      // entryIndex: this.props.entryIndex,
       property: 'isPublic',
       entryId: this.props.entry.id,
       entry: {
