@@ -43,6 +43,21 @@ const getAllEntriesError = function(el, err){
   console.log('getAllEntriesError', err)
 };
 
+const syncClientEntries = function(el){
+  var entries = el.state.entries;
+  entries.forEach(entry => {
+    if(entry.needsSync){
+      var func;
+
+      if(entry.newEntry)      func = slowCreate;
+      else if(entry.deleted)  func = deleteEntry;
+      else                    func = putEntry;
+
+      func(el, {detail: {id: entry.id, entry: entry, clientSync: true}});
+    }
+  });
+};
+
 const syncEntries = function(el, e){
   el.setState({loading: el.state.loading + 1});
   Entry.sync(e.detail.timestamp).then(response => {
@@ -50,6 +65,7 @@ const syncEntries = function(el, e){
   }).catch(err => {
     syncEntriesFailure(el, err);
   });
+  syncClientEntries(el);
 };
 
 const syncEntriesSuccess = function(el, response){
@@ -100,40 +116,49 @@ const getEntry = function(el, e){
 
 const slowCreate = function(el, e){
   let entry = e.detail.entry;
-  if(entry.postPending) return;
+  if(!e.detail.clientSync && entry.postPending) return;
 
-  el.state.entries[e.detail.entryIndex].postPending = true;
+  var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+  el.state.entries[entryIndex].postPending = true;
 
-  el.setState({
+  persist(el, {
     loading: el.state.loading + 1,
     entry: entry,
     entries: [].concat(el.state.entries)
   });
 
   Entry.create(entry).then(response => {
-    slowCreateSuccess(el, response);
+    slowCreateSuccess(el, entry.id, response);
   }).catch(err => {
-    slowCreateFailure(el, err);
+    slowCreateFailure(el, entry.id, err);
   });
 };
 
 const createEntry = debounce(slowCreate, 500);
 
-const slowCreateSuccess = function(el, response){
-  el.state.entry.id = response.id;
-  el.state.entries[0].id = response.id;
-  delete el.state.entries[0].postPending;
-  delete el.state.entries[0].newEntry;
-  delete el.state.entries[0].needsSync;
+const slowCreateSuccess = function(el, oldId, response){
+  var entryIndex = findObjectIndexById(oldId, el.state.entries);
+  // THIS PROBABLY WON'T WORK. I NEED TO LOOK IT'S UNDEX UP BY ITS OLD ID
+  // el.state.entry.id = response.id;
+  // el.state.entries[0].id = response.id;
+  delete el.state.entries[entryIndex].postPending;
+  delete el.state.entries[entryIndex].newEntry;
+  delete el.state.entries[entryIndex].needsSync;
 
-  el.setState({
+  persist(el, {
     loading: el.state.loading - 1,
-    entry: Object.assign({}, el.state.entry),
+    // entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
 };
 
 const slowCreateFailure = function(el, err){
+  var entryIndex = findObjectIndexById(oldId, el.state.entries);
+  delete el.state.entries[entryIndex].postPending;
+  el.setState({
+    loading: el.state.loading - 1,
+    entries: [].concat(el.state.entries)
+  });
   console.log('slowCreateFailure', err);
 };
 
@@ -145,17 +170,18 @@ const slowUpdate = function(el, e){
   }
 
   d.entry[d.property] = d.entry[d.property];
-  var current = el.state.entries[d.entryIndex][d.property];
+  var entryIndex = findObjectIndexById(d.entryId, el.state.entries);
+  var current = el.state.entries[entryIndex][d.property];
   var next = d.entry[d.property];
   if(current === next) return;
 
-  el.state.entries[d.entryIndex][d.property] = d.entry[d.property];
-  // el.state.entries[d.entryIndex].needsSync = true;
+  el.state.entries[entryIndex][d.property] = d.entry[d.property];
+  el.state.entries[entryIndex].needsSync = true;
   persist(el, {
+    entry: Object.assign({}, el.state.entries[entryIndex]),
     entries: [].concat(el.state.entries)
   });
 
-  el.state.entries[d.entryIndex].needsSync = true;
   Entry.update(d.entryId, d.entry).then(function(){
     slowUpdateSuccess(el, d.entryId);
   }).catch(function(err){
@@ -166,19 +192,47 @@ const slowUpdate = function(el, e){
 const updateEntry = debounce(slowUpdate, 500);
 
 const slowUpdateSuccess = function(el, id){
-  // Remove entry's needsSync property
+  var entryIndex = findObjectIndexById(id, el.state.entries);
+  delete el.state.entries[entryIndex].needsSync;
+  persist(el, {
+    entry: Object.assign({}, el.state.entries[entryIndex]),
+    entries: [].concat(el.state.entries)
+  });
 };
 
 const slowUpdateFailure = function(el, err){
   console.log('slowUpdateFailure', err);
 };
 
-const deleteEntry = function(el, e){
-  el.setState({loading: el.state.loading + 1});
-  // if(isNaN(entryIndex)) return;
+const putEntry = function(el, e){
+  var entry = e.detail.entry;
+  Entry.update(entry.id, entry).then(function(){
+    slowUpdateSuccess(el, entry.id);
+  }).catch(function(err){
+    slowUpdateFailure(el, err);
+  });
+};
 
-  Entry.del(e.detail.id).then(function(){
-    deleteEntrySuccess(el, e.detail.id);
+const deleteEntry = function(el, e){
+  // if(isNaN(entryIndex)) return;
+  // el.setState({loading: el.state.loading + 1});
+
+  var id = e.detail.id;
+  if(!id) return;
+
+  var entryIndex = findObjectIndexById(id, el.state.entries);
+  el.state.entries[entryIndex].needsSync = true;
+  el.state.entries[entryIndex].deleted = true;
+
+  persist(el, {
+    entry: undefined,
+    entries: [].concat(el.state.entries)
+  }, function(){
+    route('/entries');
+  });
+
+  Entry.del(id).then(function(){
+    deleteEntrySuccess(el, id);
   }).catch(err => {
     deleteEntryFailure(el, err);
   });
@@ -187,10 +241,8 @@ const deleteEntry = function(el, e){
 const deleteEntrySuccess = function(el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
   persist(el, {
-    loading: el.state.loading - 1,
+    // loading: el.state.loading - 1,
     entries: removeObjectByIndex(entryIndex, el.state.entries)
-  }, function(){
-    route('/entries');
   });
 };
 

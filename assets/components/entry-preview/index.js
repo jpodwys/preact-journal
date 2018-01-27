@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 
 export default class EntryPreview extends Component {
   render({ entry }) {
+    if(entry.deleted || entry.newEntry && !entry.postPending) return '';
     return (
       <div class="entry-preview">
         <a

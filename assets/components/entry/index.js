@@ -32,7 +32,7 @@ export default class Entry extends Component {
 
       fire('createEntry', {
         entry: entry,
-        entryIndex: this.props.entryIndex
+        // entryIndex: this.props.entryIndex
       })();
     } else {
       this.update(e);
@@ -47,7 +47,7 @@ export default class Entry extends Component {
     }
 
     var obj = {
-      entryIndex: this.props.entryIndex,
+      // entryIndex: this.props.entryIndex,
       property: property,
       entryId: this.props.entry.id,
       entry: {}
@@ -59,7 +59,7 @@ export default class Entry extends Component {
 
   togglePublic = e => {
     var obj = {
-      entryIndex: this.props.entryIndex,
+      // entryIndex: this.props.entryIndex,
       property: 'isPublic',
       entryId: this.props.entry.id,
       entry: {
