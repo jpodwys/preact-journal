@@ -1,6 +1,14 @@
 import fire from '../fire';
 import { removeObjectByIndex } from '../utils';
 
+// Make sure new pages are always scrolled to the top
+// while history entries maintain their scroll position.
+let { pushState } = history;
+history.pushState = (a, b, url) => {
+  pushState.call(history, a, b, url);
+  scrollTo(0, 0);
+};
+
 export function handleRouteChange(e) {
   var view = e.url.lastIndexOf('/') > 0
     ? e.url.substr(0, e.url.lastIndexOf('/'))
