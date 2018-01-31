@@ -1,5 +1,4 @@
-export default function(url, config) {
-  config = config || {};
+export default function(url, config = {}) {
   config.credentials = 'same-origin';
   config.headers = new Headers({
     'Content-Type': 'application/json',

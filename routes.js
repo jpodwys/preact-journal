@@ -10,7 +10,7 @@ module.exports = function(app){
   app.post('/api/user/logout', function(req, res) {
     res.clearCookie('auth_token');
     res.clearCookie('logged_in');
-    res.send(204);
+    res.sendStatus(204);
   });
   app.post('/api/user', user.createAccount);
   // app.put('/user/:id');
@@ -23,7 +23,7 @@ module.exports = function(app){
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
 
   /* Convenience routes for development and metrics */
-  app.get('/baseline', function (req, res){ res.send(200); });
+  app.get('/baseline', function (req, res){ res.sendStatus(200); });
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
 
