@@ -1,4 +1,4 @@
-import User from '../user-service';
+import User from '../services/user-service';
 import { route } from 'preact-router';
 import getInitialState from '../../js/app-state';
 

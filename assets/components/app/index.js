@@ -39,7 +39,6 @@ export default class App extends Component {
             <Router onChange={handleRouteChange.bind(this)}>
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
-              {/* <NewEntry path="/entry/new" loggedIn={loggedIn} loading={loading} /> */}
               <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
               <FourOhFour default/>
             </Router>
