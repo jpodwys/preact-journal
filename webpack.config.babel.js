@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const { resolve } = require('path');
 // const HTML = require('html-webpack-plugin');
 // const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
@@ -18,18 +19,42 @@ module.exports = {
       {
         test: /\.jsx?/i,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        loader: 'babel-loader',
       },
-      {
-        test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ]
-      },
+      // {
+      //   test: /\.css$/,
+      //   use: [ 'style-loader', 'css-loader' ]
+      // },
       // {
       //   test: /\.css$/,
       //   use: ExtractTextPlugin.extract({
       //     use: 'css-loader?importLoaders=1',
       //   }),
       // }
+    ],
+    loaders: [
+      {
+        test: /\.jsx?/i,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: [
+            ['env', {
+              'targets': {
+                'browsers': [
+                  'last 2 Chrome versions',
+                  'last 2 Firefox versions',
+                  'last 2 Safari versions',
+                  'last 2 Edge versions',
+                  'last 2 iOS versions',
+                  'last 2 ChromeAndroid versions'
+                ]
+              }
+            }],
+            'stage-0'
+          ],
+        }
+      }
     ]
   },
   plugins: [

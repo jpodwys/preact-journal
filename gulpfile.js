@@ -10,10 +10,26 @@ var htmlmin = require('gulp-htmlmin');
 var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
 
-function scripts() {
+function scripts(cb) {
   return gulp.src('assets/js/index.js')
-    .pipe(webpack())
-    // Does babel go here?
+    .pipe(webpack(require('./webpack.config.babel.js')))
+    // .pipe(babel({
+    //   presets: [
+    //     ['env', {
+    //       'targets': {
+    //         'browsers': [
+    //           'last 2 Chrome versions',
+    //           'last 2 Firefox versions',
+    //           'last 2 Safari versions',
+    //           'last 2 Edge versions',
+    //           'last 2 iOS versions',
+    //           'last 2 ChromeAndroid versions'
+    //         ]
+    //       }
+    //     }],
+    //     'stage-0'
+    //   ]
+    // }))
     // .pipe(uglify())
     .pipe(rename('bundle.js'))
     .pipe(gulp.dest('dist'));
@@ -21,6 +37,10 @@ function scripts() {
 
 function sw() {
   return gulp.src('assets/js/sw.js')
+    // .pipe(babel({
+    //   presets: ['@babel/env']
+    // }))
+    // .pipe(uglify())
     .pipe(gulp.dest('dist'));
 }
 
@@ -37,7 +57,10 @@ function images() {
 
 function inline() {
   return gulp.src('assets/index.html')
-    .pipe(inlinesource({rootpath: __dirname + '/dist'}))
+    .pipe(inlinesource({
+      rootpath: __dirname + '/dist',
+      compress: false
+    }))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 }
