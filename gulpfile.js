@@ -35,9 +35,9 @@ function images() {
     .pipe(gulp.dest('dist'));
 }
 
-function concat() {
+function inline() {
   return gulp.src('assets/index.html')
-    .pipe(inlinesource())
+    .pipe(inlinesource({rootpath: __dirname + '/dist'}))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 }
@@ -50,7 +50,7 @@ function concat() {
 // var build = gulp.series(gulp.parallel(scripts, styles), concat);
 
 function build() {
-  return gulp.series(gulp.parallel(scripts, sw, styles, images), concat)();
+  return gulp.series(gulp.parallel(scripts, sw, styles, images), inline)();
 }
 
 gulp.task('build', build);
