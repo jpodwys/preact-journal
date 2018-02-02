@@ -5,7 +5,6 @@ import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
-// import NewEntry from '../new-entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';

@@ -4,6 +4,13 @@ var Sequelize = require('sequelize'),
   entry = require('./middleware/entryMW')(db, Sequelize),
   fs = require('fs');
 
+// import render from 'preact-render-to-string';
+// import { h, Component } from 'preact';
+// import App from 'assets/components/app-ssr';
+// /** @jsx h */
+
+// let html = render(<App />);
+
 module.exports = function(app){
   /* REST endpoints */
   app.post('/api/user/login', user.attemptLogin);
@@ -26,6 +33,11 @@ module.exports = function(app){
   app.get('/baseline', function (req, res){ res.sendStatus(200); });
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
+
+  /* Critical CSS Utility Route */
+  // app.get('/critical', function(req, res){
+  //   res.send('<!DOCTYPE html><html><body>' + html + '</body></html>');
+  // });
 
   /* Catch-all view route */
   app.get('/*', function(req, res){
