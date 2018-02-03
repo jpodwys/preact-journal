@@ -6,13 +6,20 @@ var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
 var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
-// var critical = require('critical');
 var criticalCss = require('gulp-penthouse');
+var del = require('del');
 
 function scripts(cb) {
   return gulp.src('assets/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
     .pipe(rename('bundle.js'))
+    .pipe(gulp.dest('dist'));
+}
+
+function criticalScripts(cb) {
+  return gulp.src('assets/js/critical.js')
+    .pipe(webpack(require('./webpack-critical.config.babel.js')))
+    .pipe(rename('critical-bundle.js'))
     .pipe(gulp.dest('dist'));
 }
 
@@ -25,32 +32,32 @@ function sw() {
     .pipe(gulp.dest('dist'));
 }
 
+function images() {
+  return gulp.src('assets/images/**.*')
+    .pipe(gulp.dest('dist'));
+}
+
 function styles() {
   return gulp.src('assets/css/styles.css')
+    .pipe(criticalCss({
+      url: 'http://localhost:3000/critical',
+      pageLoadSkipTimeout: 1000,
+      blockJSRequests: false,
+      renderWaitTime: 1000,
+      out: 'styles.css'
+    }))
     .pipe(cleanCSS({compatibility: 'ie8'}))
     .pipe(gulp.dest('dist'));
 }
 
-// function styles() {
-//   return gulp.src('dist/components.html')
-//     .pipe(critical({
-//       base: 'dist/',
-//       dest: 'styles.css',
-//       minify: true
-//       css: ['assets/css/styles.css']}))
-// }
-
-// function styles() {
-//   return gulp.src('assets/css/styles.css')
-//     .pipe(criticalCss({
-//       url: 'http://localhost:3000/critical',
-//       out: 'dist/styles.css'
-//     }));
-// }
-
-function images() {
-  return gulp.src('assets/images/**.*')
+function moveStyles() {
+  return gulp.src('cssstyles.css')
+    .pipe(rename('styles.css'))
     .pipe(gulp.dest('dist'));
+}
+
+function clean() {
+  return del(['cssstyles.css']);
 }
 
 function inline() {
@@ -71,7 +78,12 @@ function inline() {
 // var build = gulp.series(gulp.parallel(scripts, styles), concat);
 
 function build() {
-  return gulp.series(gulp.parallel(scripts, sw, styles, images), inline)();
+  return gulp.series(
+    gulp.parallel(scripts, criticalScripts, sw, images),
+    styles,
+    moveStyles,
+    gulp.parallel(clean, inline)
+  )();
 }
 
 gulp.task('build', build);

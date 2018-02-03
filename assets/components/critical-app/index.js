@@ -1,6 +1,4 @@
 import { h, Component } from 'preact';
-import { Router, route } from 'preact-router';
-
 import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
@@ -29,7 +27,7 @@ export default class App extends Component {
             <Login loggedIn={loggedIn} loading={loading}/>
             <Entries loggedIn={loggedIn} loading={loading} entries={entries}/>
             <Entry loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
-            <FourOhFour default/>
+            <FourOhFour/>
           </main>
         </div>
       </div>
