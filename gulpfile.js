@@ -9,7 +9,11 @@ var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
 var criticalCss = require('gulp-penthouse');
 var del = require('del');
-PORT = process.env.PORT || 3000;
+var PORT = process.env.PORT || 3000;
+var LOCAL = process.env.NODE_ENV === 'production';
+var CRITICAL_URL = process.env.NODE_ENV === 'production'
+  ? 'https://preact-journal.herokuapp.com/critical'
+  : 'http://localhost:' + PORT + '/critical';
 
 function serve(cb) {
   require('./app.js');
@@ -50,8 +54,8 @@ function styles() {
       width: 768,
       height: 10000,
       keepLargerMediaQueries: true,
-      url: 'http://localhost:' + PORT + '/critical',
-      pageLoadSkipTimeout: 1000,
+      url: CRITICAL_URL,
+      pageLoadSkipTimeout: 5000,
       blockJSRequests: false,
       renderWaitTime: 1000,
       out: 'styles.css'

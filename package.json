@@ -8,9 +8,9 @@
     "url": "git+https://github.com/jpodwys/preact-journal.git"
   },
   "scripts": {
-    "start": "nodemon app.js & gulp",
+    "start": "node app.js & gulp",
     "build": "gulp build",
-    "serve": "gulp serve",
+    "serve": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
