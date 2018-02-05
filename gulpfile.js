@@ -24,14 +24,14 @@ function scripts(cb) {
   return gulp.src('assets/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
     .pipe(rename('bundle.js'))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function criticalScripts(cb) {
   return gulp.src('assets/js/critical.js')
     .pipe(webpack(require('./webpack-critical.config.babel.js')))
     .pipe(rename('critical-bundle.js'))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function sw() {
@@ -40,12 +40,12 @@ function sw() {
       presets: ['env']
     }))
     .pipe(uglify())
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function images() {
   return gulp.src('assets/images/**.*')
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function styles() {
@@ -61,13 +61,13 @@ function styles() {
       out: 'styles.css'
     }))
     .pipe(cleanCSS({compatibility: 'ie8'}))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function moveStyles() {
   return gulp.src('cssstyles.css')
     .pipe(rename('styles.css'))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function clean() {
@@ -81,7 +81,7 @@ function inline() {
       rootpath: __dirname + '/dist',
       compress: false
     }))
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('./dist'));
 }
 
 // function watch() {
