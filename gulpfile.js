@@ -9,6 +9,11 @@ var webpack = require('gulp-webpack');
 var criticalCss = require('gulp-penthouse');
 var del = require('del');
 
+function serve(cb) {
+  require('./app.js');
+  cb();
+}
+
 function scripts(cb) {
   return gulp.src('assets/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
@@ -78,8 +83,6 @@ function inline() {
 //   gulp.watch(paths.styles.src, styles);
 // }
 
-// var build = gulp.series(gulp.parallel(scripts, styles), concat);
-
 function build() {
   return gulp.series(
     gulp.parallel(scripts, criticalScripts, sw, images),
@@ -91,4 +94,6 @@ function build() {
 
 gulp.task('build', build);
 
-gulp.task('default', build/*, watch*/);
+gulp.task('serve', serve);
+
+gulp.task('default', serve, build/*, watch*/);

@@ -1,4 +1,3 @@
-require('dotenv').load();
 var express = require('express'),
   compress = require('compression'),
   // shrinkRay = require('shrink-ray-current'),
