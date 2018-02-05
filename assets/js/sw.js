@@ -1,7 +1,7 @@
 self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open('preact-journal').then(function(cache) {
-      return cache.addAll(['/', '/bundle.js', '/styles.css'])
+      return cache.addAll(['/'])
     })
   )
 })
