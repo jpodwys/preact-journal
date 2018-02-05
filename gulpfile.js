@@ -1,3 +1,4 @@
+require('dotenv').load();
 var gulp = require('gulp');
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
@@ -8,6 +9,7 @@ var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
 var criticalCss = require('gulp-penthouse');
 var del = require('del');
+PORT = process.env.PORT || 3000;
 
 function serve(cb) {
   require('./app.js');
@@ -48,7 +50,7 @@ function styles() {
       width: 768,
       height: 10000,
       keepLargerMediaQueries: true,
-      url: 'http://localhost:3000/critical',
+      url: 'http://localhost:' + PORT + '/critical',
       pageLoadSkipTimeout: 1000,
       blockJSRequests: false,
       renderWaitTime: 1000,
@@ -85,6 +87,7 @@ function inline() {
 
 function build() {
   return gulp.series(
+    // serve,
     gulp.parallel(scripts, criticalScripts, sw, images),
     styles,
     moveStyles,
@@ -92,8 +95,8 @@ function build() {
   )();
 }
 
-gulp.task('build', build);
+// gulp.task('build', build);
 
-gulp.task('serve', serve);
+// gulp.task('serve', serve);
 
-gulp.task('default', serve, build/*, watch*/);
+gulp.task('default', build/*, watch*/);
