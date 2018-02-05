@@ -10,12 +10,12 @@ module.exports = function(app){
   app.post('/api/user/logout', function(req, res) {
     res.clearCookie('auth_token');
     res.clearCookie('logged_in');
-    res.send(204);
+    res.sendStatus(204);
   });
   app.post('/api/user', user.createAccount);
   // app.put('/user/:id');
   // app.delete('/user/:id')
-  app.get('/api/entries/sync', app.restrict, entry.getUpdatesSinceTimestamp);
+  app.get('/api/entries/sync/:timestamp', app.restrict, entry.getUpdatesSinceTimestamp);
   app.get('/api/entries', app.restrict, entry.getAllEntriesByOwnerId);
   app.get('/api/entry/:id', entry.getEntryById);
   app.post('/api/entry', app.restrict, entry.createEntry);
@@ -23,9 +23,14 @@ module.exports = function(app){
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
 
   /* Convenience routes for development and metrics */
-  app.get('/baseline', function (req, res){ res.send(200); });
+  app.get('/baseline', function (req, res){ res.sendStatus(200); });
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
+
+  /* Critical CSS Utility Route */
+  app.get('/critical', function(req, res){
+    res.sendFile('critical.html', {root: './assets', maxAge: '0d'});
+  });
 
   /* Catch-all view route */
   app.get('/*', function(req, res){

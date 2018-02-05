@@ -5,7 +5,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const dist = resolve('dist');
 
 module.exports = {
-  entry: './assets/js/index.js',
+  entry: './assets/js/critical.js',
   module: {
     rules: [
       {
@@ -43,7 +43,7 @@ module.exports = {
     new UglifyJSPlugin()
   ],
   output: {
-    filename: 'bundle.js',
+    filename: 'critical-bundle.js',
     path: dist
   }
 }

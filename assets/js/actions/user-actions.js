@@ -1,4 +1,4 @@
-import User from '../user-service';
+import User from '../services/user-service';
 import { route } from 'preact-router';
 import getInitialState from '../../js/app-state';
 
@@ -16,7 +16,7 @@ const login = function(el, e){
 const loginSuccess = function(el, user){
   /*
    * THIS SHOULD NOT NEED OBJECT.ASSIGN BUT IT DOES.
-   * When I remove object.assing, entries is undefined.
+   * When I remove object.assign, entries is undefined.
    */
   el.setState(Object.assign(el.state, {
     loggedIn: true,

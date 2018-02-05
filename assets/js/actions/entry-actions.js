@@ -1,4 +1,4 @@
-import Entry from '../entry-service';
+import Entry from '../services/entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
 import { findObjectIndexById, removeObjectByIndex } from '../utils';
@@ -43,7 +43,7 @@ const getAllEntriesError = function(el, err){
   console.log('getAllEntriesError', err)
 };
 
-// Sync entries to the server that were updated while
+// Sync entries to the server that were updated while offline
 const syncClientEntries = function(el){
   var entries = el.state.entries;
   entries.forEach(entry => {
@@ -59,7 +59,7 @@ const syncClientEntries = function(el){
   });
 };
 
-// Sync entries with newer versions from the serrver
+// Sync entries with newer versions from the server
 const syncEntries = function(el, e){
   el.setState({loading: el.state.loading + 1});
   Entry.sync(e.detail.timestamp).then(response => {

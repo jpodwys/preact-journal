@@ -1,45 +1,35 @@
 import xhr from '../xhr';
 
 const create = function(entry) {
-  return xhr({
-    url: '/api/entry',
+  return xhr('/api/entry', {
     method: 'POST',
     body: entry
   });
 };
 
 const get = function(id) {
-  return xhr({
-    url: '/api/entry/' + entry.id
-  });
+  return xhr('/api/entry/' + entry.id);
 };
 
 const update = function(entryId, entry) {
-  return xhr({
-    url: '/api/entry/' + entryId,
+  return xhr('/api/entry/' + entryId, {
     method: 'PATCH',
     body: entry
   });
 };
 
 const del = function(id) {
-  return xhr({
-    url: '/api/entry/' + id,
+  return xhr('/api/entry/' + id, {
     method: 'DELETE'
   });
 };
 
 const getAll = function() {
-  return xhr({
-    url: '/api/entries'
-  });
+  return xhr('/api/entries');
 };
 
 const sync = function(timestamp) {
-  return xhr({
-    url: '/api/entries/sync',
-    query: {timestamp: timestamp}
-  });
+  return xhr('/api/entries/sync/' + timestamp);
 };
 
 export default { create, get, update, del, getAll, sync };

@@ -12,10 +12,10 @@ module.exports = function(Entry){
     });
   }
 
-  self.getUpdatesSinceTimestamp = function({body, query, user}){
+  self.getUpdatesSinceTimestamp = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      if(!query.timestamp) return reject({status: 400, message: 'Timestamp is required.'});
-      Entry.getUpdatesSinceTimestamp(user.id, parseInt(query.timestamp, 10), user.deviceId).then(function (entries){
+      if(!params.timestamp) return reject({status: 400, message: 'Timestamp is required.'});
+      Entry.getUpdatesSinceTimestamp(user.id, parseInt(params.timestamp, 10), user.deviceId).then(function (entries){
         if(!entries) return reject({status: 500, message: 'There was an error.'});
         return resolve(entries);
       }, function (err){
