@@ -7,7 +7,6 @@ var htmlmin = require('gulp-htmlmin');
 var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
 var criticalCss = require('gulp-penthouse');
-var critical = require('critical').stream;
 var del = require('del');
 
 function scripts(cb) {
@@ -60,22 +59,6 @@ function moveStyles() {
     .pipe(gulp.dest('dist'));
 }
 
-function critical() {
-  return critical.generate({
-    base: './',
-    src: 'http://127.0.0.1:3000/critical',
-    css: ['assets/css/styles.css'],
-    dest: 'dist/styles.css',
-    dimensions: [{
-      height: 10000,
-      width: 768
-    }, {
-      height: 10000,
-      width: 1000
-    }]
-  });
-}
-
 function clean() {
   return del(['cssstyles.css']);
 }
@@ -102,7 +85,6 @@ function build() {
     gulp.parallel(scripts, criticalScripts, sw, images),
     styles,
     moveStyles,
-    // critical,
     gulp.parallel(clean, inline)
   )();
 }
