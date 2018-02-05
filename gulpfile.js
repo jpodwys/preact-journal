@@ -91,7 +91,7 @@ function inline() {
 
 function build() {
   return gulp.series(
-    // serve,
+    serve,
     gulp.parallel(scripts, criticalScripts, sw, images),
     styles,
     moveStyles,
