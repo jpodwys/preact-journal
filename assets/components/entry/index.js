@@ -38,9 +38,9 @@ export default class Entry extends Component {
 
   update = e => {
     var property;
-    switch(e.target.nodeName){
-      case 'H1':  property = 'date'; break;
-      case 'PRE': property = 'text'; break;
+    switch(e.target.id){
+      case 'entryDate':  property = 'date'; break;
+      case 'entryText':  property = 'text'; break;
     }
 
     var obj = {
@@ -75,7 +75,7 @@ export default class Entry extends Component {
         </h1>
         Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
         <button onClick={fire('deleteEntry', {id: entry.id})}>Delete</button>
-        <pre id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</pre>        
+        <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
       </entry-view>
     );
   }

@@ -40,6 +40,8 @@ function images() {
 function styles() {
   return gulp.src('assets/css/styles.css')
     .pipe(criticalCss({
+      width: 1000,
+      height: 10000,
       url: 'http://localhost:3000/critical',
       pageLoadSkipTimeout: 1000,
       blockJSRequests: false,

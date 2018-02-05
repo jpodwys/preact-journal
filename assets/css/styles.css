@@ -170,14 +170,6 @@ entry-view h1 span {
   font-size: 18px;
   vertical-align: middle;
 }
-pre {
-  font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  white-space: -pre-wrap;
-  white-space: -o-pre-wrap;
-  word-wrap: break-word;
-}
 textarea.entry-text {
   width: 100%;
   height: 350px;
@@ -297,7 +289,7 @@ form.form-submit-only {
   .hide-on-mobile {
     display: none !important;
   }
-  pre.entry-text {
+  div.entry-text {
     margin-bottom: 100px;
   }
   .entry-actions {
