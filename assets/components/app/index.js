@@ -20,7 +20,7 @@ export default class App extends Component {
     freedux(this, actions);
     fire('getEntries')();
 
-    //For debugging
+    // For debugging
     window.app = this;
     window.route = route;
   }
@@ -34,7 +34,7 @@ export default class App extends Component {
       <div id="main-wrapper">
         <div id="view-wrapper">
           <main id="main">
-            <Header />
+            <Header loggedIn={loggedIn}/>
             <Router onChange={handleRouteChange.bind(this)}>
               <Login path="/" loggedIn={loggedIn} loading={loading}/>
               <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>

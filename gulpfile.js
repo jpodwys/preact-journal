@@ -58,6 +58,11 @@ function styles() {
       pageLoadSkipTimeout: 5000,
       blockJSRequests: false,
       renderWaitTime: 1000,
+      forceInclude: [
+        '.pure-menu-link:focus',
+        '.pure-menu-link:hover',
+        '.pure-menu-link.active'
+      ],
       out: 'styles.css'
     }))
     .pipe(cleanCSS({compatibility: 'ie8'}))
