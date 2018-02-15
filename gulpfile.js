@@ -60,8 +60,7 @@ function styles() {
       renderWaitTime: 1000,
       forceInclude: [
         '.pure-menu-link:focus',
-        '.pure-menu-link:hover',
-        '.pure-menu-link.active'
+        '.pure-menu-link:hover'
       ],
       out: 'styles.css'
     }))
