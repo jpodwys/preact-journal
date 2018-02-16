@@ -1,7 +1,7 @@
 import Entry from '../services/entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
-import { findObjectIndexById, removeObjectByIndex } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, filterObjectsByText } from '../utils';
 import persist from '../persist';
 
 let dataFetched = false;
@@ -294,4 +294,36 @@ const newEntry = function(el){
   });
 };
 
-export default { getEntries, createEntry, getEntry, updateEntry, deleteEntry, setEntry, newEntry };
+const slowFilter = function(el, e){
+  if(!e || !e.detail) return;
+  if(!e.detail.value) return el.setState({
+    filterText: '',
+    viewEntries: el.state.entries
+  });
+
+  // If the new query is a continuation of the prior query,
+  // fitler viewEntries for efficiency.
+  var query = e.detail.value;
+  var entries = (query.indexOf(el.state.filterText) === 0)
+    ? el.state.viewEntries
+    : el.state.entries;
+
+  var viewEntries = filterObjectsByText(query, entries);
+  el.setState({
+    filterText: query,
+    viewEntries: viewEntries
+  });
+};
+
+const filterByText = debounce(slowFilter, 200);
+
+export default {
+  getEntries,
+  createEntry,
+  getEntry,
+  updateEntry,
+  deleteEntry,
+  setEntry,
+  newEntry,
+  filterByText
+};

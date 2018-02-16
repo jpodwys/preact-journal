@@ -29,20 +29,18 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
+  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText }) {
     return (
       <div id="main-wrapper">
-        <div id="view-wrapper">
-          <main id="main">
-            <Header loggedIn={loggedIn}/>
-            <Router onChange={handleRouteChange.bind(this)}>
-              <Login path="/" loggedIn={loggedIn} loading={loading}/>
-              <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
-              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
-              <FourOhFour default/>
-            </Router>
-          </main>
-        </div>
+        <Header loggedIn={loggedIn}/>
+        <main id="main">
+          <Router onChange={handleRouteChange.bind(this)}>
+            <Login path="/" loggedIn={loggedIn} loading={loading}/>
+            <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={viewEntries}/>
+            <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
+            <FourOhFour default/>
+          </Router>
+        </main>
       </div>
     );
   }

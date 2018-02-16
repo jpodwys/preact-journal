@@ -58,9 +58,17 @@ function styles() {
       pageLoadSkipTimeout: 5000,
       blockJSRequests: false,
       renderWaitTime: 1000,
+      propertiesToRemove: [
+        'cursor',
+        'pointer-events',
+        '(-webkit-)?tap-highlight-color',
+        '(.*)user-select'
+      ],
       forceInclude: [
-        '.pure-menu-link:focus',
-        '.pure-menu-link:hover'
+        '(.*)transition(.*)',
+        'a:not(.pure-menu-link):hover',
+        '.pure-menu-link:hover',
+        '.pure-menu-link.active'
       ],
       out: 'styles.css'
     }))

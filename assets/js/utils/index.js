@@ -7,4 +7,8 @@ const removeObjectByIndex = function(index, list) {
   return list;
 };
 
-export { findObjectIndexById, removeObjectByIndex };
+const filterObjectsByText = function(query, list) {
+  return list.filter(function(obj){ return ~obj.text.indexOf(query); });
+};
+
+export { findObjectIndexById, removeObjectByIndex, filterObjectsByText };
