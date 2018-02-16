@@ -1,9 +1,11 @@
 import cookie from '../cookie';
+import { sortObjectsByDate } from '../utils';
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) localStorage.clear();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
+  if(entries) entries = sortObjectsByDate(entries);
 
   let state = {
     filterText: '',

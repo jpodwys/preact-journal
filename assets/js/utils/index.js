@@ -7,6 +7,13 @@ const removeObjectByIndex = function(index, list) {
   return list;
 };
 
+const sortObjectsByDate = function(list) {
+  if(!list) return [];
+  return list.sort(function(a, b){
+    return new Date(b.date) - new Date(a.date);
+  });
+};
+
 const filterObjectsByText = function(query, list) {
   return list.filter(function(obj){
     return ~obj.text.toLowerCase().indexOf(query)
@@ -18,4 +25,10 @@ const preventDefault = function(e) {
   e.preventDefault();
 };
 
-export { findObjectIndexById, removeObjectByIndex, filterObjectsByText, preventDefault };
+export {
+  findObjectIndexById,
+  removeObjectByIndex,
+  sortObjectsByDate,
+  filterObjectsByText,
+  preventDefault
+};
