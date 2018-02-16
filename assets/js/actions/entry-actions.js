@@ -305,7 +305,7 @@ const slowFilter = function(el, e){
 
   // If the new query is a continuation of the prior query,
   // fitler viewEntries for efficiency.
-  var query = e.detail.value;
+  var query = e.detail.value.toLowerCase();
   var entries = (query.indexOf(el.state.filterText) === 0)
     ? el.state.viewEntries
     : el.state.entries;
