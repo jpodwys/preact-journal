@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router/match';
 import fire from '../../js/fire';
+import { preventDefault } from '../../js/utils';
 
 export default class Header extends Component {
 	render({loggedIn}) {
@@ -22,10 +23,10 @@ export default class Header extends Component {
 						</li>
 				</ul>
 
-				<form class="pure-form search-input">
+				<form class="pure-form search-input" onsubmit={preventDefault}>
 					<input oninput={fire('filterByText')}/>
 				</form>
-				
+
 				<ul class="pure-menu-list right">
 					<li class="pure-menu-item">
 						<Link activeClassName="active" href="/entries" class="pure-menu-link">

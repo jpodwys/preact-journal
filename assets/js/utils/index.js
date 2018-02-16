@@ -11,4 +11,8 @@ const filterObjectsByText = function(query, list) {
   return list.filter(function(obj){ return ~obj.text.toLowerCase().indexOf(query); });
 };
 
-export { findObjectIndexById, removeObjectByIndex, filterObjectsByText };
+const preventDefault = function(e) {
+  e.preventDefault();
+};
+
+export { findObjectIndexById, removeObjectByIndex, filterObjectsByText, preventDefault };
