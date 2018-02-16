@@ -59,12 +59,12 @@ function styles() {
       blockJSRequests: false,
       renderWaitTime: 1000,
       propertiesToRemove: [
-        'cursor',
         'pointer-events',
         '(-webkit-)?tap-highlight-color',
         '(.*)user-select'
       ],
       forceInclude: [
+        '.search-icon:hover',
         '(.*)transition(.*)',
         'a:not(.pure-menu-link):hover',
         '.pure-menu-link:hover',

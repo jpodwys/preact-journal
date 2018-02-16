@@ -29,8 +29,10 @@ const getAllEntries = function(el){
 };
 
 const getAllEntriesSuccess = function(el, response){
+  var entries = response.entries;
   persist(el, {
-    entries: response.entries,
+    entries: entries,
+    viewEntries: filterObjectsByText(el.state.filterText, entries),
     loading: el.state.loading - 1
   }, function(){
     setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
