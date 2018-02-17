@@ -17,6 +17,7 @@ const sortObjectsByDate = function(list) {
 };
 
 const filterObjectsByText = function(query, list) {
+  if(!query) return list;
   return list.filter(function(obj){
     return ~obj.text.toLowerCase().indexOf(query)
       || ~obj.date.indexOf(query);
