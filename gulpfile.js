@@ -88,7 +88,10 @@ function clean() {
 
 function inline() {
   return gulp.src('assets/index.html')
-    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      minifyCSS: true
+    }))
     .pipe(inlinesource({
       rootpath: __dirname + '/dist',
       compress: false

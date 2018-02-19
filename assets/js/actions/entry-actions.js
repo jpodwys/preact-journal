@@ -1,7 +1,7 @@
 import Entry from '../services/entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
-import { findObjectIndexById, removeObjectByIndex, sortObjectsByDate, filterObjectsByText } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, filterObjectsByText } from '../utils';
 import persist from '../persist';
 
 let dataFetched = false;
@@ -29,10 +29,8 @@ const getAllEntries = function(el){
 };
 
 const getAllEntriesSuccess = function(el, response){
-  var entries = response.entries;
   persist(el, {
-    entries: entries,
-    viewEntries: filterObjectsByText(el.state.filterText, entries),
+    entries: response.entries,
     loading: el.state.loading - 1
   }, function(){
     setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
@@ -98,11 +96,9 @@ const applySyncPatch = function(el, entries){
 };
 
 const persistSyncPatch = function(el, timestamp){
-  var entries = sortObjectsByDate([].concat(el.state.entries));
   persist(el, {
     loading: el.state.loading - 1,
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   }, function(){
     if(el.view === '/entry' && el.state.entryId){
       setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
@@ -125,22 +121,18 @@ const slowCreate = function(el, e){
 
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
-  var entries = sortObjectsByDate([].concat(el.state.entries));
 
   persist(el, {
     loading: el.state.loading + 1,
     entry: entry,
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   });
 
   if(!e.detail.clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
-  var entries = sortObjectsByDate([].concat(el.state.entries));
   persist(el, {
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   });
 
   Entry.create(entry).then(response => {
@@ -163,24 +155,19 @@ const slowCreateSuccess = function(el, oldId, response){
   delete el.state.entries[entryIndex].newEntry;
   delete el.state.entries[entryIndex].needsSync;
 
-  var entries = [].concat(el.state.entries);
-
   persist(el, {
     loading: el.state.loading - 1,
     entry: Object.assign({}, el.state.entry),
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   });
 };
 
 const slowCreateFailure = function(el, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
-  var entries = [].concat(el.state.entries);
   el.setState({
     loading: el.state.loading - 1,
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   });
   console.log('slowCreateFailure', err);
 };
@@ -200,11 +187,9 @@ const slowUpdate = function(el, e){
 
   el.state.entries[entryIndex][d.property] = d.entry[d.property];
   el.state.entries[entryIndex].needsSync = true;
-  var entries = sortObjectsByDate([].concat(el.state.entries));
   persist(el, {
     entry: Object.assign({}, el.state.entries[entryIndex]),
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   });
 
   Entry.update(d.entryId, d.entry).then(function(){
@@ -217,13 +202,12 @@ const slowUpdate = function(el, e){
 const updateEntry = debounce(slowUpdate, 500);
 
 const slowUpdateSuccess = function(el, id){
-  var entries = sortObjectsByDate([].concat(el.state.entries));
+  let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
   persist(el, {
     entry: Object.assign({}, entries[entryIndex]),
-    entries: entries,
-    viewEntries: entries
+    entries: entries
   });
 };
 
@@ -250,12 +234,10 @@ const deleteEntry = function(el, e){
   var entryIndex = findObjectIndexById(id, el.state.entries);
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
-  var entries = [].concat(el.state.entries);
 
   persist(el, {
     entry: undefined,
-    entries: entries,
-    viewEntries: entries
+    entries: [].concat(el.state.entries)
   }, function(){
     route('/entries');
   });
@@ -269,11 +251,9 @@ const deleteEntry = function(el, e){
 
 const deleteEntrySuccess = function(el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  var entries = removeObjectByIndex(entryIndex, el.state.entries);
   persist(el, {
     // loading: el.state.loading - 1,
-    entries: entries,
-    viewEntries: entries
+    entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
 };
 
@@ -306,11 +286,9 @@ const newEntry = function(el){
     newEntry: true
   };
 
-  var entries = [newEntry].concat(el.state.entries);
   el.setState({
     entryIndex: 0,
-    entries: entries,
-    viewEntries: entries
+    entries: [newEntry].concat(el.state.entries)
   }, function(){
     setEntry(el, {detail: {id: newEntry.id, entryReady: true}});
     // route('/entry/' + newEntry.id);
