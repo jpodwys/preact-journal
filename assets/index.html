@@ -9,9 +9,26 @@
     <script>
       if ('serviceWorker' in navigator){
         navigator.serviceWorker.register('sw.js');
-        navigator.serviceWorker.onmessage = function (e){
-          console.log('reloading');
-          if(e.data === 'reload') location.reload();
+        // navigator.serviceWorker.onmessage = function (e){
+        //   console.log('reloading');
+        //   if(e.data === 'reload') location.reload();
+        // }
+        navigator.serviceWorker.onmessage = function (e) {
+          var message = JSON.parse(e.data);
+
+          var isRefresh = message.type === 'reload';
+          // var isAsset = message.url.includes('asset');
+          var lastETag = localStorage.getItem('currentETag');
+          var isNew =  lastETag !== message.eTag;
+
+          if (isRefresh && /*isAsset &&*/ isNew) {
+            // if (lastETag) {
+            //   notice.hidden = false;
+            // }
+            localStorage.setItem('currentETag', message.eTag);
+            console.log('RELOAD');
+            location.reload();
+          }
         }
       }
     </script>
