@@ -8,6 +8,7 @@ const getInitialState = function() {
   if(entries) entries = sortObjectsByDate(entries);
 
   let state = {
+    view: '/',
     showFilterInput: false,
     filterText: '',
     entryReady: false,

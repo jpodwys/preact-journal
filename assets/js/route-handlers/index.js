@@ -13,8 +13,8 @@ export function handleRouteChange(e) {
   var view = e.url.lastIndexOf('/') > 0
     ? e.url.substr(0, e.url.lastIndexOf('/'))
     : e.url;
-  this.view = view;
   if(view !== '/' && !this.state.loggedIn) return route('/');
+  this.setState({view: view});
   handleRoute.call(this, view, e);
 }
 

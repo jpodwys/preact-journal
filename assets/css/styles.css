@@ -1,8 +1,14 @@
 body {
   margin: 0;
+  font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
 
 header {
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
   display: flex;
   justify-content: flex-end;
   height: 50px;
@@ -17,7 +23,9 @@ header .nav-set {
 }
 
 header .nav-set > * {
-  display: inline;
+  position: relative;
+  display: inline-block;
+  margin: 0;
   padding: 12.5px;
   cursor: pointer;
   transition: all ease .2s;
@@ -27,7 +35,7 @@ header .nav-set > .full-height {
   padding: 5px;
 }
 
-header .nav-set > svg:hover {
+header .nav-set svg:hover {
   fill: orange;
 }
 
@@ -36,6 +44,37 @@ input {
   border-radius: 4px;
   border: 1px grey;
 }
+
+a, a:visited {
+  color: #5776d0;
+  text-decoration: none;
+}
+
+main {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 65px 15px;
+}
+
+.button {
+
+}
+
+.button--fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 30px;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+.button--fab.add-entry {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #5776d0;
+}
+
 
 .grow {
   flex: 1 2;

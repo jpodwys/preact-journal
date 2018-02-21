@@ -5,7 +5,7 @@ const actions = {
   linkstate: function(el, e){
     let obj = {};
     obj[e.detail.key] = e.detail.val;
-    el.setState(obj);
+    el.setState(obj, e.detail.cb);
   }
 };
 
