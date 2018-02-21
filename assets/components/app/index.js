@@ -32,7 +32,7 @@ export default class App extends Component {
   render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput }) {
     return (
       <div>
-        <Header view={view} loggedIn={loggedIn} filterText={filterText} showFilterInput={showFilterInput}/>
+        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={loggedIn} loading={loading}/>

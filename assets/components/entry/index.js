@@ -7,10 +7,12 @@ export default class Entry extends Component {
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
-    if(ne.date === oe.date
-      && ne.text === oe.text.trim()
-      && ne.isPublic === oe.isPublic) return false;
-    return true;
+    if(oe.id !== ne.id) return true;
+    return false;
+    // if(ne.date === oe.date
+    //   && ne.text === oe.text.trim()
+    //   && ne.isPublic === oe.isPublic) return false;
+    // return true;
   }
 
   // getIcons(entry) {
@@ -74,7 +76,6 @@ export default class Entry extends Component {
           {entry.date}
         </h1>
         Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
-        <button onClick={fire('deleteEntry', {id: entry.id})}>Delete</button>
         <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
       </entry-view>
     );

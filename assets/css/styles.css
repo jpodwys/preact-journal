@@ -73,8 +73,8 @@ main {
 
 .button--fab.add-entry {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 15px;
+  right: 15px;
   background-color: #5776d0;
 }
 
@@ -99,4 +99,14 @@ main {
 .search-form input {
   padding: 8px;
   width: 100%;
+  background: transparent;
+  border: none;
+  outline: 0;
+  border: 0;
+  border-bottom: 1px solid black;
+  color: white;
+}
+
+.search-form input::placeholder {
+  color: white;
 }

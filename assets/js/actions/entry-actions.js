@@ -297,6 +297,7 @@ const newEntry = function(el){
 
 const slowFilter = function(el, e){
   if(!e || !e.detail) return;
+  if(el.state.filterText === e.detail.value) return;
   if(!e.detail.value) return el.setState({
     filterText: '',
     viewEntries: el.state.entries
@@ -304,12 +305,13 @@ const slowFilter = function(el, e){
 
   // If the new query is a continuation of the prior query,
   // fitler viewEntries for efficiency.
-  var query = e.detail.value.toLowerCase();
-  var entries = (query.indexOf(el.state.filterText) === 0)
+  var query = e.detail.value;
+  var q = query.toLowerCase();
+  var entries = (q.indexOf(el.state.filterText) === 0)
     ? el.state.viewEntries
     : el.state.entries;
 
-  var viewEntries = filterObjectsByText(query, entries);
+  var viewEntries = filterObjectsByText(q, entries);
   el.setState({
     filterText: query,
     viewEntries: viewEntries
