@@ -29,10 +29,10 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText }) {
+  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput }) {
     return (
       <div id="main-wrapper">
-        <Header loggedIn={loggedIn}/>
+        <Header loggedIn={loggedIn} filterText={filterText} showFilterInput={showFilterInput}/>
         <main id="main">
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={loggedIn} loading={loading}/>

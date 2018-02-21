@@ -318,6 +318,12 @@ const slowFilter = function(el, e){
 
 const filterByText = debounce(slowFilter, 200);
 
+const blurTextFilter = function(el){
+  if(!el.state.filterText){
+    el.setState({showFilterInput: false});
+  }
+};
+
 export default {
   getEntries,
   createEntry,
@@ -326,5 +332,6 @@ export default {
   deleteEntry,
   setEntry,
   newEntry,
-  filterByText
+  filterByText,
+  blurTextFilter
 };

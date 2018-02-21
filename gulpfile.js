@@ -48,31 +48,37 @@ function images() {
     .pipe(gulp.dest('./dist'));
 }
 
+// function styles() {
+//   return gulp.src('assets/css/styles.css')
+//     .pipe(criticalCss({
+//       width: 768,
+//       height: 10000,
+//       keepLargerMediaQueries: true,
+//       url: CRITICAL_URL,
+//       pageLoadSkipTimeout: 5000,
+//       blockJSRequests: false,
+//       renderWaitTime: 1000,
+//       propertiesToRemove: [
+//         'pointer-events',
+//         '(-webkit-)?tap-highlight-color',
+//         '(.*)user-select'
+//       ],
+//       forceInclude: [
+//         '.search-icon:hover',
+//         '(.*)transition(.*)',
+//         'a:not(.pure-menu-link):hover',
+//         '.pure-menu-link:hover',
+//         '.pure-menu-link.active'
+//       ],
+//       out: 'styles.css'
+//     }))
+//     .pipe(cleanCSS({compatibility: 'ie8'}))
+//     .pipe(gulp.dest('./dist'));
+// }
+
 function styles() {
   return gulp.src('assets/css/styles.css')
-    .pipe(criticalCss({
-      width: 768,
-      height: 10000,
-      keepLargerMediaQueries: true,
-      url: CRITICAL_URL,
-      pageLoadSkipTimeout: 5000,
-      blockJSRequests: false,
-      renderWaitTime: 1000,
-      propertiesToRemove: [
-        'pointer-events',
-        '(-webkit-)?tap-highlight-color',
-        '(.*)user-select'
-      ],
-      forceInclude: [
-        '.search-icon:hover',
-        '(.*)transition(.*)',
-        'a:not(.pure-menu-link):hover',
-        '.pure-menu-link:hover',
-        '.pure-menu-link.active'
-      ],
-      out: 'styles.css'
-    }))
-    .pipe(cleanCSS({compatibility: 'ie8'}))
+    .pipe(cleanCSS())
     .pipe(gulp.dest('./dist'));
 }
 
@@ -109,8 +115,9 @@ function build() {
     serve,
     gulp.parallel(scripts, criticalScripts, sw, images),
     styles,
-    moveStyles,
-    gulp.parallel(clean, inline)
+    // moveStyles,
+    // gulp.parallel(clean, inline)
+    inline
   )();
 }
 
