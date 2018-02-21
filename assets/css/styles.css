@@ -13,7 +13,6 @@ header {
   justify-content: flex-end;
   height: 50px;
   background-color: #5776d0;
-  box-shadow: 0 5px 5px #c1c1c1;
   /*box-sizing: border-box;
   padding: 0 30px;*/
 }
@@ -54,6 +53,10 @@ main {
   margin: 0 auto;
   max-width: 800px;
   padding: 65px 15px;
+}
+
+.elevated {
+  box-shadow: 0 5px 5px #c1c1c1;
 }
 
 .button {

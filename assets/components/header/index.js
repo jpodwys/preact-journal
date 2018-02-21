@@ -18,13 +18,13 @@ export default class Header extends Component {
 	render({view, loggedIn, filterText, showFilterInput}) {
 		if(!loggedIn) return '';
 		return (
-			<header>
+			<header class="elevated">
 				<span class="nav-set">
 					{view === '/entries' &&
 						<h3>Entries</h3>
 					}
 
-					{loggedIn && view === '/entry' &&
+					{loggedIn && (view === '/entry' || view === '/new') &&
 						<a href="/entries">
 							<svg fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
 							  <path d="M0 0h24v24H0z" fill="none"/>
@@ -61,6 +61,18 @@ export default class Header extends Component {
 						  <path d="M0 0h24v24H0z" fill="none"/>
 						</svg>
 				  }
+				  {view === '/entry' &&
+					  <svg fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+						  <path d="M0 0h24v24H0z" fill="none"/>
+						  <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+						</svg>
+					}
+					{loggedIn && view === '/entry' &&
+						<svg fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+						  <path d="M6 19c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+						  <path d="M0 0h24v24H0z" fill="none"/>
+						</svg>
+					}
 				  {loggedIn &&
 						<svg fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg" onclick={fire('logout')}>
 						  <path d="M0 0h24v24H0z" fill="none"/>
@@ -70,7 +82,7 @@ export default class Header extends Component {
 				</span>
 
 				{view === '/entries' &&
-					<span class="button button--fab add-entry">
+					<span class="button button--fab add-entry elevated">
 						<a href="/entry/new">
 							<svg fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
 							  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
