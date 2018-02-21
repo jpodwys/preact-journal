@@ -7,7 +7,13 @@
   <body>
     <script src="/bundle.js" inline></script>
     <script>
-      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+      if ('serviceWorker' in navigator){
+        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.onmessage = function (e){
+          console.log('reloading');
+          if(e.data === 'reload') location.reload();
+        }
+      }
     </script>
   </body>
 </html>
