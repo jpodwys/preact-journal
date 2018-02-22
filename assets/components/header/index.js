@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from 'preact-router/match';
 import fire from '../../js/fire';
 import { preventDefault } from '../../js/utils';
+import select from 'select';
 
 export default class Header extends Component {
 	clearFilterText = (e) => {
@@ -15,7 +16,16 @@ export default class Header extends Component {
 		}})();
 	}
 
-	render({view, loggedIn, entry, filterText, showFilterInput}) {
+	copyText(e) {
+		var contenteditable = document.querySelector('#entryText');
+		var result = select(contenteditable);
+		var successful = document.execCommand('copy');
+		document.querySelector('#entryDate').focus();
+		document.querySelector('#entryDate').blur();
+		if(successful) fire('linkstate', {key: 'entryTextCopied', val: true})();
+	}
+
+	render({view, loggedIn, entry, filterText, showFilterInput, entryTextCopied}) {
 		if(!loggedIn) return '';
 		return (
 			<header class="elevated">
@@ -62,8 +72,14 @@ export default class Header extends Component {
 						  <path d="M0 0h24v24H0z" fill="none"/>
 						</svg>
 				  }
-				  {view === '/entry' &&
-					  <svg key="copy" fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+				  {entryTextCopied && view === '/entry' &&
+					  <svg key="done" fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+						  <path d="M0 0h24v24H0z" fill="none"/>
+						  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+						</svg>
+					}
+				  {!entryTextCopied && view === '/entry' &&
+					  <svg key="copy" fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg" onclick={this.copyText}>
 						  <path d="M0 0h24v24H0z" fill="none"/>
 						  <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
 						</svg>

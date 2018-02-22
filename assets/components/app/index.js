@@ -29,10 +29,10 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput }) {
+  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, entryTextCopied }) {
     return (
       <div>
-        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
+        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput} entryTextCopied={entryTextCopied}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={loggedIn} loading={loading}/>

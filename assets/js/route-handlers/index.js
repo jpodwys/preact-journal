@@ -15,7 +15,10 @@ export function handleRouteChange(e) {
     : e.url;
   if(view !== '/' && !this.state.loggedIn) return route('/');
   if(~e.url.indexOf('/new')) view = '/new';
-  this.setState({view: view});
+  this.setState({
+    view: view,
+    entryTextCopied: false
+  });
   handleRoute.call(this, view, e);
 };
 

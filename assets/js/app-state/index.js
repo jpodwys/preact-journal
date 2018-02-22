@@ -9,6 +9,7 @@ const getInitialState = function() {
 
   let state = {
     view: '/',
+    entryTextCopied: false,
     showFilterInput: false,
     filterText: '',
     entryReady: false,
