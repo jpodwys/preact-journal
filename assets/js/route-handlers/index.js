@@ -38,7 +38,7 @@ const handleLoginView = function(e) {
 const handleEntriesView = function(e) {
   if(Array.isArray(this.state.entries)){
     var entry = this.state.entries[0];
-    if(entry.newEntry && !entry.text){
+    if(entry && entry.newEntry && !entry.text){
       this.setState({
         entries: removeObjectByIndex(0, this.state.entries)
       });

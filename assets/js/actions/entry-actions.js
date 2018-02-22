@@ -162,7 +162,7 @@ const slowCreateSuccess = function(el, oldId, response){
   });
 };
 
-const slowCreateFailure = function(el, err){
+const slowCreateFailure = function(el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
@@ -262,7 +262,7 @@ const deleteEntryFailure = function(el, err){
 };
 
 const setEntry = function(el, e){
-  if(!el.state.entries || !e || !e.detail || !e.detail.id || e.detail.id === -1) return;
+  if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
 
   var entryIndex = findObjectIndexById(parseInt(e.detail.id, 10), el.state.entries);
   var entry = el.state.entries[entryIndex];
@@ -276,7 +276,7 @@ const setEntry = function(el, e){
 };
 
 const newEntry = function(el){
-  var newEntry = {
+  var entry = {
     id: Date.now(),
     date: new Date().toISOString().slice(0, 10),
     text: '',
@@ -288,9 +288,10 @@ const newEntry = function(el){
 
   el.setState({
     entryIndex: 0,
-    entries: [newEntry].concat(el.state.entries)
+    entry: entry,
+    entries: [entry].concat(el.state.entries)
   }, function(){
-    setEntry(el, {detail: {id: newEntry.id, entryReady: true}});
+    setEntry(el, {detail: {id: entry.id, entryReady: true}});
     // route('/entry/' + newEntry.id);
   });
 };
