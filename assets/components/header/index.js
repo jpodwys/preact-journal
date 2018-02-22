@@ -56,12 +56,6 @@ export default class Header extends Component {
 						  <path d="M0 0h24v24H0z" fill="none"/>
 						</svg>
 				  }
-				  {view === '/entries' && !showFilterInput &&
-				  	<svg key="search" fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg" onclick={this.showFilterText}>
-						  <path d="M15.5 14h-.8l-.3-.3c1-1.1 1.6-2.6 1.6-4.2a6.5 6.5 0 1 0-2.3 5l.3.2v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/>
-						  <path d="M0 0h24v24H0z" fill="none"/>
-						</svg>
-				  }
 				  {view === '/entry' &&
 					  <svg key="copy" fill="#FFF" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
 						  <path d="M0 0h24v24H0z" fill="none"/>
