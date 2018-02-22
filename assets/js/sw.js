@@ -36,6 +36,7 @@ function fromCache(request) {
 function update(request) {
   return caches.open(CACHE).then(function (cache) {
     return fetch(request).then(function (response) {
+      if(response.status >= 300) return;
       return cache.put(request, response.clone()).then(function () {
         return response;
       });
@@ -44,6 +45,7 @@ function update(request) {
 }
  
 function refresh(response) {
+  if(!response) return;
   return self.clients.matchAll().then(function (clients) {
     clients.forEach(function (client) {
       // var message = {
