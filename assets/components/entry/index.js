@@ -3,6 +3,12 @@ import fire from '../../js/fire';
 import FourOhFour from '../four-oh-four';
 
 export default class Entry extends Component {
+  componentDidUpdate() {
+    if(this.props.view === '/new'){
+      this.base.querySelector('#entryText').focus();
+    }
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     var oe = this.props.entry;
     var ne = nextProps.entry;
@@ -67,7 +73,7 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ entryIndex, entry, entryReady }) {
+  render({ view, entryIndex, entry, entryReady }) {
     if(!entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
