@@ -6,34 +6,5 @@
   </head>
   <body>
     <script src="/bundle.js" inline></script>
-    <script>
-      if ('serviceWorker' in navigator){
-        var CACHE = 'preact-journal';
-
-        function update(request) {
-          return caches.open(CACHE).then(function(cache) {
-            return fetch(request).then(function(response) {
-              return cache.put(request, response.clone()).then(function(){
-                location.reload();
-              });
-            });
-          });
-        }
-
-        navigator.serviceWorker.register('sw.js').then(function(reg) {
-          reg.addEventListener('updatefound', function() {
-            var newWorker = reg.installing;
-
-            newWorker.addEventListener('statechange', function(e){
-              if(newWorker.state === 'activated'){
-                update('/');
-              }
-            });
-          });
-
-          reg.update();
-        });
-      }
-    </script>
   </body>
 </html>
