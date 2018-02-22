@@ -3,24 +3,27 @@ import App from '../components/app';
 
 render(<App />, document.body);
 
-if ('serviceWorker' in navigator){
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js');
   // var CACHE = 'preact-journal';
 
-  navigator.serviceWorker.onmessage = function (eTag) {
-    // var message = JSON.parse(e.data);
-
+  navigator.serviceWorker.onmessage = function (e) {
+    if(!e || !e.data) return;
+    var eTag = e.data;
     // var isRefresh = message.type === 'refresh';
     // var isAsset = message.url.includes('asset');
     var lastETag = localStorage.getItem('currentETag');
-    var isNew =  lastETag !== eTag;
+    var isNew = !!lastETag && !!eTag && lastETag !== eTag;
 
-    if (/*isRefresh && isAsset &&*/ isNew) {
+    if (/*isRefresh && isAsset &&*/ isNew || !lastETag) {
       // if (lastETag) {
       //   notice.hidden = false;
       // }
       localStorage.setItem('currentETag', eTag);
-      // location.reload();
+
+      if(isNew){
+        location.reload();
+      }
     }
   };
 }
-

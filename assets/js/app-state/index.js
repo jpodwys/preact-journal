@@ -3,7 +3,10 @@ import { sortObjectsByDate } from '../utils';
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) localStorage.clear();
+  if(!loggedIn){
+    localStorage.removeItem('entries');
+    localStorage.removeItem('timestamp');
+  }
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
   if(entries) entries = sortObjectsByDate(entries);
 

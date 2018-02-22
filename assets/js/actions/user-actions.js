@@ -2,8 +2,13 @@ import User from '../services/user-service';
 import { route } from 'preact-router';
 import getInitialState from '../../js/app-state';
 
+const clearLocalStorage = function(){
+  localStorage.removeItem('entries');
+  localStorage.removeItem('timestamp');
+};
+
 const login = function(el, e){
-  localStorage.clear();
+  clearLocalStorage();
   el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.login(user).then(user => {
@@ -32,7 +37,7 @@ const loginFailure = function(el, err){
 };
 
 const createAccount = function(el, e){
-  localStorage.clear();
+  clearLocalStorage();
   el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.create(user).then(user => {
@@ -62,7 +67,7 @@ const logout = function(el, e){
 };
 
 const logoutSuccess = function(el){
-  localStorage.clear();
+  clearLocalStorage();
   el.setState(getInitialState());
   route('/');
 };
