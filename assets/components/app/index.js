@@ -20,7 +20,7 @@ export default class App extends Component {
     freedux(this, actions);
     fire('getEntries')();
 
-    //For debugging
+    // For debugging
     window.app = this;
     window.route = route;
   }
@@ -29,20 +29,18 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { loggedIn, loading, entryIndex, entry, entries, entryReady }) {
+  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, entryTextCopied }) {
     return (
-      <div id="main-wrapper">
-        <div id="view-wrapper">
-          <main id="main">
-            <Header />
-            <Router onChange={handleRouteChange.bind(this)}>
-              <Login path="/" loggedIn={loggedIn} loading={loading}/>
-              <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={entries}/>
-              <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
-              <FourOhFour default/>
-            </Router>
-          </main>
-        </div>
+      <div>
+        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput} entryTextCopied={entryTextCopied}/>
+        <main>
+          <Router onChange={handleRouteChange.bind(this)}>
+            <Login path="/" loggedIn={loggedIn} loading={loading}/>
+            <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={viewEntries}/>
+            <Entry path="/entry/:id" loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
+            <FourOhFour default/>
+          </Router>
+        </main>
       </div>
     );
   }

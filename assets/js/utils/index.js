@@ -1,5 +1,7 @@
 const findObjectIndexById = function(id, list) {
-  return list.map(function(obj){ return obj.id; }).indexOf(id);
+  return list.map(function(obj){
+    return obj.id;
+  }).indexOf(id);
 };
 
 const removeObjectByIndex = function(index, list) {
@@ -7,4 +9,29 @@ const removeObjectByIndex = function(index, list) {
   return list;
 };
 
-export { findObjectIndexById, removeObjectByIndex };
+const sortObjectsByDate = function(list) {
+  if(!list) return [];
+  return list.sort(function(a, b){
+    return new Date(b.date) - new Date(a.date);
+  });
+};
+
+const filterObjectsByText = function(query, list) {
+  if(!query) return list;
+  return list.filter(function(obj){
+    return ~obj.text.toLowerCase().indexOf(query)
+      || ~obj.date.indexOf(query);
+  });
+};
+
+const preventDefault = function(e) {
+  e.preventDefault();
+};
+
+export {
+  findObjectIndexById,
+  removeObjectByIndex,
+  sortObjectsByDate,
+  filterObjectsByText,
+  preventDefault
+};

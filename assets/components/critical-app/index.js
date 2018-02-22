@@ -23,7 +23,7 @@ export default class App extends Component {
       <div id="main-wrapper">
         <div id="view-wrapper">
           <main id="main">
-            <Header />
+            <Header loggedIn={true}/>
             <Login loggedIn={loggedIn} loading={loading}/>
             <Entries loggedIn={loggedIn} loading={loading} entries={entries}/>
             <Entry loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>

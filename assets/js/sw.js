@@ -1,11 +1,12 @@
+let version;
+var CACHE = 'preact-journal';
+ 
 self.addEventListener('install', function(e) {
-  e.waitUntil(
-    caches.open('preact-journal').then(function(cache) {
-      return cache.addAll(['/'])
-    })
-  )
-})
-
+  e.waitUntil(caches.open(CACHE).then(function (cache) {
+    cache.addAll(['/']);
+  }));
+});
+ 
 self.addEventListener('fetch', function(e) {
   if(e.request.method !== 'GET') return
   if(e.request.url.indexOf('/api') > -1) return
@@ -18,11 +19,39 @@ self.addEventListener('fetch', function(e) {
     reqUrl = '/';
   }
 
-  e.respondWith(
-    caches.match(reqUrl || e.request)
-    .then(response => response
-      ? response
-      : fetch(e.request)
-    )
-  )
-})
+  e.respondWith(fromCache(reqUrl || e.request));
+
+  e.waitUntil(
+    update(reqUrl || e.request)
+    .then(refresh)
+  );
+});
+ 
+function fromCache(request) {
+  return caches.open(CACHE).then(function (cache) {
+    return cache.match(request);
+  });
+}
+ 
+function update(request) {
+  return caches.open(CACHE).then(function (cache) {
+    return fetch(request).then(function (response) {
+      return cache.put(request, response.clone()).then(function () {
+        return response;
+      });
+    });
+  });
+}
+ 
+function refresh(response) {
+  return self.clients.matchAll().then(function (clients) {
+    clients.forEach(function (client) {
+      // var message = {
+      //   // type: 'refresh',
+      //   // url: response.url,
+      //   eTag: response.headers.get('ETag')
+      // };
+      client.postMessage(response.headers.get('ETag'));
+    });
+  });
+}

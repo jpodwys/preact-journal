@@ -1,7 +1,7 @@
 import Entry from '../services/entry-service';
 import { route } from 'preact-router';
 import debounce from '../debounce';
-import { findObjectIndexById, removeObjectByIndex } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, filterObjectsByText } from '../utils';
 import persist from '../persist';
 
 let dataFetched = false;
@@ -100,7 +100,7 @@ const persistSyncPatch = function(el, timestamp){
     loading: el.state.loading - 1,
     entries: [].concat(el.state.entries)
   }, function(){
-    if(el.view === '/entry' && el.state.entryId){
+    if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
     }
     localStorage.setItem('timestamp', timestamp);
@@ -202,11 +202,12 @@ const slowUpdate = function(el, e){
 const updateEntry = debounce(slowUpdate, 500);
 
 const slowUpdateSuccess = function(el, id){
-  var entryIndex = findObjectIndexById(id, el.state.entries);
-  delete el.state.entries[entryIndex].needsSync;
+  let entries = [].concat(el.state.entries);
+  var entryIndex = findObjectIndexById(id, entries);
+  delete entries[entryIndex].needsSync;
   persist(el, {
-    entry: Object.assign({}, el.state.entries[entryIndex]),
-    entries: [].concat(el.state.entries)
+    entry: Object.assign({}, entries[entryIndex]),
+    entries: entries
   });
 };
 
@@ -294,4 +295,45 @@ const newEntry = function(el){
   });
 };
 
-export default { getEntries, createEntry, getEntry, updateEntry, deleteEntry, setEntry, newEntry };
+const slowFilter = function(el, e){
+  if(!e || !e.detail) return;
+  if(el.state.filterText === e.detail.value) return;
+  if(!e.detail.value) return el.setState({
+    filterText: '',
+    viewEntries: el.state.entries
+  });
+
+  // If the new query is a continuation of the prior query,
+  // fitler viewEntries for efficiency.
+  var query = e.detail.value;
+  var q = query.toLowerCase();
+  var entries = (q.indexOf(el.state.filterText) === 0)
+    ? el.state.viewEntries
+    : el.state.entries;
+
+  var viewEntries = filterObjectsByText(q, entries);
+  el.setState({
+    filterText: query,
+    viewEntries: viewEntries
+  });
+};
+
+const filterByText = debounce(slowFilter, 200);
+
+const blurTextFilter = function(el){
+  if(!el.state.filterText){
+    el.setState({showFilterInput: false});
+  }
+};
+
+export default {
+  getEntries,
+  createEntry,
+  getEntry,
+  updateEntry,
+  deleteEntry,
+  setEntry,
+  newEntry,
+  filterByText,
+  blurTextFilter
+};

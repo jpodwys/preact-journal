@@ -13,22 +13,27 @@ export function handleRouteChange(e) {
   var view = e.url.lastIndexOf('/') > 0
     ? e.url.substr(0, e.url.lastIndexOf('/'))
     : e.url;
-  this.view = view;
   if(view !== '/' && !this.state.loggedIn) return route('/');
+  if(~e.url.indexOf('/new')) view = '/new';
+  this.setState({
+    view: view,
+    entryTextCopied: false
+  });
   handleRoute.call(this, view, e);
-}
+};
 
 const handleRoute = function(view, e) {
   switch(view) {
     case '/':         handleLoginView.call(this, e);    break;
     case '/entries':  handleEntriesView.call(this, e);  break;
     case '/entry':    handleEntryView.call(this, e);    break;
+    case '/new':      handleEntryView.call(this, e);    break;
   }
-}
+};
 
 const handleLoginView = function(e) {
   if(this.state.loggedIn) route('/entries');
-}
+};
 
 const handleEntriesView = function(e) {
   if(Array.isArray(this.state.entries)){
@@ -39,7 +44,7 @@ const handleEntriesView = function(e) {
       });
     }
   }
-}
+};
 
 const handleEntryView = function(e) {
   var id;
@@ -52,4 +57,4 @@ const handleEntryView = function(e) {
   } else {
     fire('setEntry', {id: id})();
   }
-}
+};

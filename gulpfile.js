@@ -9,6 +9,9 @@ var rename = require('gulp-rename');
 var webpack = require('gulp-webpack');
 var criticalCss = require('gulp-penthouse');
 var del = require('del');
+var replace = require('gulp-replace');
+// var rev = require('gulp-rev');
+// var revReplace = require('gulp-rev-replace');
 var PORT = process.env.PORT || 3000;
 var LOCAL = process.env.NODE_ENV === 'production';
 var CRITICAL_URL = process.env.NODE_ENV === 'production'
@@ -36,31 +39,62 @@ function criticalScripts(cb) {
 
 function sw() {
   return gulp.src('assets/js/sw.js')
+    .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
     .pipe(babel({
       presets: ['env']
     }))
     .pipe(uglify())
+    // .pipe(rev())
+    // .pipe(gulp.dest('./dist'))
+    // .pipe(rev.manifest())
     .pipe(gulp.dest('./dist'));
+    
 }
+
+// function replaceRevRef() {
+//   var manifest = gulp.src('dist/rev-manifest.json');
+
+//   return gulp.src('assets/index.html')
+//     .pipe(revReplace({manifest: manifest}))
+//     .pipe(gulp.dest('./dist'));
+// }
 
 function images() {
   return gulp.src('assets/images/**.*')
     .pipe(gulp.dest('./dist'));
 }
 
+// function styles() {
+//   return gulp.src('assets/css/styles.css')
+//     .pipe(criticalCss({
+//       width: 768,
+//       height: 10000,
+//       keepLargerMediaQueries: true,
+//       url: CRITICAL_URL,
+//       pageLoadSkipTimeout: 5000,
+//       blockJSRequests: false,
+//       renderWaitTime: 1000,
+//       propertiesToRemove: [
+//         'pointer-events',
+//         '(-webkit-)?tap-highlight-color',
+//         '(.*)user-select'
+//       ],
+//       forceInclude: [
+//         '.search-icon:hover',
+//         '(.*)transition(.*)',
+//         'a:not(.pure-menu-link):hover',
+//         '.pure-menu-link:hover',
+//         '.pure-menu-link.active'
+//       ],
+//       out: 'styles.css'
+//     }))
+//     .pipe(cleanCSS({compatibility: 'ie8'}))
+//     .pipe(gulp.dest('./dist'));
+// }
+
 function styles() {
   return gulp.src('assets/css/styles.css')
-    .pipe(criticalCss({
-      width: 768,
-      height: 10000,
-      keepLargerMediaQueries: true,
-      url: CRITICAL_URL,
-      pageLoadSkipTimeout: 5000,
-      blockJSRequests: false,
-      renderWaitTime: 1000,
-      out: 'styles.css'
-    }))
-    .pipe(cleanCSS({compatibility: 'ie8'}))
+    .pipe(cleanCSS())
     .pipe(gulp.dest('./dist'));
 }
 
@@ -70,13 +104,20 @@ function moveStyles() {
     .pipe(gulp.dest('./dist'));
 }
 
+// function clean() {
+//   return del(['cssstyles.css']);
+// }
+
 function clean() {
-  return del(['cssstyles.css']);
+  return del(['./dist']);
 }
 
 function inline() {
   return gulp.src('assets/index.html')
-    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      minifyCSS: true
+    }))
     .pipe(inlinesource({
       rootpath: __dirname + '/dist',
       compress: false
@@ -91,11 +132,14 @@ function inline() {
 
 function build() {
   return gulp.series(
+    clean,
     serve,
     gulp.parallel(scripts, criticalScripts, sw, images),
     styles,
-    moveStyles,
-    gulp.parallel(clean, inline)
+    // moveStyles,
+    // gulp.parallel(clean, inline)
+    // replaceRevRef,
+    inline
   )();
 }
 

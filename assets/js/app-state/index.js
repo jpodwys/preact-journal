@@ -1,18 +1,31 @@
 import cookie from '../cookie';
+import { sortObjectsByDate } from '../utils';
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) localStorage.clear();
+  if(!loggedIn){
+    localStorage.removeItem('entries');
+    localStorage.removeItem('timestamp');
+  }
+  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
+  if(entries) entries = sortObjectsByDate(entries);
 
-  return {
+  let state = {
+    view: '/',
+    entryTextCopied: false,
+    showFilterInput: false,
+    filterText: '',
     entryReady: false,
     loggedIn: loggedIn,
     loading: 0,
     syncing: 0,
     entryIndex: -1,
     entry: undefined,
-    entries: JSON.parse(localStorage.getItem('entries')) || undefined
+    entries: entries,
+    viewEntries: entries
   };
+
+  return state;
 };
 
 export default getInitialState;

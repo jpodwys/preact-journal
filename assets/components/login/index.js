@@ -2,6 +2,13 @@ import { h, Component } from 'preact';
 import fire from '../../js/fire';
 
 export default class Login extends Component {
+  componentWillUnmount() {
+    this.base.querySelector('#cusername').value = '';
+    this.base.querySelector('#cpassword').value = '';
+    this.base.querySelector('#lusername').value = '';
+    this.base.querySelector('#lpassword').value = '';
+  }
+
   join = (e) => {
     e.preventDefault();
     fire('createAccount', {
