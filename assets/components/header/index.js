@@ -20,8 +20,9 @@ export default class Header extends Component {
 		var contenteditable = document.querySelector('#entryText');
 		var result = select(contenteditable);
 		var successful = document.execCommand('copy');
-		document.querySelector('#entryDate').focus();
-		document.querySelector('#entryDate').blur();
+		var date = document.querySelector('#entryDate');
+		date.focus();
+		date.blur();
 		if(successful) fire('linkstate', {key: 'entryTextCopied', val: true})();
 	}
 
