@@ -59,9 +59,9 @@ main {
   box-shadow: 0 5px 5px #c1c1c1;
 }
 
-.button {
+/*.button {
 
-}
+}*/
 
 .button--fab {
   width: 48px;
@@ -73,11 +73,10 @@ main {
 
 .button--fab.add-entry {
   position: fixed;
-  bottom: 15px;
-  right: 15px;
+  bottom: 25px;
+  right: 25px;
   background-color: #5776d0;
 }
-
 
 .grow {
   flex: 1 2;

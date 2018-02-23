@@ -24,14 +24,9 @@ const filterObjectsByText = function(query, list) {
   });
 };
 
-const preventDefault = function(e) {
-  e.preventDefault();
-};
-
 export {
   findObjectIndexById,
   removeObjectByIndex,
   sortObjectsByDate,
-  filterObjectsByText,
-  preventDefault
+  filterObjectsByText
 };

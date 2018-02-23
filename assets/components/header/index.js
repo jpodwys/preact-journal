@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from 'preact-router/match';
 import fire from '../../js/fire';
-import { preventDefault } from '../../js/utils';
 import select from 'select';
 
 export default class Header extends Component {
@@ -14,6 +13,11 @@ export default class Header extends Component {
 		fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
 			this.base.querySelector('#filterTextInput').focus();
 		}})();
+	}
+
+	cancelAndBlur = (e) => {
+		e.preventDefault();
+		this.base.querySelector('#filterTextInput').blur();
 	}
 
 	copyText(e) {
@@ -47,7 +51,7 @@ export default class Header extends Component {
 
 				<span class="nav-set grow">
 					{view === '/entries' && showFilterInput &&
-						<form class="search-form full-height right" onsubmit={preventDefault}>
+						<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
 					    <input
 					    	id="filterTextInput"
 					    	autocomplete="off"
