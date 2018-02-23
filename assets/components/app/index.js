@@ -11,7 +11,7 @@ import freedux from '../../js/freedux';
 import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
-import { handleRouteChange } from '../../js/route-handlers';
+import handleRouteChange from '../../js/route-handlers';
 
 export default class App extends Component {
   state = getInitialState();

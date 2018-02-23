@@ -319,7 +319,7 @@ const slowFilter = function(el, e){
   });
 };
 
-const filterByText = debounce(slowFilter, 200);
+const filterByText = debounce(slowFilter, 100);
 
 const blurTextFilter = function(el){
   if(!el.state.filterText){

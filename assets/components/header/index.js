@@ -21,8 +21,8 @@ export default class Header extends Component {
 	}
 
 	copyText(e) {
-		var contenteditable = document.querySelector('#entryText');
-		var result = select(contenteditable);
+		var text = document.querySelector('#entryText');
+		var result = select(text);
 		var successful = document.execCommand('copy');
 		var date = document.querySelector('#entryDate');
 		date.focus();

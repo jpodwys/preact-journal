@@ -108,3 +108,7 @@ main {
 .search-form input::placeholder {
   color: white;
 }
+
+.center-text {
+  text-align: center;
+}
