@@ -1,7 +1,8 @@
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  color: black;
+  color: #424242;
+  font-size: 18px;
 }
 
 header {
@@ -115,7 +116,7 @@ main {
 }
 
 .list-item {
-  margin: 25px 0;
+  margin: 20px 0;
 }
 
 .list-item * {
@@ -123,13 +124,13 @@ main {
 }
 
 .list-item .first-row {
-  font-size: 18px;
-  height: 24px;
+  font-size: 22px;
+  height: 26px;
 }
 
 .list-item .second-row {
-  font-size: 16px;
-  color: #5d5d5d;
-  height: 38px;
+  /*font-size: 18px;*/
+  /*color: #5d5d5d;*/
+  height: 44px;
   overflow: hidden;
 }
