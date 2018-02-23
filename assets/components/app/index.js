@@ -22,14 +22,6 @@ export default class App extends Component {
     freedux(this, actions);
     fire('getEntries')();
 
-    if(this.state.loggedIn && !done){
-      let moreEntries = getDeferredState();
-      if(moreEntries){
-        persist(this, {entries: this.state.entries.concat(moreEntries)});
-        done = true;
-      }
-    }
-
     // For debugging
     window.app = this;
     window.route = route;
@@ -37,6 +29,16 @@ export default class App extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     fire('getEntries')();
+  }
+
+  componentDidUpdate() {
+    if(!done && this.state.loggedIn && this.state.entries){
+      let moreEntries = getDeferredState();
+      if(moreEntries){
+        persist(this, {entries: this.state.entries.concat(moreEntries)});
+        done = true;
+      }
+    }
   }
 
   render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, entryTextCopied }) {

@@ -29,9 +29,11 @@ const loginSuccess = function(el, user){
     loading: el.state.loading - 1
   }), function(){
     route('/entries');
-    let moreEntries = getDeferredState();
-    if(moreEntries){
-      persist(el, {entries: el.state.entries.concat(moreEntries)});
+    if(el.state.entries){
+      let moreEntries = getDeferredState();
+      if(moreEntries){
+        persist(el, {entries: el.state.entries.concat(moreEntries)});
+      }
     }
   });
 };
