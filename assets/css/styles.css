@@ -1,6 +1,7 @@
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
+  color: black;
 }
 
 header {
@@ -52,7 +53,7 @@ a, a:visited {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 65px 15px;
+  padding: 55px 15px 65px 15px;
 }
 
 .elevated {
@@ -111,4 +112,24 @@ main {
 
 .center-text {
   text-align: center;
+}
+
+.list-item {
+  margin: 25px 0;
+}
+
+.list-item * {
+  margin: 0;
+}
+
+.list-item .first-row {
+  font-size: 18px;
+  height: 24px;
+}
+
+.list-item .second-row {
+  font-size: 16px;
+  color: #5d5d5d;
+  height: 38px;
+  overflow: hidden;
 }
