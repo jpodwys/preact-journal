@@ -1,6 +1,7 @@
 import User from '../services/user-service';
 import { route } from 'preact-router';
-import getInitialState from '../../js/app-state';
+import { getInitialState, getDeferredState } from '../../js/app-state';
+import persist from '../../js/persist';
 
 const clearLocalStorage = function(){
   localStorage.removeItem('entries');
@@ -28,6 +29,10 @@ const loginSuccess = function(el, user){
     loading: el.state.loading - 1
   }), function(){
     route('/entries');
+    let moreEntries = getDeferredState();
+    if(moreEntries){
+      persist(el, {entries: el.state.entries.concat(moreEntries)});
+    }
   });
 };
 

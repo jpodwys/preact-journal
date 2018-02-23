@@ -8,10 +8,12 @@ import Entry from '../entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
-import getInitialState from '../../js/app-state';
+import { getInitialState, getDeferredState } from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
-import { handleRouteChange } from '../../js/route-handlers';
+import handleRouteChange from '../../js/route-handlers';
+import persist from '../../js/persist';
+let done = false;
 
 export default class App extends Component {
   state = getInitialState();
@@ -19,6 +21,14 @@ export default class App extends Component {
   componentWillMount() {
     freedux(this, actions);
     fire('getEntries')();
+
+    if(this.state.loggedIn && !done){
+      let moreEntries = getDeferredState();
+      if(moreEntries){
+        persist(this, {entries: this.state.entries.concat(moreEntries)});
+        done = true;
+      }
+    }
 
     // For debugging
     window.app = this;

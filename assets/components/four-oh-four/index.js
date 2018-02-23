@@ -3,7 +3,7 @@ import { h, Component } from 'preact';
 export default class FourOhFour extends Component {
   render() {
     return (
-      <h2>Looks like that doesn't exist!</h2>
+      <h2 class="center-text">Looks like that doesn't exist!</h2>
     );
   }
 }

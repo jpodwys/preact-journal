@@ -9,7 +9,7 @@ history.pushState = (a, b, url) => {
   scrollTo(0, 0);
 };
 
-export function handleRouteChange(e) {
+export default function handleRouteChange(e) {
   var view = e.url.lastIndexOf('/') > 0
     ? e.url.substr(0, e.url.lastIndexOf('/'))
     : e.url;
