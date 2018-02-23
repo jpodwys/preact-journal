@@ -1,7 +1,7 @@
 import cookie from '../cookie';
 import { sortObjectsByDate } from '../utils';
 
-export function getInitialState(){
+const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn){
     localStorage.removeItem('entries');
@@ -28,6 +28,4 @@ export function getInitialState(){
   return state;
 };
 
-export function getDeferredState(){
-  return JSON.parse(localStorage.getItem('moreEntries'));
-};
+export default getInitialState;

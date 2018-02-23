@@ -8,12 +8,10 @@ import Entry from '../entry';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
-import { getInitialState, getDeferredState } from '../../js/app-state';
+import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
-import persist from '../../js/persist';
-let done = false;
 
 export default class App extends Component {
   state = getInitialState();
@@ -29,16 +27,6 @@ export default class App extends Component {
 
   componentWillUpdate(nextProps, nextState) {
     fire('getEntries')();
-  }
-
-  componentDidUpdate() {
-    if(!done && this.state.loggedIn && this.state.entries){
-      let moreEntries = getDeferredState();
-      if(moreEntries){
-        persist(this, {entries: this.state.entries.concat(moreEntries)});
-        done = true;
-      }
-    }
   }
 
   render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, entryTextCopied }) {
