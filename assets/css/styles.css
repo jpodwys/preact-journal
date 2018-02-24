@@ -65,9 +65,9 @@ header .nav-set > * {
   padding: 5px;
 }
 
-.nav-set svg:hover {
+/*.nav-set svg:hover {
   fill: orange;
-}
+}*/
 
 svg {
   fill: #FFF;

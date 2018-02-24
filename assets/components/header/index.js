@@ -69,7 +69,7 @@ export default class Header extends Component {
 				  	<Icon icon="copy" key="-header-copy" onclick={this.copy}/>
 					}
 					{loggedIn && entry && view === '/entry' &&
-						<Icon icon="delete" key="-header-delete" onclick={fire('deleteEntry', {id: entry.id})}/>
+						<Icon icon="delete" key="-header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
 					}
 				  {loggedIn &&
 				  	<Icon icon="menu" key="-header-menu" onclick={fire('logout')}/>

@@ -17,6 +17,7 @@ const handleRouteChange = function(e) {
   if(~e.url.indexOf('/new')) view = '/new';
   this.setState({view: view});
   handleRoute.call(this, view, e);
+  fire('linkstate', {key: 'toastConfig'})();
 };
 
 const handleRoute = function(view, e) {
