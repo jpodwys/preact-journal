@@ -10,7 +10,6 @@ toast {
   transform: translateX(-50%);
   position: fixed;
   text-align: center;
-  max-width: 400px;
   height: 36px;
   background-color: #424242;
   bottom: -100px;
@@ -18,6 +17,7 @@ toast {
   z-index: 2;
   color: #fff;
   width: 100%;
+  max-width: 450px;
 }
 
 toast.show {
