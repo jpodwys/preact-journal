@@ -70,8 +70,12 @@ header .nav-set > * {
 }
 
 @media (hover: none) {
-  .nav-set svg:hover {
-    fill: initial;
+  svg:hover {
+    fill: #fff;
+  }
+
+  .dark-fill svg:hover {
+    fill: #6f6f6f;
   }
 }
 
