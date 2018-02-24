@@ -69,13 +69,19 @@ header .nav-set > * {
   fill: orange;
 }
 
+@media (hover: none) {
+  .nav-set svg:hover {
+    fill: initial;
+  }
+}
+
 svg {
   fill: #FFF;
   height: 24px;
   width: 24px;
 }
 
-.dark-fill svg, .dark-fill svg:active {
+.dark-fill svg {
   fill: #6f6f6f;
 }
 
