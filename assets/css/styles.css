@@ -65,9 +65,9 @@ header .nav-set > * {
   padding: 5px;
 }
 
-/*.nav-set svg:hover {
+.nav-set svg:hover {
   fill: orange;
-}*/
+}
 
 svg {
   fill: #FFF;
@@ -75,8 +75,8 @@ svg {
   width: 24px;
 }
 
-.dark-fill svg {
-  fill: #424242;
+.dark-fill svg, .dark-fill svg:active {
+  fill: #6f6f6f;
 }
 
 .half-width {
@@ -202,15 +202,15 @@ main {
   vertical-align: middle;
 }
 
-.mdl-button--grey {
+/*.mdl-button--grey {
   color: #424242;
-  background-color: #E6E6E6; /* grey */
+  background-color: #E6E6E6;
 }
 
 .mdl-button--warning {
-  background: rgb(223, 117, 20); /* orange */
+  background: rgb(223, 117, 20);
 }
 
 .mdl-button--recommended {
-  background: rgb(223, 117, 20); /* orange */
-}
+  background: rgb(223, 117, 20);
+}*/
