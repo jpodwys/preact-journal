@@ -5,6 +5,7 @@ import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
+import Toast from '../toast';
 import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
@@ -29,10 +30,10 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, entryTextCopied }) {
+  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, toastConfig}) {
     return (
       <div>
-        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput} entryTextCopied={entryTextCopied}/>
+        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={loggedIn} loading={loading}/>
@@ -40,6 +41,7 @@ export default class App extends Component {
             <Entry path="/entry/:id" view={view} loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
             <FourOhFour default/>
           </Router>
+          <Toast toastConfig={toastConfig}/>
         </main>
       </div>
     );

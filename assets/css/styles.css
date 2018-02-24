@@ -5,9 +5,34 @@ body {
   font-size: 16px;
 }
 
-header {
-  color: white;
+toast {
+  left: 50%;
+  transform: translateX(-50%);
   position: fixed;
+  text-align: center;
+  max-width: 400px;
+  height: 36px;
+  background-color: #424242;
+  bottom: -100px;
+  transition: bottom linear .2s;
+  z-index: 2;
+  color: #fff;
+  width: 100%;
+}
+
+toast.show {
+  bottom: 0;
+}
+
+.toast-label {
+  display: inline-block;
+  padding: 8px 16px;
+}
+
+header {
+  color: #fff;
+  position: fixed;
+  z-index: 1;
   left: 0;
   top: 0;
   right: 0;
@@ -19,25 +44,44 @@ header {
   padding: 0 30px;*/
 }
 
-header .nav-set {
+header .nav-set > * {
+  padding: 12.5px;
+}
+
+.nav-set {
   height: inherit;
 }
 
-header .nav-set > * {
+.nav-set > * {
   position: relative;
   display: inline-block;
   margin: 0;
-  padding: 12.5px;
+  padding: 0 12.5px;
   cursor: pointer;
   transition: all ease .2s;
 }
 
-header .nav-set > .full-height {
+.nav-set > .full-height {
   padding: 5px;
 }
 
-header .nav-set svg:hover {
+.nav-set svg:hover {
   fill: orange;
+}
+
+svg {
+  fill: #FFF;
+  height: 24px;
+  width: 24px;
+}
+
+.dark-fill svg {
+  fill: #424242;
+}
+
+.half-width {
+  position: relative;
+  width: 50%;
 }
 
 input {
@@ -60,10 +104,6 @@ main {
 .elevated {
   box-shadow: 0 5px 5px #c1c1c1;
 }
-
-/*.button {
-
-}*/
 
 .button--fab {
   width: 48px;
@@ -104,11 +144,11 @@ main {
   border: none;
   outline: 0;
   border: 0;
-  color: white;
+  color: #fff;
 }
 
 .search-form input::placeholder {
-  color: white;
+  color: #fff;
 }
 
 .center-text {
@@ -131,6 +171,46 @@ main {
 .list-item .second-row {
   /*font-size: 16px;*/
   /*color: #5d5d5d;*/
-  height: 38px;
+  height: 40px;
   overflow: hidden;
+}
+
+.mdl-button {
+  background: transparent;
+  border: none;
+  border-radius: 2px;
+  color: #fff;
+  position: relative;
+  height: 36px;
+  margin: 0;
+  min-width: 64px;
+  padding: 0 16px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0;
+  overflow: hidden;
+  will-change: box-shadow;
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  line-height: 36px;
+  vertical-align: middle;
+}
+
+.mdl-button--grey {
+  color: #424242;
+  background-color: #E6E6E6; /* grey */
+}
+
+.mdl-button--warning {
+  background: rgb(223, 117, 20); /* orange */
+}
+
+.mdl-button--recommended {
+  background: rgb(223, 117, 20); /* orange */
 }
