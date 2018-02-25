@@ -1,5 +1,4 @@
 import { h, Component } from 'preact';
-import { Link } from 'preact-router/match';
 import Icon from '../Icon';
 import fire from '../../js/fire';
 import copyText from '../../js/copy-text';
