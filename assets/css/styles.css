@@ -108,7 +108,7 @@ a, a:visited {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 55px 15px 65px 15px;
+  padding: 0 15px 65px 15px;
 }
 
 .elevated {
@@ -163,6 +163,14 @@ main {
 
 .center-text {
   text-align: center;
+}
+
+.entry-list {
+  padding-top: 55px;
+}
+
+.entry-list > div {
+  padding-bottom: 65px;
 }
 
 .list-item {

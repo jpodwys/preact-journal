@@ -11,7 +11,7 @@ export default class Entries extends Component {
       );
     }
     return (
-      <ScrollViewport class="list" rowHeight={this.rowHeight}>
+      <ScrollViewport class="entry-list" rowHeight={64} overscan={20}>
         {entries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );
