@@ -15,11 +15,9 @@ const handleRouteChange = function(e) {
     : e.url;
   if(view !== '/' && !this.state.loggedIn) return route('/');
   if(~e.url.indexOf('/new')) view = '/new';
-  this.setState({
-    view: view,
-    entryTextCopied: false
-  });
+  this.setState({view: view});
   handleRoute.call(this, view, e);
+  fire('linkstate', {key: 'toastConfig'})();
 };
 
 const handleRoute = function(view, e) {

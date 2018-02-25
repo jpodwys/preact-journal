@@ -22,6 +22,16 @@ export default class Entry extends Component {
     // return true;
   }
 
+  // componentDidMount() {
+  //   setTimeout(function(){
+  //     this.base.classList.remove('hidden');
+  //   }.bind(this), 1000)
+  // }
+
+  // componentWillUnmount() {
+  //   this.base.classList.add('hidden');
+  // }
+
   // getIcons(entry) {
     // if(!entry.isOwner) return '';
     // return !entry.isPublic ? '🔐' : '🔓'
@@ -78,11 +88,11 @@ export default class Entry extends Component {
     if(view !== '/new' && !entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
-      <entry-view>
+      <entry-view class="hidden">
         <h1 id="entryDate" contenteditable onInput={this.upsert}>
           {entry.date}
         </h1>
-        Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/>
+        {/* Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/> */}
         <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
       </entry-view>
     );

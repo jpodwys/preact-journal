@@ -12,7 +12,6 @@ const getInitialState = function() {
 
   let state = {
     view: '/',
-    entryTextCopied: false,
     showFilterInput: false,
     filterText: '',
     entryReady: false,
@@ -22,7 +21,8 @@ const getInitialState = function() {
     entryIndex: -1,
     entry: undefined,
     entries: entries,
-    viewEntries: entries
+    viewEntries: entries,
+    toastConfig: undefined
   };
 
   return state;
