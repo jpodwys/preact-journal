@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import ScrollViewport from 'preact-scroll-viewport';
 import EntryPreview from '../entry-preview';
 
 export default class Entries extends Component {
@@ -10,9 +11,9 @@ export default class Entries extends Component {
       );
     }
     return (
-      <entry-list>
+      <ScrollViewport class="list" rowHeight={this.rowHeight}>
         {entries.map(entry => <EntryPreview entry={entry}/>)}
-      </entry-list>
+      </ScrollViewport>
     );
   }
 }
