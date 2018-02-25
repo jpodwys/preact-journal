@@ -165,6 +165,14 @@ main {
   text-align: center;
 }
 
+/*.entry-list {
+
+}*/
+
+.entry-list > div {
+  padding-bottom: 65px;
+}
+
 .list-item {
   margin: 20px 0;
 }

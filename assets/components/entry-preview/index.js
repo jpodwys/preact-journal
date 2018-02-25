@@ -22,12 +22,10 @@ export default class EntryPreview extends Component {
             <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
             <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
           </span>
-          {/*<span>{ !entry.isPublic ? '🔐' : '🔓' }</span>✖*/}
         </div>
 
         <div class="second-row">
           <p class="entry-text">
-            {/* {entry.text.length > 140 ? entry.text.substr(0, 140) + '...' : entry.text} */}
             {entry.text}
           </p>
         </div>
