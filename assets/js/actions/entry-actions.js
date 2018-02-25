@@ -280,8 +280,6 @@ const newEntry = function(el){
     id: Date.now(),
     date: new Date().toISOString().slice(0, 10),
     text: '',
-    isPublic: 0,
-    // isOwner: true,
     needsSync: true,
     newEntry: true
   };

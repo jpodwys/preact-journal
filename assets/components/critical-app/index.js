@@ -5,7 +5,7 @@ import Entries from '../entries';
 import Entry from '../entry';
 import FourOhFour from '../four-oh-four';
 
-let entry = {id: 1234, date: '12-12-1212', text: 'Bogus', isPublic: false};
+let entry = {id: 1234, date: '12-12-1212', text: 'Bogus'};
 
 export default class App extends Component {
   state = {

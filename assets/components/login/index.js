@@ -33,7 +33,7 @@ export default class Login extends Component {
     return (
       <div class="login-page-wrapper">
         <h1 class="center-text">Journalize</h1>
-        <h4 class="center-text">Private and public journal entries</h4>
+        <h4 class="center-text">Private journal entries</h4>
           <form action="javscript:" onSubmit={this.join} class="join-form pure-form pure-form-stacked full-width">
             <fieldset>
               <legend>Create an Account</legend>

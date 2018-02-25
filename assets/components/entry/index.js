@@ -16,10 +16,6 @@ export default class Entry extends Component {
     if(!oe || !ne) return true;
     if(oe.id !== ne.id) return true;
     return false;
-    // if(ne.date === oe.date
-    //   && ne.text === oe.text.trim()
-    //   && ne.isPublic === oe.isPublic) return false;
-    // return true;
   }
 
   // componentDidMount() {
@@ -32,20 +28,12 @@ export default class Entry extends Component {
   //   this.base.classList.add('hidden');
   // }
 
-  // getIcons(entry) {
-    // if(!entry.isOwner) return '';
-    // return !entry.isPublic ? '🔐' : '🔓'
-    // var isPublic = entry.isPublic ? 'Public' : 'Private';
-    // return <span id="isPublic" data-val={entry.isPublic}>{isPublic}</span>
-  // }
-
   upsert = e => {
     var entry = this.props.entry;
 
     if(entry.newEntry){
       entry.date = this.base.querySelector('#entryDate').innerText;
       entry.text = this.base.querySelector('#entryText').innerText;
-      entry.isPublic = this.base.querySelector('#isPublic').checked;
 
       fire('createEntry', {
         entry: entry,
@@ -72,18 +60,6 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  togglePublic = e => {
-    var obj = {
-      property: 'isPublic',
-      entryId: this.props.entry.id,
-      entry: {
-        isPublic: this.base.querySelector('#isPublic').checked
-      }
-    }
-
-    fire('updateEntry', obj)();
-  }
-
   render({ view, entryIndex, entry, entryReady }) {
     if(view !== '/new' && !entryReady) return;
     if(!entry) return <FourOhFour/>
@@ -92,7 +68,6 @@ export default class Entry extends Component {
         <h1 id="entryDate" contenteditable onInput={this.upsert}>
           {entry.date}
         </h1>
-        {/* Public <input id="isPublic" type="checkbox" onClick={this.togglePublic} checked={entry.isPublic}/> */}
         <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
       </entry-view>
     );
