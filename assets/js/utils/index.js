@@ -12,7 +12,7 @@ const removeObjectByIndex = function(index, list) {
 const sortObjectsByDate = function(list) {
   if(!list) return [];
   return list.sort(function(a, b){
-    return new Date(b.date) > new Date(a.date);
+    return new Date(b.date) - new Date(a.date);
   });
 };
 
