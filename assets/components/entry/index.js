@@ -11,7 +11,6 @@ export default class Entry extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if(nextProps.view === '/new') return true;
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
