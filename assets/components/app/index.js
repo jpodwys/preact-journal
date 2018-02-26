@@ -30,14 +30,14 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, toastConfig}) {
+  render(props, { scrollPosition, view, loggedIn, loading, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, toastConfig}) {
     return (
       <div>
         <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={loggedIn} loading={loading}/>
-            <Entries path="/entries" loggedIn={loggedIn} loading={loading} entries={viewEntries}/>
+            <Entries path="/entries" scrollPosition={scrollPosition} loggedIn={loggedIn} loading={loading} entries={viewEntries}/>
             <Entry path="/entry/:id" view={view} loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
             <FourOhFour default/>
           </Router>

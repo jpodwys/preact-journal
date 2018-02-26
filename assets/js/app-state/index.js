@@ -11,6 +11,7 @@ const getInitialState = function() {
   if(entries) entries = sortObjectsByDate(entries);
 
   let state = {
+    scrollPosition: 0,
     view: '/',
     showFilterInput: false,
     filterText: '',
