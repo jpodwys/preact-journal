@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import Icon from '../Icon';
 import fire from '../../js/fire';
 import copyText from '../../js/copy-text';
+import debounce from '../../js/debounce';
 
 export default class Header extends Component {
 	clearFilterText = (e) => {
@@ -51,7 +52,7 @@ export default class Header extends Component {
 					    	autocomplete="off"
 					    	value={filterText}
 					    	placeholder="Search entries"
-					    	oninput={fire('filterByText')}
+					    	oninput={debounce(fire('filterByText'), 100)}
 					    	onblur={fire('blurTextFilter')}
 					    />
 					  </form>

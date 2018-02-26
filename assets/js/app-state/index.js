@@ -1,5 +1,5 @@
 import cookie from '../cookie';
-import { sortObjectsByDate } from '../utils';
+import { sortObjectsByDate, filterHiddenEntries } from '../utils';
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
@@ -9,6 +9,8 @@ const getInitialState = function() {
   }
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
   if(entries) entries = sortObjectsByDate(entries);
+  let viewEntries;
+  if(entries) viewEntries = filterHiddenEntries(entries);
 
   let state = {
     scrollPosition: 0,
@@ -22,7 +24,7 @@ const getInitialState = function() {
     entryIndex: -1,
     entry: undefined,
     entries: entries,
-    viewEntries: entries,
+    viewEntries: viewEntries || entries,
     toastConfig: undefined
   };
 

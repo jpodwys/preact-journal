@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import fire from '../../js/fire';
 import FourOhFour from '../four-oh-four';
+import debounce from '../../js/debounce';
 
 export default class Entry extends Component {
   componentDidUpdate() {
@@ -28,7 +29,7 @@ export default class Entry extends Component {
   //   this.base.classList.add('hidden');
   // }
 
-  upsert = e => {
+  slowUpsert = e => {
     var entry = this.props.entry;
 
     if(entry.newEntry){
@@ -40,6 +41,8 @@ export default class Entry extends Component {
       this.update(e);
     }
   }
+
+  upsert = debounce(this.slowUpsert, 500);
 
   update = e => {
     var property;

@@ -6,7 +6,7 @@ import debounce from '../../js/debounce';
 
 export default class Entries extends Component {
   componentDidMount() {
-    document.body.onscroll = debounce(fire('scrollBody'), 200);
+    document.body.onscroll = debounce(fire('scrollBody'), 50);
   }
 
   shouldComponentUpdate(np) {
