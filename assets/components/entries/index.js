@@ -6,12 +6,13 @@ import debounce from '../../js/debounce';
 
 export default class Entries extends Component {
   componentDidMount() {
-    document.body.onscroll = function(){
-      debounce(
-        fire('linkstate', {key: 'scrollPosition', val: document.body.scrollTop})(),
-        200
-      );
-    }
+    document.body.onscroll = debounce(fire('scrollBody'), 200);
+  }
+
+  shouldComponentUpdate(np) {
+    let op = this.props;
+    return op.entries !== np.entries
+      || op.scrollPosition === np.scrollPosition;
   }
 
   render({ entries, scrollPosition }) {

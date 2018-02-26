@@ -35,9 +35,7 @@ export default class Entry extends Component {
       entry.date = this.base.querySelector('#entryDate').innerText;
       entry.text = this.base.querySelector('#entryText').innerText;
 
-      fire('createEntry', {
-        entry: entry,
-      })();
+      fire('createEntry', {entry: entry})();
     } else {
       this.update(e);
     }
