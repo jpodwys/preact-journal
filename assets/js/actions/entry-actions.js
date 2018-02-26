@@ -1,7 +1,6 @@
 import Entry from '../services/entry-service';
 import { route } from 'preact-router';
-import debounce from '../debounce';
-import { findObjectIndexById, removeObjectByIndex, filterObjectsByText } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
 import persist from '../persist';
 
 let dataFetched = false;
@@ -116,7 +115,7 @@ const getEntry = function(el, e){
   
 };
 
-const slowCreate = function(el, e){
+const createEntry = function(el, e){
   let entry = e.detail.entry;
 
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
@@ -141,8 +140,6 @@ const slowCreate = function(el, e){
     slowCreateFailure(el, entry.id, err);
   });
 };
-
-const createEntry = debounce(slowCreate, 500);
 
 const slowCreateSuccess = function(el, oldId, response){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
@@ -172,7 +169,7 @@ const slowCreateFailure = function(el, oldId, err){
   console.log('slowCreateFailure', err);
 };
 
-const slowUpdate = function(el, e){
+const updateEntry = function(el, e){
   var d = e.detail;
   var val = d.entry[d.property];
   if(typeof val === 'string'){
@@ -193,15 +190,13 @@ const slowUpdate = function(el, e){
   });
 
   Entry.update(d.entryId, d.entry).then(function(){
-    slowUpdateSuccess(el, d.entryId);
+    updateEntrySuccess(el, d.entryId);
   }).catch(function(err){
-    slowUpdateFailure(el, err);
+    updateEntryFailure(el, err);
   });
 };
 
-const updateEntry = debounce(slowUpdate, 500);
-
-const slowUpdateSuccess = function(el, id){
+const updateEntrySuccess = function(el, id){
   let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
@@ -211,7 +206,7 @@ const slowUpdateSuccess = function(el, id){
   });
 };
 
-const slowUpdateFailure = function(el, err){
+const updateEntryFailure = function(el, err){
   console.log('slowUpdateFailure', err);
 };
 
@@ -294,12 +289,12 @@ const newEntry = function(el){
   });
 };
 
-const slowFilter = function(el, e){
+const filterByText = function(el, e){
   if(!e || !e.detail) return;
   if(el.state.filterText === e.detail.value) return;
   if(!e.detail.value) return el.setState({
     filterText: '',
-    viewEntries: el.state.entries
+    viewEntries: applyFilters('', el.state.entries)
   });
 
   // If the new query is a continuation of the prior query,
@@ -310,14 +305,12 @@ const slowFilter = function(el, e){
     ? el.state.viewEntries
     : el.state.entries;
 
-  var viewEntries = filterObjectsByText(q, entries);
+  var viewEntries = applyFilters(q, entries);
   el.setState({
     filterText: query,
     viewEntries: viewEntries
   });
 };
-
-const filterByText = debounce(slowFilter, 100);
 
 const blurTextFilter = function(el){
   if(!el.state.filterText){

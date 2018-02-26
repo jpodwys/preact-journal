@@ -12,7 +12,7 @@ const removeObjectByIndex = function(index, list) {
 const sortObjectsByDate = function(list) {
   if(!list) return [];
   return list.sort(function(a, b){
-    return new Date(b.date) - new Date(a.date);
+    return new Date(b.date) > new Date(a.date);
   });
 };
 
@@ -24,9 +24,29 @@ const filterObjectsByText = function(query, list) {
   });
 };
 
+// const filterObjectsWithProperty = function(property, list) {
+//   return list.filter(function(obj){
+//     return !obj[property];
+//   });
+// };
+
+const filterHiddenEntries = function(entries) {
+  return entries.filter(function(entry){
+    return !(entry.deleted || entry.newEntry && !entry.postPending);
+  });
+};
+
+const applyFilters = function(query, list){
+  list = filterHiddenEntries(list);
+  return filterObjectsByText(query, list);
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
   sortObjectsByDate,
-  filterObjectsByText
+  filterObjectsByText,
+  // filterObjectsWithProperty,
+  filterHiddenEntries,
+  applyFilters
 };
