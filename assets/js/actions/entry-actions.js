@@ -30,7 +30,7 @@ const getAllEntries = function(el){
 const getAllEntriesSuccess = function(el, response){
   persist(el, {
     entries: response.entries,
-    loading: el.state.loading - 1
+    // loading: el.state.loading - 1
   }, function(){
     setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
     localStorage.setItem('timestamp', response.timestamp);
@@ -94,7 +94,7 @@ const applySyncPatch = function(el, entries){
 
 const persistSyncPatch = function(el, timestamp){
   persist(el, {
-    loading: el.state.loading - 1,
+    // loading: el.state.loading - 1,
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
@@ -120,7 +120,7 @@ const createEntry = function(el, e){
   el.state.entries[entryIndex] = entry;
 
   persist(el, {
-    loading: el.state.loading + 1,
+    // loading: el.state.loading + 1,
     entry: entry,
     entries: [].concat(el.state.entries)
   });
@@ -151,7 +151,7 @@ const slowCreateSuccess = function(el, oldId, response){
   delete el.state.entries[entryIndex].needsSync;
 
   persist(el, {
-    loading: el.state.loading - 1,
+    // loading: el.state.loading - 1,
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
