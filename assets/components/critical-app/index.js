@@ -11,7 +11,7 @@ export default class App extends Component {
   state = {
     entryReady: true,
     loggedIn: true,
-    loading: 0,
+    // loading: 0,
     syncing: 0,
     entryIndex: 0,
     entry: entry,
@@ -24,9 +24,9 @@ export default class App extends Component {
         <div id="view-wrapper">
           <main id="main">
             <Header loggedIn={true}/>
-            <Login loggedIn={loggedIn} loading={loading}/>
-            <Entries loggedIn={loggedIn} loading={loading} entries={entries}/>
-            <Entry loggedIn={loggedIn} loading={loading} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
+            <Login loggedIn={loggedIn}/>
+            <Entries loggedIn={loggedIn} entries={entries}/>
+            <Entry loggedIn={loggedIn} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
             <FourOhFour/>
           </main>
         </div>

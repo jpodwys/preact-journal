@@ -19,7 +19,7 @@ const getInitialState = function() {
     filterText: '',
     entryReady: false,
     loggedIn: loggedIn,
-    loading: 0,
+    // loading: 0,
     syncing: 0,
     entryIndex: -1,
     entry: undefined,

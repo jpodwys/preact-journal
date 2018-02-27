@@ -19,14 +19,10 @@ const login = function(el, e){
 };
 
 const loginSuccess = function(el, user){
-  /*
-   * THIS SHOULD NOT NEED OBJECT.ASSIGN BUT IT DOES.
-   * When I remove object.assign, entries is undefined.
-   */
-  el.setState(Object.assign(el.state, {
+  el.setState({
     loggedIn: true,
     // loading: el.state.loading - 1
-  }), function(){
+  }, function(){
     route('/entries');
   });
 };
