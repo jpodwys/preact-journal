@@ -9,7 +9,7 @@ const clearLocalStorage = function(){
 
 const login = function(el, e){
   clearLocalStorage();
-  el.setState({loading: el.state.loading + 1});
+  // el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.login(user).then(user => {
     loginSuccess(el, user);
@@ -25,20 +25,20 @@ const loginSuccess = function(el, user){
    */
   el.setState(Object.assign(el.state, {
     loggedIn: true,
-    loading: el.state.loading - 1
+    // loading: el.state.loading - 1
   }), function(){
     route('/entries');
   });
 };
 
 const loginFailure = function(el, err){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   console.log('loginFailure', err);
 };
 
 const createAccount = function(el, e){
   clearLocalStorage();
-  el.setState({loading: el.state.loading + 1});
+  // el.setState({loading: el.state.loading + 1});
   let user = e.detail.user;
   User.create(user).then(user => {
     createAccountSuccess(el, user);
@@ -48,17 +48,17 @@ const createAccount = function(el, e){
 };
 
 const createAccountSuccess = function(el, user){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   route('/entries');
 };
 
 const createAccountFailure = function(el, err){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   console.log('createAccountFailure', err);
 };
 
 const logout = function(el, e){
-  el.setState({loading: el.state.loading + 1});
+  // el.setState({loading: el.state.loading + 1});
   User.logout().then(() => {
     logoutSuccess(el);
   }).catch(err => {
@@ -73,7 +73,7 @@ const logoutSuccess = function(el){
 };
 
 const logoutFailure = function(el, err){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   console.log('logoutFailure', err);
 };
 

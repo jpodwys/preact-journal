@@ -19,7 +19,7 @@ const getEntries = function(el, e){
 
 const getAllEntries = function(el){
   if(el.state.entries) return;
-  el.setState({loading: el.state.loading + 1});
+  // el.setState({loading: el.state.loading + 1});
   Entry.getAll().then(response => {
     getAllEntriesSuccess(el, response);
   }).catch(err => {
@@ -38,7 +38,7 @@ const getAllEntriesSuccess = function(el, response){
 };
 
 const getAllEntriesError = function(el, err){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   console.log('getAllEntriesError', err)
 };
 
@@ -60,7 +60,7 @@ const syncClientEntries = function(el){
 
 // Sync entries with newer versions from the server
 const syncEntries = function(el, e){
-  el.setState({loading: el.state.loading + 1});
+  // el.setState({loading: el.state.loading + 1});
   Entry.sync(e.detail.timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
@@ -71,9 +71,7 @@ const syncEntries = function(el, e){
 
 const syncEntriesSuccess = function(el, response){
   if(response.entries.length === 0){
-    el.setState({
-      loading: el.state.loading - 1,
-    });
+    // el.setState({loading: el.state.loading - 1});
     localStorage.setItem('timestamp', response.timestamp);
     return;
   }
@@ -107,7 +105,7 @@ const persistSyncPatch = function(el, timestamp){
 };
 
 const syncEntriesFailure = function(el, err){
-  el.setState({loading: el.state.loading - 1});
+  // el.setState({loading: el.state.loading - 1});
   console.log('syncEntriesFailure', err)
 };
 
@@ -163,7 +161,7 @@ const slowCreateFailure = function(el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
-    loading: el.state.loading - 1,
+    // loading: el.state.loading - 1,
     entries: [].concat(el.state.entries)
   });
   console.log('slowCreateFailure', err);
