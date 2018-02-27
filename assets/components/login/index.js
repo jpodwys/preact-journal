@@ -34,7 +34,7 @@ export default class Login extends Component {
       <div class="login-page-wrapper">
         <h1 class="center-text">Journalize</h1>
         <h4 class="center-text">Private journal entries</h4>
-          <form action="javscript:" onSubmit={this.join} class="join-form pure-form pure-form-stacked full-width">
+          <form action="/api/user" method="POST" onSubmit={this.join} class="join-form pure-form pure-form-stacked full-width">
             <fieldset>
               <legend>Create an Account</legend>
               <input id="cusername" placeholder="username" autocapitalize="off"/>
@@ -42,7 +42,7 @@ export default class Login extends Component {
               <input type="submit" class="pure-button pure-button-primary"/>
             </fieldset>
           </form>
-          <form action="javascript:" onSubmit={this.login} class="login-form pure-form pure-form-stacked full-width">
+          <form action="/api/user/login" method="POST" onSubmit={this.login} class="login-form pure-form pure-form-stacked full-width">
             <fieldset>
               <legend>or Login</legend>
               <input id="lusername" placeholder="username" autocapitalize="off"/>
