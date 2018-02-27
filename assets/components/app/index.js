@@ -22,8 +22,8 @@ export default class App extends Component {
     fire('getEntries')();
 
     // For debugging
-    window.app = this;
-    window.route = route;
+    // window.app = this;
+    // window.route = route;
   }
 
   componentWillUpdate(nextProps, nextState) {
