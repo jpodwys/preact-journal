@@ -1,5 +1,5 @@
 import User from '../services/user-service';
-import { route } from 'preact-router';
+// import { route } from 'preact-router';
 import getInitialState from '../../js/app-state';
 
 const clearLocalStorage = function(){
@@ -23,7 +23,7 @@ const loginSuccess = function(el, user){
     loggedIn: true,
     // loading: el.state.loading - 1
   }, function(){
-    route('/entries');
+    // route('/entries');
   });
 };
 
@@ -45,7 +45,7 @@ const createAccount = function(el, e){
 
 const createAccountSuccess = function(el, user){
   // el.setState({loading: el.state.loading - 1});
-  route('/entries');
+  // route('/entries');
 };
 
 const createAccountFailure = function(el, err){
@@ -65,7 +65,7 @@ const logout = function(el, e){
 const logoutSuccess = function(el){
   clearLocalStorage();
   el.setState(getInitialState());
-  route('/');
+  // route('/');
 };
 
 const logoutFailure = function(el, err){

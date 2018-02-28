@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import { Router, route } from 'preact-router';
+// import { Router, route } from 'preact-router';
 
 import Header from '../header';
 import Login from '../login';
@@ -12,7 +12,7 @@ import freedux from '../../js/freedux';
 import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
-import handleRouteChange from '../../js/route-handlers';
+// import handleRouteChange from '../../js/route-handlers';
 
 export default class App extends Component {
   state = getInitialState();
@@ -22,7 +22,7 @@ export default class App extends Component {
     fire('getEntries')();
 
     // For debugging
-    // window.app = this;
+    window.app = this;
     // window.route = route;
   }
 
@@ -35,12 +35,17 @@ export default class App extends Component {
       <div>
         <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
         <main>
-          <Router onChange={handleRouteChange.bind(this)}>
+          {/* <Router onChange={handleRouteChange.bind(this)}> */}
+          {view === '/' &&
             <Login path="/" loggedIn={loggedIn}/>
+          }
+          {view === '/entries' &&
             <Entries path="/entries" scrollPosition={scrollPosition} loggedIn={loggedIn} entries={viewEntries}/>
+          }
+          {view === '/entry' || view === '/new' &&
             <Entry path="/entry/:id" view={view} loggedIn={loggedIn} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
-            <FourOhFour default/>
-          </Router>
+          }
+          {/* </Router> */}
           <Toast toastConfig={toastConfig}/>
         </main>
       </div>

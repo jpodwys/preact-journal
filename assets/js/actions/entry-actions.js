@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { route } from 'preact-router';
+// import { route } from 'preact-router';
 import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
 import persist from '../persist';
 
@@ -232,7 +232,7 @@ const deleteEntry = function(el, e){
     entry: undefined,
     entries: [].concat(el.state.entries)
   }, function(){
-    route('/entries');
+    // route('/entries');
   });
 
   Entry.del(id).then(function(){
