@@ -1,21 +1,13 @@
 import fire from '../fire';
 import { removeObjectByIndex } from '../utils';
 
-// Make sure new pages are always scrolled to the top
-// while history entries maintain their scroll position.
-let { pushState } = history;
-history.pushState = (a, b, url) => {
-  pushState.call(history, a, b, url);
-  scrollTo(0, 0);
-};
-
-const handleRouteChange = function({view, url}) {
-  // var view = e.url.lastIndexOf('/') > 0
-  //   ? e.url.substr(0, e.url.lastIndexOf('/'))
-  //   : e.url;
-  // if(view !== '/' && !this.state.loggedIn) return route('/');
-  // if(~e.url.indexOf('/new')) view = '/new';
-  // this.setState({view: view});
+const handleRouteChange = function(url) {
+  var view = url.lastIndexOf('/') > 0
+    ? url.substr(0, url.lastIndexOf('/'))
+    : url;
+  if(view !== '/' && !this.state.loggedIn) return fire('route', {href: '/'});
+  if(~url.indexOf('/new')) view = '/new';
+  this.setState({view: view});
   handleRoute.call(this, view, url);
   fire('linkstate', {key: 'toastConfig'})();
 };
