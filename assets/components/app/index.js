@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 // import { Router, route } from 'preact-router';
 
+import Router from '../router';
 import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
@@ -12,7 +13,7 @@ import freedux from '../../js/freedux';
 import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
-// import handleRouteChange from '../../js/route-handlers';
+import handleRouteChange from '../../js/route-handlers';
 
 export default class App extends Component {
   state = getInitialState();
@@ -30,23 +31,30 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  render(props, { scrollPosition, view, loggedIn, entryIndex, entry, entries, entryReady, viewEntries, filterText, showFilterInput, toastConfig}) {
+  render(props, state) {
     return (
       <div>
-        <Header view={view} loggedIn={loggedIn} entry={entry} filterText={filterText} showFilterInput={showFilterInput}/>
+        <Header
+          view={state.view}
+          loggedIn={state.loggedIn}
+          entry={state.entry}
+          filterText={state.filterText}
+          showFilterInput={state.showFilterInput}/>
         <main>
-          {/* <Router onChange={handleRouteChange.bind(this)}> */}
-          {view === '/' &&
-            <Login path="/" loggedIn={loggedIn}/>
-          }
-          {view === '/entries' &&
-            <Entries path="/entries" scrollPosition={scrollPosition} loggedIn={loggedIn} entries={viewEntries}/>
-          }
-          {view === '/entry' || view === '/new' &&
-            <Entry path="/entry/:id" view={view} loggedIn={loggedIn} entryIndex={entryIndex} entry={entry} entryReady={entryReady}/>
-          }
-          {/* </Router> */}
-          <Toast toastConfig={toastConfig}/>
+          <Router view={state.view} onChange={handleRouteChange.bind(this)}>
+            <Login path="/" loggedIn={state.loggedIn}/>
+            <Entries path="/entries"
+              scrollPosition={state.scrollPosition}
+              loggedIn={state.loggedIn}
+              entries={state.viewEntries}/>
+            <Entry path="/entry||/new"
+              view={state.view}
+              loggedIn={state.loggedIn}
+              entryIndex={state.entryIndex}
+              entry={state.entry} 
+              entryReady={state.entryReady}/>
+          </Router>
+          <Toast toastConfig={state.toastConfig}/>
         </main>
       </div>
     );

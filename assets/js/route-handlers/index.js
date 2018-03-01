@@ -9,31 +9,31 @@ history.pushState = (a, b, url) => {
   scrollTo(0, 0);
 };
 
-const handleRouteChange = function(e) {
-  var view = e.url.lastIndexOf('/') > 0
-    ? e.url.substr(0, e.url.lastIndexOf('/'))
-    : e.url;
-  if(view !== '/' && !this.state.loggedIn) return route('/');
-  if(~e.url.indexOf('/new')) view = '/new';
-  this.setState({view: view});
-  handleRoute.call(this, view, e);
+const handleRouteChange = function({view, url}) {
+  // var view = e.url.lastIndexOf('/') > 0
+  //   ? e.url.substr(0, e.url.lastIndexOf('/'))
+  //   : e.url;
+  // if(view !== '/' && !this.state.loggedIn) return route('/');
+  // if(~e.url.indexOf('/new')) view = '/new';
+  // this.setState({view: view});
+  handleRoute.call(this, view, url);
   fire('linkstate', {key: 'toastConfig'})();
 };
 
-const handleRoute = function(view, e) {
+const handleRoute = function(view, url) {
   switch(view) {
-    case '/':         handleLoginView.call(this, e);    break;
-    case '/entries':  handleEntriesView.call(this, e);  break;
-    case '/entry':    handleEntryView.call(this, e);    break;
-    case '/new':      handleEntryView.call(this, e);    break;
+    case '/':         handleLoginView.call(this, url);    break;
+    case '/entries':  handleEntriesView.call(this, url);  break;
+    case '/entry':    handleEntryView.call(this, url);    break;
+    case '/new':      handleEntryView.call(this, url);    break;
   }
 };
 
-const handleLoginView = function(e) {
-  if(this.state.loggedIn) route('/entries');
+const handleLoginView = function(url) {
+  if(this.state.loggedIn) fire('route', {href: '/entries'});
 };
 
-const handleEntriesView = function(e) {
+const handleEntriesView = function(url) {
   if(Array.isArray(this.state.entries)){
     var entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
@@ -44,9 +44,13 @@ const handleEntriesView = function(e) {
   }
 };
 
-const handleEntryView = function(e) {
+const handleEntryView = function(url) {
   var id;
-  try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
+
+  try {
+    id = parseInt(url.substr(url.lastIndexOf('/') + 1));
+  } catch(err) {/*Do nothing*/}
+
   if(!id) return;
 
   // This is a brand new entry
