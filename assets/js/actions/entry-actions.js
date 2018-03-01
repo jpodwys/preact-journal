@@ -49,7 +49,7 @@ const syncClientEntries = function(el){
     if(entry.needsSync){
       var func;
 
-      if(entry.newEntry)      func = slowCreate;
+      if(entry.newEntry)      func = createEntry;
       else if(entry.deleted)  func = deleteEntry;
       else                    func = putEntry;
 
@@ -133,13 +133,13 @@ const createEntry = function(el, e){
   });
 
   Entry.create(entry).then(response => {
-    slowCreateSuccess(el, entry.id, response);
+    createEntrySuccess(el, entry.id, response);
   }).catch(err => {
-    slowCreateFailure(el, entry.id, err);
+    createEntryFailure(el, entry.id, err);
   });
 };
 
-const slowCreateSuccess = function(el, oldId, response){
+const createEntrySuccess = function(el, oldId, response){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
   if(el.state.entry.id === oldId){
@@ -157,7 +157,7 @@ const slowCreateSuccess = function(el, oldId, response){
   });
 };
 
-const slowCreateFailure = function(el, oldId, err){
+const createEntryFailure = function(el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
