@@ -52,7 +52,10 @@ class Router extends Component {
 
   componentWillMount() {
     ROUTER = this;
-    if(this.props.onChange) ONCHANGE = this.props.onChange;
+    if(this.props.onChange){
+      ONCHANGE = this.props.onChange;
+      ONCHANGE(location.pathname);
+    }
     document.onclick = clickListener;
     window.onpopstate = popstateListener;
   }
