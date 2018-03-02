@@ -1,6 +1,7 @@
 import User from '../services/user-service';
 import getInitialState from '../app-state';
 import fire from '../fire';
+import { route } from '../../components/router';
 
 const clearLocalStorage = function(){
   localStorage.removeItem('entries');
@@ -21,7 +22,8 @@ const loginSuccess = function(el, user){
   el.setState({
     loggedIn: true,
   }, function(){
-    fire('route', {href: '/entries'})();
+    // fire('route', {href: '/entries'})();
+    route('/entries');
   });
 };
 

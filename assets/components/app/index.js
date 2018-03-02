@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
-// import { Router, route } from 'preact-router';
 
-import Switch from '../switch';
+import { Router, route } from '../router';
 import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
@@ -11,7 +10,6 @@ import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
 import getInitialState from '../../js/app-state';
-import Router from '../../js/actions/router-actions';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
@@ -20,8 +18,7 @@ export default class App extends Component {
   state = getInitialState();
   
   componentWillMount() {
-    let router = Router(handleRouteChange.bind(this));
-    freedux(this, Object.assign(actions, router));
+    freedux(this, Object.assign(actions));
     fire('getEntries')();
 
     // For debugging
@@ -43,19 +40,19 @@ export default class App extends Component {
           filterText={state.filterText}
           showFilterInput={state.showFilterInput}/>
         <main>
-          <Switch caseProp={'path'} caseVal={state.view}>
+          <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={state.loggedIn}/>
             <Entries path="/entries"
               scrollPosition={state.scrollPosition}
               loggedIn={state.loggedIn}
               entries={state.viewEntries}/>
-            <Entry path="/entry||/new"
+            <Entry path="/entry/:id"
               view={state.view}
               loggedIn={state.loggedIn}
               entryIndex={state.entryIndex}
               entry={state.entry} 
               entryReady={state.entryReady}/>
-          </Switch>
+          </Router>
           <Toast toastConfig={state.toastConfig}/>
         </main>
       </div>

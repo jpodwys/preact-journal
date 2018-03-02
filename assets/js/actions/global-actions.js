@@ -5,7 +5,6 @@ const linkstate = function(el, e){
 };
 
 const scrollBody = function(el, e){
-  console.log('scrolled')
   if(el.state.view === '/entries'){
     el.setState({scrollPosition: document.body.scrollTop});
   }
