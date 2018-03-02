@@ -23,7 +23,7 @@ export default class App extends Component {
 
     // For debugging
     window.app = this;
-    // window.route = route;
+    window.route = route;
   }
 
   componentWillUpdate(nextProps, nextState) {

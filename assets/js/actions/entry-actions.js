@@ -1,5 +1,4 @@
 import Entry from '../services/entry-service';
-// import { route } from 'preact-router';
 import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
 import persist from '../persist';
 
@@ -19,7 +18,6 @@ const getEntries = function(el, e){
 
 const getAllEntries = function(el){
   if(el.state.entries) return;
-  // el.setState({loading: el.state.loading + 1});
   Entry.getAll().then(response => {
     getAllEntriesSuccess(el, response);
   }).catch(err => {
@@ -30,7 +28,6 @@ const getAllEntries = function(el){
 const getAllEntriesSuccess = function(el, response){
   persist(el, {
     entries: response.entries,
-    // loading: el.state.loading - 1
   }, function(){
     setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
     localStorage.setItem('timestamp', response.timestamp);
@@ -38,7 +35,6 @@ const getAllEntriesSuccess = function(el, response){
 };
 
 const getAllEntriesError = function(el, err){
-  // el.setState({loading: el.state.loading - 1});
   console.log('getAllEntriesError', err)
 };
 
@@ -60,7 +56,6 @@ const syncClientEntries = function(el){
 
 // Sync entries with newer versions from the server
 const syncEntries = function(el, e){
-  // el.setState({loading: el.state.loading + 1});
   Entry.sync(e.detail.timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
@@ -71,7 +66,6 @@ const syncEntries = function(el, e){
 
 const syncEntriesSuccess = function(el, response){
   if(response.entries.length === 0){
-    // el.setState({loading: el.state.loading - 1});
     localStorage.setItem('timestamp', response.timestamp);
     return;
   }
@@ -94,7 +88,6 @@ const applySyncPatch = function(el, entries){
 
 const persistSyncPatch = function(el, timestamp){
   persist(el, {
-    // loading: el.state.loading - 1,
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
@@ -105,12 +98,7 @@ const persistSyncPatch = function(el, timestamp){
 };
 
 const syncEntriesFailure = function(el, err){
-  // el.setState({loading: el.state.loading - 1});
   console.log('syncEntriesFailure', err)
-};
-
-const getEntry = function(el, e){
-  
 };
 
 const createEntry = function(el, e){
@@ -120,7 +108,6 @@ const createEntry = function(el, e){
   el.state.entries[entryIndex] = entry;
 
   persist(el, {
-    // loading: el.state.loading + 1,
     entry: entry,
     entries: [].concat(el.state.entries)
   });
@@ -151,7 +138,6 @@ const createEntrySuccess = function(el, oldId, response){
   delete el.state.entries[entryIndex].needsSync;
 
   persist(el, {
-    // loading: el.state.loading - 1,
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
@@ -161,7 +147,6 @@ const createEntryFailure = function(el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
-    // loading: el.state.loading - 1,
     entries: [].concat(el.state.entries)
   });
   console.log('createEntryFailure', err);
@@ -245,7 +230,6 @@ const deleteEntry = function(el, e){
 const deleteEntrySuccess = function(el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
   persist(el, {
-    // loading: el.state.loading - 1,
     entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
 };
@@ -319,7 +303,6 @@ const blurTextFilter = function(el){
 export default {
   getEntries,
   createEntry,
-  getEntry,
   updateEntry,
   deleteEntry,
   setEntry,

@@ -47,7 +47,6 @@
     "nodemon": "1.8.1",
     "preact": "^8.2.5",
     "preact-render-to-string": "^3.7.0",
-    "preact-router": "^2.5.7",
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",
     "sequelize": "3.19.3",

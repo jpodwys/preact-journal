@@ -1,12 +1,7 @@
 import User from '../services/user-service';
 import getInitialState from '../app-state';
-import fire from '../fire';
 import { route } from '../../components/router';
-
-const clearLocalStorage = function(){
-  localStorage.removeItem('entries');
-  localStorage.removeItem('timestamp');
-};
+import { clearLocalStorage } from '../utils';
 
 const login = function(el, e){
   clearLocalStorage();
@@ -22,7 +17,6 @@ const loginSuccess = function(el, user){
   el.setState({
     loggedIn: true,
   }, function(){
-    // fire('route', {href: '/entries'})();
     route('/entries');
   });
 };
@@ -43,7 +37,7 @@ const createAccount = function(el, e){
 };
 
 const createAccountSuccess = function(el, user){
-    fire('route', {href: '/entries'})();
+  route('/entries');
 };
 
 const createAccountFailure = function(el, err){
@@ -61,7 +55,7 @@ const logout = function(el, e){
 const logoutSuccess = function(el){
   clearLocalStorage();
   el.setState(getInitialState());
-  fire('route', {href: '/'})();
+  route('/');
 };
 
 const logoutFailure = function(el, err){

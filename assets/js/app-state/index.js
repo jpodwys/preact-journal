@@ -1,5 +1,5 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries } from '../utils';
+import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage } from '../utils';
 
 const getViewFromHref = function(href){
   if(~href.indexOf('/entries')){
@@ -15,10 +15,7 @@ const getViewFromHref = function(href){
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn){
-    localStorage.removeItem('entries');
-    localStorage.removeItem('timestamp');
-  }
+  if(!loggedIn) clearLocalStorage();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
   if(entries) entries = sortObjectsByDate(entries);
   let viewEntries;
@@ -31,7 +28,6 @@ const getInitialState = function() {
     filterText: '',
     entryReady: false,
     loggedIn: loggedIn,
-    // loading: 0,
     syncing: 0,
     entryIndex: -1,
     entry: undefined,

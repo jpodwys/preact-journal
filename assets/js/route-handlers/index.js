@@ -1,5 +1,6 @@
 import fire from '../fire';
 import { removeObjectByIndex } from '../utils';
+import { route } from '../../components/router';
 
 const handleRouteChange = function(url) {
   var view = url.lastIndexOf('/') > 0
@@ -22,7 +23,7 @@ const handleRoute = function(view, url) {
 };
 
 const handleLoginView = function(url) {
-  if(this.state.loggedIn) fire('route', {href: '/entries'});
+  if(this.state.loggedIn) route('/entries');
 };
 
 const handleEntriesView = function(url) {
