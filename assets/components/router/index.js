@@ -3,14 +3,6 @@ import { h, Component } from 'preact';
 let ROUTER;
 let ONCHANGE;
 
-// Make sure new pages are always scrolled to the top
-// while history entries maintain their scroll position.
-let { pushState } = history;
-history.pushState = (a, b, url) => {
-  pushState.call(history, a, b, url);
-  scrollTo(0, 0);
-};
-
 const shouldFollowLink = function(node) {
   if (!node || !node.getAttribute) return false;
   let href = node.getAttribute('href'),
@@ -48,16 +40,23 @@ const route = function(url, replace){
 };
 
 class Router extends Component {
-  state = {url: location.pathname};
+  constructor(props) {
+    super(props);
+    ROUTER = this;
+    this.state = {url: location.pathname};
+    document.onclick = clickListener;
+    window.onpopstate = popstateListener;
+  }
+
+  shouldComponentUpdate({ onChange }, { url }) {
+    return url !== this.props.url || onChange !== this.props.onChange;
+  }
 
   componentWillMount() {
-    ROUTER = this;
     if(this.props.onChange){
       ONCHANGE = this.props.onChange;
       ONCHANGE(location.pathname);
     }
-    document.onclick = clickListener;
-    window.onpopstate = popstateListener;
   }
 
   matchUrl(path, url) {

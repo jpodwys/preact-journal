@@ -14,6 +14,14 @@ import actions from '../../js/actions';
 import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
 
+// Make sure new pages are always scrolled to the top
+// while history entries maintain their scroll position.
+let { pushState } = history;
+history.pushState = (a, b, url) => {
+  pushState.call(history, a, b, url);
+  scrollTo(0, 0);
+};
+
 export default class App extends Component {
   state = getInitialState();
   
