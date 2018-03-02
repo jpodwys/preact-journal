@@ -3,7 +3,7 @@ import { removeObjectByIndex } from '../utils';
 import { route } from '../../components/router';
 
 const handleRouteChange = function(url) {
-  var view = url.lastIndexOf('/') > 0
+  let view = url.lastIndexOf('/') > 0
     ? url.substr(0, url.lastIndexOf('/'))
     : url;
   if(view !== '/' && !this.state.loggedIn) return fire('route', {href: '/'});
@@ -28,7 +28,7 @@ const handleLoginView = function(url) {
 
 const handleEntriesView = function(url) {
   if(Array.isArray(this.state.entries)){
-    var entry = this.state.entries[0];
+    let entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
       this.setState({
         entries: removeObjectByIndex(0, this.state.entries)
@@ -38,12 +38,9 @@ const handleEntriesView = function(url) {
 };
 
 const handleEntryView = function(url) {
-  var id;
+  if(!url) return;
 
-  try {
-    id = parseInt(url.substr(url.lastIndexOf('/') + 1));
-  } catch(err) {/*Do nothing*/}
-
+  let id = url.substr(url.lastIndexOf('/') + 1);
   if(!id) return;
 
   // This is a brand new entry
