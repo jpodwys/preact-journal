@@ -4,7 +4,7 @@ let ROUTER;
 let ONCHANGE;
 
 const shouldFollowLink = function(node) {
-  if (!node || !node.getAttribute) return false;
+  if (!node || !node.getAttribute || node.hasAttribute('native')) return false;
   let href = node.getAttribute('href'),
     target = node.getAttribute('target');
   if (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i))) return false;
