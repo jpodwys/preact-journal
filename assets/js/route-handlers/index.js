@@ -1,41 +1,34 @@
 import fire from '../fire';
 import { removeObjectByIndex } from '../utils';
+import { route } from '../../components/router';
 
-// Make sure new pages are always scrolled to the top
-// while history entries maintain their scroll position.
-let { pushState } = history;
-history.pushState = (a, b, url) => {
-  pushState.call(history, a, b, url);
-  scrollTo(0, 0);
-};
-
-const handleRouteChange = function(e) {
-  var view = e.url.lastIndexOf('/') > 0
-    ? e.url.substr(0, e.url.lastIndexOf('/'))
-    : e.url;
-  if(view !== '/' && !this.state.loggedIn) return route('/');
-  if(~e.url.indexOf('/new')) view = '/new';
+const handleRouteChange = function(url) {
+  let view = url.lastIndexOf('/') > 0
+    ? url.substr(0, url.lastIndexOf('/'))
+    : url;
+  if(view !== '/' && !this.state.loggedIn) return fire('route', {href: '/'});
+  if(~url.indexOf('/new')) view = '/new';
   this.setState({view: view});
-  handleRoute.call(this, view, e);
+  handleRoute.call(this, view, url);
   fire('linkstate', {key: 'toastConfig'})();
 };
 
-const handleRoute = function(view, e) {
+const handleRoute = function(view, url) {
   switch(view) {
-    case '/':         handleLoginView.call(this, e);    break;
-    case '/entries':  handleEntriesView.call(this, e);  break;
-    case '/entry':    handleEntryView.call(this, e);    break;
-    case '/new':      handleEntryView.call(this, e);    break;
+    case '/':         handleLoginView.call(this, url);    break;
+    case '/entries':  handleEntriesView.call(this, url);  break;
+    case '/entry':    handleEntryView.call(this, url);    break;
+    case '/new':      handleEntryView.call(this, url);    break;
   }
 };
 
-const handleLoginView = function(e) {
+const handleLoginView = function(url) {
   if(this.state.loggedIn) route('/entries');
 };
 
-const handleEntriesView = function(e) {
+const handleEntriesView = function(url) {
   if(Array.isArray(this.state.entries)){
-    var entry = this.state.entries[0];
+    let entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
       this.setState({
         entries: removeObjectByIndex(0, this.state.entries)
@@ -44,9 +37,10 @@ const handleEntriesView = function(e) {
   }
 };
 
-const handleEntryView = function(e) {
-  var id;
-  try { id = e.current.attributes.id; } catch(err) {/*Do nothing*/}
+const handleEntryView = function(url) {
+  if(!url) return;
+
+  let id = url.substr(url.lastIndexOf('/') + 1);
   if(!id) return;
 
   // This is a brand new entry

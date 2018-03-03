@@ -6,7 +6,8 @@ import debounce from '../../js/debounce';
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      this.base.querySelector('#entryText').focus();
+      let entryText = this.base.querySelector('#entryText');
+      if(entryText) entryText.focus();
     }
   }
 
