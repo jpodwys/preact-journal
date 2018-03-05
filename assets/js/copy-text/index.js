@@ -12,12 +12,10 @@ const createTextarea = function() {
 }
 
 export default function copyText(text, e) {
-  let textarea = document.getElementById(textareaId);
-  if(!textarea) textarea = createTextarea();
+  let textarea = createTextarea();
   textarea.value = text;
   select(textarea);
   let successful = document.execCommand('copy');
-  textarea.blur();
-  if(e && e.target) e.target.focus();
   if(successful) fire('linkstate', {key: 'toastConfig', val: {type: 'text copied'}})();
+  document.removeElementById(textareaId);
 }
