@@ -35,7 +35,6 @@
     "gulp-clean-css": "^3.9.2",
     "gulp-htmlmin": "^4.0.0",
     "gulp-inline-source": "^3.1.0",
-    "gulp-penthouse": "^0.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.6.1",
     "gulp-rev": "^8.1.1",
@@ -46,13 +45,10 @@
     "mysql": "2.5.5",
     "nodemon": "1.8.1",
     "preact": "^8.2.5",
-    "preact-render-to-string": "^3.7.0",
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",
     "sequelize": "3.19.3",
-    "shrink-ray-current": "^2.1.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "vinyl-source-stream": "^2.0.0",
     "webpack": "^3.6.0"
   },
   "devDependencies": {

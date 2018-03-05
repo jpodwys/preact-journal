@@ -1,7 +1,6 @@
 require('dotenv').load();
 var express = require('express'),
   compress = require('compression'),
-  // shrinkRay = require('shrink-ray-current'),
   bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),
   app = express(),
@@ -22,8 +21,6 @@ app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
 app.use(compress({threshold: '1.4kb'}));
-// app.use(shrinkRay({threshold: '1.4kb'}));
-// var maxAge = (process.env.NODE_ENV === 'production') ? '30d' : '0h';
 app.use(express.static('dist', {maxAge: '0h'}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
