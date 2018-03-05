@@ -208,6 +208,7 @@ main {
 }
 
 .login-form-wrapper input[type=submit] {
+  cursor: pointer;
   background-color: #0078e7;
   color: #fff;
   box-shadow: none;
