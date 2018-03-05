@@ -220,7 +220,7 @@ main {
 }
 
 .entry-text {
-  white-space: pre;
+  white-space: pre-wrap;
   min-height: calc(100vh - 200px);
 }
 
