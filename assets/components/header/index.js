@@ -24,7 +24,7 @@ export default class Header extends Component {
 	copy = (e) => {
 		let date = document.getElementById('entryDate').innerText;
 		let text = document.getElementById('entryText').innerText;
-		copyText(date + ' ' + text, e);
+		copyText(date + ' ' + text);
 	}
 
 	render({view, loggedIn, entry, filterText, showFilterInput}) {
