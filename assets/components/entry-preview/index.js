@@ -5,7 +5,7 @@ import copyText from '../../js/copy-text';
 
 export default class EntryPreview extends Component {
   copy = (e) => {
-    copyText(this.props.entry.date + ' ' + this.props.entry.text);
+    copyText(this.props.entry.date + ' ' + this.props.entry.text, e);
   }
 
   render({ entry }) {

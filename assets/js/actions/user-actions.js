@@ -17,7 +17,7 @@ const loginSuccess = function(el, user){
   el.setState({
     loggedIn: true,
   }, function(){
-    route('/entries');
+    route('/entries', true);
   });
 };
 
@@ -37,7 +37,7 @@ const createAccount = function(el, e){
 };
 
 const createAccountSuccess = function(el, user){
-  route('/entries');
+  route('/entries', true);
 };
 
 const createAccountFailure = function(el, err){
