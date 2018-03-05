@@ -219,6 +219,11 @@ main {
   padding-bottom: 65px;
 }
 
+.entry-text {
+  white-space: pre;
+  min-height: calc(100vh - 200px);
+}
+
 .list-item {
   margin: 20px 0;
 }

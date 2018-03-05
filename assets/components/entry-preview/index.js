@@ -24,7 +24,7 @@ export default class EntryPreview extends Component {
         </div>
 
         <div class="second-row">
-          <p class="entry-text">
+          <p>
             {entry.text}
           </p>
         </div>
