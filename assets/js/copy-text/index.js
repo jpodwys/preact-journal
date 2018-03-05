@@ -16,6 +16,7 @@ export default function copyText(text, e) {
   textarea.value = text;
   select(textarea);
   let successful = document.execCommand('copy');
+  textarea.blur();
   if(successful) fire('linkstate', {key: 'toastConfig', val: {type: 'text copied'}})();
   document.removeElementById(textareaId);
 }
