@@ -38,7 +38,7 @@ export default class Header extends Component {
 
 					{loggedIn && (view === '/entry' || view === '/new') &&
 						<a href="/entries">
-							<Icon icon="back" key="header-back" tabindex="1" />
+							<Icon icon="back" key="header-back" />
 						</a>
 					}
 				</span>
@@ -60,26 +60,26 @@ export default class Header extends Component {
 
 				<span class="nav-set">
 					{view === '/entries' && showFilterInput &&
-						<Icon icon="clear" key="header-clear" tabindex="1" onclick={this.clearFilterText}/>
+						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText}/>
 				  }
 				  {view === '/entries' && !showFilterInput &&
-				  	<Icon icon="search" key="header-search" tabindex="1" onclick={this.showFilterText}/>
+				  	<Icon icon="search" key="header-search" onclick={this.showFilterText}/>
 				  }
 				  {view === '/entry' &&
-				  	<Icon icon="copy" key="header-copy" tabindex="1" onclick={this.copy}/>
+				  	<Icon icon="copy" key="header-copy" onclick={this.copy}/>
 					}
 					{loggedIn && entry && view === '/entry' &&
-						<Icon icon="delete" key="header-delete" tabindex="1" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
+						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
 					}
 				  {loggedIn &&
-				  	<Icon icon="menu" key="header-menu" tabindex="1" onclick={fire('logout')}/>
+				  	<Icon icon="menu" key="header-menu" onclick={fire('logout')}/>
 					}
 				</span>
 
 				{view === '/entries' &&
 					<span class="button button--fab add-entry elevated">
 						<a href="/entry/new">
-							<Icon icon="add" key="header-add" tabindex="1" />
+							<Icon icon="add" key="header-add" />
 						</a>
 					</span>
 				}

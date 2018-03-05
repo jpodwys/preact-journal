@@ -40,6 +40,13 @@ const clearLocalStorage = function(){
   localStorage.removeItem('timestamp');
 };
 
+const getViewFromHref = function(href){
+  if(~href.indexOf('/new')) return '/new';
+  return href.lastIndexOf('/') > 0
+    ? href.substr(0, href.lastIndexOf('/'))
+    : href;
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
@@ -47,5 +54,6 @@ export {
   filterObjectsByText,
   filterHiddenEntries,
   applyFilters,
-  clearLocalStorage
+  clearLocalStorage,
+  getViewFromHref
 };

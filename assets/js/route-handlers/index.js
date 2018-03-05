@@ -1,13 +1,10 @@
 import fire from '../fire';
-import { removeObjectByIndex } from '../utils';
+import { removeObjectByIndex, getViewFromHref } from '../utils';
 import { route } from '../../components/router';
 
 const handleRouteChange = function(url) {
-  let view = url.lastIndexOf('/') > 0
-    ? url.substr(0, url.lastIndexOf('/'))
-    : url;
+  let view = getViewFromHref(url);
   if(view !== '/' && !this.state.loggedIn) return fire('route', {href: '/'});
-  if(~url.indexOf('/new')) view = '/new';
   this.setState({view: view});
   handleRoute.call(this, view, url);
   fire('linkstate', {key: 'toastConfig'})();

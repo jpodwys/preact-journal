@@ -4,7 +4,7 @@ let ROUTER;
 let ONCHANGE;
 
 const shouldFollowLink = function(node) {
-  if (!node || !node.getAttribute || node.hasAttribute('native')) return false;
+  if (!node || !node.getAttribute) return false;
   let href = node.getAttribute('href'),
     target = node.getAttribute('target');
   if (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i))) return false;
@@ -40,19 +40,16 @@ const route = function(url, replace){
 };
 
 class Router extends Component {
-  constructor(props) {
-    super(props);
-    ROUTER = this;
-    this.state = {url: location.pathname};
-    document.onclick = clickListener;
-    window.onpopstate = popstateListener;
-  }
+  state = {url: location.pathname};
 
   shouldComponentUpdate({ onChange }, { url }) {
     return url !== this.props.url || onChange !== this.props.onChange;
   }
 
   componentWillMount() {
+    ROUTER = this;
+    document.onclick = clickListener;
+    window.onpopstate = popstateListener;
     if(this.props.onChange){
       ONCHANGE = this.props.onChange;
       ONCHANGE(location.pathname);

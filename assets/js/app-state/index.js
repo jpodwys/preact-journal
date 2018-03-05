@@ -1,17 +1,5 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage } from '../utils';
-
-const getViewFromHref = function(href){
-  if(~href.indexOf('/entries')){
-    return '/entries';
-  } else if(~href.indexOf('/entry/new')){
-    return '/new'
-  } else if(~href.indexOf('/entry')){
-    return '/entry'
-  } else {
-    return '/';
-  }
-};
+import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
 
 const getInitialState = function() {
   let loggedIn = !!cookie.get('logged_in');
