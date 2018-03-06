@@ -40,7 +40,7 @@ export default class Login extends Component {
                 <legend>Create an Account</legend>
                 <input id="cusername" placeholder="username" autocapitalize="off"/>
                 <input id="cpassword" type="password" placeholder="password"/>
-                <input type="submit" class="pure-button pure-button-primary"/>
+                <input type="submit"/>
               </fieldset>
             </form>
             <form action="/api/user/login" method="POST" onSubmit={this.login} class="full-width full-width--all">
@@ -48,7 +48,7 @@ export default class Login extends Component {
                 <legend>or Login</legend>
                 <input id="lusername" placeholder="username" autocapitalize="off"/>
                 <input id="lpassword" type="password" placeholder="password"/>
-                <input type="submit" class="pure-button pure-button-primary"/>
+                <input type="submit"/>
               </fieldset>
             </form>
           </div>

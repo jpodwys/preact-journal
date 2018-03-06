@@ -4,7 +4,7 @@ export default class Icon extends Component {
   getSVG(props) {
     switch(props.icon) {
       case 'back':
-        return  <svg xmlns="http://www.w3.org/2000/svg" {...props}>
+        return <svg xmlns="http://www.w3.org/2000/svg" {...props}>
                   <path d="M0 0h24v24H0z" fill="none"/>
                   <path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/>
                 </svg>

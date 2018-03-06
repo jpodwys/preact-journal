@@ -13,6 +13,7 @@ import getInitialState from '../../js/app-state';
 import actions from '../../js/actions';
 import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
+import swipe from '../../js/swipe';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -32,6 +33,12 @@ export default class App extends Component {
     // For debugging
     window.app = this;
     window.route = route;
+  }
+
+  componentDidMount() {
+    swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
+    swipe.listen(document, 'mousemove touchmove', swipe.swipeMove);
+    swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -57,7 +64,6 @@ export default class App extends Component {
             <Entry path="/entry/:id"
               view={state.view}
               loggedIn={state.loggedIn}
-              entryIndex={state.entryIndex}
               entry={state.entry} 
               entryReady={state.entryReady}/>
           </Router>
