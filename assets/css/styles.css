@@ -215,9 +215,10 @@ main {
   border: none;
 }
 
-.entry-list > div {
+/* This breaks the virtual scroll. When used, I can't scroll to the bottom of the view. */
+/*.entry-list > div {
   padding-bottom: 65px;
-}
+}*/
 
 .entry-text {
   white-space: pre-wrap;
