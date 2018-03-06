@@ -10,9 +10,9 @@ self.addEventListener('install', function(e) {
 self.addEventListener('fetch', event => {
   // Skip cross-origin requests, like those for Google Analytics.
   if (event.request.url.startsWith(self.location.origin)) {
-    if(event.request.method !== 'GET') return
-    if(event.request.url.indexOf('/api') > -1) return
-    if(event.request.url.indexOf('/manifest.json') > -1) return
+    // if(event.request.method !== 'GET') return
+    // if(event.request.url.indexOf('/api') > -1) return
+    // if(event.request.url.indexOf('/manifest.json') > -1) return
     event.respondWith(
       caches.match(event.request).then(cachedResponse => {
         if (cachedResponse) {
