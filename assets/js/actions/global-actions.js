@@ -1,5 +1,4 @@
 const focusin = function(el, e){
-  console.log('focusin', e);
   el.setState({inputFocused: true});
 };
 
