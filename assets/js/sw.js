@@ -13,17 +13,8 @@ self.addEventListener('fetch', event => {
     if(event.request.method !== 'GET') return
     if(event.request.url.indexOf('/api') > -1) return
     // if(event.request.url.indexOf('/manifest.json') > -1) return
-
-    // All routes return the same payload. As such, cache only '/'
-    // and return its cached value on all routes.
-    let reqUrl;
-    let url = e.request.url
-    if(~url.indexOf('/entries') || ~url.indexOf('/entry/')){
-      reqUrl = '/';
-    }
-
     event.respondWith(
-      caches.match(reqUrl || event.request).then(cachedResponse => {
+      caches.match(event.request).then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
