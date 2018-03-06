@@ -27,11 +27,6 @@ module.exports = function(app){
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
 
-  /* Serve webapp manifest file */
-  app.get('/manifest.json', function(req, res){
-    res.sendFile('manifest.json', {root: './dist', maxAge: '0d'});
-  });
-
   /* Catch-all view route */
   app.get('/*', function(req, res){
     res.sendFile('index.html', {root: './dist', maxAge: '30d'});
