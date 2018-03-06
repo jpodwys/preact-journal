@@ -17,6 +17,7 @@ const getInitialState = function() {
     entryReady: false,
     loggedIn: loggedIn,
     syncing: 0,
+    inputFocused: false,
     entry: undefined,
     entries: entries,
     viewEntries: viewEntries || entries,
