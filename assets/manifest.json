@@ -3,6 +3,7 @@
   "short_name": "Journalize",
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#fff",
   "theme_color": "#5776d0",
   "description": "Private journal entries.",
