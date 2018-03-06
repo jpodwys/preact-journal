@@ -1,5 +1,5 @@
 let version;
-var CACHE = 'preact-journal';
+let CACHE = 'preact-journal';
  
 self.addEventListener('install', function(e) {
   e.waitUntil(caches.open(CACHE).then(function (cache) {
@@ -14,16 +14,21 @@ self.addEventListener('fetch', function(e) {
   
   // All routes return the same payload. As such, cache only '/'
   // and return its cached value on all routes.
-  var reqUrl
-  var url = e.request.url
-  if(~url.indexOf('/entries') || ~url.indexOf('/entry/')){
-    reqUrl = '/';
+  let request = Object.assign(e.request);
+  if(~request.url.indexOf('/entries') || ~request.url.indexOf('/entry/')){
+    request.url = '/';
   }
 
-  e.respondWith(fromCache(reqUrl || e.request));
+  // let reqUrl;
+  // let url = e.request.url
+  // if(~url.indexOf('/entries') || ~url.indexOf('/entry/')){
+  //   reqUrl = '/';
+  // }
+
+  e.respondWith(fromCache(request));
 
   e.waitUntil(
-    update(reqUrl || e.request)
+    update(request)
     .then(refresh)
   );
 });
@@ -49,11 +54,6 @@ function refresh(response) {
   if(!response) return;
   return self.clients.matchAll().then(function (clients) {
     clients.forEach(function (client) {
-      // var message = {
-      //   // type: 'refresh',
-      //   // url: response.url,
-      //   eTag: response.headers.get('ETag')
-      // };
       client.postMessage(response.headers.get('ETag'));
     });
   });
