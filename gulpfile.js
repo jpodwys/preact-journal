@@ -75,7 +75,7 @@ function build() {
   return gulp.series(
     clean,
     serve,
-    gulp.parallel(scripts, sw, images),
+    gulp.parallel(scripts, sw, manifest, images),
     styles,
     inline
   )();
