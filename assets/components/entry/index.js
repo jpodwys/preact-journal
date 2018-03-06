@@ -66,7 +66,7 @@ export default class Entry extends Component {
     if(!entry) return <FourOhFour/>
     return (
       <entry-view class="hidden">
-        <h1 id="entryDate" contenteditable onInput={this.upsert}>
+        <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
           {entry.date}
         </h1>
         <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
