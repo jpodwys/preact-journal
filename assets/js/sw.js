@@ -22,10 +22,10 @@ self.addEventListener('fetch', function(e) {
 
   e.respondWith(fromCache(reqUrl || e.request));
 
-  e.waitUntil(
-    update(reqUrl || e.request)
-    .then(refresh)
-  );
+  // e.waitUntil(
+  //   update(reqUrl || e.request)
+  //   .then(refresh)
+  // );
 });
  
 function fromCache(request) {
