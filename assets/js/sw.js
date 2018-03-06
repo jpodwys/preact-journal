@@ -3,7 +3,7 @@ let CACHE = 'preact-journal';
  
 self.addEventListener('install', function(e) {
   e.waitUntil(caches.open(CACHE).then(function (cache) {
-    cache.addAll(['/', '/manifest.json']);
+    cache.addAll(['/']);
   }));
 });
 
@@ -35,6 +35,7 @@ self.addEventListener('install', function(e) {
 self.addEventListener('fetch', function(e) {
   if(e.request.method !== 'GET') return
   if(e.request.url.indexOf('/api') > -1) return
+  // if(e.request.url.indexOf('/manifest.json') > -1) return
   
   // All routes return the same payload. As such, cache only '/'
   // and return its cached value on all routes.
