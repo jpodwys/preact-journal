@@ -27,9 +27,9 @@ module.exports = function(app){
   app.get('/user-count', user.getUserCount);
   app.get('/entry-count', entry.getEntryCount);
 
-  /* Critical CSS Utility Route */
-  app.get('/critical', function(req, res){
-    res.sendFile('critical.html', {root: './assets', maxAge: '0d'});
+  /* Serve webapp manifest file */
+  app.get('/manifest.json', function(req, res){
+    res.sendFile('manifest.json', {root: './dist', maxAge: '0d'});
   });
 
   /* Catch-all view route */
