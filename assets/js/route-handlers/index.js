@@ -4,7 +4,7 @@ import { route } from '../../components/router';
 
 const handleRouteChange = function(url) {
   let view = getViewFromHref(url);
-  if(view !== '/' && !this.state.loggedIn) return fire('route', {href: '/'});
+  if(view !== '/' && !this.state.loggedIn) route('/', true);
   this.setState({view: view});
   handleRoute.call(this, view, url);
   fire('linkstate', {key: 'toastConfig'})();
@@ -20,7 +20,7 @@ const handleRoute = function(view, url) {
 };
 
 const handleLoginView = function(url) {
-  if(this.state.loggedIn) route('/entries');
+  if(this.state.loggedIn) route('/entries', true);
 };
 
 const handleEntriesView = function(url) {
