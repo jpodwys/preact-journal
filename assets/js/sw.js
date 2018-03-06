@@ -14,21 +14,16 @@ self.addEventListener('fetch', function(e) {
   
   // All routes return the same payload. As such, cache only '/'
   // and return its cached value on all routes.
-  let request = Object.assign(e.request);
-  if(~request.url.indexOf('/entries') || ~request.url.indexOf('/entry/')){
-    request.url = '/';
+  let reqUrl;
+  let url = e.request.url
+  if(~url.indexOf('/entries') || ~url.indexOf('/entry/')){
+    reqUrl = '/';
   }
 
-  // let reqUrl;
-  // let url = e.request.url
-  // if(~url.indexOf('/entries') || ~url.indexOf('/entry/')){
-  //   reqUrl = '/';
-  // }
-
-  e.respondWith(fromCache(request));
+  e.respondWith(fromCache(reqUrl || e.request));
 
   e.waitUntil(
-    update(request)
+    update(reqUrl || e.request)
     .then(refresh)
   );
 });
