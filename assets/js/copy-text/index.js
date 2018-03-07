@@ -13,8 +13,8 @@ const hideKeyboard = function(el) {
   el.setAttribute('disabled', 'true');
   setTimeout(function() {
     el.blur();
-    el.setAttribute('readonly');
-    el.setAttribute('disabled');
+    el.removeAttribute('readonly');
+    el.removeAttribute('disabled');
   }, 10);
 }
 
