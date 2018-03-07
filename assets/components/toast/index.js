@@ -34,11 +34,13 @@ export default class Toast extends Component {
         }
         {toastConfig && toastConfig.type === 'confirm delete' &&
           <div>
-            <span class="toast-label left">Delete entry?</span>
+            {/* <span class="toast-label left">Delete entry?</span>
             <span class="nav-set right">
               <button class="mdl-button" onclick={this.handleDeleteEntry}>Delete</button>
               <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
-            </span>
+            </span> */}
+            <button class="mdl-button left" onclick={this.handleDeleteEntry}>Delete</button>
+            <button class="mdl-button right" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </div>
         }
         {toastConfig && toastConfig.type === 'menu' &&
