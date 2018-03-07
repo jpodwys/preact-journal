@@ -108,7 +108,7 @@ a, a:visited {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 55px 15px 65px 15px;
+  padding: 60px 15px 75px 15px;
 }
 
 .elevated {
@@ -226,7 +226,7 @@ main {
 }
 
 .list-item {
-  margin: 20px 0;
+  padding: 10px 0;
 }
 
 .list-item * {
