@@ -239,8 +239,6 @@ main {
 }
 
 .list-item .second-row {
-  /*font-size: 16px;*/
-  /*color: #5d5d5d;*/
   height: 40px;
   overflow: hidden;
 }
@@ -248,28 +246,16 @@ main {
 .mdl-button {
   background: transparent;
   border: none;
-  /*border-radius: 2px;*/
   color: #fff;
   position: relative;
   height: 36px;
-  /*margin: 0;*/
-  /*min-width: 64px;*/
   padding: 0 16px;
-  /*display: inline-block;*/
   font-size: 14px;
   font-weight: 500;
   text-transform: uppercase;
-  /*line-height: 1;*/
-  /*letter-spacing: 0;*/
-  /*overflow: hidden;*/
-  /*will-change: box-shadow;*/
-  /*transition: box-shadow 0.2s cubic-bezier(0.4, 0, 1, 1), background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s cubic-bezier(0.4, 0, 0.2, 1);*/
   outline: none;
   cursor: pointer;
-  /*text-decoration: none;*/
-  /*text-align: center;*/
   line-height: 36px;
-  /*vertical-align: middle;*/
 }
 
 /*.mdl-button--grey {
