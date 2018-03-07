@@ -37,6 +37,11 @@ function images() {
     .pipe(gulp.dest('./dist'));
 }
 
+function manifest() {
+  return gulp.src('assets/manifest.json')
+    .pipe(gulp.dest('./dist'));
+}
+
 function styles() {
   return gulp.src('assets/css/styles.css')
     .pipe(cleanCSS())
@@ -70,7 +75,7 @@ function build() {
   return gulp.series(
     clean,
     serve,
-    gulp.parallel(scripts, sw, images),
+    gulp.parallel(scripts, sw, manifest, images),
     styles,
     inline
   )();
