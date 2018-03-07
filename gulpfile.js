@@ -19,7 +19,7 @@ function scripts(cb) {
   return gulp.src('assets/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
     .pipe(rename('bundle.js'))
-    .pipe(gulp.dest('./dist/assets'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function sw() {
@@ -29,7 +29,7 @@ function sw() {
       presets: ['env']
     }))
     .pipe(uglify())
-    .pipe(gulp.dest('./dist/assets'));   
+    .pipe(gulp.dest('./dist'));   
 }
 
 function images() {
@@ -39,13 +39,13 @@ function images() {
 
 function manifest() {
   return gulp.src('assets/manifest.json')
-    .pipe(gulp.dest('./dist/assets'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function styles() {
   return gulp.src('assets/css/styles.css')
     .pipe(cleanCSS())
-    .pipe(gulp.dest('./dist/assets'));
+    .pipe(gulp.dest('./dist'));
 }
 
 function clean() {
