@@ -21,7 +21,8 @@ const getInitialState = function() {
     entry: undefined,
     entries: entries,
     viewEntries: viewEntries || entries,
-    toastConfig: undefined
+    toastConfig: undefined,
+    dark: !!localStorage.getItem('dark')
   };
 
   return state;

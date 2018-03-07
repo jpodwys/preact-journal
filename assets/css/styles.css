@@ -5,6 +5,35 @@ body {
   font-size: 16px;
 }
 
+.app {
+  height: 100%;
+}
+
+.app.dark {
+  background-color: #000;
+  color: white !important;
+}
+
+.app.dark header {
+  background-color: #424242;
+}
+
+.app.dark .dark-fill svg {
+  fill: #c5c5c5;
+}
+
+.app.dark .entry-link {
+  color: #9ab4ff;
+}
+
+.app.dark .button--fab.add-entry {
+  background-color: #424242;
+}
+
+.app.dark .elevated {
+  box-shadow: none;
+}
+
 toast {
   left: 50%;
   transform: translateX(-50%);

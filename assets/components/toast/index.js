@@ -21,6 +21,11 @@ export default class Toast extends Component {
     fire('linkstate', {key: 'toastConfig'})();
   }
 
+  handleToggleDarkMode = (e) => {
+    fire('linkstate', {key: 'dark', val: !this.props.toastConfig.data})();
+    fire('linkstate', {key: 'toastConfig'})();
+  }
+
   render({toastConfig}) {
     return (
       <toast class={!!toastConfig ? 'show' : ''}>
@@ -31,9 +36,16 @@ export default class Toast extends Component {
           <span>
             <span class="toast-label left">Delete entry?</span>
             <span class="nav-set right">
-              <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
               <button class="mdl-button" onclick={this.handleDeleteEntry}>Delete</button>
+              <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
             </span>
+          </span>
+        }
+        {toastConfig && toastConfig.type === 'menu' &&
+          <span>
+            <button class="mdl-button" onclick={fire('logout')}>Logout</button>
+            <button class="mdl-button" onclick={this.handleToggleDarkMode}>Toggle Dark Mode</button>
+            <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </span>
         }
       </toast>

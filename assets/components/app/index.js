@@ -47,13 +47,14 @@ export default class App extends Component {
 
   render(props, state) {
     return (
-      <div>
+      <div class={!!state.dark ? 'app dark' : 'app'}>
         <Header
           view={state.view}
           loggedIn={state.loggedIn}
           entry={state.entry}
           filterText={state.filterText}
-          showFilterInput={state.showFilterInput}/>
+          showFilterInput={state.showFilterInput}
+          dark={state.dark}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
             <Login path="/" loggedIn={state.loggedIn}/>

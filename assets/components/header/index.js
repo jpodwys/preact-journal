@@ -27,7 +27,9 @@ export default class Header extends Component {
 		copyText(date + ' ' + text);
 	}
 
-	render({view, loggedIn, entry, filterText, showFilterInput}) {
+
+
+	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return '';
 		return (
 			<header class="elevated">
@@ -72,7 +74,7 @@ export default class Header extends Component {
 						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
 					}
 				  {loggedIn &&
-				  	<Icon icon="menu" key="header-menu" onclick={fire('logout')}/>
+				  	<Icon icon="menu" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 					}
 				</span>
 
