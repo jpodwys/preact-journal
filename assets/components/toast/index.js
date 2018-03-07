@@ -43,9 +43,9 @@ export default class Toast extends Component {
         }
         {toastConfig && toastConfig.type === 'menu' &&
           <div>
-            <button class="mdl-button" onclick={fire('logout')}>Logout</button>
+            <button class="mdl-button left" onclick={fire('logout')}>Logout</button>
             <button class="mdl-button" onclick={this.handleToggleDarkMode}>{toastConfig.data ? 'Light' : 'Dark'}</button>
-            <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
+            <button class="mdl-button right" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </div>
         }
       </toast>
