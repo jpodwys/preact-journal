@@ -22,7 +22,7 @@ const getInitialState = function() {
     entries: entries,
     viewEntries: viewEntries || entries,
     toastConfig: undefined,
-    dark: !!localStorage.getItem('dark')
+    dark: localStorage.getItem('dark') === 'true'
   };
 
   return state;

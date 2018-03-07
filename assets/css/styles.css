@@ -5,6 +5,10 @@ body {
   font-size: 16px;
 }
 
+.app {
+  min-height: 100%;
+}
+
 .app.dark {
   background-color: #000;
   color: white !important;
