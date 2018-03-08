@@ -27,7 +27,7 @@ export default class App extends Component {
   state = getInitialState();
   
   componentWillMount() {
-    freedux(this, Object.assign(actions));
+    freedux(this, actions);
     fire('getEntries')();
 
     // For debugging
