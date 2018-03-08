@@ -217,7 +217,7 @@ const deleteEntry = function(el, e){
     entry: undefined,
     entries: [].concat(el.state.entries)
   }, function(){
-    // route('/entries');
+    route('/entries');
   });
 
   Entry.del(id).then(function(){

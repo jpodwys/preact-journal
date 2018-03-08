@@ -21,7 +21,6 @@ app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
 app.use(compress({threshold: '1.4kb'}));
-app.use(express.static('dist', {maxAge: '0h'}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -35,6 +34,11 @@ app.use(jwtMW({
     return null;
   }
 }));
+app.get('/favicon.ico', function(req, res, next){
+  res.sendFile('favicon.ico', {root: './dist', maxAge: '30d'});
+  next();
+});
+app.use(express.static('dist', {maxAge: '0h'}));
 require('./middleware/app-middleware')(app);
 require('./routes')(app);
 

@@ -28,7 +28,7 @@ export default class Header extends Component {
 	}
 
 	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
-		if(!loggedIn) return '';
+		if(!loggedIn) return null;
 		return (
 			<header class="elevated">
 				<span class="nav-set">
@@ -36,7 +36,7 @@ export default class Header extends Component {
 						<h3>Entries</h3>
 					}
 
-					{loggedIn && (view === '/entry' || view === '/new') &&
+					{(view === '/entry' || view === '/new') &&
 						<a href="/entries">
 							<Icon icon="back" key="header-back" />
 						</a>
@@ -65,15 +65,13 @@ export default class Header extends Component {
 				  {view === '/entries' && !showFilterInput &&
 				  	<Icon icon="search" key="header-search" onclick={this.showFilterText}/>
 				  }
-				  {view === '/entry' &&
+				  {(view === '/entry' || view === '/new') &&
 				  	<Icon icon="copy" key="header-copy" onclick={this.copy}/>
 					}
-					{loggedIn && entry && view === '/entry' &&
+					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
 					}
-				  {loggedIn &&
-				  	<Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
-					}
+				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 				</span>
 
 				{view === '/entries' &&
