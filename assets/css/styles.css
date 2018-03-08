@@ -5,6 +5,14 @@ body {
   font-size: 16px;
 }
 
+* {
+  transition: background-color .2s ease, box-shadow .2s ease;
+}
+
+svg {
+  transition: fill .2s ease;
+}
+
 .app {
   min-height: 100%;
 }
