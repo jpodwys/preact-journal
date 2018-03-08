@@ -38,6 +38,7 @@ const applyFilters = function(query, list){
 const clearLocalStorage = function(){
   localStorage.removeItem('entries');
   localStorage.removeItem('timestamp');
+  localStorage.removeItem('dark');
 };
 
 const getViewFromHref = function(href){

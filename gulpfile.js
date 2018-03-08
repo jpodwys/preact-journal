@@ -48,12 +48,6 @@ function styles() {
     .pipe(gulp.dest('./dist'));
 }
 
-function moveStyles() {
-  return gulp.src('cssstyles.css')
-    .pipe(rename('styles.css'))
-    .pipe(gulp.dest('./dist'));
-}
-
 function clean() {
   return del(['./dist']);
 }

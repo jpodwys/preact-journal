@@ -13,12 +13,20 @@ const hideKeyboard = function(el) {
   el.setAttribute('disabled', 'true');
   setTimeout(function() {
     el.blur();
-    el.setAttribute('readonly');
-    el.setAttribute('disabled');
+    el.removeAttribute('readonly');
+    el.removeAttribute('disabled');
   }, 10);
 }
 
+const tryShareApi = function(text) {
+  if(navigator.share){
+    return navigator.share({text: text});
+  }
+  return false;
+}
+
 export default function copyText(text) {
+  if(tryShareApi(text)) return;
   let textarea = document.getElementById(textareaId);
   textarea.value = text;
   select(textarea);

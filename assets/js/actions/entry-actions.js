@@ -241,7 +241,7 @@ const deleteEntryFailure = function(el, err){
 const setEntry = function(el, e){
   if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
 
-  var entryIndex = findObjectIndexById(parseInt(e.detail.id, 10), el.state.entries);
+  var entryIndex = findObjectIndexById(parseInt(e.detail.id), el.state.entries);
   var entry = el.state.entries[entryIndex];
   var entryReady = !!entry || !!e.detail.entryReady;
 
@@ -302,7 +302,7 @@ const blurTextFilter = function(el){
 
 const shiftEntry = function(el, e){
   if(el.state.view !== '/entry' || el.state.inputFocused || !e || !e.detail || !el.state.entries || !el.state.entry) return;
-  var entryIndex = findObjectIndexById(parseInt(el.state.entry.id, 10), el.state.viewEntries);
+  var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + e.detail.count];
   // if(entry) el.setState({entry: entry});
   if(entry) route('/entry/' + entry.id);
