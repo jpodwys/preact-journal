@@ -27,8 +27,6 @@ export default class Header extends Component {
 		copyText(date + ' ' + text);
 	}
 
-
-
 	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return '';
 		return (
