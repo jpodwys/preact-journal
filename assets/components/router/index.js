@@ -61,8 +61,8 @@ class Router extends Component {
   }
 
   matchUrlWithWildCards(path, url) {
-    let paths = path.split('/').filter(String);
-    let urls = url.split('/').filter(String);
+    let paths = path.split('/');
+    let urls = url.split('/');
 
     if(paths.length !== urls.length) return false;
 
