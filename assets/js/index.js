@@ -7,16 +7,13 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js');
   
   navigator.serviceWorker.onmessage = function (e) {
-    if(!e || !e.data) return;
     let eTag = e.data;
     let lastETag = localStorage.getItem('currentETag');
     let isNew = !!lastETag && !!eTag && lastETag !== eTag;
 
-    if (isNew || !lastETag) {
+    if(isNew || !lastETag) {
       localStorage.setItem('currentETag', eTag);
-      if(isNew){
-        location.reload();
-      }
+      if(isNew) location.reload();
     }
   };
 }
