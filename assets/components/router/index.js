@@ -4,7 +4,7 @@ let ROUTER;
 let ONCHANGE;
 
 const shouldFollowLink = function(node) {
-  if (!node || !node.getAttribute) return false;
+  if(!node || !node.getAttribute) return false;
   let href = node.getAttribute('href'),
     target = node.getAttribute('target');
   if (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i))) return false;
@@ -19,7 +19,7 @@ const getLinkTarget = function(target){
 };
 
 const clickListener = function(e) {
-  if(!e || !e.target) return;
+  if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
   let href = shouldFollowLink(getLinkTarget(e.target));
   if(href){
     e.preventDefault();
