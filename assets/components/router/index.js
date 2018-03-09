@@ -56,10 +56,6 @@ class Router extends Component {
     }
   }
 
-  matchUrl(path, url) {
-    return path === url || this.matchUrlWithWildCards(path, url);
-  }
-
   matchUrlWithWildCards(path, url) {
     let paths = path.split('/');
     let urls = url.split('/');
@@ -78,7 +74,7 @@ class Router extends Component {
   matchPath(url, children) {
     return children.filter(child => {
       let path = child.attributes.path;
-      return this.matchUrl(path, url);
+      return path === url || this.matchUrlWithWildCards(path, url);
     });
   }
 
