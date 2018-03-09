@@ -203,9 +203,6 @@ const putEntry = function(el, e){
 };
 
 const deleteEntry = function(el, e){
-  // if(isNaN(entryIndex)) return;
-  // el.setState({loading: el.state.loading + 1});
-
   var id = e.detail.id;
   if(!id) return;
 
@@ -217,7 +214,7 @@ const deleteEntry = function(el, e){
     entry: undefined,
     entries: [].concat(el.state.entries)
   }, function(){
-    route('/entries');
+    if(el.state.view !== '/entries') route('/entries', true);
   });
 
   Entry.del(id).then(function(){

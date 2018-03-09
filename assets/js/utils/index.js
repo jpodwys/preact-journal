@@ -26,7 +26,7 @@ const filterObjectsByText = function(query, list) {
 
 const filterHiddenEntries = function(entries) {
   return entries.filter(function(entry){
-    return !(entry.deleted || entry.newEntry && !entry.postPending);
+    return !entry.deleted;
   });
 };
 
