@@ -86,6 +86,7 @@ toast.show {
 }
 
 header {
+  color: #fff;
   position: fixed;
   z-index: 1;
   left: 0;
