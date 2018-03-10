@@ -23,7 +23,7 @@ svg {
 
 .app.dark {
   background-color: #000;
-  color: white !important;
+  color: #fff;
 }
 
 .app.dark header {
@@ -34,8 +34,12 @@ svg {
   fill: #c5c5c5;
 }
 
-.app.dark .entry-preview .entry-link {
-  color: #fff;
+.app.dark .entry-preview .entry-link, .app.dark .entry-date {
+  color: #f3f3f3;
+}
+
+.app.dark .entry-text {
+  color: #ccc;
 }
 
 .app.dark .list-item .second-row {
@@ -82,7 +86,6 @@ toast.show {
 }
 
 header {
-  color: #fff;
   position: fixed;
   z-index: 1;
   left: 0;
