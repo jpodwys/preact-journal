@@ -52,7 +52,9 @@ svg {
 }
 
 .entry-preview .entry-link {
-  color: #333;
+  /*color: #333;*/
+  /*color: #424242;*/
+  color: #5776d0;
 }
 
 toast {
