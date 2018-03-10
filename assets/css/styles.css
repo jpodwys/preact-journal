@@ -27,7 +27,7 @@ svg {
 }
 
 .app.dark header {
-  background-color: #585858;
+  background-color: #424242;
 }
 
 .app.dark .dark-fill svg {
@@ -47,7 +47,7 @@ svg {
 }
 
 .app.dark .button--fab.add-entry {
-  background-color: #585858;
+  background-color: #424242;
 }
 
 .app.dark .elevated {
