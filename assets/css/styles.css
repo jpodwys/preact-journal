@@ -5,6 +5,10 @@ body {
   font-size: 16px;
 }
 
+h3 {
+  padding: 14px 15px;
+}
+
 * {
   transition: background-color .25s ease, box-shadow .25s ease;
 }
@@ -30,8 +34,13 @@ svg {
   fill: #c5c5c5;
 }
 
-.app.dark .entry-link {
-  color: #9ab4ff;
+.app.dark .entry-preview .entry-link {
+  /*color: #9ab4ff;*/
+  color: #fff;
+}
+
+.app.dark .list-item .second-row {
+  color: #ccc;
 }
 
 .app.dark .button--fab.add-entry {
@@ -138,7 +147,7 @@ input {
 }
 
 a, a:visited {
-  color: #5776d0;
+  color: #424242;
   text-decoration: none;
 }
 
@@ -146,6 +155,20 @@ main {
   margin: 0 auto;
   max-width: 800px;
   padding: 60px 15px 75px 15px;
+}
+
+.entry-preview {
+  position: relative;
+}
+
+.entry-preview .nav-set svg:last-child {
+  padding-right: 0;
+}
+
+.entry-preview--icons {
+  position: absolute;
+  top: 10px;
+  right: 0;
 }
 
 .elevated {
