@@ -5,7 +5,7 @@ body {
   font-size: 16px;
 }
 
-h3 {
+header .nav-set h3 {
   padding: 14px 15px;
 }
 
@@ -35,7 +35,6 @@ svg {
 }
 
 .app.dark .entry-preview .entry-link {
-  /*color: #9ab4ff;*/
   color: #fff;
 }
 
@@ -48,7 +47,12 @@ svg {
 }
 
 .app.dark .elevated {
-  box-shadow: none;
+  /*box-shadow: none;*/
+  filter: none;
+}
+
+.entry-preview .entry-link {
+  color: #333;
 }
 
 toast {
@@ -172,7 +176,8 @@ main {
 }
 
 .elevated {
-  box-shadow: 0 5px 5px #c1c1c1;
+  /*box-shadow: 0 5px 5px #c1c1c1;*/
+  filter: drop-shadow(0 4px 4px #9c9c9c);
 }
 
 .button--fab {
