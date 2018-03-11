@@ -10,7 +10,7 @@ header .nav-set h3 {
 }
 
 .app.dark header .nav-set h3 {
-  padding: 14px 15px;
+  font-weight: 100;
 }
 
 * {
