@@ -9,10 +9,6 @@ header .nav-set h3 {
   padding: 14px 15px;
 }
 
-.app.dark header .nav-set h3 {
-  font-weight: 100;
-}
-
 * {
   transition: background-color .25s ease, box-shadow .25s ease;
 }
@@ -40,6 +36,7 @@ svg {
 
 .app.dark .entry-preview .entry-link, .app.dark .entry-date {
   color: #f3f3f3;
+  font-weight: 100;
 }
 
 .app.dark .entry-text {
