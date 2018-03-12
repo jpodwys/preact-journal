@@ -38,7 +38,7 @@ const getAllEntriesError = function(el, err){
   console.log('getAllEntriesError', err)
 };
 
-// Sync entries to the server that were updated while offline
+// Send updates to the server
 const syncClientEntries = function(el){
   var entries = el.state.entries;
   entries.forEach(entry => {
@@ -54,7 +54,7 @@ const syncClientEntries = function(el){
   });
 };
 
-// Sync entries with newer versions from the server
+// Get updates from the server
 const syncEntries = function(el, e){
   Entry.sync(e.detail.timestamp).then(response => {
     syncEntriesSuccess(el, response);
@@ -264,7 +264,6 @@ const newEntry = function(el){
     entries: [entry].concat(el.state.entries)
   }, function(){
     setEntry(el, {detail: {id: entry.id, entryReady: true}});
-    // route('/entry/' + newEntry.id);
   });
 };
 
@@ -301,7 +300,6 @@ const shiftEntry = function(el, e){
   if(el.state.view !== '/entry' || el.state.inputFocused || !e || !e.detail || !el.state.entries || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + e.detail.count];
-  // if(entry) el.setState({entry: entry});
   if(entry) route('/entry/' + entry.id);
 };
 

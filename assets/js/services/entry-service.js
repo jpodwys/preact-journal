@@ -1,14 +1,18 @@
 import xhr from '../xhr';
 
+const getAll = function() {
+  return xhr('/api/entries');
+};
+
+const sync = function(timestamp) {
+  return xhr('/api/entries/sync/' + timestamp);
+};
+
 const create = function(entry) {
   return xhr('/api/entry', {
     method: 'POST',
     body: entry
   });
-};
-
-const get = function(id) {
-  return xhr('/api/entry/' + entry.id);
 };
 
 const update = function(entryId, entry) {
@@ -24,12 +28,5 @@ const del = function(id) {
   });
 };
 
-const getAll = function() {
-  return xhr('/api/entries');
-};
 
-const sync = function(timestamp) {
-  return xhr('/api/entries/sync/' + timestamp);
-};
-
-export default { create, get, update, del, getAll, sync };
+export default { getAll, sync, create, update, del };

@@ -10,10 +10,7 @@ header .nav-set h3 {
 }
 
 * {
-  transition:
-    background-color .25s ease,
-    color .25s ease,
-    filter .25s ease;
+  transition: background-color .25s ease;
 }
 
 svg {
@@ -58,13 +55,10 @@ svg {
 }
 
 .app.dark .elevated {
-  /*box-shadow: none;*/
   filter: none;
 }
 
 .entry-preview .entry-link {
-  /*color: #333;*/
-  /*color: #424242;*/
   color: #5776d0;
 }
 
@@ -189,7 +183,6 @@ main {
 }
 
 .elevated {
-  /*box-shadow: 0 5px 5px #c1c1c1;*/
   filter: drop-shadow(0 4px 4px #9c9c9c);
 }
 
