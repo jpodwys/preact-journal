@@ -34,9 +34,12 @@ svg {
   fill: #c5c5c5;
 }
 
-.app.dark .entry-preview .entry-link, .app.dark .entry-date {
+.app.dark .entry-preview .entry-link {
   color: #f3f3f3;
-  font-weight: 100;
+}
+
+.app.dark .entry-date {
+  color: #e0e0e0;
 }
 
 .app.dark .entry-text {
