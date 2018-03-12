@@ -10,24 +10,27 @@ export default class EntryPreview extends Component {
 
   render({ entry }) {
     return (
-      <div class="list-item">
-        <div class="first-row">
-          <a
-            class="entry-link"
-            href={"/entry/" + entry.id}>
-            {entry.date}
-          </a>
-          <span class="nav-set right dark-fill">
-            <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
-            <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
-          </span>
-        </div>
+      <div class="entry-preview">
+        <a href={"/entry/" + entry.id}>
+          <div class="list-item">
+            <div class="first-row">
+              <span
+                class="entry-link">
+                {entry.date}
+              </span>
+        
+            </div>
 
-        <div class="second-row">
-          <p>
-            {entry.text}
-          </p>
-        </div>
+            <div class="second-row">
+              {entry.text}
+            </div>
+          </div>
+        </a>
+
+        <span class="nav-set right dark-fill entry-preview--icons">
+          <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
+          <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
+        </span>
       </div>
     );
   }

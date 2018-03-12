@@ -5,8 +5,15 @@ body {
   font-size: 16px;
 }
 
+header .nav-set h3 {
+  padding: 14px 15px;
+}
+
 * {
-  transition: background-color .25s ease, box-shadow .25s ease;
+  transition:
+    background-color .25s ease,
+    color .25s ease,
+    filter .25s ease;
 }
 
 svg {
@@ -19,7 +26,7 @@ svg {
 
 .app.dark {
   background-color: #000;
-  color: white !important;
+  color: #fff;
 }
 
 .app.dark header {
@@ -30,8 +37,20 @@ svg {
   fill: #c5c5c5;
 }
 
-.app.dark .entry-link {
-  color: #9ab4ff;
+.app.dark .entry-preview .entry-link {
+  color: #f3f3f3;
+}
+
+.app.dark .entry-date {
+  color: #e0e0e0;
+}
+
+.app.dark .entry-text {
+  color: #ccc;
+}
+
+.app.dark .list-item .second-row {
+  color: #ccc;
 }
 
 .app.dark .button--fab.add-entry {
@@ -39,7 +58,14 @@ svg {
 }
 
 .app.dark .elevated {
-  box-shadow: none;
+  /*box-shadow: none;*/
+  filter: none;
+}
+
+.entry-preview .entry-link {
+  /*color: #333;*/
+  /*color: #424242;*/
+  color: #5776d0;
 }
 
 toast {
@@ -138,7 +164,7 @@ input {
 }
 
 a, a:visited {
-  color: #5776d0;
+  color: #424242;
   text-decoration: none;
 }
 
@@ -148,8 +174,23 @@ main {
   padding: 60px 15px 75px 15px;
 }
 
+.entry-preview {
+  position: relative;
+}
+
+.entry-preview .nav-set svg:last-child {
+  padding-right: 0;
+}
+
+.entry-preview--icons {
+  position: absolute;
+  top: 10px;
+  right: 0;
+}
+
 .elevated {
-  box-shadow: 0 5px 5px #c1c1c1;
+  /*box-shadow: 0 5px 5px #c1c1c1;*/
+  filter: drop-shadow(0 4px 4px #9c9c9c);
 }
 
 .button--fab {
