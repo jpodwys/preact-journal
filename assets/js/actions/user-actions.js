@@ -26,19 +26,22 @@ const loginFailure = function(el, err){
 };
 
 const createAccount = function(el, e){
-  console.log('createAccount')
   clearLocalStorage();
   let user = e.detail.user;
   User.create(user).then(user => {
-    createAccountSuccess(el, user);
+    loginSuccess(el, user);
   }).catch(err => {
     createAccountFailure(el, err);
   });
 };
 
-const createAccountSuccess = function(el, user){
-  route('/entries', true);
-};
+// const createAccountSuccess = function(el, user){
+//   el.setState({
+//     loggedIn: true,
+//   }, function(){
+//     route('/entries', true);
+//   });
+// };
 
 const createAccountFailure = function(el, err){
   console.log('createAccountFailure', err);
