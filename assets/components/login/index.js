@@ -35,7 +35,7 @@ export default class Login extends Component {
         <h1 class="center-text">Journalize</h1>
         <h4 class="center-text">Private journal entries</h4>
           <div class="login-form-wrapper">
-            <form action="/api/user" method="POST" onSubmit={this.join} class="full-width full-width--all">
+            <form action="/api/user" method="POST" onsubmit={this.join} class="full-width full-width--all">
               <fieldset>
                 <legend>Create an Account</legend>
                 <input id="cusername" placeholder="username" autocapitalize="off"/>
@@ -43,7 +43,7 @@ export default class Login extends Component {
                 <input type="submit"/>
               </fieldset>
             </form>
-            <form action="/api/user/login" method="POST" onSubmit={this.login} class="full-width full-width--all">
+            <form action="/api/user/login" method="POST" onsubmit={this.login} class="full-width full-width--all">
               <fieldset>
                 <legend>or Login</legend>
                 <input id="lusername" placeholder="username" autocapitalize="off"/>
