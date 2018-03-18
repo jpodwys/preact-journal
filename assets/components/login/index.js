@@ -9,24 +9,21 @@ export default class Login extends Component {
     this.base.querySelector('#lpassword').value = '';
   }
 
-  join = (e) => {
+  getUser = prefix => ({
+    user: {
+      username: this.base.querySelector('#' + prefix + 'username').value,
+      password: this.base.querySelector('#' + prefix + 'password').value
+    }
+  })
+
+  join = e => {
     e.preventDefault();
-    fire('createAccount', {
-      user: {
-        username: this.base.querySelector('#cusername').value,
-        password: this.base.querySelector('#cpassword').value
-      }
-    })();
+    fire('createAccount', this.getUser('c'))();
   }
 
-  login = (e) => {
+  login = e => {
     e.preventDefault();
-    fire('login', {
-      user: {
-        username: this.base.querySelector('#lusername').value,
-        password: this.base.querySelector('#lpassword').value
-      }
-    })();
+    fire('login', this.getUser('l'))();
   }
 
   render() {
