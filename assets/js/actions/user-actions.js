@@ -3,9 +3,9 @@ import getInitialState from '../app-state';
 import { route } from '../../components/router';
 import { clearLocalStorage } from '../utils';
 
-const login = function(el, e){
+const login = function(el, user){
   clearLocalStorage();
-  let user = e.detail.user;
+  // let user = e.detail.user;
   User.login(user).then(user => {
     loginSuccess(el, user);
   }).catch(err => {

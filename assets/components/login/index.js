@@ -10,10 +10,10 @@ export default class Login extends Component {
   }
 
   getUser = prefix => ({
-    user: {
+    // user: {
       username: this.base.querySelector('#' + prefix + 'username').value,
       password: this.base.querySelector('#' + prefix + 'password').value
-    }
+    // }
   })
 
   join = e => {
