@@ -5,7 +5,6 @@ import { clearLocalStorage } from '../utils';
 
 const login = function(el, user){
   clearLocalStorage();
-  // let user = e.detail.user;
   User.login(user).then(user => {
     loginSuccess(el, user);
   }).catch(err => {
@@ -33,14 +32,6 @@ const createAccount = function(el, user){
     createAccountFailure(el, err);
   });
 };
-
-// const createAccountSuccess = function(el, user){
-//   el.setState({
-//     loggedIn: true,
-//   }, function(){
-//     route('/entries', true);
-//   });
-// };
 
 const createAccountFailure = function(el, err){
   console.log('createAccountFailure', err);
