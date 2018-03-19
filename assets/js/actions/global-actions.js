@@ -1,8 +1,8 @@
-const focusin = function(el, e){
+const focusin = function(el){
   el.setState({inputFocused: true});
 };
 
-const focusout = function(el, e){
+const focusout = function(el){
   el.setState({inputFocused: false});
 };
 
@@ -13,7 +13,7 @@ const linkstate = function(el, data){
   if(data.key === 'dark') localStorage.setItem('dark', data.val);
 };
 
-const scrollBody = function(el, e){
+const scrollBody = function(el){
   if(el.state.view === '/entries'){
     el.setState({scrollPosition: document.body.scrollTop});
   }

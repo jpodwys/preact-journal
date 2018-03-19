@@ -25,9 +25,8 @@ const loginFailure = function(el, err){
   console.log('loginFailure', err);
 };
 
-const createAccount = function(el, e){
+const createAccount = function(el, user){
   clearLocalStorage();
-  let user = e.detail.user;
   User.create(user).then(user => {
     loginSuccess(el, user);
   }).catch(err => {
@@ -47,7 +46,7 @@ const createAccountFailure = function(el, err){
   console.log('createAccountFailure', err);
 };
 
-const logout = function(el, e){
+const logout = function(el){
   User.logout().then(() => {
     logoutSuccess(el);
   }).catch(err => {
