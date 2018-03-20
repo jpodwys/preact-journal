@@ -6,11 +6,11 @@ const focusout = function(el){
   el.setState({inputFocused: false});
 };
 
-const linkstate = function(el, data){
+const linkstate = function(el, { key, val, cb }){
   let obj = {};
-  obj[data.key] = data.val;
-  el.setState(obj, data.cb);
-  if(data.key === 'dark') localStorage.setItem('dark', data.val);
+  obj[key] = val;
+  el.setState(obj, cb);
+  if(key === 'dark') localStorage.setItem('dark', val);
 };
 
 const scrollBody = function(el){
