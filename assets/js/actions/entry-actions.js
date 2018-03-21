@@ -262,17 +262,18 @@ const newEntry = function(el){
   });
 };
 
-const filterByText = function(el, _, e){
-  if(!e || !e.target) return;
-  if(el.state.filterText === e.target.value) return;
-  if(!e.target.value) return el.setState({
+const filterByText = function(el, text, e){
+  if(text === undefined && (!e || !e.target)) return;
+  let value = text === undefined ? e.target.value : text;
+  if(el.state.filterText === value) return;
+  if(!value) return el.setState({
     filterText: '',
     viewEntries: applyFilters('', el.state.entries)
   });
 
   // If the new query is a continuation of the prior query,
   // fitler viewEntries for efficiency.
-  var query = e.target.value;
+  var query = value;
   var q = query.toLowerCase();
   var entries = (q.indexOf(el.state.filterText) === 0)
     ? el.state.viewEntries
