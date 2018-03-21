@@ -35,10 +35,10 @@ exports.swipeEnd = function(e) {
       direction = (touchEndCoords.x < 0) ? 'left' : 'right';
       switch(direction){
         case 'left':
-          fire('shiftEntry', {count: 1})();
+          fire('shiftEntry', 1)();
           break;
         case 'right':
-          fire('shiftEntry', {count: -1})();
+          fire('shiftEntry', -1)();
           break;
       }
     }

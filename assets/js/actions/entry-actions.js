@@ -29,7 +29,7 @@ const getAllEntriesSuccess = function(el, response){
   persist(el, {
     entries: response.entries,
   }, function(){
-    setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+    setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     localStorage.setItem('timestamp', response.timestamp);
   });
 };
@@ -91,7 +91,7 @@ const persistSyncPatch = function(el, timestamp){
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
-      setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+      setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     }
     localStorage.setItem('timestamp', timestamp);
   });
@@ -230,17 +230,16 @@ const deleteEntryFailure = function(el, err){
   console.log('deleteEntryFailure', err);
 };
 
-const setEntry = function(el, { id, entryReady }){
+const setEntry = function(el, { id/*, entryReady*/ }){
   if(!id || id === -1) return;
 
   var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
   var entry = el.state.entries[entryIndex];
-  var entryReady = !!entry || !!entryReady;
+  // var entryReady = !!entry || !!entryReady;
 
   el.setState({
     entry: entry,
-    entryIndex: entryIndex,
-    entryReady: entryReady
+    // entryReady: entryReady
   });
 };
 
@@ -254,11 +253,10 @@ const newEntry = function(el){
   };
 
   el.setState({
-    entryIndex: 0,
     entry: entry,
     entries: [entry].concat(el.state.entries)
   }, function(){
-    setEntry(el, {detail: {id: entry.id, entryReady: true}});
+    setEntry(el, {id: entry.id/*, entryReady: true*/});
   });
 };
 
@@ -292,10 +290,10 @@ const blurTextFilter = function(el){
   }
 };
 
-const shiftEntry = function(el, e){
-  if(el.state.view !== '/entry' || el.state.inputFocused || !e || !e.detail || !el.state.entries || !el.state.entry) return;
+const shiftEntry = function(el, count){
+  if(el.state.view !== '/entry' || el.state.inputFocused || !count || !el.state.entries || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
-  let entry = el.state.viewEntries[entryIndex + e.detail.count];
+  let entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);
 };
 

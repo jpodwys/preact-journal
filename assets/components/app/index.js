@@ -6,7 +6,6 @@ import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
 import Toast from '../toast';
-import FourOhFour from '../four-oh-four';
 
 import freedux from '../../js/freedux';
 import getInitialState from '../../js/app-state';
