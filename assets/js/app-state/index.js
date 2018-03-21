@@ -14,7 +14,7 @@ const getInitialState = function() {
     view: getViewFromHref(location.href),
     showFilterInput: false,
     filterText: '',
-    entryReady: false,
+    // entryReady: false,
     loggedIn: loggedIn,
     syncing: 0,
     inputFocused: false,

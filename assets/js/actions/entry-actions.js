@@ -4,13 +4,13 @@ import persist from '../persist';
 
 let dataFetched = false;
 
-const getEntries = function(el, e){
+const getEntries = function(el){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
   let timestamp = localStorage.getItem('timestamp');
   if(timestamp){
-    syncEntries(el, {detail: {timestamp: timestamp}});
+    syncEntries(el, timestamp);
   } else {
     getAllEntries(el);
   }
@@ -29,7 +29,7 @@ const getAllEntriesSuccess = function(el, response){
   persist(el, {
     entries: response.entries,
   }, function(){
-    setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+    setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     localStorage.setItem('timestamp', response.timestamp);
   });
 };
@@ -49,14 +49,14 @@ const syncClientEntries = function(el){
       else if(entry.deleted)  func = deleteEntry;
       else                    func = putEntry;
 
-      func(el, {detail: {id: entry.id, entry: entry, clientSync: true}});
+      func(el, {id: entry.id, entry: entry, clientSync: true});
     }
   });
 };
 
 // Get updates from the server
-const syncEntries = function(el, e){
-  Entry.sync(e.detail.timestamp).then(response => {
+const syncEntries = function(el, timestamp){
+  Entry.sync(timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
     syncEntriesFailure(el, err);
@@ -91,7 +91,7 @@ const persistSyncPatch = function(el, timestamp){
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
-      setEntry(el, {detail: {id: el.state.entryId, entryReady: true}});
+      setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     }
     localStorage.setItem('timestamp', timestamp);
   });
@@ -101,9 +101,7 @@ const syncEntriesFailure = function(el, err){
   console.log('syncEntriesFailure', err)
 };
 
-const createEntry = function(el, e){
-  let entry = e.detail.entry;
-
+const createEntry = function(el, { entry, clientSync }){
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
 
@@ -112,7 +110,7 @@ const createEntry = function(el, e){
     entries: [].concat(el.state.entries)
   });
 
-  if(!e.detail.clientSync && entry.postPending) return;
+  if(!clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
   persist(el, {
@@ -152,28 +150,27 @@ const createEntryFailure = function(el, oldId, err){
   console.log('createEntryFailure', err);
 };
 
-const updateEntry = function(el, e){
-  var d = e.detail;
-  var val = d.entry[d.property];
+const updateEntry = function(el, { entry, property, entryId }){
+  var val = entry[property];
   if(typeof val === 'string'){
     val = val.trim();
   }
 
-  d.entry[d.property] = d.entry[d.property];
-  var entryIndex = findObjectIndexById(d.entryId, el.state.entries);
-  var current = el.state.entries[entryIndex][d.property];
-  var next = d.entry[d.property];
+  entry[property] = entry[property];
+  var entryIndex = findObjectIndexById(entryId, el.state.entries);
+  var current = el.state.entries[entryIndex][property];
+  var next = entry[property];
   if(current === next) return;
 
-  el.state.entries[entryIndex][d.property] = d.entry[d.property];
+  el.state.entries[entryIndex][property] = entry[property];
   el.state.entries[entryIndex].needsSync = true;
   persist(el, {
     entry: Object.assign({}, el.state.entries[entryIndex]),
     entries: [].concat(el.state.entries)
   });
 
-  Entry.update(d.entryId, d.entry).then(function(){
-    updateEntrySuccess(el, d.entryId);
+  Entry.update(entryId, entry).then(function(){
+    updateEntrySuccess(el, entryId);
   }).catch(function(err){
     updateEntryFailure(el, err);
   });
@@ -193,8 +190,7 @@ const updateEntryFailure = function(el, err){
   console.log('updateEntryFailure', err);
 };
 
-const putEntry = function(el, e){
-  var entry = e.detail.entry;
+const putEntry = function(el, { entry }){
   Entry.update(entry.id, entry).then(function(){
     updateEntrySuccess(el, entry.id);
   }).catch(function(err){
@@ -202,8 +198,7 @@ const putEntry = function(el, e){
   });
 };
 
-const deleteEntry = function(el, e){
-  var id = e.detail.id;
+const deleteEntry = function(el, { id }){
   if(!id) return;
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
@@ -235,17 +230,16 @@ const deleteEntryFailure = function(el, err){
   console.log('deleteEntryFailure', err);
 };
 
-const setEntry = function(el, e){
-  if(!e || !e.detail || !e.detail.id || e.detail.id === -1) return;
+const setEntry = function(el, { id/*, entryReady*/ }){
+  if(!id || id === -1) return;
 
-  var entryIndex = findObjectIndexById(parseInt(e.detail.id), el.state.entries);
+  var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
   var entry = el.state.entries[entryIndex];
-  var entryReady = !!entry || !!e.detail.entryReady;
+  // var entryReady = !!entry || !!entryReady;
 
   el.setState({
     entry: entry,
-    entryIndex: entryIndex,
-    entryReady: entryReady
+    // entryReady: entryReady
   });
 };
 
@@ -259,25 +253,25 @@ const newEntry = function(el){
   };
 
   el.setState({
-    entryIndex: 0,
     entry: entry,
     entries: [entry].concat(el.state.entries)
   }, function(){
-    setEntry(el, {detail: {id: entry.id, entryReady: true}});
+    setEntry(el, {id: entry.id/*, entryReady: true*/});
   });
 };
 
-const filterByText = function(el, e){
-  if(!e || !e.detail) return;
-  if(el.state.filterText === e.detail.value) return;
-  if(!e.detail.value) return el.setState({
+const filterByText = function(el, text, e){
+  if(text === undefined && (!e || !e.target)) return;
+  let value = text === undefined ? e.target.value : text;
+  if(el.state.filterText === value) return;
+  if(!value) return el.setState({
     filterText: '',
     viewEntries: applyFilters('', el.state.entries)
   });
 
   // If the new query is a continuation of the prior query,
   // fitler viewEntries for efficiency.
-  var query = e.detail.value;
+  var query = value;
   var q = query.toLowerCase();
   var entries = (q.indexOf(el.state.filterText) === 0)
     ? el.state.viewEntries
@@ -296,10 +290,10 @@ const blurTextFilter = function(el){
   }
 };
 
-const shiftEntry = function(el, e){
-  if(el.state.view !== '/entry' || el.state.inputFocused || !e || !e.detail || !el.state.entries || !el.state.entry) return;
+const shiftEntry = function(el, count){
+  if(el.state.view !== '/entry' || el.state.inputFocused || !count || !el.state.entries || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
-  let entry = el.state.viewEntries[entryIndex + e.detail.count];
+  let entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);
 };
 

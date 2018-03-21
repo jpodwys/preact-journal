@@ -7,7 +7,7 @@ import debounce from '../../js/debounce';
 export default class Header extends Component {
 	clearFilterText = (e) => {
 		this.base.querySelector('#filterTextInput').focus();
-		fire('filterByText', {value: ''})();
+		fire('filterByText', '')();
 	}
 
 	showFilterText = (e) => {

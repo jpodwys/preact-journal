@@ -3,9 +3,8 @@ import getInitialState from '../app-state';
 import { route } from '../../components/router';
 import { clearLocalStorage } from '../utils';
 
-const login = function(el, e){
+const login = function(el, user){
   clearLocalStorage();
-  let user = e.detail.user;
   User.login(user).then(user => {
     loginSuccess(el, user);
   }).catch(err => {
@@ -25,9 +24,8 @@ const loginFailure = function(el, err){
   console.log('loginFailure', err);
 };
 
-const createAccount = function(el, e){
+const createAccount = function(el, user){
   clearLocalStorage();
-  let user = e.detail.user;
   User.create(user).then(user => {
     loginSuccess(el, user);
   }).catch(err => {
@@ -35,19 +33,11 @@ const createAccount = function(el, e){
   });
 };
 
-// const createAccountSuccess = function(el, user){
-//   el.setState({
-//     loggedIn: true,
-//   }, function(){
-//     route('/entries', true);
-//   });
-// };
-
 const createAccountFailure = function(el, err){
   console.log('createAccountFailure', err);
 };
 
-const logout = function(el, e){
+const logout = function(el){
   User.logout().then(() => {
     logoutSuccess(el);
   }).catch(err => {

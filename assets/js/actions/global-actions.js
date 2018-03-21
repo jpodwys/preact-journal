@@ -1,19 +1,19 @@
-const focusin = function(el, e){
+const focusin = function(el){
   el.setState({inputFocused: true});
 };
 
-const focusout = function(el, e){
+const focusout = function(el){
   el.setState({inputFocused: false});
 };
 
-const linkstate = function(el, e){
+const linkstate = function(el, { key, val, cb }){
   let obj = {};
-  obj[e.detail.key] = e.detail.val;
-  el.setState(obj, e.detail.cb);
-  if(e.detail.key === 'dark') localStorage.setItem('dark', e.detail.val);
+  obj[key] = val;
+  el.setState(obj, cb);
+  if(key === 'dark') localStorage.setItem('dark', val);
 };
 
-const scrollBody = function(el, e){
+const scrollBody = function(el){
   if(el.state.view === '/entries'){
     el.setState({scrollPosition: document.body.scrollTop});
   }

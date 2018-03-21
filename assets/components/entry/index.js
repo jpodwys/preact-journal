@@ -62,7 +62,7 @@ export default class Entry extends Component {
   }
 
   render({ view, entryIndex, entry, entryReady }) {
-    if(view !== '/new' && !entryReady) return;
+    // if(view !== '/new' && !entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
       <entry-view class="hidden">

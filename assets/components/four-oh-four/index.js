@@ -1,9 +1,7 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
 
-export default class FourOhFour extends Component {
-  render() {
-    return (
-      <h2 class="center-text">Looks like that doesn't exist!</h2>
-    );
-  }
-}
+const FourOhFour = () => (
+  <h2 class="center-text">Looks like that doesn't exist!</h2>
+);
+
+export default FourOhFour;
