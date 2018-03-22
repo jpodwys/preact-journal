@@ -29,7 +29,7 @@ const getAllEntriesSuccess = function(el, response){
   persist(el, {
     entries: response.entries,
   }, function(){
-    setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
+    // setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     localStorage.setItem('timestamp', response.timestamp);
   });
 };
@@ -91,7 +91,7 @@ const persistSyncPatch = function(el, timestamp){
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
-      setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
+      setEntry(el, {id: el.state.entryId/*, entryReady: true*/});
     }
     localStorage.setItem('timestamp', timestamp);
   });
