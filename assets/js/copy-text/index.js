@@ -1,9 +1,9 @@
 import select from 'select';
 import fire from '../fire';
 
-const textareaId = 'copyTextTextarea';
+// const textareaId = 'copyTextTextarea';
 let textarea = document.createElement('textarea');
-textarea.setAttribute('id', textareaId);
+// textarea.setAttribute('id', textareaId);
 textarea.setAttribute('tabindex', '-1');
 textarea.setAttribute('style', 'position:absolute;height:1px;width:1px;bottom:-100px;left:-100px;');
 document.body.appendChild(textarea);
@@ -27,7 +27,7 @@ const tryShareApi = function(text) {
 
 export default function copyText(text) {
   if(tryShareApi(text)) return;
-  let textarea = document.getElementById(textareaId);
+  // let textarea = document.getElementById(textareaId);
   textarea.value = text;
   select(textarea);
   let successful = document.execCommand('copy');

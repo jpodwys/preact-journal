@@ -36,7 +36,7 @@ export default class App extends Component {
 
   componentDidMount() {
     swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
-    swipe.listen(document, 'mousemove touchmove', swipe.swipeMove);
+    // swipe.listen(document, 'mousemove touchmove', swipe.swipeMove);
     swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
   }
 

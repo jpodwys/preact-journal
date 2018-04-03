@@ -8,8 +8,8 @@ var touchStartCoords =  {'x':-1, 'y':-1}, // X and Y coordinates on mousedown or
     maxDistanceYAxis = 20,// Max distance on mousemove or touchmove on the Y axis
     maxAllowedTime = 1000,// Max allowed time between swipeStart and swipeEnd
     startTime = 0,// Time on swipeStart
-    elapsedTime = 0,// Elapsed time between swipeStart and swipeEnd
-    targetElement = document.body;// Element to delegate
+    elapsedTime = 0;// Elapsed time between swipeStart and swipeEnd
+    // targetElement = document.body;// Element to delegate
 
 exports.swipeStart = function(e) {
   e = e ? e : window.event;
@@ -18,10 +18,10 @@ exports.swipeStart = function(e) {
   startTime = new Date().getTime();
 }
 
-exports.swipeMove = function(e) {
-  e = e ? e : window.event;
-  // e.preventDefault();
-}
+// exports.swipeMove = function(e) {
+//   e = e ? e : window.event;
+//   // e.preventDefault();
+// }
 
 exports.swipeEnd = function(e) {
   let el = document.activeElement;
