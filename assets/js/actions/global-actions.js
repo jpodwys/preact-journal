@@ -1,11 +1,3 @@
-// const focusin = function(el){
-//   el.setState({inputFocused: true});
-// };
-
-// const focusout = function(el){
-//   el.setState({inputFocused: false});
-// };
-
 const linkstate = function(el, { key, val, cb }){
   let obj = {};
   obj[key] = val;
@@ -20,8 +12,6 @@ const scrollBody = function(el){
 };
 
 export default {
-  // focusin,
-  // focusout,
   linkstate,
   scrollBody
 };

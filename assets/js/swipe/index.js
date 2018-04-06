@@ -1,6 +1,6 @@
 import fire from '../fire';
 
-// http://codepen.io/yzubizarreta/pen/ojJBQp
+// Adapted from here: http://codepen.io/yzubizarreta/pen/ojJBQp
 var touchStartCoords =  {'x':-1, 'y':-1}, // X and Y coordinates on mousedown or touchstart events.
     touchEndCoords = {'x':-1, 'y':-1},// X and Y coordinates on mouseup or touchend events.
     direction = 'undefined',// Swipe direction
@@ -9,7 +9,6 @@ var touchStartCoords =  {'x':-1, 'y':-1}, // X and Y coordinates on mousedown or
     maxAllowedTime = 1000,// Max allowed time between swipeStart and swipeEnd
     startTime = 0,// Time on swipeStart
     elapsedTime = 0;// Elapsed time between swipeStart and swipeEnd
-    // targetElement = document.body;// Element to delegate
 
 exports.swipeStart = function(e) {
   e = e ? e : window.event;
@@ -17,11 +16,6 @@ exports.swipeStart = function(e) {
   touchStartCoords = {'x':e.pageX, 'y':e.pageY};
   startTime = new Date().getTime();
 }
-
-// exports.swipeMove = function(e) {
-//   e = e ? e : window.event;
-//   // e.preventDefault();
-// }
 
 exports.swipeEnd = function(e) {
   let el = document.activeElement;

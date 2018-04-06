@@ -291,7 +291,7 @@ const blurTextFilter = function(el){
 };
 
 const shiftEntry = function(el, count){
-  if(el.state.view !== '/entry' /*|| el.state.inputFocused*/ || !count || !el.state.entries || !el.state.entry) return;
+  if(el.state.view !== '/entry' || !count || !el.state.entries || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);
