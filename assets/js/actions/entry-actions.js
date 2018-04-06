@@ -1,6 +1,7 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
 import persist from '../persist';
+import { route } from '../../components/router';
 
 let dataFetched = false;
 
