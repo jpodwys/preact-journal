@@ -30,13 +30,12 @@ export default class App extends Component {
     fire('getEntries')();
 
     // For debugging
-    window.app = this;
-    window.route = route;
+    // window.app = this;
+    // window.route = route;
   }
 
   componentDidMount() {
     swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
-    swipe.listen(document, 'mousemove touchmove', swipe.swipeMove);
     swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
   }
 

@@ -14,8 +14,9 @@ const handleRoute = function(view, url) {
   switch(view) {
     case '/':         handleLoginView.call(this, url);    break;
     case '/entries':  handleEntriesView.call(this, url);  break;
-    case '/entry':    handleEntryView.call(this, url);    break;
+    case '/entry':    // Fallthrough 
     case '/new':      handleEntryView.call(this, url);    break;
+    default:          route('/');                         break;
   }
 };
 
