@@ -5,7 +5,7 @@ import fire from '../../js/fire';
 let timeout;
 
 export default class Toast extends Component {
-  componentDidUpdate(props, state) {
+  componentDidUpdate(props) {
     if(timeout) clearTimeout(timeout);
     let config = this.props.toastConfig;
     if(!config) return;
@@ -16,12 +16,12 @@ export default class Toast extends Component {
     }
   }
 
-  handleDeleteEntry = (e) => {
+  handleDeleteEntry = () => {
     fire('deleteEntry', {id: this.props.toastConfig.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }
 
-  handleToggleDarkMode = (e) => {
+  handleToggleDarkMode = () => {
     fire('linkstate', {key: 'dark', val: !this.props.toastConfig.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }

@@ -6,12 +6,12 @@ import debounce from '../../js/debounce';
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      let entryText = this.base.querySelector('#entryText');
+      let entryText = q('#entryText');
       if(entryText) entryText.focus();
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
@@ -33,8 +33,8 @@ export default class Entry extends Component {
     var entry = this.props.entry;
 
     if(entry.newEntry){
-      entry.date = this.base.querySelector('#entryDate').innerText;
-      entry.text = this.base.querySelector('#entryText').innerText;
+      entry.date = q('#entryDate').innerText;
+      entry.text = q('#entryText').innerText;
 
       fire('createEntry', {entry: entry})();
     } else {
@@ -62,7 +62,6 @@ export default class Entry extends Component {
   }
 
   render({ view, entryIndex, entry, entryReady }) {
-    // if(view !== '/new' && !entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
       <entry-view class="hidden">

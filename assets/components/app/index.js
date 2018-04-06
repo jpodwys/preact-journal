@@ -39,7 +39,7 @@ export default class App extends Component {
     swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
   }
 
-  componentWillUpdate(nextProps, nextState) {
+  componentWillUpdate() {
     fire('getEntries')();
   }
 

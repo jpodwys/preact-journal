@@ -1,6 +1,8 @@
 import { h, render } from 'preact';
 import App from '../components/app';
 
+let q = document.querySelector;
+
 render(<App />, document.body);
 
 if('serviceWorker' in navigator){
