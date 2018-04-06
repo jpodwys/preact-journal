@@ -21,9 +21,9 @@ exports.swipeEnd = function(e) {
   let el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
   e = e ? e : window.event;
-  e = ('changedTouches' in e)?e.changedTouches[0] : e;
-  touchEndCoords = {'x':e.pageX - touchStartCoords.x, 'y':e.pageY - touchStartCoords.y};
-  elapsedTime = new Date().getTime() - startTime;
+  e = ('changedTouches' in e) ? e.changedTouches[0] : e;
+  touchEndCoords = {'x': e.pageX - touchStartCoords.x, 'y': e.pageY - touchStartCoords.y};
+  elapsedTime = Date.now() - startTime;
   if (elapsedTime <= maxAllowedTime){
     if (Math.abs(touchEndCoords.x) >= minDistanceXAxis && Math.abs(touchEndCoords.y) <= maxDistanceYAxis){
       direction = (touchEndCoords.x < 0) ? 'left' : 'right';
@@ -41,7 +41,7 @@ exports.swipeEnd = function(e) {
 
 exports.listen = function(el, s, fn) {
   var evts = s.split(' ');
-  for (var i=0, iLen=evts.length; i<iLen; i++) {
+  for (var i = 0, iLen = evts.length; i < iLen; i++) {
     el.addEventListener(evts[i], fn, false);
   }
 }

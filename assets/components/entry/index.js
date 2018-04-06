@@ -6,7 +6,7 @@ import debounce from '../../js/debounce';
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      let entryText = q('#entryText');
+      let entryText = this.base.querySelector('#entryText');
       if(entryText) entryText.focus();
     }
   }
@@ -33,8 +33,8 @@ export default class Entry extends Component {
     var entry = this.props.entry;
 
     if(entry.newEntry){
-      entry.date = q('#entryDate').innerText;
-      entry.text = q('#entryText').innerText;
+      entry.date = this.base.querySelector('#entryDate').innerText;
+      entry.text = this.base.querySelector('#entryText').innerText;
 
       fire('createEntry', {entry: entry})();
     } else {

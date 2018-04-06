@@ -6,19 +6,19 @@ import debounce from '../../js/debounce';
 
 export default class Header extends Component {
 	clearFilterText = () => {
-		q('#filterTextInput').focus();
+		this.base.querySelector('#filterTextInput').focus();
 		fire('filterByText', '')();
 	}
 
 	showFilterText = () => {
 		fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
-			q('#filterTextInput').focus();
+			this.base.querySelector('#filterTextInput').focus();
 		}})();
 	}
 
 	cancelAndBlur = (e) => {
 		e.preventDefault();
-		q('#filterTextInput').blur();
+		this.base.querySelector('#filterTextInput').blur();
 	}
 
 	copy = () => {

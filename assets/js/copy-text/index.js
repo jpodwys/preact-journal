@@ -6,7 +6,7 @@ textarea.setAttribute('tabindex', '-1');
 textarea.setAttribute('style', 'position:absolute;height:1px;width:1px;bottom:-100px;left:-100px;');
 document.body.appendChild(textarea);
 
-const hideKeyboard = function(el) {
+function hideKeyboard (el) {
   el.setAttribute('readonly', 'readonly');
   el.setAttribute('disabled', 'true');
   setTimeout(function() {
@@ -16,7 +16,7 @@ const hideKeyboard = function(el) {
   }, 10);
 }
 
-const tryShareApi = function(text) {
+function tryShareApi (text) {
   if(navigator.share){
     return navigator.share({text: text});
   }

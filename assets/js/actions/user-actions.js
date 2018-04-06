@@ -3,7 +3,7 @@ import getInitialState from '../app-state';
 import { route } from '../../components/router';
 import { clearLocalStorage } from '../utils';
 
-const login = function(el, user){
+function login (el, user){
   clearLocalStorage();
   User.login(user).then(user => {
     loginSuccess(el, user);
@@ -12,7 +12,7 @@ const login = function(el, user){
   });
 };
 
-const loginSuccess = function(el, user){
+function loginSuccess (el, user){
   el.setState({
     loggedIn: true,
   }, function(){
@@ -20,11 +20,11 @@ const loginSuccess = function(el, user){
   });
 };
 
-const loginFailure = function(el, err){
+function loginFailure (el, err){
   console.log('loginFailure', err);
 };
 
-const createAccount = function(el, user){
+function createAccount (el, user){
   clearLocalStorage();
   User.create(user).then(user => {
     loginSuccess(el, user);
@@ -33,11 +33,11 @@ const createAccount = function(el, user){
   });
 };
 
-const createAccountFailure = function(el, err){
+function createAccountFailure (el, err){
   console.log('createAccountFailure', err);
 };
 
-const logout = function(el){
+function logout (el){
   User.logout().then(() => {
     logoutSuccess(el);
   }).catch(err => {
@@ -45,13 +45,13 @@ const logout = function(el){
   });
 };
 
-const logoutSuccess = function(el){
+function logoutSuccess (el){
   clearLocalStorage();
   el.setState(getInitialState());
   route('/');
 };
 
-const logoutFailure = function(el, err){
+function logoutFailure (el, err){
   console.log('logoutFailure', err);
 };
 

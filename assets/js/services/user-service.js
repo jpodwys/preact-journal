@@ -1,26 +1,26 @@
 import xhr from '../xhr';
 
-const create = function(user) {
+function create (user) {
   return xhr('/api/user', {
     method: 'POST',
     body: user
   });
 };
 
-const login = function(user) {
+function login (user) {
   return xhr('/api/user/login', {
     method: 'POST',
     body: user
   });
 };
 
-const logout = function() {
+function logout () {
   return xhr('/api/user/logout', {
     method: 'POST'
   });
 };
 
-// const update = function(user) {
+// function update (user) {
 //   return xhr({
 //     url: '/api/user/' + data.id,
 //     method: 'PUT',
@@ -28,7 +28,7 @@ const logout = function() {
 //   });
 // };
 
-// const delete = function(id) {
+// function delete (id) {
 //   return xhr({
 //     url: '/api/user/' + data.id,
 //     method: 'DELETE'

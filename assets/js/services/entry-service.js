@@ -1,28 +1,28 @@
 import xhr from '../xhr';
 
-const getAll = function() {
+function getAll () {
   return xhr('/api/entries');
 };
 
-const sync = function(timestamp) {
+function sync (timestamp) {
   return xhr('/api/entries/sync/' + timestamp);
 };
 
-const create = function(entry) {
+function create (entry) {
   return xhr('/api/entry', {
     method: 'POST',
     body: entry
   });
 };
 
-const update = function(entryId, entry) {
+function update (entryId, entry) {
   return xhr('/api/entry/' + entryId, {
     method: 'PATCH',
     body: entry
   });
 };
 
-const del = function(id) {
+function del (id) {
   return xhr('/api/entry/' + id, {
     method: 'DELETE'
   });

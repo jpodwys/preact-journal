@@ -4,13 +4,13 @@ import fire from '../../js/fire';
 export default class Login extends Component {
   componentWillUnmount() {
     ['cuser', 'cpass', 'luser', 'lpass'].forEach(selector => {
-      q('#' + selector).value = '';
+      this.base.querySelector('#' + selector).value = '';
     });
   }
 
   getUser = prefix => ({
-    username: q('#' + prefix + 'username').value,
-    password: q('#' + prefix + 'password').value
+    username: this.base.querySelector('#' + prefix + 'user').value,
+    password: this.base.querySelector('#' + prefix + 'pass').value
   })
 
   join = e => {
