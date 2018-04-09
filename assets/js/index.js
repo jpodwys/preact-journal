@@ -5,15 +5,25 @@ render(<App />, document.body);
 
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('/sw.js');
-  
-  navigator.serviceWorker.onmessage = function (e) {
-    let eTag = e.data;
-    let lastETag = localStorage.getItem('currentETag');
-    let isNew = !!lastETag && !!eTag && lastETag !== eTag;
+  // var CACHE = 'preact-journal';
 
-    if(isNew || !lastETag) {
+  navigator.serviceWorker.onmessage = function (e) {
+    if(!e || !e.data) return;
+    var eTag = e.data;
+    // var isRefresh = message.type === 'refresh';
+    // var isAsset = message.url.includes('asset');
+    var lastETag = localStorage.getItem('currentETag');
+    var isNew = !!lastETag && !!eTag && lastETag !== eTag;
+
+    if (/*isRefresh && isAsset &&*/ isNew || !lastETag) {
+      // if (lastETag) {
+      //   notice.hidden = false;
+      // }
       localStorage.setItem('currentETag', eTag);
-      if(isNew) location.reload();
+
+      if(isNew){
+        location.reload();
+      }
     }
   };
 }
