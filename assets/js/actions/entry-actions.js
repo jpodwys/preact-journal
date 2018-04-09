@@ -258,25 +258,25 @@ function newEntry (el){
 
 function filterByText (el, text, e){
   if(text === undefined && (!e || !e.target)) return;
-  let value = text === undefined ? e.target.value : text;
-  if(el.state.filterText === value) return;
-  if(!value) return el.setState({
+  let query = text === undefined ? e.target.value : text;
+  if(el.state.filterText === query) return;
+  if(!query) return el.setState({
     filterText: '',
     viewEntries: applyFilters('', el.state.entries)
   });
 
   // If the new query is a continuation of the prior query,
   // fitler viewEntries for efficiency.
-  var query = value;
   var q = query.toLowerCase();
-  var entries = (q.indexOf(el.state.filterText) === 0)
+  var f = el.state.filterText;
+  var entries = (q.length > f.length && q.indexOf(f) === 0)
     ? el.state.viewEntries
     : el.state.entries;
+  entries = [].concat(entries);
 
-  var viewEntries = applyFilters(q, entries);
   el.setState({
     filterText: query,
-    viewEntries: viewEntries
+    viewEntries: applyFilters(q, entries)
   });
 };
 

@@ -18,10 +18,17 @@ function sortObjectsByDate (list) {
 
 function filterObjectsByText (query, list) {
   if(!query) return list;
-  return list.filter(function(obj){
-    return ~obj.text.toLowerCase().indexOf(query)
-      || ~obj.date.indexOf(query);
-  });
+  return list.reduce(function(accumulator, obj){
+    var index = obj.text.toLowerCase().indexOf(query);
+    if(index > -1){
+      obj = Object.assign({}, obj);
+      obj.text = obj.text.substr(Math.max(0, index - 10));
+      accumulator.push(obj);
+    } else if(obj.date === query) {
+      accumulator.push(obj);
+    }
+    return accumulator;
+  }, []);
 };
 
 function filterHiddenEntries (entries) {
