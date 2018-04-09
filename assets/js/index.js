@@ -13,7 +13,7 @@ if('serviceWorker' in navigator){
 
     if(isNew || !lastETag) {
       localStorage.setItem('currentETag', eTag);
-      if(isNew) location.reload();
+      // if(isNew) location.reload();
     }
   };
 }
