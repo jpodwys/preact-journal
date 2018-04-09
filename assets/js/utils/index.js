@@ -30,18 +30,18 @@ function filterHiddenEntries (entries) {
   });
 };
 
-function applyFilters (query, list){
+function applyFilters (query, list) {
   list = filterHiddenEntries(list);
   return filterObjectsByText(query, list);
 };
 
-function clearLocalStorage (){
+function clearLocalStorage () {
   localStorage.removeItem('entries');
   localStorage.removeItem('timestamp');
   localStorage.removeItem('dark');
 };
 
-function getViewFromHref (href){
+function getViewFromHref (href) {
   if(~href.indexOf('/new')) return '/new';
   return href.lastIndexOf('/') > 0
     ? href.substr(0, href.lastIndexOf('/'))
