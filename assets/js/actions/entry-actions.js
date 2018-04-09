@@ -5,7 +5,7 @@ import { route } from '../../components/router';
 
 let dataFetched = false;
 
-const getEntries = function(el){
+function getEntries (el){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
@@ -17,7 +17,7 @@ const getEntries = function(el){
   }
 };
 
-const getAllEntries = function(el){
+function getAllEntries (el){
   if(el.state.entries) return;
   Entry.getAll().then(response => {
     getAllEntriesSuccess(el, response);
@@ -26,21 +26,20 @@ const getAllEntries = function(el){
   });
 };
 
-const getAllEntriesSuccess = function(el, response){
+function getAllEntriesSuccess (el, response){
   persist(el, {
     entries: response.entries,
   }, function(){
-    // setEntry(el, {detail: {id: el.state.entryId/*, entryReady: true*/}});
     localStorage.setItem('timestamp', response.timestamp);
   });
 };
 
-const getAllEntriesError = function(el, err){
+function getAllEntriesError (el, err){
   console.log('getAllEntriesError', err)
 };
 
 // Send updates to the server
-const syncClientEntries = function(el){
+function syncClientEntries (el){
   var entries = el.state.entries;
   entries.forEach(entry => {
     if(entry.needsSync){
@@ -56,7 +55,7 @@ const syncClientEntries = function(el){
 };
 
 // Get updates from the server
-const syncEntries = function(el, timestamp){
+function syncEntries (el, timestamp){
   Entry.sync(timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
@@ -65,7 +64,7 @@ const syncEntries = function(el, timestamp){
   syncClientEntries(el);
 };
 
-const syncEntriesSuccess = function(el, response){
+function syncEntriesSuccess (el, response){
   if(response.entries.length === 0){
     localStorage.setItem('timestamp', response.timestamp);
     return;
@@ -75,7 +74,7 @@ const syncEntriesSuccess = function(el, response){
   persistSyncPatch(el, response.timestamp);
 };
 
-const applySyncPatch = function(el, entries){
+function applySyncPatch (el, entries){
   entries.forEach((entry, i) => {
     var entryIndex = findObjectIndexById(entry.id, el.state.entries);
     if(entryIndex > -1){
@@ -87,22 +86,22 @@ const applySyncPatch = function(el, entries){
   });
 };
 
-const persistSyncPatch = function(el, timestamp){
+function persistSyncPatch (el, timestamp){
   persist(el, {
     entries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
-      setEntry(el, {id: el.state.entryId/*, entryReady: true*/});
+      setEntry(el, {id: el.state.entryId});
     }
     localStorage.setItem('timestamp', timestamp);
   });
 };
 
-const syncEntriesFailure = function(el, err){
+function syncEntriesFailure (el, err){
   console.log('syncEntriesFailure', err)
 };
 
-const createEntry = function(el, { entry, clientSync }){
+function createEntry (el, { entry, clientSync }){
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
 
@@ -125,7 +124,7 @@ const createEntry = function(el, { entry, clientSync }){
   });
 };
 
-const createEntrySuccess = function(el, oldId, response){
+function createEntrySuccess (el, oldId, response){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
   if(el.state.entry.id === oldId){
@@ -142,7 +141,7 @@ const createEntrySuccess = function(el, oldId, response){
   });
 };
 
-const createEntryFailure = function(el, oldId, err){
+function createEntryFailure (el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
@@ -151,7 +150,7 @@ const createEntryFailure = function(el, oldId, err){
   console.log('createEntryFailure', err);
 };
 
-const updateEntry = function(el, { entry, property, entryId }){
+function updateEntry (el, { entry, property, entryId }){
   var val = entry[property];
   if(typeof val === 'string'){
     val = val.trim();
@@ -177,7 +176,7 @@ const updateEntry = function(el, { entry, property, entryId }){
   });
 };
 
-const updateEntrySuccess = function(el, id){
+function updateEntrySuccess (el, id){
   let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
@@ -187,11 +186,11 @@ const updateEntrySuccess = function(el, id){
   });
 };
 
-const updateEntryFailure = function(el, err){
+function updateEntryFailure (el, err){
   console.log('updateEntryFailure', err);
 };
 
-const putEntry = function(el, { entry }){
+function putEntry (el, { entry }){
   Entry.update(entry.id, entry).then(function(){
     updateEntrySuccess(el, entry.id);
   }).catch(function(err){
@@ -199,7 +198,7 @@ const putEntry = function(el, { entry }){
   });
 };
 
-const deleteEntry = function(el, { id }){
+function deleteEntry (el, { id }){
   if(!id) return;
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
@@ -220,31 +219,27 @@ const deleteEntry = function(el, { id }){
   });
 };
 
-const deleteEntrySuccess = function(el, id){
+function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
   persist(el, {
     entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
 };
 
-const deleteEntryFailure = function(el, err){
+function deleteEntryFailure (el, err){
   console.log('deleteEntryFailure', err);
 };
 
-const setEntry = function(el, { id/*, entryReady*/ }){
+function setEntry (el, { id/*, entryReady*/ }){
   if(!id || id === -1) return;
 
   var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
   var entry = el.state.entries[entryIndex];
-  // var entryReady = !!entry || !!entryReady;
 
-  el.setState({
-    entry: entry,
-    // entryReady: entryReady
-  });
+  el.setState({entry: entry});
 };
 
-const newEntry = function(el){
+function newEntry (el){
   var entry = {
     id: Date.now(),
     date: new Date().toISOString().slice(0, 10),
@@ -257,11 +252,11 @@ const newEntry = function(el){
     entry: entry,
     entries: [entry].concat(el.state.entries)
   }, function(){
-    setEntry(el, {id: entry.id/*, entryReady: true*/});
+    setEntry(el, {id: entry.id});
   });
 };
 
-const filterByText = function(el, text, e){
+function filterByText (el, text, e){
   if(text === undefined && (!e || !e.target)) return;
   let value = text === undefined ? e.target.value : text;
   if(el.state.filterText === value) return;
@@ -285,13 +280,13 @@ const filterByText = function(el, text, e){
   });
 };
 
-const blurTextFilter = function(el){
+function blurTextFilter (el){
   if(!el.state.filterText){
     el.setState({showFilterInput: false});
   }
 };
 
-const shiftEntry = function(el, count){
+function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entries || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];

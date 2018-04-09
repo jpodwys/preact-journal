@@ -3,15 +3,14 @@ import fire from '../../js/fire';
 
 export default class Login extends Component {
   componentWillUnmount() {
-    this.base.querySelector('#cusername').value = '';
-    this.base.querySelector('#cpassword').value = '';
-    this.base.querySelector('#lusername').value = '';
-    this.base.querySelector('#lpassword').value = '';
+    ['cuser', 'cpass', 'luser', 'lpass'].forEach(selector => {
+      this.base.querySelector('#' + selector).value = '';
+    });
   }
 
   getUser = prefix => ({
-    username: this.base.querySelector('#' + prefix + 'username').value,
-    password: this.base.querySelector('#' + prefix + 'password').value
+    username: this.base.querySelector('#' + prefix + 'user').value,
+    password: this.base.querySelector('#' + prefix + 'pass').value
   })
 
   join = e => {
@@ -33,16 +32,16 @@ export default class Login extends Component {
             <form action="/api/user" method="POST" onsubmit={this.join} class="full-width full-width--all">
               <fieldset>
                 <legend>Create an Account</legend>
-                <input id="cusername" placeholder="username" autocapitalize="off"/>
-                <input id="cpassword" type="password" placeholder="password"/>
+                <input id="cuser" placeholder="username" autocapitalize="off"/>
+                <input id="cpass" type="password" placeholder="password"/>
                 <input type="submit"/>
               </fieldset>
             </form>
             <form action="/api/user/login" method="POST" onsubmit={this.login} class="full-width full-width--all">
               <fieldset>
                 <legend>or Login</legend>
-                <input id="lusername" placeholder="username" autocapitalize="off"/>
-                <input id="lpassword" type="password" placeholder="password"/>
+                <input id="luser" placeholder="username" autocapitalize="off"/>
+                <input id="lpass" type="password" placeholder="password"/>
                 <input type="submit"/>
               </fieldset>
             </form>

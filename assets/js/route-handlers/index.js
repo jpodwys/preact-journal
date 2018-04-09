@@ -2,7 +2,7 @@ import fire from '../fire';
 import { removeObjectByIndex, getViewFromHref } from '../utils';
 import { route } from '../../components/router';
 
-const handleRouteChange = function(url) {
+export default function handleRouteChange (url) {
   let view = getViewFromHref(url);
   if(view !== '/' && !this.state.loggedIn) route('/', true);
   this.setState({view: view});
@@ -10,7 +10,7 @@ const handleRouteChange = function(url) {
   fire('linkstate', {key: 'toastConfig'})();
 };
 
-const handleRoute = function(view, url) {
+function handleRoute (view, url) {
   switch(view) {
     case '/':         handleLoginView.call(this, url);    break;
     case '/entries':  handleEntriesView.call(this, url);  break;
@@ -20,11 +20,11 @@ const handleRoute = function(view, url) {
   }
 };
 
-const handleLoginView = function(url) {
+function handleLoginView (url) {
   if(this.state.loggedIn) route('/entries', true);
 };
 
-const handleEntriesView = function(url) {
+function handleEntriesView (url) {
   if(Array.isArray(this.state.entries)){
     let entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
@@ -35,7 +35,7 @@ const handleEntriesView = function(url) {
   }
 };
 
-const handleEntryView = function(url) {
+function handleEntryView (url) {
   if(!url) return;
 
   let id = url.substr(url.lastIndexOf('/') + 1);
@@ -48,5 +48,3 @@ const handleEntryView = function(url) {
     fire('setEntry', {id: id})();
   }
 };
-
-export default handleRouteChange;

@@ -5,12 +5,12 @@ import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
 export default class Header extends Component {
-	clearFilterText = (e) => {
+	clearFilterText = () => {
 		this.base.querySelector('#filterTextInput').focus();
 		fire('filterByText', '')();
 	}
 
-	showFilterText = (e) => {
+	showFilterText = () => {
 		fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
 			this.base.querySelector('#filterTextInput').focus();
 		}})();
@@ -21,7 +21,7 @@ export default class Header extends Component {
 		this.base.querySelector('#filterTextInput').blur();
 	}
 
-	copy = (e) => {
+	copy = () => {
 		let date = document.getElementById('entryDate').innerText;
 		let text = document.getElementById('entryText').innerText;
 		copyText(date + ' ' + text);

@@ -11,7 +11,7 @@ export default class Entry extends Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
@@ -62,7 +62,6 @@ export default class Entry extends Component {
   }
 
   render({ view, entryIndex, entry, entryReady }) {
-    // if(view !== '/new' && !entryReady) return;
     if(!entry) return <FourOhFour/>
     return (
       <entry-view class="hidden">

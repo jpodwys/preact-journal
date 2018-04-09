@@ -4,7 +4,7 @@ import fire from '../../js/fire';
 import copyText from '../../js/copy-text';
 
 export default class EntryPreview extends Component {
-  copy = (e) => {
+  copy = () => {
     copyText(this.props.entry.date + ' ' + this.props.entry.text);
   }
 

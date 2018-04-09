@@ -10,7 +10,6 @@ header .nav-set h3 {
 }
 
 * {
-  /*transition: background-color .25s ease;*/
   transition: background-color .25s ease, box-shadow .25s ease;
 }
 
@@ -56,7 +55,6 @@ svg {
 }
 
 .app.dark .elevated {
-  /*filter: none;*/
   box-shadow: none;
 }
 
@@ -99,8 +97,6 @@ header {
   justify-content: flex-end;
   height: 50px;
   background-color: #5776d0;
-  /*box-sizing: border-box;
-  padding: 0 30px;*/
 }
 
 header .nav-set > * {
@@ -288,11 +284,6 @@ main {
   box-shadow: none;
   border: none;
 }
-
-/* This breaks the virtual scroll. When used, I can't scroll to the bottom of the view. */
-/*.entry-list > div {
-  padding-bottom: 65px;
-}*/
 
 .entry-text {
   white-space: pre-wrap;

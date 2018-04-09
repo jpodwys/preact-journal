@@ -1,7 +1,7 @@
 import cookie from '../cookie';
 import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
 
-const getInitialState = function() {
+export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
@@ -15,7 +15,6 @@ const getInitialState = function() {
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
-    syncing: 0,
     entry: undefined,
     entries: entries,
     viewEntries: viewEntries || entries,
@@ -25,5 +24,3 @@ const getInitialState = function() {
 
   return state;
 };
-
-export default getInitialState;

@@ -1,11 +1,11 @@
-const linkstate = function(el, { key, val, cb }){
+function linkstate (el, { key, val, cb }){
   let obj = {};
   obj[key] = val;
   el.setState(obj, cb);
   if(key === 'dark') localStorage.setItem('dark', val);
 };
 
-const scrollBody = function(el){
+function scrollBody (el){
   if(el.state.view === '/entries'){
     el.setState({scrollPosition: document.body.scrollTop});
   }

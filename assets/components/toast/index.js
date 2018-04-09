@@ -5,7 +5,7 @@ import fire from '../../js/fire';
 let timeout;
 
 export default class Toast extends Component {
-  componentDidUpdate(props, state) {
+  componentDidUpdate(props) {
     if(timeout) clearTimeout(timeout);
     let config = this.props.toastConfig;
     if(!config) return;
@@ -16,12 +16,12 @@ export default class Toast extends Component {
     }
   }
 
-  handleDeleteEntry = (e) => {
+  handleDeleteEntry = () => {
     fire('deleteEntry', {id: this.props.toastConfig.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }
 
-  handleToggleDarkMode = (e) => {
+  handleToggleDarkMode = () => {
     fire('linkstate', {key: 'dark', val: !this.props.toastConfig.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }
@@ -34,11 +34,6 @@ export default class Toast extends Component {
         }
         {toastConfig && toastConfig.type === 'confirm delete' &&
           <div>
-            {/* <span class="toast-label left">Delete entry?</span>
-            <span class="nav-set right">
-              <button class="mdl-button" onclick={this.handleDeleteEntry}>Delete</button>
-              <button class="mdl-button" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
-            </span> */}
             <button class="mdl-button left" onclick={this.handleDeleteEntry}>Delete</button>
             <button class="mdl-button right" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </div>
