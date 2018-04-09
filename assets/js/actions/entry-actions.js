@@ -230,7 +230,7 @@ function deleteEntryFailure (el, err){
   console.log('deleteEntryFailure', err);
 };
 
-function setEntry (el, { id/*, entryReady*/ }){
+function setEntry (el, { id }){
   if(!id || id === -1) return;
 
   var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
@@ -272,7 +272,6 @@ function filterByText (el, text, e){
   var entries = (q.length > f.length && q.indexOf(f) === 0)
     ? el.state.viewEntries
     : el.state.entries;
-  entries = [].concat(entries);
 
   el.setState({
     filterText: query,
