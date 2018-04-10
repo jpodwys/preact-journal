@@ -32,7 +32,7 @@ export default class Header extends Component {
 		return (
 			<header class="elevated">
 				<span class="nav-set">
-					{view === '/entries' &&
+					{view === '/entries' && !showFilterInput &&
 						<h3>Entries</h3>
 					}
 

@@ -22,7 +22,7 @@ function filterObjectsByText (query, list) {
     var index = obj.text.toLowerCase().indexOf(query);
     if(index > -1){
       obj = Object.assign({}, obj);
-      index = Math.max(0, index - 10);
+      index = Math.max(0, index - 40);
       var ellipses = index ? '...' : '';
       obj.text = ellipses + obj.text.substr(index);
       accumulator.push(obj);
