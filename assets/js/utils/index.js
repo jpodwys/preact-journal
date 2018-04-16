@@ -20,13 +20,13 @@ function filterObjectsByText (query, list) {
   if(!query) return list;
   return list.reduce(function(accumulator, obj){
     var index = obj.text.toLowerCase().indexOf(query);
-    if(index > -1){
+    if(~index){
       obj = Object.assign({}, obj);
       index = Math.max(0, index - 40);
       var ellipses = index ? '...' : '';
       obj.text = ellipses + obj.text.substr(index);
       accumulator.push(obj);
-    } else if(obj.date === query) {
+    } else if(~obj.date.indexOf(query)) {
       accumulator.push(obj);
     }
     return accumulator;
