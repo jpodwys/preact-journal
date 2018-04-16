@@ -29,10 +29,11 @@ export default class Header extends Component {
 
 	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return null;
+		let vw = window.innerWidth;
 		return (
 			<header class="elevated">
 				<span class="nav-set">
-					{view === '/entries' &&
+					{view === '/entries' && (vw > 400 || !showFilterInput) &&
 						<h3>Entries</h3>
 					}
 
