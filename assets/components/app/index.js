@@ -13,6 +13,7 @@ import actions from '../../js/actions';
 import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
 import swipe from '../../js/swipe';
+import arrow from '../../js/arrow';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -37,6 +38,7 @@ export default class App extends Component {
   componentDidMount() {
     swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
     swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
+    arrow(document);
   }
 
   componentWillUpdate() {
