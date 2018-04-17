@@ -33,11 +33,6 @@ export default class Icon extends Component {
                 <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
               </g>
-      case 'add':
-        return <g>
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                <path d="M0 0h24v24H0z" fill="none"/>
-              </g>
     }
   }
 
