@@ -361,10 +361,10 @@ main {
 
 .reveal {
   opacity: 1;
-  animation: reveal ease 0.4s forwards;
+  animation: reveal ease 0.35s forwards;
 }
 
 .fly {
   opacity: 1;
-  animation: fly ease 0.4s forwards;
+  animation: fly ease 0.25s forwards;
 }
