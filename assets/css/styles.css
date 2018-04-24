@@ -1,3 +1,5 @@
+/* COMPONENT STYLES */
+
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
@@ -166,7 +168,7 @@ a, a:visited {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 60px 15px 75px 15px;
+  padding: 60px 15px 75px;
 }
 
 .entry-preview {
@@ -244,10 +246,6 @@ main {
 .center-text {
   text-align: center;
 }
-
-/*.entry-list {
-
-}*/
 
 .full-width {
   width: 100%;
@@ -333,15 +331,24 @@ main {
   line-height: 36px;
 }
 
-/*.mdl-button--grey {
-  color: #424242;
-  background-color: #E6E6E6;
+/* COMPONENT TRANSITIONS */
+
+.entry-list {
+  opacity: 0;
 }
 
-.mdl-button--warning {
-  background: rgb(223, 117, 20);
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.mdl-button--recommended {
-  background: rgb(223, 117, 20);
-}*/
+.reveal {
+  opacity: 1;
+  animation: reveal ease 0.4s forwards;
+}
