@@ -21,6 +21,7 @@ export default class Transition extends Component {
     return (
       <div>
         {children.map(child => {
+          child.attributes = child.attributes || {class: ''};
           child.attributes.class = this.getClassName(mounted, className, child.attributes.class)
           return child;
         })}
