@@ -5,14 +5,6 @@ import FourOhFour from '../four-oh-four';
 import debounce from '../../js/debounce';
 
 export default class Entry extends Component {
-  state = {mounted: false};
-
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({mounted: true});
-    });
-  }
-
   componentDidUpdate() {
     if(this.props.view === '/new'){
       let entryText = this.base.querySelector('#entryText');
@@ -20,17 +12,12 @@ export default class Entry extends Component {
     }
   }
 
-  shouldComponentUpdate(nextProps, { mounted }) {
-    if(this.state.mounted !== mounted) return true;
+  shouldComponentUpdate(nextProps) {
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
     if(oe.id !== ne.id) return true;
     return false;
-  }
-
-  componentWillExit() {
-    this.setState({mounted: false});
   }
 
   slowUpsert = e => {
@@ -65,11 +52,11 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entryIndex, entry, entryReady, entryTop }, { mounted }) {
+  render({ view, entryIndex, entry, entryReady, entryTop }) {
     if(!entry) return <FourOhFour/>
     return (
-      <Transition mounted={mounted} inlineStyle={entryTop}>
-        <div class={mounted ? 'entry reveal' : 'entry'}>
+      <Transition className="reveal" inlineStyle>
+        <div class="entry">
           <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
             {entry.date}
           </h1>

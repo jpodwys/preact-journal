@@ -33,17 +33,10 @@ const popstateListener = function(e) {
 };
 
 const route = function(url, replace){
-  let delay = 0;
-  if(ROUTER.component && ROUTER.component.componentWillExit){
-    ROUTER.component.componentWillExit();
-    delay = 200;
-  }
-  setTimeout(() => {
-    if(ONCHANGE) ONCHANGE(url);
-    if(ROUTER) ROUTER.setState({url: url});
-    let func = replace ? 'replace' : 'push';
-    history[func + 'State'](null, null, url);
-  }, delay);
+  if(ONCHANGE) ONCHANGE(url);
+  if(ROUTER) ROUTER.setState({url: url});
+  let func = replace ? 'replace' : 'push';
+  history[func + 'State'](null, null, url);
 };
 
 class Router extends Component {
@@ -86,9 +79,7 @@ class Router extends Component {
   }
 
   render({ children, path, onChange }, { url }) {
-    let el = this.matchPath(url, children)[0];
-    el.attributes.ref = component => this.component = component;
-    return el;
+    return this.matchPath(url, children)[0];
   }
 }
 
