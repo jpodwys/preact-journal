@@ -13,13 +13,13 @@ header .nav-set h3 {
 
 * {
   transition:
-    background-color .25s ease,
-    color .25s ease,
-    box-shadow .25s ease;
+    background-color .35s ease,
+    color .35s ease,
+    box-shadow .35s ease;
 }
 
 svg {
-  transition: fill .25s ease;
+  transition: fill .35s ease;
 }
 
 .app {
