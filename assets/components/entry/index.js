@@ -52,10 +52,10 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entryIndex, entry, entryReady }) {
+  render({ view, entryIndex, entry, entryReady, entryTop }) {
     if(!entry) return <FourOhFour/>
     return (
-      <Transition className="reveal">
+      <Transition className="" inlineStyle={entryTop}>
         <div class="entry">
           <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
             {entry.date}

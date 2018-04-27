@@ -11,7 +11,7 @@ export default class EntryPreview extends Component {
   render({ entry }) {
     return (
       <div class="entry-preview">
-        <a href={"/entry/" + entry.id}>
+        <a href={"/entry/" + entry.id} onclick={fire('setEntryTop')}>
           <div class="list-item">
             <div class="first-row">
               <span

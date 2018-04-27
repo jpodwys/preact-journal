@@ -32,6 +32,8 @@ export default class App extends Component {
 
     // For debugging
     // window.app = this;
+    // window.fire = fire;
+    // window.state = this.state;
     // window.route = route;
   }
 
@@ -66,7 +68,8 @@ export default class App extends Component {
               view={state.view}
               loggedIn={state.loggedIn}
               entry={state.entry} 
-              entryReady={state.entryReady}/>
+              entryReady={state.entryReady}
+              entryTop={state.entryTop}/>
           </Router>
           <Toast toastConfig={state.toastConfig}/>
         </main>

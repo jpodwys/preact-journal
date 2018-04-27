@@ -334,7 +334,13 @@ main {
 /* COMPONENT TRANSITIONS */
 
 .entry-list, .entry {
-  opacity: 0;
+  /*opacity: 0;*/
+}
+
+.entry {
+  position: relative;
+  top: 0;
+  transition: top .2s ease;
 }
 
 @keyframes reveal {
