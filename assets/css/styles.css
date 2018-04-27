@@ -357,11 +357,11 @@ main {
 @keyframes fly {
   from {
     opacity: 0;
-    transform: translateX(-150px);
+    transform: translateY(-25px);
   }
   to {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
