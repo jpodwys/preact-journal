@@ -333,9 +333,15 @@ main {
 
 /* COMPONENT TRANSITIONS */
 
-.entry-list, .entry {
-  /*opacity: 0;*/
+.entry-preview {
+  opacity: 1;
+  /*transition: opacity .2s ease;*/
+  transition: opacity .75s ease;
 }
+
+/*.entry-preview.hide {
+  opacity: 0;
+}*/
 
 .entry {
   position: relative;
@@ -343,34 +349,6 @@ main {
   transition: top .2s ease;
 }
 
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(25px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fly {
-  from {
-    opacity: 0;
-    transform: translateY(-25px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.reveal {
-  opacity: 1;
-  animation: reveal ease 0.2s forwards;
-}
-
-.fly {
-  opacity: 1;
-  animation: fly ease 0.2s forwards;
+.entry.show {
+  top: 0;
 }
