@@ -19,8 +19,7 @@ export default function getInitialState () {
     entries: entries,
     viewEntries: viewEntries || entries,
     toastConfig: undefined,
-    dark: localStorage.getItem('dark') === 'true',
-    entryTop: '0px'
+    dark: localStorage.getItem('dark') === 'true'
   };
 
   return state;

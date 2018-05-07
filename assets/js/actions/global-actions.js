@@ -11,18 +11,7 @@ function scrollBody (el){
   }
 };
 
-function setEntryTop (el, data, e){
-  let num = data && typeof data.override !== 'undefined'
-    ? data.override
-    : e.currentTarget.getBoundingClientRect().top - 106;
-
-  el.setState({
-    entryTop: 'top:' + num + 'px'
-  });
-};
-
 export default {
   linkstate,
-  scrollBody,
-  setEntryTop
+  scrollBody
 };

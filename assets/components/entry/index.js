@@ -52,7 +52,7 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entryIndex, entry, entryReady, entryTop }) {
+  render({ view, entryIndex, entry, entryReady }) {
     if(!entry) return <FourOhFour/>
     return (
       <Transition className="reveal" inlineStyle>
