@@ -1,3 +1,5 @@
+/* COMPONENT STYLES */
+
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
@@ -11,13 +13,13 @@ header .nav-set h3 {
 
 * {
   transition:
-    background-color .25s ease,
-    color .25s ease,
-    box-shadow .25s ease;
+    background-color .35s ease,
+    color .35s ease,
+    box-shadow .35s ease;
 }
 
 svg {
-  transition: fill .25s ease;
+  transition: fill .35s ease;
 }
 
 .app {
@@ -166,7 +168,7 @@ a, a:visited {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 60px 15px 75px 15px;
+  padding: 60px 15px 75px;
 }
 
 .entry-preview {
@@ -244,10 +246,6 @@ main {
 .center-text {
   text-align: center;
 }
-
-/*.entry-list {
-
-}*/
 
 .full-width {
   width: 100%;
@@ -333,15 +331,36 @@ main {
   line-height: 36px;
 }
 
-/*.mdl-button--grey {
-  color: #424242;
-  background-color: #E6E6E6;
+/* COMPONENT TRANSITIONS */
+
+@keyframes reveal {
+  from {
+    opacity: .25;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.mdl-button--warning {
-  background: rgb(223, 117, 20);
+@keyframes fly {
+  from {
+    opacity: .25;
+    transform: translateY(-25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.mdl-button--recommended {
-  background: rgb(223, 117, 20);
-}*/
+.reveal {
+  opacity: 1;
+  animation: reveal ease 0.2s forwards;
+}
+
+.fly {
+  opacity: 1;
+  animation: fly ease 0.2s forwards;
+}

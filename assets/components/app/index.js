@@ -32,6 +32,8 @@ export default class App extends Component {
 
     // For debugging
     // window.app = this;
+    // window.fire = fire;
+    // window.state = this.state;
     // window.route = route;
   }
 

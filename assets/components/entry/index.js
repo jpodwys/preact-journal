@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import fire from '../../js/fire';
+import Transition from '../transition';
 import FourOhFour from '../four-oh-four';
 import debounce from '../../js/debounce';
 
@@ -18,16 +19,6 @@ export default class Entry extends Component {
     if(oe.id !== ne.id) return true;
     return false;
   }
-
-  // componentDidMount() {
-  //   setTimeout(function(){
-  //     this.base.classList.remove('hidden');
-  //   }.bind(this), 1000)
-  // }
-
-  // componentWillUnmount() {
-  //   this.base.classList.add('hidden');
-  // }
 
   slowUpsert = e => {
     var entry = this.props.entry;
@@ -64,12 +55,14 @@ export default class Entry extends Component {
   render({ view, entryIndex, entry, entryReady }) {
     if(!entry) return <FourOhFour/>
     return (
-      <entry-view class="hidden">
-        <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
-          {entry.date}
-        </h1>
-        <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
-      </entry-view>
+      <Transition className="reveal" inlineStyle>
+        <div class="entry">
+          <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
+            {entry.date}
+          </h1>
+          <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
+        </div>
+      </Transition>
     );
   }
 }
