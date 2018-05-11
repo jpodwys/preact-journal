@@ -60,7 +60,7 @@ export default class Entry extends Component {
         <div class="entry">
           <div class="entry-header nav-set dark-fill">
 
-            {view !== 'new' &&
+            {view !== '/new' &&
               <Icon
                 icon="left"
                 key={entry.id + '-left'}
@@ -76,7 +76,7 @@ export default class Entry extends Component {
               {entry.date}
             </h1>
 
-            {view !== 'new' &&
+            {view !== '/new' &&
               <Icon
                 icon="right"
                 key={entry.id + '-right'}
