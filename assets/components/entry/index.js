@@ -60,10 +60,12 @@ export default class Entry extends Component {
         <div class="entry">
           <div class="entry-header nav-set dark-fill">
 
-            <Icon
-              icon="left"
-              onclick={fire('shiftEntry', -1)}
-              class={entryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
+            {view !== 'new' &&
+              <Icon
+                icon="left"
+                onclick={fire('shiftEntry', -1)}
+                class={entryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
+            }
 
             <h1
               id="entryDate"
@@ -73,10 +75,12 @@ export default class Entry extends Component {
               {entry.date}
             </h1>
 
-            <Icon
-              icon="right"
-              onclick={fire('shiftEntry', 1)}
-              class={entryIndex < (entries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+            {view !== 'new' &&
+              <Icon
+                icon="right"
+                onclick={fire('shiftEntry', 1)}
+                class={entryIndex < (entries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+            }
 
           </div>
           <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
