@@ -67,6 +67,10 @@ svg {
   color: #5776d0;
 }
 
+.hidden {
+  visibility: hidden;
+}
+
 toast {
   left: 50%;
   transform: translateX(-50%);
@@ -104,7 +108,7 @@ header {
   background-color: #5776d0;
 }
 
-header .nav-set > * {
+header .nav-set > *:not(h1) {
   padding: 12.5px;
 }
 
@@ -291,6 +295,19 @@ main {
   color: #fff;
   box-shadow: none;
   border: none;
+}
+
+.entry-header {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.entry-header > *:first-child {
+  padding-left: 0;
+}
+
+.entry-header > *:last-child {
+  padding-right: 0;
 }
 
 .entry-text {

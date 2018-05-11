@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import Icon from '../icon';
 import fire from '../../js/fire';
 import Transition from '../transition';
 import FourOhFour from '../four-oh-four';
@@ -52,14 +53,32 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entryIndex, entry, entryReady }) {
+  render({ view, entries, entry, entryIndex, entryReady }) {
     if(!entry) return <FourOhFour/>
     return (
       <Transition className="reveal" inlineStyle>
         <div class="entry">
-          <h1 id="entryDate" contenteditable onInput={this.upsert} class="entry-date center-text">
-            {entry.date}
-          </h1>
+          <div class="entry-header nav-set dark-fill">
+
+            <Icon
+              icon="left"
+              onclick={fire('shiftEntry', -1)}
+              class={entryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
+
+            <h1
+              id="entryDate"
+              contenteditable
+              onInput={this.upsert}
+              class="entry-date center-text">
+              {entry.date}
+            </h1>
+
+            <Icon
+              icon="right"
+              onclick={fire('shiftEntry', 1)}
+              class={entryIndex < (entries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+
+          </div>
           <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
         </div>
       </Transition>

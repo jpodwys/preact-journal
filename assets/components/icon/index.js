@@ -5,9 +5,9 @@ export default class Icon extends Component {
     switch(icon) {
       case 'back':
         return <g>
-                  <path d="M0 0h24v24H0z" fill="none"/>
-                  <path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/>
-                </g>
+                <path d="M0 0h24v24H0z" fill="none"/>
+                <path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"/>
+              </g>
       case 'clear':
         return <g>
                 <path d="M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"/>
@@ -32,6 +32,16 @@ export default class Icon extends Component {
         return <g>
                 <path d="M0 0h24v24H0z" fill="none"/>
                 <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </g>
+      case 'left':
+        return <g>
+                <path d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4-4.6-4.6z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+              </g>
+      case 'right':
+        return <g>
+                <path d="M10 6L8.6 7.4l4.6 4.6-4.6 4.6L10 18l6-6z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
               </g>
     }
   }
