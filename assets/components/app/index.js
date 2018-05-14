@@ -69,7 +69,6 @@ export default class App extends Component {
               loggedIn={state.loggedIn}
               entry={state.entry}
               viewEntryIndex={state.viewEntryIndex}
-              entryReady={state.entryReady}
               viewEntries={state.viewEntries}/>
           </Router>
           <Toast toastConfig={state.toastConfig}/>
