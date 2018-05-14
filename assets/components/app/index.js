@@ -68,7 +68,7 @@ export default class App extends Component {
               view={state.view}
               loggedIn={state.loggedIn}
               entry={state.entry}
-              entryIndex={state.entryIndex}
+              viewEntryIndex={state.viewEntryIndex}
               entryReady={state.entryReady}
               viewEntries={state.viewEntries}/>
           </Router>

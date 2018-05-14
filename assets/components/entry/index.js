@@ -53,7 +53,7 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entry, viewEntries, entryIndex }) {
+  render({ view, entry, viewEntries, viewEntryIndex }) {
     if(!entry) return <FourOhFour/>
     return (
       <Transition className="reveal">
@@ -65,7 +65,7 @@ export default class Entry extends Component {
                 icon="left"
                 key={entry.id + '-left'}
                 onclick={fire('shiftEntry', -1)}
-                class={entryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
+                class={viewEntryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
             }
 
             <h1
@@ -81,7 +81,7 @@ export default class Entry extends Component {
                 icon="right"
                 key={entry.id + '-right'}
                 onclick={fire('shiftEntry', 1)}
-                class={entryIndex < (viewEntries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+                class={viewEntryIndex < (viewEntries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
             }
 
           </div>

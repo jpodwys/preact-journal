@@ -233,16 +233,13 @@ function deleteEntryFailure (el, err){
 function setEntry (el, { id }){
   if(!id || id === -1) return;
 
-  var collection = el.state.view === '/new'
-    ? 'entries'
-    : 'viewEntries';
-
-  var entryIndex = findObjectIndexById(parseInt(id), el.state[collection]);
-  var entry = el.state[collection][entryIndex];
+  var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
+  var viewEntryIndex = findObjectIndexById(parseInt(id), el.state.viewEntries);
+  var entry = el.state.entries[entryIndex];
 
   el.setState({
     entry: entry,
-    entryIndex: entryIndex
+    viewEntryIndex: viewEntryIndex
   });
 };
 

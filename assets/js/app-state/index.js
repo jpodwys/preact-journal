@@ -16,7 +16,7 @@ export default function getInitialState () {
     filterText: '',
     loggedIn: loggedIn,
     entry: undefined,
-    entryIndex: -1,
+    viewEntryIndex: -1,
     entries: entries,
     viewEntries: viewEntries || entries,
     toastConfig: undefined,
