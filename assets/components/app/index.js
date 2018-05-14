@@ -70,7 +70,7 @@ export default class App extends Component {
               entry={state.entry}
               entryIndex={state.entryIndex}
               entryReady={state.entryReady}
-              entries={state.viewEntries}/>
+              viewEntries={state.viewEntries}/>
           </Router>
           <Toast toastConfig={state.toastConfig}/>
         </main>

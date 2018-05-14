@@ -53,10 +53,10 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
-  render({ view, entries, entry, entryIndex, entryReady }) {
+  render({ view, entry, viewEntries, entryIndex }) {
     if(!entry) return <FourOhFour/>
     return (
-      <Transition className="reveal" inlineStyle>
+      <Transition className="reveal">
         <div class="entry">
           <div class="entry-header nav-set dark-fill">
 
@@ -81,7 +81,7 @@ export default class Entry extends Component {
                 icon="right"
                 key={entry.id + '-right'}
                 onclick={fire('shiftEntry', 1)}
-                class={entryIndex < (entries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+                class={entryIndex < (viewEntries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
             }
 
           </div>
