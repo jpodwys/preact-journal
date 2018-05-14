@@ -8,6 +8,10 @@ export default class EntryPreview extends Component {
     copyText(this.props.entry.date + ' ' + this.props.entry.text);
   }
 
+  getText(entry) {
+    return entry.previewText || entry.text;
+  }
+
   render({ entry }) {
     return (
       <div class="entry-preview">
@@ -22,7 +26,7 @@ export default class EntryPreview extends Component {
             </div>
 
             <div class="second-row">
-              {entry.text}
+              {this.getText(entry)}
             </div>
           </div>
         </a>

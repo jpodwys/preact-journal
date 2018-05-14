@@ -24,7 +24,7 @@ function filterObjectsByText (query, list) {
       obj = Object.assign({}, obj);
       index = Math.max(0, index - 40);
       var ellipses = index ? '...' : '';
-      obj.text = ellipses + obj.text.substr(index);
+      obj.previewText = ellipses + obj.text.substr(index);
       accumulator.push(obj);
     } else if(~obj.date.indexOf(query)) {
       accumulator.push(obj);

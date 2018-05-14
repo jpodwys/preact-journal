@@ -233,13 +233,20 @@ function deleteEntryFailure (el, err){
 function setEntry (el, { id }){
   if(!id || id === -1) return;
 
-  var entryIndex = findObjectIndexById(parseInt(id), el.state.entries);
-  var viewEntryIndex = findObjectIndexById(parseInt(id), el.state.viewEntries);
-  var entry = el.state.entries[entryIndex];
+  // If writing a new entry, look in state.entries,
+  // otherwise look in state.viewEntries.
+  // This is only necessary because I unshift
+  // new blank entries onto state.entries.
+  var collection = el.state.view === '/new'
+    ? 'entries'
+    : 'viewEntries';
+
+  var entryIndex = findObjectIndexById(parseInt(id), el.state[collection]);
+  var entry = el.state[collection][entryIndex];
 
   el.setState({
     entry: entry,
-    viewEntryIndex: viewEntryIndex
+    entryIndex: entryIndex
   });
 };
 
