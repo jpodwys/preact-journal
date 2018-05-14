@@ -10,7 +10,7 @@ module.exports = function(Entry, sequelize){
         deleted: { $ne: 1 }
       },
       attributes: [
-        'id', 'date', 'text', 'isPublic',
+        'id', 'date', 'text',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       order: [
@@ -29,23 +29,12 @@ module.exports = function(Entry, sequelize){
         deviceId: { $ne: deviceId }
       },
       attributes: [
-        'id', 'date', 'text', 'isPublic', 'deleted',
+        'id', 'date', 'text', 'deleted',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       order: [
         ['date', 'DESC'],
         ['updated_at', 'DESC']
-      ],
-      raw: true
-    });
-  }
-
-  self.getEntryById = function(id){
-    return Entry.findOne({
-      where: {id: id},
-      attributes: [
-        'id', 'ownerId', 'text', 'isPublic',
-        [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       raw: true
     });
@@ -57,7 +46,7 @@ module.exports = function(Entry, sequelize){
         ownerId: ownerId,
         date: data.date,
         text: data.text,
-        isPublic: (!!data.isPublic) ? 1 : 0,
+        isPublic: 0,
         updatedAt: date.getUtcZeroTimestamp(),
         deviceId: deviceId
       }).then(function (entry){
@@ -69,9 +58,7 @@ module.exports = function(Entry, sequelize){
   }
 
   self.updateEntry = function(entryId, data, deviceId){
-    if(data.isPublic !== undefined){
-      data.isPublic = (!!data.isPublic) ? 1 : 0;
-    }
+    data.isPublic = 0;
     data.updatedAt = date.getUtcZeroTimestamp();
     data.deviceId = deviceId;
 
