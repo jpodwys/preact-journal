@@ -65,10 +65,11 @@ export default class App extends Component {
               loggedIn={state.loggedIn}
               entries={state.viewEntries}/>
             <Entry path="/entry/:id"
-              view={state.view}
               loggedIn={state.loggedIn}
-              entry={state.entry} 
-              entryReady={state.entryReady}/>
+              view={state.view}
+              entry={state.entry}
+              viewEntries={state.viewEntries}
+              entryIndex={state.entryIndex}/>
           </Router>
           <Toast toastConfig={state.toastConfig}/>
         </main>

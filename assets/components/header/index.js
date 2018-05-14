@@ -39,7 +39,7 @@ export default class Header extends Component {
 
 					{(view === '/entry' || view === '/new') &&
 						<a href="/entries">
-							<Icon icon="back" key="header-back" />
+							<Icon icon="back" key="header-back"/>
 						</a>
 					}
 				</span>

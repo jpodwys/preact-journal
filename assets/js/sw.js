@@ -24,7 +24,7 @@ self.addEventListener('fetch', function(e) {
   if(~url.indexOf('manifest') || ~url.indexOf('favicon')) return;
   e.waitUntil(
     update(reqUrl || e.request)
-    .then(refresh)
+    // .then(refresh)
   );
 });
  
@@ -45,11 +45,11 @@ function update(request) {
   });
 }
  
-function refresh(response) {
-  if(!response) return;
-  return self.clients.matchAll().then(function (clients) {
-    clients.forEach(function (client) {
-      client.postMessage(response.headers.get('ETag'));
-    });
-  });
-}
+// function refresh(response) {
+//   if(!response) return;
+//   return self.clients.matchAll().then(function (clients) {
+//     clients.forEach(function (client) {
+//       client.postMessage(response.headers.get('ETag'));
+//     });
+//   });
+// }
