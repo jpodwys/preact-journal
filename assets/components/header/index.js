@@ -75,7 +75,7 @@ export default class Header extends Component {
 				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 				</span>
 
-				{view === '/entries' &&
+				{view !== '/new' &&
 					<span class="button button--fab add-entry elevated">
 						<a href="/entry/new">
 							<Icon icon="clear" key="header-add" style="transform:rotate(45deg)"/>
