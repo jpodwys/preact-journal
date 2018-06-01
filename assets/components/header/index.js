@@ -30,9 +30,6 @@ export default class Header extends Component {
 	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return null;
 		let vw = window.innerWidth;
-		let el = document.activeElement;
-		let typing = (el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable'));
-		
 		return (
 			<header class="elevated">
 				<span class="nav-set">
@@ -78,7 +75,7 @@ export default class Header extends Component {
 				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 				</span>
 
-				{view !== '/new' && !typing &&
+				{view === '/entries' &&
 					<span class="button button--fab add-entry elevated">
 						<a href="/entry/new">
 							<Icon icon="clear" key="header-add" style="transform:rotate(45deg)"/>
