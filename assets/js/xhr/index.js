@@ -9,6 +9,6 @@ export default function(url, config = {}) {
   return fetch(url, config).then(res => {
     if(res.status >= 300) return Promise.reject(res);
     if(res.status === 204) return Promise.resolve();
-    return Promise.resolve(res.json())
+    return Promise.resolve(res.json());
   });
 }
