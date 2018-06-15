@@ -53,6 +53,7 @@ export default class App extends Component {
         <Header
           view={state.view}
           loggedIn={state.loggedIn}
+          entryCount={state.viewEntries.length}
           entry={state.entry}
           filterText={state.filterText}
           showFilterInput={state.showFilterInput}

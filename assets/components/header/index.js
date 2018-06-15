@@ -27,14 +27,14 @@ export default class Header extends Component {
 		copyText(date + ' ' + text);
 	}
 
-	render({view, loggedIn, entry, filterText, showFilterInput, dark}) {
+	render({view, loggedIn, entryCount, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return null;
 		let vw = window.innerWidth;
 		return (
 			<header class="elevated">
 				<span class="nav-set">
 					{view === '/entries' && (vw > 400 || !showFilterInput) &&
-						<h3>Entries</h3>
+						<h3>{entryCount} Entries</h3>
 					}
 
 					{(view === '/entry' || view === '/new') &&
