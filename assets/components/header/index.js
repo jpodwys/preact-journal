@@ -27,9 +27,10 @@ export default class Header extends Component {
 		copyText(date + ' ' + text);
 	}
 
-	render({view, loggedIn, entryCount, entry, filterText, showFilterInput, dark}) {
+	render({view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark}) {
 		if(!loggedIn) return null;
 		let vw = window.innerWidth;
+		let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
 		return (
 			<header class="elevated">
 				<span class="nav-set">
