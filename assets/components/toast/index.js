@@ -7,7 +7,7 @@ let timeout;
 export default class Toast extends Component {
   componentDidUpdate(props) {
     if(timeout) clearTimeout(timeout);
-    let config = this.props.toastConfig;
+    let config = this.props.config;
     if(!config) return;
     if(config.type === 'text copied'){
       timeout = setTimeout(function(){
@@ -17,31 +17,31 @@ export default class Toast extends Component {
   }
 
   handleDeleteEntry = () => {
-    fire('deleteEntry', {id: this.props.toastConfig.data})();
+    fire('deleteEntry', {id: this.props.config.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }
 
   handleToggleDarkMode = () => {
-    fire('linkstate', {key: 'dark', val: !this.props.toastConfig.data})();
+    fire('linkstate', {key: 'dark', val: !this.props.config.data})();
     fire('linkstate', {key: 'toastConfig'})();
   }
 
-  render({toastConfig}) {
+  render({config}) {
     return (
-      <toast class={!!toastConfig ? 'show' : ''}>
-        {toastConfig && toastConfig.type === 'text copied' &&
+      <toast class={!!config ? 'show' : ''}>
+        {config && config.type === 'text copied' &&
           <span class="toast-label">Entry copied to clipboard!</span>
         }
-        {toastConfig && toastConfig.type === 'confirm delete' &&
+        {config && config.type === 'confirm delete' &&
           <div>
             <button class="mdl-button left" onclick={this.handleDeleteEntry}>Delete</button>
             <button class="mdl-button right" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </div>
         }
-        {toastConfig && toastConfig.type === 'menu' &&
+        {config && config.type === 'menu' &&
           <div>
             <button class="mdl-button left" onclick={fire('logout')}>Logout</button>
-            <button class="mdl-button" onclick={this.handleToggleDarkMode}>{toastConfig.data ? 'Light' : 'Dark'}</button>
+            <button class="mdl-button" onclick={this.handleToggleDarkMode}>{config.data ? 'Light' : 'Dark'}</button>
             <button class="mdl-button right" onclick={fire('linkstate', {key: 'toastConfig'})}>Cancel</button>
           </div>
         }
