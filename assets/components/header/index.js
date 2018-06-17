@@ -78,7 +78,7 @@ export default class Header extends Component {
 
 				{view === '/entries' &&
 					<span class="button button--fab add-entry elevated">
-						<a href="/entry/new" class={dark ? 'dark-fill' : ''}>
+						<a href="/entry/new">
 							<Icon icon="clear" key="header-add" style="transform:rotate(45deg)"/>
 						</a>
 					</span>
