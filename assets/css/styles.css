@@ -329,8 +329,11 @@ main {
 }
 
 .list-item .second-row {
+  position: relative;
   height: 40px;
   overflow: hidden;
+  left: 5px;
+  width: calc(100% - 5px);
 }
 
 .mdl-button {
