@@ -56,7 +56,7 @@ svg {
 }
 
 .app.dark .button--fab.add-entry {
-  background-color: #2850bf;
+  background-color: #2d50af;
 }
 
 .app.dark .elevated {
@@ -332,8 +332,13 @@ main {
   position: relative;
   height: 40px;
   overflow: hidden;
-  left: 5px;
-  width: calc(100% - 5px);
+}
+
+@media (min-width: 850px) {
+  .list-item .second-row {
+    left: 5px;
+    width: calc(100% - 5px);
+  }
 }
 
 .mdl-button {
