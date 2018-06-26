@@ -54,8 +54,7 @@ export default class Header extends Component {
 					    	value={filterText}
 					    	placeholder="Search entries"
 					    	oninput={debounce(fire('filterByText'), 100)}
-					    	onblur={fire('blurTextFilter')}
-					    />
+					    	onblur={fire('blurTextFilter')}/>
 					  </form>
 					}
 				</span>
