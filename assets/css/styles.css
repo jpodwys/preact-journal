@@ -207,6 +207,10 @@ main {
   background-color: #5776d0;
 }
 
+.button--fab.add-entry svg {
+  transform: rotate(45deg);
+}
+
 .button--fab.add-entry a {
   height: 25px;
   width: 25px;
@@ -380,12 +384,23 @@ main {
   }
 }
 
+@keyframes grow {
+  from {
+    transform: scale(.2);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 .reveal {
-  opacity: 1;
-  animation: reveal ease 0.2s forwards;
+  animation: reveal ease .2s forwards;
 }
 
 .fly {
-  opacity: 1;
-  animation: fly ease 0.2s forwards;
+  animation: fly ease .2s forwards;
+}
+
+.grow {
+  animation: grow ease .2s forwards;
 }

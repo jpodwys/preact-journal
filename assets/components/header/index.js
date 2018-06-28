@@ -35,12 +35,12 @@ export default class Header extends Component {
 			<header class="elevated">
 				<span class="nav-set">
 					{view === '/entries' && (vw > 400 || !showFilterInput) &&
-						<h3>{entryCount} Entries</h3>
+						<h3 class="grow">{entryCount} Entries</h3>
 					}
 
 					{(view === '/entry' || view === '/new') &&
 						<a href="/entries">
-							<Icon icon="back" key="header-back"/>
+							<Icon icon="back" key="header-back" class="grow"/>
 						</a>
 					}
 				</span>
@@ -54,31 +54,32 @@ export default class Header extends Component {
 					    	value={filterText}
 					    	placeholder="Search entries"
 					    	oninput={debounce(fire('filterByText'), 100)}
-					    	onblur={fire('blurTextFilter')}/>
+					    	onblur={fire('blurTextFilter')}
+					    	class="grow"/>
 					  </form>
 					}
 				</span>
 
 				<span class="nav-set">
 					{view === '/entries' && showFilterInput &&
-						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText}/>
+						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="grow"/>
 				  }
 				  {view === '/entries' && !showFilterInput &&
-				  	<Icon icon="search" key="header-search" onclick={this.showFilterText}/>
+				  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="grow"/>
 				  }
 				  {(view === '/entry' || view === '/new') &&
-				  	<Icon icon="copy" key="header-copy" onclick={this.copy}/>
+				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="grow"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
+						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="grow"/>
 					}
 				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 				</span>
 
 				{view === '/entries' &&
-					<span class="button button--fab add-entry elevated">
+					<span class="button button--fab add-entry elevated grow">
 						<a href="/entry/new">
-							<Icon icon="clear" key="header-add" style="transform:rotate(45deg)"/>
+							<Icon icon="clear" key="header-add"/>
 						</a>
 					</span>
 				}
