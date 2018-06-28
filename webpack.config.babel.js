@@ -5,7 +5,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const dist = resolve('dist');
 
 module.exports = {
-  entry: './assets/js/index.js',
+  entry: './client/js/index.js',
   module: {
     rules: [
       {

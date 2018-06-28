@@ -16,14 +16,14 @@ function serve(cb) {
 }
 
 function scripts(cb) {
-  return gulp.src('assets/js/index.js')
+  return gulp.src('client/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
     .pipe(rename('bundle.js'))
     .pipe(gulp.dest('./dist'));
 }
 
 function sw() {
-  return gulp.src('assets/js/sw.js')
+  return gulp.src('client/js/sw.js')
     .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
     .pipe(babel({
       presets: ['env']
@@ -33,17 +33,17 @@ function sw() {
 }
 
 function images() {
-  return gulp.src('assets/images/**.*')
+  return gulp.src('client/images/**.*')
     .pipe(gulp.dest('./dist'));
 }
 
 function manifest() {
-  return gulp.src('assets/manifest.json')
+  return gulp.src('client/manifest.json')
     .pipe(gulp.dest('./dist'));
 }
 
 function styles() {
-  return gulp.src('assets/css/styles.css')
+  return gulp.src('client/css/styles.css')
     .pipe(cleanCSS())
     .pipe(gulp.dest('./dist'));
 }
@@ -53,7 +53,7 @@ function clean() {
 }
 
 function inline() {
-  return gulp.src('assets/index.html')
+  return gulp.src('client/index.html')
     .pipe(htmlmin({
       collapseWhitespace: true,
       minifyCSS: true

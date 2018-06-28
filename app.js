@@ -4,11 +4,11 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),
   app = express(),
-  strictTransportSecurity = require('./middleware/strict-transport-security'),
+  strictTransportSecurity = require('./server/middleware/strict-transport-security'),
   forceSsl = require('force-ssl-heroku'),
   jwtMW = require('express-jwt'),
-  resMods = require('./middleware/response-mods'),
-  AES = require('./utils/aes'),
+  resMods = require('./server/middleware/response-mods'),
+  AES = require('./server/utils/aes'),
   PORT = process.env.PORT || 3000;
 
 // Keep the dyno awake
@@ -43,7 +43,7 @@ app.get('/icon-192x192.png', function(req, res, next){
   next();
 });
 app.use(express.static('dist', {maxAge: '0h'}));
-require('./middleware/app-middleware')(app);
-require('./routes')(app);
+require('./server/middleware/app-middleware')(app);
+require('./server/routes')(app);
 
 var server = app.listen(PORT);
