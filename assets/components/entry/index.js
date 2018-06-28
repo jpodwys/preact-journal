@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import Icon from '../icon';
 import fire from '../../js/fire';
-// import Transition from '../transition';
 import FourOhFour from '../four-oh-four';
 import debounce from '../../js/debounce';
 

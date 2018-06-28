@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
 import ScrollViewport from 'preact-scroll-viewport';
-// import Transition from '../transition';
 import EntryPreview from '../entry-preview';
 import fire from '../../js/fire';
 import debounce from '../../js/debounce';
