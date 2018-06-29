@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 
-import { Router, route } from '../router';
+import Router from '../router';
 import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
@@ -29,12 +29,6 @@ export default class App extends Component {
   componentWillMount() {
     freedux(this, actions);
     fire('getEntries')();
-
-    // For debugging
-    // window.app = this;
-    // window.fire = fire;
-    // window.state = this.state;
-    // window.route = route;
   }
 
   componentDidMount() {
