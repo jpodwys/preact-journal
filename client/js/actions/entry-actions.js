@@ -276,16 +276,8 @@ function filterByText (el, text, e){
     filterText: ''
   });
 
-  // If the new query is a continuation of the prior query,
-  // fitler viewEntries for efficiency.
-  var q = query.toLowerCase();
-  var f = el.state.filterText;
-  var entries = (q.length > f.length && q.indexOf(f) === 0)
-    ? el.state.viewEntries
-    : el.state.entries;
-
   el.setState({
-    filterText: query
+    filterText: query.toLowerCase()
   });
 };
 
