@@ -41,7 +41,8 @@ function filterHiddenEntries (entries) {
 
 function applyFilters (query = '', list = []) {
   list = filterHiddenEntries(list);
-  return filterObjectsByText(query, list);
+  list = filterObjectsByText(query, list);
+  return sortObjectsByDate(list);
 };
 
 function clearLocalStorage () {

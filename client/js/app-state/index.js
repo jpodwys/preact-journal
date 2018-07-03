@@ -4,8 +4,8 @@ import { sortObjectsByDate, clearLocalStorage, getViewFromHref, applyFilters } f
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
-  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  if(entries) entries = sortObjectsByDate(entries);
+  let _filterText = '';
+  let _entries = JSON.parse(localStorage.getItem('entries')) || undefined;
 
   let state = {
     entryIndex: -1,
@@ -16,21 +16,25 @@ export default function getInitialState () {
     toastConfig: undefined,
     view: getViewFromHref(location.href),
     dark: localStorage.getItem('dark') === 'true',
-
-    filterText: '',
-    set setFilterText(filterText) {
-      this.filterText = filterText;
-      this.viewEntries = applyFilters(filterText, this.entries);
+    
+    get filterText() {
+      return _filterText;
+    },
+    set filterText(filterText) {
+      _filterText = filterText;
+      this.viewEntries = applyFilters(filterText, _entries);
     },
 
-    entries: [],
-    set setEntries(entries) {
-      this.entries = entries;
-      this.viewEntries = applyFilters(this.filterText, entries);
+    get entries() {
+      return _entries;
+    },
+    set entries(entries) {
+      _entries = entries;
+      this.viewEntries = applyFilters(_filterText, entries);
     }
   };
 
-  state.setEntries = entries;
+  state.entries = _entries;
 
   return state;
 };
