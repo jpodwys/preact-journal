@@ -18,6 +18,7 @@ function sortObjectsByDate (list) {
 
 function filterObjectsByText (query, list) {
   if(!query) return list;
+  query = query.toLowerCase();
   return list.reduce(function(accumulator, obj){
     var index = obj.text.toLowerCase().indexOf(query);
     if(~index){

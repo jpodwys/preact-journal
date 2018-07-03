@@ -277,7 +277,7 @@ function filterByText (el, text, e){
   });
 
   el.setState({
-    filterText: query.toLowerCase()
+    filterText: query
   });
 };
 
