@@ -81,9 +81,16 @@ export default class Entry extends Component {
               onclick={fire('shiftEntry', 1)}
               class={entryIndex < (viewEntries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
           }
-
         </div>
-        <div id="entryText" contenteditable onInput={this.upsert} class="entry-text">{entry.text}</div>
+
+        <div
+          id="entryText"
+          contenteditable
+          class="entry-text"
+          onInput={this.upsert}
+          key={'entry-' + entry.id}>
+          {entry.text}
+        </div>
       </div>
     );
   }
