@@ -21,15 +21,14 @@ export default function getInitialState () {
       return _filterText;
     },
     set filterText(filterText) {
-      // If the new query is a continuation of the prior query,
+      // If the filterText is a continuation of _filterText,
       // fitler viewEntries for efficiency.
-      // var q = query.toLowerCase();
-      // var f = el.state.filterText;
-      // var entries = (q.length > f.length && q.indexOf(f) === 0)
-      //   ? el.state.viewEntries
-      //   : el.state.entries;
+      var list = (filterText.length > _filterText.length && filterText.indexOf(_filterText) === 0)
+        ? this.viewEntries
+        : _entries;
+
       _filterText = filterText;
-      this.viewEntries = applyFilters(filterText, _entries);
+      this.viewEntries = applyFilters(filterText, list);
     },
 
     get entries() {
