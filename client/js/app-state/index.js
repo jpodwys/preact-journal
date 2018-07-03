@@ -5,46 +5,50 @@ export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
   let _filterText = '';
-  let _entries = JSON.parse(localStorage.getItem('entries')) || undefined;
+  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
+
+  const computedProps = {
+    viewEntries: {
+      computer: applyFilters,
+      args: ['filterText', 'entries']
+    }
+  };
 
   let state = {
+    entries: [],
     entryIndex: -1,
+    filterText: '',
+    viewEntries: [],
     entry: undefined,
     scrollPosition: 0,
     loggedIn: loggedIn,
     showFilterInput: false,
     toastConfig: undefined,
     view: getViewFromHref(location.href),
-    dark: localStorage.getItem('dark') === 'true',
-    
-    get filterText() {
-      return _filterText;
-    },
-    set filterText(filterText) {
-      // If the filterText is a continuation of _filterText,
-      // fitler viewEntries for efficiency.
-      var list = (filterText.length > _filterText.length && filterText.indexOf(_filterText) === 0)
-        ? this.viewEntries
-        : _entries;
+    dark: localStorage.getItem('dark') === 'true'
+  };
 
-      _filterText = filterText;
-      this.viewEntries = applyFilters(filterText, list);
-    },
+  let compute = {
+    set: function(obj, prop, value) {
+      obj[prop] = value;
 
-    get entries() {
-      return _entries;
-    },
-    set entries(entries) {
-      // Consider moving localStorage persistence to here
-      // and getting rid of persist.js altogether. But setters
-      // appear to be syncronous so that would lock the main
-      // thread unless I JSON.stringify in a worker.
-      _entries = entries;
-      this.viewEntries = applyFilters(_filterText, entries);
+      for(let computedProp in computedProps){
+        let computedConfig = computedProps[computedProp];
+        if(~computedConfig.args.indexOf(prop)){
+          let computedArgs = computedConfig.args.map(arg => {
+            return obj[arg];
+          });
+          obj[computedProp] = computedConfig.computer(...computedArgs);
+        }
+      }
+
+      return true;
     }
   };
 
-  state.entries = _entries;
+  let stateProxy = new Proxy(state, compute);
 
-  return state;
+  stateProxy.entries = entries;
+
+  return stateProxy;
 };
