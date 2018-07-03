@@ -28,5 +28,4 @@ function del (id) {
   });
 };
 
-
 export default { getAll, sync, create, update, del };
