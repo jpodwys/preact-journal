@@ -35,6 +35,10 @@ export default function getInitialState () {
       return _entries;
     },
     set entries(entries) {
+      // Consider moving localStorage persistence to here
+      // and getting rid of persist.js altogether. But setters
+      // appear to be syncronous so that would lock the main
+      // thread unless I JSON.stringify in a worker.
       _entries = entries;
       this.viewEntries = applyFilters(_filterText, entries);
     }
