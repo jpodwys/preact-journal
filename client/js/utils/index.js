@@ -39,7 +39,7 @@ function filterHiddenEntries (entries) {
   });
 };
 
-function applyFilters (query, list) {
+function applyFilters (query = '', list = []) {
   list = filterHiddenEntries(list);
   return filterObjectsByText(query, list);
 };

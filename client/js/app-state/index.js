@@ -1,27 +1,36 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { sortObjectsByDate, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
   if(entries) entries = sortObjectsByDate(entries);
-  let viewEntries;
-  if(entries) viewEntries = filterHiddenEntries(entries);
 
   let state = {
-    scrollPosition: 0,
-    view: getViewFromHref(location.href),
-    showFilterInput: false,
-    filterText: '',
-    loggedIn: loggedIn,
-    entry: undefined,
     entryIndex: -1,
-    entries: entries,
-    viewEntries: viewEntries || entries,
+    entry: undefined,
+    scrollPosition: 0,
+    loggedIn: loggedIn,
+    showFilterInput: false,
     toastConfig: undefined,
-    dark: localStorage.getItem('dark') === 'true'
+    view: getViewFromHref(location.href),
+    dark: localStorage.getItem('dark') === 'true',
+
+    filterText: '',
+    set setFilterText(filterText) {
+      this.filterText = filterText;
+      this.viewEntries = applyFilters(filterText, this.entries);
+    },
+
+    entries: [],
+    set setEntries(entries) {
+      this.entries = entries;
+      this.viewEntries = applyFilters(this.filterText, entries);
+    }
   };
+
+  state.setEntries = entries;
 
   return state;
 };

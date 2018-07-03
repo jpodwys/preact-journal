@@ -29,7 +29,7 @@ function handleEntriesView (url) {
     let entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
       this.setState({
-        entries: removeObjectByIndex(0, this.state.entries)
+        setEntries: removeObjectByIndex(0, this.state.entries)
       });
     }
   }

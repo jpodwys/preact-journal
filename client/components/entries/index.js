@@ -20,7 +20,7 @@ export default class Entries extends Component {
     entries = entries || [];
     if(!entries.length){
       return (
-        <h2 class="center-text">It's empty in here!</h2>
+        <h2 class="center-text fly">It's empty in here!</h2>
       );
     }
     return (

@@ -28,7 +28,7 @@ function getAllEntries (el){
 
 function getAllEntriesSuccess (el, response){
   persist(el, {
-    entries: response.entries,
+    setEntries: response.entries,
   }, function(){
     localStorage.setItem('timestamp', response.timestamp);
   });
@@ -41,6 +41,7 @@ function getAllEntriesError (el, err){
 // Send updates to the server
 function syncClientEntries (el){
   var entries = el.state.entries;
+  if(!entries) return;
   entries.forEach(entry => {
     if(entry.needsSync){
       var func;
@@ -88,7 +89,7 @@ function applySyncPatch (el, entries){
 
 function persistSyncPatch (el, timestamp){
   persist(el, {
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
@@ -107,14 +108,14 @@ function createEntry (el, { entry, clientSync }){
 
   persist(el, {
     entry: entry,
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   });
 
   if(!clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
   persist(el, {
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   });
 
   Entry.create(entry).then(response => {
@@ -137,7 +138,7 @@ function createEntrySuccess (el, oldId, response){
 
   persist(el, {
     entry: Object.assign({}, el.state.entry),
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   });
 };
 
@@ -145,7 +146,7 @@ function createEntryFailure (el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.setState({
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   });
   console.log('createEntryFailure', err);
 };
@@ -166,7 +167,7 @@ function updateEntry (el, { entry, property, entryId }){
   el.state.entries[entryIndex].needsSync = true;
   persist(el, {
     entry: Object.assign({}, el.state.entries[entryIndex]),
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   });
 
   Entry.update(entryId, entry).then(function(){
@@ -182,7 +183,7 @@ function updateEntrySuccess (el, id){
   delete entries[entryIndex].needsSync;
   persist(el, {
     entry: Object.assign({}, entries[entryIndex]),
-    entries: entries
+    setEntries: entries
   });
 };
 
@@ -207,7 +208,7 @@ function deleteEntry (el, { id }){
 
   persist(el, {
     entry: undefined,
-    entries: [].concat(el.state.entries)
+    setEntries: [].concat(el.state.entries)
   }, function(){
     if(el.state.view !== '/entries') route('/entries', true);
   });
@@ -222,7 +223,7 @@ function deleteEntry (el, { id }){
 function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
   persist(el, {
-    entries: removeObjectByIndex(entryIndex, el.state.entries)
+    setEntries: removeObjectByIndex(entryIndex, el.state.entries)
   });
 };
 
@@ -261,7 +262,7 @@ function newEntry (el){
 
   el.setState({
     entry: entry,
-    entries: [entry].concat(el.state.entries)
+    setEntries: [entry].concat(el.state.entries)
   }, function(){
     setEntry(el, {id: entry.id});
   });
@@ -272,8 +273,7 @@ function filterByText (el, text, e){
   let query = text === undefined ? e.target.value : text;
   if(el.state.filterText === query) return;
   if(!query) return el.setState({
-    filterText: '',
-    viewEntries: applyFilters('', el.state.entries)
+    setFilterText: ''
   });
 
   // If the new query is a continuation of the prior query,
@@ -285,8 +285,7 @@ function filterByText (el, text, e){
     : el.state.entries;
 
   el.setState({
-    filterText: query,
-    viewEntries: applyFilters(q, entries)
+    setFilterText: query
   });
 };
 
