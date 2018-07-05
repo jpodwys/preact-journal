@@ -1,7 +1,19 @@
 export default function compute (state, computedProps) {
+  const observedProps = [];
+
+  for(let computedProp in computedProps){
+    observedProps.concat(computedProps[computedProp].args);
+  }
+
+  const uniqueProps = Array.from(new Set(observedProps));
+
+  let stateProxy;
+
   let compute = {
     set: function(obj, prop, value) {
       obj[prop] = value;
+
+      if(uniqueProps.indexOf < 0) return true;
 
       for(let computedProp in computedProps){
         let computedConfig = computedProps[computedProp];
@@ -9,7 +21,7 @@ export default function compute (state, computedProps) {
           let computedArgs = computedConfig.args.map(arg => {
             return obj[arg];
           });
-          obj[computedProp] = computedConfig.computer(...computedArgs);
+          stateProxy[computedProp] = computedConfig.computer(...computedArgs);
         }
       }
 
@@ -17,5 +29,6 @@ export default function compute (state, computedProps) {
     }
   };
 
-  return new Proxy(state, compute);
+  stateProxy = new Proxy(state, compute);
+  return stateProxy;
 };
