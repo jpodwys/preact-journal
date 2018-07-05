@@ -19,7 +19,6 @@ export default function getInitialState () {
     dark: localStorage.getItem('dark') === 'true',
     set viewEntries(_) { return; },
     get viewEntries() {
-      console.log('called')
       return this.filterText
         ? applyFilters(this.filterText, this.entries)
         : this.entries;
