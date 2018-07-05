@@ -1,26 +1,23 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
-  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  if(entries) entries = sortObjectsByDate(entries);
-  let viewEntries;
-  if(entries) viewEntries = filterHiddenEntries(entries);
 
   let state = {
-    scrollPosition: 0,
-    view: getViewFromHref(location.href),
-    showFilterInput: false,
-    filterText: '',
-    loggedIn: loggedIn,
-    entry: undefined,
     entryIndex: -1,
-    entries: entries,
-    viewEntries: viewEntries || entries,
+    filterText: '',
+    entry: undefined,
+    scrollPosition: 0,
+    loggedIn: loggedIn,
+    showFilterInput: false,
     toastConfig: undefined,
-    dark: localStorage.getItem('dark') === 'true'
+    view: getViewFromHref(location.href),
+    dark: localStorage.getItem('dark') === 'true',
+    entries: JSON.parse(localStorage.getItem('entries')) || undefined,
+    get viewEntries() { return applyFilters(this.filterText, this.entries); },
+    set viewEntries(_) { return console.warn('Attempted to set computed property viewEntries.'); }
   };
 
   return state;

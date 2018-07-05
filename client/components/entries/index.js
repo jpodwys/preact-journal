@@ -11,21 +11,21 @@ export default class Entries extends Component {
 
   shouldComponentUpdate(np) {
     let op = this.props;
-    return op.entries !== np.entries
+    return op.viewEntries !== np.viewEntries
       || op.scrollPosition === np.scrollPosition;
   }
 
-  render({ entries, scrollPosition }) {
+  render({ viewEntries, scrollPosition }) {
     document.body.scrollTop = scrollPosition;
-    entries = entries || [];
-    if(!entries.length){
+    viewEntries = viewEntries || [];
+    if(!viewEntries.length){
       return (
-        <h2 class="center-text">It's empty in here!</h2>
+        <h2 class="center-text fly">It's empty in here!</h2>
       );
     }
     return (
       <ScrollViewport class="entry-list fly" rowHeight={84} overscan={20}>
-        {entries.map(entry => <EntryPreview entry={entry}/>)}
+        {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );
   }
