@@ -17,12 +17,8 @@ export default function getInitialState () {
     toastConfig: undefined,
     view: getViewFromHref(location.href),
     dark: localStorage.getItem('dark') === 'true',
-    set viewEntries(_) { return console.warn('Attempted to set computed property viewEntries.'); },
-    get viewEntries() {
-      return this.filterText
-        ? applyFilters(this.filterText, this.entries)
-        : this.entries;
-    }
+    get viewEntries() { return applyFilters(this.filterText, this.entries); },
+    set viewEntries() { return console.warn('Attempted to set computed property viewEntries.'); }
   };
 
   return state;
