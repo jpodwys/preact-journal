@@ -17,7 +17,7 @@ export default function getInitialState () {
     dark: localStorage.getItem('dark') === 'true',
     entries: JSON.parse(localStorage.getItem('entries')) || undefined,
     get viewEntries() { return applyFilters(this.filterText, this.entries); },
-    set viewEntries() { return console.warn('Attempted to set computed property viewEntries.'); }
+    set viewEntries(_) { return console.warn('Attempted to set computed property viewEntries.'); }
   };
 
   return state;
