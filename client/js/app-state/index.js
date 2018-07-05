@@ -1,14 +1,15 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
+import { clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
-  let _filterText = '';
-  let _entries = JSON.parse(localStorage.getItem('entries')) || undefined;
+  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
 
   let state = {
     entryIndex: -1,
+    filterText: '',
+    entries: entries,
     entry: undefined,
     scrollPosition: 0,
     loggedIn: loggedIn,
@@ -16,35 +17,14 @@ export default function getInitialState () {
     toastConfig: undefined,
     view: getViewFromHref(location.href),
     dark: localStorage.getItem('dark') === 'true',
-    
-    get filterText() {
-      return _filterText;
-    },
-    set filterText(filterText) {
-      // If the filterText is a continuation of _filterText,
-      // fitler viewEntries for efficiency.
-      var list = (filterText.length > _filterText.length && filterText.indexOf(_filterText) === 0)
-        ? this.viewEntries
-        : _entries;
-
-      _filterText = filterText;
-      this.viewEntries = applyFilters(filterText, list);
-    },
-
-    get entries() {
-      return _entries;
-    },
-    set entries(entries) {
-      // Consider moving localStorage persistence to here
-      // and getting rid of persist.js altogether. But setters
-      // appear to be syncronous so that would lock the main
-      // thread unless I JSON.stringify in a worker.
-      _entries = entries;
-      this.viewEntries = applyFilters(_filterText, entries);
+    set viewEntries(_) { return; },
+    get viewEntries() {
+      console.log('called')
+      return this.filterText
+        ? applyFilters(this.filterText, this.entries)
+        : this.entries;
     }
   };
-
-  state.entries = _entries;
 
   return state;
 };

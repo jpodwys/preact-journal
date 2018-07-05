@@ -42,12 +42,14 @@ export default class App extends Component {
   }
 
   render(props, state) {
+    // Save this off since it triggers a getter computation
+    let viewEntries = state.viewEntries;
     return (
       <div class={!!state.dark ? 'app dark' : 'app'}>
         <Header
           view={state.view}
           loggedIn={state.loggedIn}
-          viewEntries={state.viewEntries}
+          viewEntries={viewEntries}
           entry={state.entry}
           filterText={state.filterText}
           showFilterInput={state.showFilterInput}
@@ -58,12 +60,12 @@ export default class App extends Component {
             <Entries path="/entries"
               scrollPosition={state.scrollPosition}
               loggedIn={state.loggedIn}
-              entries={state.viewEntries}/>
+              viewEntries={viewEntries}/>
             <Entry path="/entry/:id"
               loggedIn={state.loggedIn}
               view={state.view}
               entry={state.entry}
-              viewEntries={state.viewEntries}
+              viewEntries={viewEntries}
               entryIndex={state.entryIndex}/>
           </Router>
           <Toast config={state.toastConfig}/>
