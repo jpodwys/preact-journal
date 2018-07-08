@@ -21,7 +21,7 @@ self.addEventListener('fetch', function(e) {
 
   e.respondWith(fromCache(reqUrl || e.request));
 
-  if(~url.indexOf('manifest') || ~url.indexOf('favicon')) return;
+  if(~url.indexOf('manifest') || ~url.indexOf('icon')) return;
   e.waitUntil(
     update(reqUrl || e.request)
     // .then(refresh)
