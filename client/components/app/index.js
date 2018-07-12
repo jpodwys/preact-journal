@@ -42,8 +42,11 @@ export default class App extends Component {
   }
 
   render(props, state) {
+    const dark = state.dark ? 'dark' : '';
+    const toast = state.toastConfig ? 'toast' : '';
+    
     return (
-      <div class={!!state.dark ? 'app dark' : 'app'}>
+      <div class={`app ${dark} ${toast}`}>
         <Header
           view={state.view}
           loggedIn={state.loggedIn}
