@@ -78,7 +78,7 @@ toast {
   text-align: center;
   height: 36px;
   background-color: #424242;
-  bottom: -100px;
+  bottom: -36px;
   transition: bottom linear .2s;
   z-index: 2;
   color: #fff;
