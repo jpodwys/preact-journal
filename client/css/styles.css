@@ -76,9 +76,9 @@ toast {
   transform: translateX(-50%);
   position: fixed;
   text-align: center;
-  height: 36px;
+  height: 50px;
   background-color: #424242;
-  bottom: -36px;
+  bottom: -50px;
   transition: bottom linear .1s;
   z-index: 2;
   color: #fff;
@@ -210,7 +210,7 @@ main {
 
 @media (max-width: 648px) {
   .toast .button--fab.add-entry {
-    bottom: 61px;
+    bottom: 75px;
   }
 }
 
@@ -357,7 +357,7 @@ main {
   border: none;
   color: #fff;
   position: relative;
-  height: 36px;
+  height: 50px;
   padding: 0 16px;
   font-size: 14px;
   font-weight: 500;
