@@ -92,7 +92,8 @@ toast.show {
 
 .toast-label {
   display: inline-block;
-  padding: 8px 16px;
+  font-size: 16px;
+  padding: 16px 16px;
 }
 
 header {
