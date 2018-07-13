@@ -208,8 +208,10 @@ main {
   transition: bottom linear .2s;
 }
 
-.toast .button--fab.add-entry {
-  bottom: 61px;
+@media (max-width: 647px) {
+  .toast .button--fab.add-entry {
+    bottom: 61px;
+  }
 }
 
 .button--fab.add-entry svg {
