@@ -79,7 +79,7 @@ toast {
   height: 36px;
   background-color: #424242;
   bottom: -36px;
-  transition: bottom linear .2s;
+  transition: bottom linear .1s;
   z-index: 2;
   color: #fff;
   width: 100%;
@@ -205,10 +205,10 @@ main {
   bottom: 25px;
   right: 25px;
   background-color: #5776d0;
-  transition: bottom linear .2s;
+  transition: bottom linear .1s;
 }
 
-@media (max-width: 647px) {
+@media (max-width: 648px) {
   .toast .button--fab.add-entry {
     bottom: 61px;
   }
