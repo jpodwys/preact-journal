@@ -62,16 +62,16 @@ export default class Header extends Component {
 
 				<span class="nav-set">
 					{view === '/entries' && showFilterInput &&
-						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="grow"/>
+						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
 				  }
 				  {view === '/entries' && !showFilterInput &&
-				  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="grow"/>
+				  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
 				  }
 				  {(view === '/entry' || view === '/new') &&
-				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="grow"/>
+				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="grow"/>
+						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
 					}
 				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 				</span>

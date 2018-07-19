@@ -116,6 +116,7 @@ header .nav-set > *:not(h1) {
 
 .nav-set {
   height: inherit;
+  position: relative;
 }
 
 .nav-set > * {
