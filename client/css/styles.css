@@ -374,7 +374,7 @@ main {
 @keyframes reveal {
   from {
     opacity: .25;
-    transform: translateY(35px);
+    transform: translateY(25px);
   }
   to {
     opacity: 1;
@@ -385,7 +385,7 @@ main {
 @keyframes fly {
   from {
     opacity: .25;
-    transform: translateY(-35px);
+    transform: translateY(-25px);
   }
   to {
     opacity: 1;
