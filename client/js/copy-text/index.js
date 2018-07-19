@@ -17,10 +17,9 @@ function hideKeyboard (el) {
 }
 
 function tryShareApi (text) {
-  if(navigator.share){
-    return navigator.share({text: text});
-  }
-  return false;
+  return navigator.share
+    ? navigator.share({text: text})
+    : false;
 }
 
 export default function copyText(text) {
