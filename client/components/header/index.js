@@ -35,12 +35,12 @@ export default class Header extends Component {
 			<header class="elevated">
 				<span class="nav-set">
 					{view === '/entries' && (vw > 400 || !showFilterInput) &&
-						<h3 class="grow">{entryCount} Entries</h3>
+						<h3 class="fly">{entryCount} Entries</h3>
 					}
 
 					{(view === '/entry' || view === '/new') &&
 						<a href="/entries">
-							<Icon icon="back" key="header-back" class="grow"/>
+							<Icon icon="back" key="header-back" class="reveal"/>
 						</a>
 					}
 				</span>
