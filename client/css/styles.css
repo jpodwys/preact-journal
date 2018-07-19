@@ -107,6 +107,7 @@ header {
   justify-content: flex-end;
   height: 50px;
   background-color: #5776d0;
+  overflow: hidden;
 }
 
 header .nav-set > *:not(h1) {
@@ -373,7 +374,7 @@ main {
 @keyframes reveal {
   from {
     opacity: .25;
-    transform: translateY(25px);
+    transform: translateY(35px);
   }
   to {
     opacity: 1;
@@ -384,7 +385,7 @@ main {
 @keyframes fly {
   from {
     opacity: .25;
-    transform: translateY(-25px);
+    transform: translateY(-35px);
   }
   to {
     opacity: 1;
