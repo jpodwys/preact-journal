@@ -14,7 +14,7 @@ var express = require('express'),
 // Keep the dyno awake
 var http = require('http');
 setInterval(function() {
-  http.get('https://riot-demo.herokuapp.com');
+  http.get('https://preact-journal.herokuapp.com');
 }, 900000); // Every 15 minutes
 
 app.disable('x-powered-by');
