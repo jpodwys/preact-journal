@@ -107,6 +107,7 @@ header {
   justify-content: flex-end;
   height: 50px;
   background-color: #5776d0;
+  overflow: hidden;
 }
 
 header .nav-set > *:not(h1) {
@@ -115,6 +116,7 @@ header .nav-set > *:not(h1) {
 
 .nav-set {
   height: inherit;
+  position: relative;
 }
 
 .nav-set > * {
