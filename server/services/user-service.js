@@ -1,4 +1,4 @@
-module.exports = function(User, sequelize){
+module.exports = function(User, sequelize, op){
   var self = this;
 
   self.getUserById = function(id){
