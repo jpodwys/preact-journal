@@ -311,6 +311,14 @@ main {
   border: none;
 }
 
+.entry-date-wrapper {
+  display: inline-block;
+}
+
+.entry-date {
+  margin: 0;
+}
+
 .next-entry {
   transform: rotate(180deg);
 }

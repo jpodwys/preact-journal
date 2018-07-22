@@ -66,13 +66,15 @@ export default class Entry extends Component {
               class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
           }
 
-          <h1
-            id="entryDate"
-            contenteditable
-            onInput={this.upsert}
-            class="entry-date center-text">
-            {entry.date}
-          </h1>
+          <div class="entry-date-wrapper">
+            <h1
+              id="entryDate"
+              contenteditable
+              onInput={this.upsert}
+              class="entry-date center-text">
+              {entry.date}
+            </h1>
+          </div>
 
           {view !== '/new' &&
             <Icon
