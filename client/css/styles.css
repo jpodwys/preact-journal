@@ -311,6 +311,10 @@ main {
   border: none;
 }
 
+.next-entry {
+  transform: rotate(180deg);
+}
+
 .entry-header {
   text-align: center;
   padding: 20px 0;

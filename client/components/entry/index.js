@@ -63,7 +63,7 @@ export default class Entry extends Component {
               icon="left"
               key={entry.id + '-left'}
               onclick={fire('shiftEntry', -1)}
-              class={entryIndex > 0 ? 'dark-fill' : 'dark-fill hidden'}/>
+              class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
           }
 
           <h1
@@ -76,10 +76,10 @@ export default class Entry extends Component {
 
           {view !== '/new' &&
             <Icon
-              icon="right"
+              icon="left"
               key={entry.id + '-right'}
               onclick={fire('shiftEntry', 1)}
-              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill' : 'dark-fill hidden'}/>
+              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
           }
         </div>
 
