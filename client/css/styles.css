@@ -197,16 +197,22 @@ main {
 }
 
 .button--fab.add-entry {
-  position: absolute;
-  top: calc(100vh - 73px);
+  position: fixed;
+  bottom: 25px;
   right: 25px;
   background-color: #5776d0;
-  transition: top linear .1s;
+  transition: bottom linear .1s;
+}
+
+@media (min-width: 1049px) {
+  .button--fab.add-entry {
+    right: calc((100vw - 1000px) / 2)
+  }
 }
 
 @media (max-width: 648px) {
   .toast .button--fab.add-entry {
-    top: calc(100vh - 123px);
+    bottom: 75px;
   }
 }
 
