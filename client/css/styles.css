@@ -103,10 +103,18 @@ header {
   left: 0;
   top: 0;
   right: 0;
-  display: flex;
-  justify-content: flex-end;
   height: 50px;
   background-color: #5776d0;
+}
+
+header > .inner-header {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  margin: 0 auto;
 }
 
 header .nav-set > *:not(h1) {
@@ -131,20 +139,6 @@ header .nav-set > *:not(h1) {
 .nav-set > .full-height {
   padding: 5px;
 }
-
-/*.nav-set svg:hover {
-  fill: orange;
-}
-
-@media (hover: none) {
-  svg:hover {
-    fill: #fff;
-  }
-
-  .dark-fill svg:hover {
-    fill: #6f6f6f;
-  }
-}*/
 
 svg {
   fill: #FFF;
@@ -193,7 +187,6 @@ main {
 }
 
 .elevated {
-  /*filter: drop-shadow(0 4px 4px #9c9c9c);*/
   box-shadow: 0 5px 5px #c1c1c1;
 }
 
@@ -204,16 +197,16 @@ main {
 }
 
 .button--fab.add-entry {
-  position: fixed;
-  bottom: 25px;
+  position: absolute;
+  top: calc(100vh - 73px);
   right: 25px;
   background-color: #5776d0;
-  transition: bottom linear .1s;
+  transition: top linear .1s;
 }
 
 @media (max-width: 648px) {
   .toast .button--fab.add-entry {
-    bottom: 75px;
+    top: calc(100vh - 123px);
   }
 }
 
@@ -230,7 +223,7 @@ main {
   border-radius: 30px;
 }
 
-.grow {
+.flex-grow {
   flex: 1 2;
 }
 

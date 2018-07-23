@@ -33,56 +33,58 @@ export default class Header extends Component {
 		let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
 		return (
 			<header class="elevated">
-				<span class="nav-set">
-					{view === '/entries' && (vw > 400 || !showFilterInput) &&
-						<h3 class="fly">{entryCount} Entries</h3>
-					}
+				<div class="inner-header">
+					<div class="nav-set">
+						{view === '/entries' && (vw > 400 || !showFilterInput) &&
+							<h3 class="fly">{entryCount} Entries</h3>
+						}
 
-					{(view === '/entry' || view === '/new') &&
-						<a href="/entries">
-							<Icon icon="back" key="header-back" class="reveal"/>
-						</a>
-					}
-				</span>
+						{(view === '/entry' || view === '/new') &&
+							<a href="/entries">
+								<Icon icon="back" key="header-back" class="reveal"/>
+							</a>
+						}
+					</div>
 
-				<span class="nav-set grow">
-					{view === '/entries' && showFilterInput &&
-						<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
-					    <input
-					    	id="filterTextInput"
-					    	autocomplete="off"
-					    	value={filterText}
-					    	placeholder="Search entries"
-					    	oninput={debounce(fire('filterByText'), 100)}
-					    	onblur={fire('blurTextFilter')}
-					    	class="grow"/>
-					  </form>
-					}
-				</span>
+					<div class="nav-set flex-grow">
+						{view === '/entries' && showFilterInput &&
+							<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
+						    <input
+						    	id="filterTextInput"
+						    	autocomplete="off"
+						    	value={filterText}
+						    	placeholder="Search entries"
+						    	oninput={debounce(fire('filterByText'), 100)}
+						    	onblur={fire('blurTextFilter')}
+						    	class="grow"/>
+						  </form>
+						}
+					</div>
 
-				<span class="nav-set">
-					{view === '/entries' && showFilterInput &&
-						<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
-				  }
-				  {view === '/entries' && !showFilterInput &&
-				  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
-				  }
-				  {(view === '/entry' || view === '/new') &&
-				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
-					}
-					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
-					}
-				  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
-				</span>
+					<div class="nav-set">
+						{view === '/entries' && showFilterInput &&
+							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
+					  }
+					  {view === '/entries' && !showFilterInput &&
+					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
+					  }
+					  {(view === '/entry' || view === '/new') &&
+					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
+						}
+						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
+						}
+					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
+					</div>
 
-				{view === '/entries' &&
-					<span class="button button--fab add-entry elevated grow">
-						<a href="/entry/new">
-							<Icon icon="clear" key="header-add"/>
-						</a>
-					</span>
-				}
+					{view === '/entries' &&
+						<div class="button button--fab add-entry elevated grow">
+							<a href="/entry/new">
+								<Icon icon="clear" key="header-add"/>
+							</a>
+						</div>
+					}
+				</div>
 			</header>
 		);
 	}
