@@ -176,14 +176,18 @@ main {
   position: relative;
 }
 
-.entry-preview .nav-set svg:last-child {
-  padding-right: 0;
-}
-
 .entry-preview--icons {
   position: absolute;
-  top: 10px;
+  top: 0;
   right: 0;
+}
+
+.entry-preview--icons svg {
+  padding-top: 10px;
+}
+
+.entry-preview--icons svg:last-child {
+  padding-right: 0;
 }
 
 .elevated {
