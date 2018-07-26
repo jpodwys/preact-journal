@@ -1,4 +1,4 @@
-/* Native elements */
+/* Global */
 
 * {
   transition:
@@ -20,35 +20,6 @@ main {
   padding: 60px 15px 75px;
 }
 
-header {
-  color: #fff;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  right: 0;
-  height: 50px;
-  background-color: #5776d0;
-}
-
-header > .inner-header {
-  position: relative;
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  max-width: 1000px;
-  height: 100%;
-  margin: 0 auto;
-}
-
-header .nav-set h3 {
-  padding: 14px 15px;
-}
-
-header .nav-set > *:not(h1) {
-  padding: 12.5px;
-}
-
 input {
   font-size: 20px;
   border-radius: 4px;
@@ -66,8 +37,6 @@ svg {
   width: 24px;
   /*transition: fill .35s ease;*/
 }
-
-/* Global */
 
 .app {
   min-height: 100%;
@@ -247,6 +216,35 @@ svg {
 }
 
 /* Header */
+
+header {
+  color: #fff;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 50px;
+  background-color: #5776d0;
+}
+
+header > .inner-header {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: 1000px;
+  height: 100%;
+  margin: 0 auto;
+}
+
+header .nav-set h3 {
+  padding: 14px 15px;
+}
+
+header .nav-set > *:not(h1) {
+  padding: 12.5px;
+}
 
 .flex-grow {
   flex: 1 2;
