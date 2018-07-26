@@ -7,7 +7,7 @@ export default function handleRouteChange (url) {
   if(view !== '/' && !this.state.loggedIn) route('/', true);
   this.setState({view: view});
   handleRoute.call(this, view, url);
-  fire('linkstate', {key: 'toastConfig'})();
+  if(this.state.toastConfig) fire('linkstate', {key: 'toastConfig'})();
 };
 
 function handleRoute (view, url) {

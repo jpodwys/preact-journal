@@ -5,10 +5,9 @@ function linkstate (el, { key, val, cb }){
   if(key === 'dark') localStorage.setItem('dark', val);
 };
 
-function scrollBody (el){
-  if(el.state.view === '/entries'){
-    el.setState({scrollPosition: document.body.scrollTop});
-  }
+// I tried replacing this with a linkstate call, but it didn't work.
+function scrollBody (el, { scrollPosition }){
+  el.setState({scrollPosition});
 };
 
 export default {
