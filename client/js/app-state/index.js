@@ -1,5 +1,5 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
@@ -21,6 +21,21 @@ export default function getInitialState () {
     viewEntries: viewEntries || entries,
     toastConfig: undefined,
     dark: localStorage.getItem('dark') === 'true'
+  };
+
+  const handler = {
+    // get: function(obj, prop) {
+
+    // },
+
+    set: function(obj, prop, value) {
+      obj[prop] = value;
+      switch(prop) {
+        case 'entries':     // Fallthrough
+        case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries); break;
+        case 'dark':        localStorage.setItem('dark', !!value);
+      }
+    }
   };
 
   return state;
