@@ -136,6 +136,11 @@ header .nav-set > *:not(h1) {
   transition: all ease .2s;
 }
 
+.icon-button {
+  background: transparent;
+  border: none;
+}
+
 .nav-set > .full-height {
   padding: 5px;
 }

@@ -41,7 +41,9 @@ export default class Header extends Component {
 
 						{(view === '/entry' || view === '/new') &&
 							<a href="/entries">
-								<Icon icon="back" key="header-back" class="reveal"/>
+								<button class="icon-button">
+									<Icon icon="back" key="header-back" class="reveal"/>
+								</button>
 							</a>
 						}
 					</div>
@@ -63,18 +65,28 @@ export default class Header extends Component {
 
 					<div class="nav-set">
 						{view === '/entries' && showFilterInput &&
-							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
+							<button class="icon-button">
+								<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
+							</button>
 					  }
 					  {view === '/entries' && !showFilterInput &&
-					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
+					  	<button class="icon-button">
+					  		<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
+					  	</button>
 					  }
 					  {(view === '/entry' || view === '/new') &&
-					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
+					  	<button class="icon-button">
+					  		<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
+					  	</button>
 						}
 						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
+							<button class="icon-button">
+								<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
+							</button>
 						}
-					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
+						<button class="icon-button">
+					  	<Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
+					  </button>
 					</div>
 
 					{view === '/entries' &&
