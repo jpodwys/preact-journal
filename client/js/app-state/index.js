@@ -24,16 +24,19 @@ export default function getInitialState () {
   };
 
   const handler = {
-    // get: function(obj, prop) {
-
-    // },
-
     set: function(obj, prop, value) {
       obj[prop] = value;
       switch(prop) {
+        // Persistence
+        case 'dark': localStorage.setItem('dark', !!value);
+        case 'entries': {
+          obj.entries = sortObjectsByDate(value);
+          localStorage.setItem('entries', JSON.stringify(obj.entries));
+        }
+
+        // Computed properties
         case 'entries':     // Fallthrough
-        case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries); break;
-        case 'dark':        localStorage.setItem('dark', !!value);
+        case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries);
       }
     }
   };
