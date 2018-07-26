@@ -24,7 +24,7 @@ export default class Entries extends Component {
       );
     }
     return (
-      <ScrollViewport class="entry-list fly" rowHeight={84} overscan={20}>
+      <ScrollViewport class="entry-list fade-down" rowHeight={84} overscan={20}>
         {entries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );

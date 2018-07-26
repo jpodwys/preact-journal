@@ -57,13 +57,11 @@ export default class App extends Component {
           dark={state.dark}/>
         <main>
           <Router onChange={handleRouteChange.bind(this)}>
-            <Login path="/" loggedIn={state.loggedIn}/>
+            <Login path="/"/>
             <Entries path="/entries"
               scrollPosition={state.scrollPosition}
-              loggedIn={state.loggedIn}
               entries={state.viewEntries}/>
             <Entry path="/entry/:id"
-              loggedIn={state.loggedIn}
               view={state.view}
               entry={state.entry}
               viewEntries={state.viewEntries}

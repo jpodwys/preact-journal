@@ -36,12 +36,12 @@ export default class Header extends Component {
 				<div class="inner-header">
 					<div class="nav-set">
 						{view === '/entries' && (vw > 400 || !showFilterInput) &&
-							<h3 class="fly">{entryCount} Entries</h3>
+							<h3 class="fade-down">{entryCount} Entries</h3>
 						}
 
 						{(view === '/entry' || view === '/new') &&
 							<a href="/entries">
-								<Icon icon="back" key="header-back" class="reveal"/>
+								<Icon icon="back" key="header-back" class="fade-up"/>
 							</a>
 						}
 					</div>
@@ -63,16 +63,16 @@ export default class Header extends Component {
 
 					<div class="nav-set">
 						{view === '/entries' && showFilterInput &&
-							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="reveal"/>
+							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="fade-up"/>
 					  }
 					  {view === '/entries' && !showFilterInput &&
-					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fly"/>
+					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
 					  }
 					  {(view === '/entry' || view === '/new') &&
-					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="reveal"/>
+					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}
 						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="reveal"/>
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
 						}
 					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 					</div>
