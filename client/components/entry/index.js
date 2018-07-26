@@ -55,7 +55,7 @@ export default class Entry extends Component {
   render({ view, entry, viewEntries, entryIndex }) {
     if(!entry) return <FourOhFour/>
     return (
-      <div class="entry reveal">
+      <div class="entry fade-up">
         <div class="entry-header nav-set dark-fill">
 
           {view !== '/new' &&
