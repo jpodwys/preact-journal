@@ -398,7 +398,7 @@ toast.show {
 
 @keyframes fade-up {
   from {
-    opacity: .25;
+    opacity: .5;
     transform: translateY(25px);
   }
   to {
@@ -409,7 +409,7 @@ toast.show {
 
 @keyframes fade-down {
   from {
-    opacity: .25;
+    opacity: .5;
     transform: translateY(-25px);
   }
   to {
