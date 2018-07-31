@@ -1,27 +1,34 @@
+import compute from '../compute';
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { sortObjectsByDate, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  if(entries) entries = sortObjectsByDate(entries);
-  let viewEntries;
-  if(entries) viewEntries = filterHiddenEntries(entries);
+
+  const computedProps = {
+    viewEntries: {
+      computer: applyFilters,
+      args: ['filterText', 'entries']
+    }
+  };
 
   let state = {
-    scrollPosition: 0,
-    view: getViewFromHref(location.href),
-    showFilterInput: false,
-    filterText: '',
-    loggedIn: loggedIn,
-    entry: undefined,
     entryIndex: -1,
-    entries: entries,
-    viewEntries: viewEntries || entries,
+    filterText: '',
+    viewEntries: [],
+    entries: [],
+    entry: undefined,
+    scrollPosition: 0,
+    loggedIn: loggedIn,
+    showFilterInput: false,
     toastConfig: undefined,
+    view: getViewFromHref(location.href),
     dark: localStorage.getItem('dark') === 'true'
   };
 
-  return state;
+  let stateProxy = compute(state, computedProps);
+  stateProxy.entries = entries;
+  return stateProxy;
 };
