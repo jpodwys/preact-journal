@@ -153,7 +153,7 @@ svg {
 
 .login-form-wrapper input[type=submit] {
   cursor: pointer;
-  background-color: #0078e7;
+  background-color: #4285F4;
   color: #fff;
   box-shadow: none;
   border: none;
@@ -212,7 +212,7 @@ svg {
 }
 
 .entry-preview .entry-link {
-  color: #5776d0;
+  color: #4285F4;
 }
 
 /* Header */
@@ -225,7 +225,7 @@ header {
   top: 0;
   right: 0;
   height: 50px;
-  background-color: #5776d0;
+  background-color: #4285F4;
 }
 
 header > .inner-header {
@@ -273,7 +273,7 @@ header .nav-set > *:not(h1) {
   position: fixed;
   bottom: 25px;
   right: 25px;
-  background-color: #5776d0;
+  background-color: #4285F4;
   transition: bottom linear .1s;
 }
 
