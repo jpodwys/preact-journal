@@ -1,27 +1,50 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { sortObjectsByDate, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
-  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  if(entries) entries = sortObjectsByDate(entries);
-  let viewEntries;
-  if(entries) viewEntries = filterHiddenEntries(entries);
+  let _filterText = '';
+  let _entries = JSON.parse(localStorage.getItem('entries')) || undefined;
 
   let state = {
-    scrollPosition: 0,
-    view: getViewFromHref(location.href),
-    showFilterInput: false,
-    filterText: '',
-    loggedIn: loggedIn,
-    entry: undefined,
     entryIndex: -1,
-    entries: entries,
-    viewEntries: viewEntries || entries,
+    entry: undefined,
+    scrollPosition: 0,
+    loggedIn: loggedIn,
+    showFilterInput: false,
     toastConfig: undefined,
-    dark: localStorage.getItem('dark') === 'true'
+    view: getViewFromHref(location.href),
+    dark: localStorage.getItem('dark') === 'true',
+    
+    get filterText() {
+      return _filterText;
+    },
+    set filterText(filterText) {
+      // If the filterText is a continuation of _filterText,
+      // fitler viewEntries for efficiency.
+      var list = (filterText.length > _filterText.length && filterText.indexOf(_filterText) === 0)
+        ? this.viewEntries
+        : _entries;
+
+      _filterText = filterText;
+      this.viewEntries = applyFilters(filterText, list);
+    },
+
+    get entries() {
+      return _entries;
+    },
+    set entries(entries) {
+      // Consider moving localStorage persistence to here
+      // and getting rid of persist.js altogether. But setters
+      // appear to be syncronous so that would lock the main
+      // thread unless I JSON.stringify in a worker.
+      _entries = entries;
+      this.viewEntries = applyFilters(_filterText, entries);
+    }
   };
+
+  state.entries = _entries;
 
   return state;
 };
