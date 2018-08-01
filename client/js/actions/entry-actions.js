@@ -27,10 +27,9 @@ function getAllEntries (el){
 };
 
 function getAllEntriesSuccess (el, response){
-  persist(el, {
+  el.setState({
     entries: response.entries,
-  }, function(){
-    localStorage.setItem('timestamp', response.timestamp);
+    timestamp: response.timestamp
   });
 };
 
@@ -87,13 +86,13 @@ function applySyncPatch (el, entries){
 };
 
 function persistSyncPatch (el, timestamp){
-  persist(el, {
-    entries: [].concat(el.state.entries)
-  }, function(){
+  el.setState({
+    entries: [].concat(el.state.entries),
+    timestamp: response.timestamp
+  }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
     }
-    localStorage.setItem('timestamp', timestamp);
   });
 };
 
@@ -105,7 +104,7 @@ function createEntry (el, { entry, clientSync }){
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
 
-  persist(el, {
+  el.setState({
     entry: entry,
     entries: [].concat(el.state.entries)
   });
@@ -113,9 +112,7 @@ function createEntry (el, { entry, clientSync }){
   if(!clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
-  persist(el, {
-    entries: [].concat(el.state.entries)
-  });
+  el.setState({ entries: [].concat(el.state.entries) });
 
   Entry.create(entry).then(response => {
     createEntrySuccess(el, entry.id, response);
@@ -135,7 +132,7 @@ function createEntrySuccess (el, oldId, response){
   delete el.state.entries[entryIndex].newEntry;
   delete el.state.entries[entryIndex].needsSync;
 
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
@@ -164,7 +161,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   el.state.entries[entryIndex][property] = entry[property];
   el.state.entries[entryIndex].needsSync = true;
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, el.state.entries[entryIndex]),
     entries: [].concat(el.state.entries)
   });
@@ -180,7 +177,7 @@ function updateEntrySuccess (el, id){
   let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, entries[entryIndex]),
     entries: entries
   });
@@ -205,10 +202,10 @@ function deleteEntry (el, { id }){
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
 
-  persist(el, {
+  el.setState({
     entry: undefined,
     entries: [].concat(el.state.entries)
-  }, function(){
+  }, () => {
     if(el.state.view !== '/entries') route('/entries', true);
   });
 
@@ -221,9 +218,7 @@ function deleteEntry (el, { id }){
 
 function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  persist(el, {
-    entries: removeObjectByIndex(entryIndex, el.state.entries)
-  });
+  el.setState({ entries: removeObjectByIndex(entryIndex, el.state.entries) });
 };
 
 function deleteEntryFailure (el, err){

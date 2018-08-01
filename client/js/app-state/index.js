@@ -3,7 +3,8 @@ import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromH
 
 const persist = (obj, prop, value) => {
   switch(prop) {
-    case 'dark':  localStorage.setItem('dark', !!value);  return;
+    case 'dark':        localStorage.setItem('dark', !!value);      return;
+    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
     case 'entries': {
       obj.entries = sortObjectsByDate(value);
       localStorage.setItem('entries', JSON.stringify(obj.entries));
@@ -35,6 +36,7 @@ export default function getInitialState () {
   if(entries) entries = sortObjectsByDate(entries);
   let viewEntries;
   if(entries) viewEntries = filterHiddenEntries(entries);
+  let timestamp = localStorage.getItem('timestamp') || undefined;
 
   let state = {
     scrollPosition: 0,
@@ -42,6 +44,7 @@ export default function getInitialState () {
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
+    timestamp: timestamp,
     entry: undefined,
     entryIndex: -1,
     entries: entries,
