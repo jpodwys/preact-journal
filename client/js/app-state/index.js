@@ -1,7 +1,7 @@
 import cookie from '../cookie';
 import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
-const persist = (obj, prop, value) => {
+const persist = (obj, prop, value, oldVal) => {
   switch(prop) {
     case 'dark':        localStorage.setItem('dark', !!value);      return;
     case 'timestamp':   localStorage.setItem('timestamp', value);   return;
@@ -13,18 +13,30 @@ const persist = (obj, prop, value) => {
   }
 };
 
-const compute = (obj, prop, value) => {
+const compute = (obj, prop, value, oldVal) => {
   switch(prop) {
-    case 'entries':     // Fallthrough
-    case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries);  return;
+    case 'entries': // Fallthrough
+    case 'filterText': {
+      // If the new query is a continuation of the prior query,
+      // fitler viewEntries for efficiency.
+      // let entries = 'entries';
+      // if(prop === 'filterText') {
+      //   const q = value.toLowerCase();
+      //   if(q.length > oldVal.length && q.indexOf(oldVal) === 0) entries = 'viewEntries';
+      // }
+      // obj.viewEntries = applyFilters(obj.filterText, obj[entries]);
+      obj.viewEntries = applyFilters(obj.filterText, obj.entries);
+      return;
+    }
   }
 };
 
 const handler = {
   set: function(obj, prop, value) {
+    let oldVal = obj[prop];
     obj[prop] = value;
-    persist(obj, prop, value);
-    compute(obj, prop, value);
+    persist(obj, prop, value, oldVal);
+    compute(obj, prop, value, oldVal);
     return true;
   }
 };

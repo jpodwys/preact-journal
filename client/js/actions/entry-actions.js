@@ -264,23 +264,8 @@ function filterByText (el, text, e){
   if(text === undefined && (!e || !e.target)) return;
   let query = text === undefined ? e.target.value : text;
   if(el.state.filterText === query) return;
-  if(!query) return el.setState({
-    filterText: '',
-    viewEntries: applyFilters('', el.state.entries)
-  });
-
-  // If the new query is a continuation of the prior query,
-  // fitler viewEntries for efficiency.
-  var q = query.toLowerCase();
-  var f = el.state.filterText;
-  var entries = (q.length > f.length && q.indexOf(f) === 0)
-    ? el.state.viewEntries
-    : el.state.entries;
-
-  el.setState({
-    filterText: query,
-    viewEntries: applyFilters(q, entries)
-  });
+  let filterText = query || '';
+  el.setState({ filterText });
 };
 
 function blurTextFilter (el){
