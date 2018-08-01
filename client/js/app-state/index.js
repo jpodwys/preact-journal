@@ -1,6 +1,33 @@
 import cookie from '../cookie';
 import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
+const persist = (obj, prop, value) => {
+  switch(prop) {
+    case 'dark':  localStorage.setItem('dark', !!value);  return;
+    case 'entries': {
+      obj.entries = sortObjectsByDate(value);
+      localStorage.setItem('entries', JSON.stringify(obj.entries));
+      return;
+    }
+  }
+};
+
+const compute = (obj, prop, value) => {
+  switch(prop) {
+    case 'entries':     // Fallthrough
+    case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries);  return;
+  }
+};
+
+const handler = {
+  set: function(obj, prop, value) {
+    obj[prop] = value;
+    persist(obj, prop, value);
+    compute(obj, prop, value);
+    return true;
+  }
+};
+
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
@@ -23,23 +50,5 @@ export default function getInitialState () {
     dark: localStorage.getItem('dark') === 'true'
   };
 
-  const handler = {
-    set: function(obj, prop, value) {
-      obj[prop] = value;
-      switch(prop) {
-        // Persistence
-        case 'dark': localStorage.setItem('dark', !!value);
-        case 'entries': {
-          obj.entries = sortObjectsByDate(value);
-          localStorage.setItem('entries', JSON.stringify(obj.entries));
-        }
-
-        // Computed properties
-        case 'entries':     // Fallthrough
-        case 'filterText':  obj.viewEntries = applyFilters(obj.filterText, obj.entries);
-      }
-    }
-  };
-
-  return state;
+  return new Proxy(state, handler);
 };
