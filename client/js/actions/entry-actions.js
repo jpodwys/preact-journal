@@ -9,9 +9,8 @@ function getEntries (el){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
-  let timestamp = localStorage.getItem('timestamp');
-  if(timestamp){
-    syncEntries(el, timestamp);
+  if(el.state.timestamp){
+    syncEntries(el, el.state.timestamp);
   } else {
     getAllEntries(el);
   }

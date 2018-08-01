@@ -45,9 +45,10 @@ function applyFilters (query, list) {
 };
 
 function clearLocalStorage () {
-  localStorage.removeItem('entries');
-  localStorage.removeItem('timestamp');
-  localStorage.removeItem('dark');
+  localStorage.clear();
+  // localStorage.removeItem('entries');
+  // localStorage.removeItem('timestamp');
+  // localStorage.removeItem('dark');
 };
 
 function getViewFromHref (href) {
