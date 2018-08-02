@@ -1,7 +1,7 @@
 import cookie from '../cookie';
 import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
 
-const persist = (obj, prop, value, oldVal) => {
+const persist = (obj, prop, value/*, oldVal*/) => {
   switch(prop) {
     case 'dark':        localStorage.setItem('dark', !!value);      return;
     case 'timestamp':   localStorage.setItem('timestamp', value);   return;
@@ -13,7 +13,7 @@ const persist = (obj, prop, value, oldVal) => {
   }
 };
 
-const compute = (obj, prop, value, oldVal) => {
+const compute = (obj, prop, value/*, oldVal*/) => {
   switch(prop) {
     case 'entries': // Fallthrough
     case 'filterText': {
@@ -33,10 +33,10 @@ const compute = (obj, prop, value, oldVal) => {
 
 const handler = {
   set: function(obj, prop, value) {
-    let oldVal = obj[prop];
+    // let oldVal = obj[prop];
     obj[prop] = value;
-    persist(obj, prop, value, oldVal);
-    compute(obj, prop, value, oldVal);
+    persist(obj, prop, value/*, oldVal*/);
+    compute(obj, prop, value/*, oldVal*/);
     return true;
   }
 };
