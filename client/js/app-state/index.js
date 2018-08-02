@@ -1,5 +1,45 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref } from '../utils';
+import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
+
+const persist = (obj, prop, value, oldVal) => {
+  switch(prop) {
+    case 'dark':        localStorage.setItem('dark', !!value);      return;
+    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
+    case 'entries': {
+      obj.entries = sortObjectsByDate(value);
+      localStorage.setItem('entries', JSON.stringify(obj.entries));
+      return;
+    }
+  }
+};
+
+const compute = (obj, prop, value, oldVal) => {
+  switch(prop) {
+    case 'entries': // Fallthrough
+    case 'filterText': {
+      // If the new query is a continuation of the prior query,
+      // fitler viewEntries for efficiency.
+      // let entries = 'entries';
+      // if(prop === 'filterText') {
+      //   const q = value.toLowerCase();
+      //   if(q.length > oldVal.length && q.indexOf(oldVal) === 0) entries = 'viewEntries';
+      // }
+      // obj.viewEntries = applyFilters(obj.filterText, obj[entries]);
+      obj.viewEntries = applyFilters(obj.filterText, obj.entries);
+      return;
+    }
+  }
+};
+
+const handler = {
+  set: function(obj, prop, value) {
+    let oldVal = obj[prop];
+    obj[prop] = value;
+    persist(obj, prop, value, oldVal);
+    compute(obj, prop, value, oldVal);
+    return true;
+  }
+};
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
@@ -8,6 +48,7 @@ export default function getInitialState () {
   if(entries) entries = sortObjectsByDate(entries);
   let viewEntries;
   if(entries) viewEntries = filterHiddenEntries(entries);
+  let timestamp = localStorage.getItem('timestamp') || undefined;
 
   let state = {
     scrollPosition: 0,
@@ -15,6 +56,7 @@ export default function getInitialState () {
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
+    timestamp: timestamp,
     entry: undefined,
     entryIndex: -1,
     entries: entries,
@@ -23,5 +65,5 @@ export default function getInitialState () {
     dark: localStorage.getItem('dark') === 'true'
   };
 
-  return state;
+  return new Proxy(state, handler);
 };

@@ -1,6 +1,5 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
-import persist from '../persist';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -9,9 +8,8 @@ function getEntries (el){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
-  let timestamp = localStorage.getItem('timestamp');
-  if(timestamp){
-    syncEntries(el, timestamp);
+  if(el.state.timestamp){
+    syncEntries(el, el.state.timestamp);
   } else {
     getAllEntries(el);
   }
@@ -27,10 +25,9 @@ function getAllEntries (el){
 };
 
 function getAllEntriesSuccess (el, response){
-  persist(el, {
+  el.setState({
     entries: response.entries,
-  }, function(){
-    localStorage.setItem('timestamp', response.timestamp);
+    timestamp: response.timestamp
   });
 };
 
@@ -87,13 +84,13 @@ function applySyncPatch (el, entries){
 };
 
 function persistSyncPatch (el, timestamp){
-  persist(el, {
-    entries: [].concat(el.state.entries)
-  }, function(){
+  el.setState({
+    entries: [].concat(el.state.entries),
+    timestamp: response.timestamp
+  }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
     }
-    localStorage.setItem('timestamp', timestamp);
   });
 };
 
@@ -105,7 +102,7 @@ function createEntry (el, { entry, clientSync }){
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
 
-  persist(el, {
+  el.setState({
     entry: entry,
     entries: [].concat(el.state.entries)
   });
@@ -113,9 +110,7 @@ function createEntry (el, { entry, clientSync }){
   if(!clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
-  persist(el, {
-    entries: [].concat(el.state.entries)
-  });
+  el.setState({ entries: [].concat(el.state.entries) });
 
   Entry.create(entry).then(response => {
     createEntrySuccess(el, entry.id, response);
@@ -135,7 +130,7 @@ function createEntrySuccess (el, oldId, response){
   delete el.state.entries[entryIndex].newEntry;
   delete el.state.entries[entryIndex].needsSync;
 
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
@@ -164,7 +159,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   el.state.entries[entryIndex][property] = entry[property];
   el.state.entries[entryIndex].needsSync = true;
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, el.state.entries[entryIndex]),
     entries: [].concat(el.state.entries)
   });
@@ -180,7 +175,7 @@ function updateEntrySuccess (el, id){
   let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
-  persist(el, {
+  el.setState({
     entry: Object.assign({}, entries[entryIndex]),
     entries: entries
   });
@@ -205,10 +200,10 @@ function deleteEntry (el, { id }){
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
 
-  persist(el, {
+  el.setState({
     entry: undefined,
     entries: [].concat(el.state.entries)
-  }, function(){
+  }, () => {
     if(el.state.view !== '/entries') route('/entries', true);
   });
 
@@ -221,9 +216,7 @@ function deleteEntry (el, { id }){
 
 function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  persist(el, {
-    entries: removeObjectByIndex(entryIndex, el.state.entries)
-  });
+  el.setState({ entries: removeObjectByIndex(entryIndex, el.state.entries) });
 };
 
 function deleteEntryFailure (el, err){
@@ -271,23 +264,8 @@ function filterByText (el, text, e){
   if(text === undefined && (!e || !e.target)) return;
   let query = text === undefined ? e.target.value : text;
   if(el.state.filterText === query) return;
-  if(!query) return el.setState({
-    filterText: '',
-    viewEntries: applyFilters('', el.state.entries)
-  });
-
-  // If the new query is a continuation of the prior query,
-  // fitler viewEntries for efficiency.
-  var q = query.toLowerCase();
-  var f = el.state.filterText;
-  var entries = (q.length > f.length && q.indexOf(f) === 0)
-    ? el.state.viewEntries
-    : el.state.entries;
-
-  el.setState({
-    filterText: query,
-    viewEntries: applyFilters(q, entries)
-  });
+  let filterText = query || '';
+  el.setState({ filterText });
 };
 
 function blurTextFilter (el){
