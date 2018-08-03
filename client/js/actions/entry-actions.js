@@ -61,14 +61,11 @@ function syncEntries (el, timestamp){
   syncClientEntries(el);
 };
 
-function syncEntriesSuccess (el, response){
-  if(response.entries.length === 0){
-    localStorage.setItem('timestamp', response.timestamp);
-    return;
-  }
+function syncEntriesSuccess (el, { entries, timestamp }){
+  if(entries.length === 0) return;
 
-  applySyncPatch(el, response.entries);
-  persistSyncPatch(el, response.timestamp);
+  applySyncPatch(el, entries);
+  persistSyncPatch(el, timestamp);
 };
 
 function applySyncPatch (el, entries){
@@ -86,7 +83,7 @@ function applySyncPatch (el, entries){
 function persistSyncPatch (el, timestamp){
   el.setState({
     entries: [].concat(el.state.entries),
-    timestamp: response.timestamp
+    timestamp: timestamp
   }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
@@ -256,6 +253,7 @@ function newEntry (el){
     id: Date.now(),
     date: new Date().toISOString().slice(0, 10),
     text: '',
+    favorited: 0,
     needsSync: true,
     newEntry: true
   };
