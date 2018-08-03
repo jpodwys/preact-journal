@@ -26,7 +26,7 @@ const compute = (obj, prop, value/*, oldVal*/) => {
       //   if(q.length > oldVal.length && q.indexOf(oldVal) === 0) entries = 'viewEntries';
       // }
       // obj.viewEntries = applyFilters(obj.filterText, obj[entries]);
-      obj.viewEntries = applyFilters(obj.filterText, obj.favorites, obj.entries);
+      obj.viewEntries = applyFilters(obj.filterText, /*obj.favorites,*/ obj.entries);
       return;
     }
   }

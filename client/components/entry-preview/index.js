@@ -33,11 +33,11 @@ export default class EntryPreview extends Component {
 
         <span class="nav-set right dark-fill entry-preview--icons">
           <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
-          {entry.favorited &&
-            <Icon icon="star-filled" key={entry.id + 'star'} onclick={this.copy}/>
+          {entry.favorited === 1 &&
+            <Icon icon="star-filled" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})}/>
           }
-          {!entry.favorited &&
-            <Icon icon="star-empty" key={entry.id + 'star'} onclick={this.copy}/>
+          {entry.favorited === 0 &&
+            <Icon icon="star-empty" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})}/>
           }
           {/* <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/> */}
         </span>

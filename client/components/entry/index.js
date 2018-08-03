@@ -43,9 +43,9 @@ export default class Entry extends Component {
     }
 
     var obj = {
+      entry: {},
       property: property,
-      entryId: this.props.entry.id,
-      entry: {}
+      entryId: this.props.entry.id
     }
     obj.entry[property] = e.target.innerText;
 

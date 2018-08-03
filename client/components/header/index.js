@@ -71,11 +71,11 @@ export default class Header extends Component {
   				  {(view === '/entry' || view === '/new') &&
   				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
   					}
-            {view === '/entry' && entry.favorited &&
-            	<Icon icon="star-filled" key={entry.id + 'star'} onclick={this.copy}/>
+            {view === '/entry' && entry.favorited === 1 &&
+            	<Icon icon="star-filled" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
-            {view === '/entry' && !entry.favorited &&
-              <Icon icon="star-empty" key={entry.id + 'star'} onclick={this.copy}/>
+            {view === '/entry' && entry.favorited === 0 &&
+              <Icon icon="star-empty" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
             {entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
             	<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>

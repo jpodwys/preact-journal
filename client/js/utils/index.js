@@ -34,6 +34,7 @@ function filterObjectsByText (query, list) {
 };
 
 function filterHiddenEntries (entries) {
+  if(!entries) return entries;
   return entries.filter(function(entry){
     return !entry.deleted;
   });

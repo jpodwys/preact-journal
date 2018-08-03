@@ -40,6 +40,17 @@ module.exports = function(Entry, sequelize){
     });
   }
 
+  self.getEntryById = function(id){
+    return Entry.findOne({
+      where: {id: id},
+      attributes: [
+        'id', 'ownerId', 'text', 'favorited',
+        [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
+      ],
+      raw: true
+    });
+  }
+
   self.createEntry = function(data, ownerId, deviceId){
     return new Promise(function (resolve, reject){
       Entry.create({

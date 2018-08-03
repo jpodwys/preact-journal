@@ -15,7 +15,8 @@ module.exports = function(Entry){
   self.getUpdatesSinceTimestamp = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
       if(!params.timestamp) return reject({status: 400, message: 'Timestamp is required.'});
-      Entry.getUpdatesSinceTimestamp(user.id, parseInt(params.timestamp, 10), user.deviceId).then(function (entries){
+      const timestamp = parseInt(params.timestamp, 10);
+      Entry.getUpdatesSinceTimestamp(user.id, timestamp, user.deviceId).then(function (entries){
         if(!entries) return reject({status: 500, message: 'There was an error.'});
         return resolve(entries);
       }, function (err){
@@ -24,21 +25,19 @@ module.exports = function(Entry){
     });
   }
 
-  self.getEntryById = function({body, query, params, user}){
-    return new Promise(function (resolve, reject){
-      var entryId = parseInt(params.id, 10);
-      Entry.getEntryById(entryId).then(function (entry){
-        if(!entry) return reject({status: 404, message: 'Entry not found.'});
-        if(user.id !== entry.ownerId){
-          return reject({status: 404, message: 'Entry not found.'});
-        }
-        delete entry.ownerId;
-        return resolve(entry);
-      }, function (err){
-        return reject({status: 500, message: err});
-      });
-    });
-  }
+  // self.getEntryById = function({body, query, params, user}){
+  //   return new Promise(function (resolve, reject){
+  //     var entryId = parseInt(params.id, 10);
+  //     Entry.getEntryById(entryId).then(function (entry){
+  //       if(!entry || user.id !== entry.ownerId){
+  //         return reject({status: 404, message: 'Entry not found.'});
+  //       }
+  //       return resolve(entry);
+  //     }, function (err){
+  //       return reject({status: 500, message: err});
+  //     });
+  //   });
+  // }
 
   self.createEntry = function({body, query, user}){
     return new Promise(function (resolve, reject){
@@ -54,8 +53,9 @@ module.exports = function(Entry){
     return new Promise(function (resolve, reject){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
-        if(!entry) return reject({status: 404, message: 'Entry not found.'});
-        if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
+        if(!entry || user.id !== entry.ownerId){
+          return reject({status: 404, message: 'Entry not found.'});
+        }
         Entry.updateEntry(entryId, body, user.deviceId).then(function (response){
           return resolve();
         }, function (err){
@@ -71,8 +71,9 @@ module.exports = function(Entry){
     return new Promise(function (resolve, reject){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
-        if(!entry) return reject({status: 404, message: 'Entry not found.'});
-        if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
+        if(!entry || user.id !== entry.ownerId){
+          return reject({status: 404, message: 'Entry not found.'});
+        }
         Entry.deleteEntry(params.id, user.deviceId).then(function (response){
           return resolve();
         }, function (err){

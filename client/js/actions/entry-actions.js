@@ -145,13 +145,21 @@ function createEntryFailure (el, oldId, err){
   console.log('createEntryFailure', err);
 };
 
+function toggleFavorite (el, { id, favorited }){
+  updateEntry(el, {
+    entryId: id,
+    property: 'favorited',
+    entry: { favorited: favorited ? 0 : 1 }
+  });
+};
+
 function updateEntry (el, { entry, property, entryId }){
   var val = entry[property];
   if(typeof val === 'string'){
     val = val.trim();
   }
 
-  entry[property] = entry[property];
+  // entry[property] = entry[property];
   var entryIndex = findObjectIndexById(entryId, el.state.entries);
   var current = el.state.entries[entryIndex][property];
   var next = entry[property];
@@ -290,5 +298,6 @@ export default {
   newEntry,
   filterByText,
   blurTextFilter,
-  shiftEntry
+  shiftEntry,
+  toggleFavorite
 };
