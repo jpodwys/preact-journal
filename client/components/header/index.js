@@ -27,7 +27,7 @@ export default class Header extends Component {
   	copyText(date + ' ' + text);
   }
 
-  render({view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark}) {
+  render({view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput, dark}) {
   	if(!loggedIn) return null;
   	let vw = window.innerWidth;
   	let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
@@ -68,14 +68,20 @@ export default class Header extends Component {
   				  {view === '/entries' && !showFilterInput &&
   				  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
   				  }
+            {view === '/entries' && filter === 'all' &&
+              <Icon icon="list" key="header-filter-all" onclick={fire('linkstate', {key: 'filter', val: 'favorites'})} class="fade-down"/>
+            }
+            {view === '/entries' && filter === 'favorites' &&
+              <Icon icon="star-filled" key="header-filter-favorites" onclick={fire('linkstate', {key: 'filter', val: 'all'})} class="fade-up"/>
+            }
   				  {(view === '/entry' || view === '/new') &&
   				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
   					}
             {view === '/entry' && entry.favorited === 1 &&
-            	<Icon icon="star-filled" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
+            	<Icon icon="star-filled" key="header-favorite" onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
             {view === '/entry' && entry.favorited === 0 &&
-              <Icon icon="star-empty" key={entry.id + 'star'} onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
+              <Icon icon="star-empty" key="header-favorite" onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
             {entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
             	<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>

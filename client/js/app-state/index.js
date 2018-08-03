@@ -15,8 +15,8 @@ const persist = (obj, prop, value/*, oldVal*/) => {
 
 const compute = (obj, prop, value/*, oldVal*/) => {
   switch(prop) {
+    case 'filter': // Fallthrough
     case 'entries': // Fallthrough
-    case 'favorites': // Fallthrough
     case 'filterText': {
       // If the new query is a continuation of the prior query,
       // fitler viewEntries for efficiency.
@@ -26,7 +26,7 @@ const compute = (obj, prop, value/*, oldVal*/) => {
       //   if(q.length > oldVal.length && q.indexOf(oldVal) === 0) entries = 'viewEntries';
       // }
       // obj.viewEntries = applyFilters(obj.filterText, obj[entries]);
-      obj.viewEntries = applyFilters(obj.filterText, /*obj.favorites,*/ obj.entries);
+      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.entries);
       return;
     }
   }
@@ -57,6 +57,7 @@ export default function getInitialState () {
     view: getViewFromHref(location.href),
     showFilterInput: false,
     filterText: '',
+    filter: 'all',
     loggedIn: loggedIn,
     timestamp: timestamp,
     entry: undefined,

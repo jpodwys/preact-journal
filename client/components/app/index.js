@@ -52,6 +52,7 @@ export default class App extends Component {
           loggedIn={state.loggedIn}
           viewEntries={state.viewEntries}
           entry={state.entry}
+          filter={state.filter}
           filterText={state.filterText}
           showFilterInput={state.showFilterInput}
           dark={state.dark}/>

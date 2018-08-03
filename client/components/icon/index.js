@@ -49,6 +49,11 @@ export default class Icon extends Component {
                 <path d="M12 17.3l6.2 3.7-1.7-7L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.5 14l-1.7 7z"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
               </g>
+      case 'list':
+        return <g>
+                <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                <path d="M0 0h24v24H0z" fill="none"/>
+              </g>
     }
   }
 

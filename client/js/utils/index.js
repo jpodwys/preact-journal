@@ -35,13 +35,17 @@ function filterObjectsByText (query, list) {
 
 function filterHiddenEntries (entries) {
   if(!entries) return entries;
-  return entries.filter(function(entry){
-    return !entry.deleted;
-  });
+  return entries.filter(entry => !entry.deleted);
 };
 
-function applyFilters (query, list) {
+function filterByFavorited (entries) {
+  if(!entries) return entries;
+  return entries.filter(entry => !!entry.favorited);
+};
+
+function applyFilters (query, filter, list) {
   list = filterHiddenEntries(list);
+  if(filter === 'favorites') list = filterByFavorited(list);
   return filterObjectsByText(query, list);
 };
 
