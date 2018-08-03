@@ -77,10 +77,10 @@ export default class Header extends Component {
   				  {(view === '/entry' || view === '/new') &&
   				  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
   					}
-            {view === '/entry' && entry && entry.favorited === 1 &&
+            {entry && !entry.newEntry && entry.favorited === 1 && (view === '/entry' || view === '/new') &&
             	<Icon icon="star-filled" key="header-favorite" onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
-            {view === '/entry' && entry && entry.favorited === 0 &&
+            {entry && !entry.newEntry && entry.favorited === 0 && (view === '/entry' || view === '/new') &&
               <Icon icon="star-empty" key="header-favorite" onclick={fire('toggleFavorite', {id: entry.id, favorited: entry.favorited})} class="fade-up"/>
             }
             {entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
