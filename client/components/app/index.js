@@ -29,6 +29,7 @@ export default class App extends Component {
   componentWillMount() {
     freedux(this, actions);
     fire('getEntries')();
+    // window.app = this;
   }
 
   componentDidMount() {

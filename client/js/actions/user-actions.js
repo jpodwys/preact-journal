@@ -47,7 +47,7 @@ function logout (el){
 
 function logoutSuccess (el){
   clearLocalStorage();
-  el.setState(getInitialState());
+  el.state = getInitialState();
   route('/');
 };
 
