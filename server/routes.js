@@ -17,7 +17,7 @@ module.exports = function(app){
   // app.delete('/user/:id')
   app.get('/api/entries/sync/:timestamp', app.restrict, entry.getUpdatesSinceTimestamp);
   app.get('/api/entries', app.restrict, entry.getAllEntriesByOwnerId);
-  app.get('/api/entry/:id', entry.getEntryById);
+  app.get('/api/entry/:id', app.restrict, entry.getEntryById);
   app.post('/api/entry', app.restrict, entry.createEntry);
   app.patch('/api/entry/:id', app.restrict, entry.updateEntry);
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
