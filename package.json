@@ -42,7 +42,7 @@
     "jsonwebtoken": "5.5.4",
     "mysql": "2.5.5",
     "nodemon": "1.8.1",
-    "preact": "^8.2.5",
+    "preact": "8.2.5",
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",
     "sequelize": "3.19.3",
