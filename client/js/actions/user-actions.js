@@ -13,7 +13,7 @@ function login (el, user){
 };
 
 function loginSuccess (el, user){
-  el.setState({
+  el.set({
     loggedIn: true,
   }, function(){
     route('/entries', true);
