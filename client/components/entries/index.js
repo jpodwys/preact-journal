@@ -7,7 +7,7 @@ import debounce from '../../js/debounce';
 export default class Entries extends Component {
   componentDidMount() {
     document.body.onscroll = debounce(() => {
-      fire('scrollBody', {scrollPosition: document.body.scrollTop})();
+      fire('linkstate', {key: 'scrollPosition', val: document.body.scrollTop})();
     }, 50);
   }
 

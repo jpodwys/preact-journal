@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
+import { findObjectIndexById, removeObjectByIndex } from '../utils';
 import { route } from '../../components/router';
 
 let dataFetched = false;
