@@ -25,8 +25,7 @@ history.pushState = (a, b, url) => {
 };
 
 export default class App extends Component {
-  state = getInitialState();
-  realState = getInitialState();
+  realState = this.state = getInitialState();
   
   componentWillMount() {
     freedux(this, actions);
