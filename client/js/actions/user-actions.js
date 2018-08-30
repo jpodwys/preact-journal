@@ -13,7 +13,7 @@ function login (el, user){
 };
 
 function loginSuccess (el, user){
-  el.setState({
+  el.set({
     loggedIn: true,
   }, function(){
     route('/entries', true);
@@ -47,7 +47,7 @@ function logout (el){
 
 function logoutSuccess (el){
   clearLocalStorage();
-  el.state = getInitialState();
+  el.realState = el.state = getInitialState();
   route('/');
 };
 

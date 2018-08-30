@@ -5,7 +5,7 @@ import { route } from '../../components/router';
 export default function handleRouteChange (url) {
   let view = getViewFromHref(url);
   if(view !== '/' && !this.state.loggedIn) route('/', true);
-  this.setState({view: view});
+  this.set({view: view});
   handleRoute.call(this, view, url);
   if(this.state.toastConfig) fire('linkstate', {key: 'toastConfig'})();
 };
@@ -28,7 +28,7 @@ function handleEntriesView (url) {
   if(Array.isArray(this.state.entries)){
     let entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
-      this.setState({
+      this.set({
         entries: removeObjectByIndex(0, this.state.entries)
       });
     }

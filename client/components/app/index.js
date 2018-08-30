@@ -14,6 +14,7 @@ import fire from '../../js/fire';
 import handleRouteChange from '../../js/route-handlers';
 import swipe from '../../js/swipe';
 import arrow from '../../js/arrow';
+import { merge } from '../../js/utils';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -24,7 +25,7 @@ history.pushState = (a, b, url) => {
 };
 
 export default class App extends Component {
-  state = getInitialState();
+  realState = this.state = getInitialState();
   
   componentWillMount() {
     freedux(this, actions);
@@ -40,6 +41,12 @@ export default class App extends Component {
 
   componentWillUpdate() {
     fire('getEntries')();
+  }
+
+  set(delta, cb) {
+    merge(this.realState, delta);
+    this.setState(this.realState, cb);
+    this.state = this.realState;
   }
 
   render(props, state) {
@@ -61,7 +68,7 @@ export default class App extends Component {
             <Login path="/"/>
             <Entries path="/entries"
               scrollPosition={state.scrollPosition}
-              entries={state.viewEntries}/>
+              viewEntries={state.viewEntries}/>
             <Entry path="/entry/:id"
               view={state.view}
               entry={state.entry}

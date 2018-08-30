@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex, applyFilters } from '../utils';
+import { findObjectIndexById, removeObjectByIndex } from '../utils';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -25,7 +25,7 @@ function getAllEntries (el){
 };
 
 function getAllEntriesSuccess (el, response){
-  el.setState({
+  el.set({
     entries: response.entries,
     timestamp: response.timestamp
   });
@@ -84,7 +84,7 @@ function applySyncPatch (el, entries){
 };
 
 function persistSyncPatch (el, timestamp){
-  el.setState({
+  el.set({
     entries: [].concat(el.state.entries),
     timestamp: response.timestamp
   }, () => {
@@ -102,7 +102,7 @@ function createEntry (el, { entry, clientSync }){
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
   el.state.entries[entryIndex] = entry;
 
-  el.setState({
+  el.set({
     entry: entry,
     entries: [].concat(el.state.entries)
   });
@@ -110,7 +110,7 @@ function createEntry (el, { entry, clientSync }){
   if(!clientSync && entry.postPending) return;
 
   el.state.entries[entryIndex].postPending = true;
-  el.setState({ entries: [].concat(el.state.entries) });
+  el.set({ entries: [].concat(el.state.entries) });
 
   Entry.create(entry).then(response => {
     createEntrySuccess(el, entry.id, response);
@@ -130,7 +130,7 @@ function createEntrySuccess (el, oldId, response){
   delete el.state.entries[entryIndex].newEntry;
   delete el.state.entries[entryIndex].needsSync;
 
-  el.setState({
+  el.set({
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
@@ -139,7 +139,7 @@ function createEntrySuccess (el, oldId, response){
 function createEntryFailure (el, oldId, err){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
-  el.setState({
+  el.set({
     entries: [].concat(el.state.entries)
   });
   console.log('createEntryFailure', err);
@@ -159,7 +159,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   el.state.entries[entryIndex][property] = entry[property];
   el.state.entries[entryIndex].needsSync = true;
-  el.setState({
+  el.set({
     entry: Object.assign({}, el.state.entries[entryIndex]),
     entries: [].concat(el.state.entries)
   });
@@ -175,7 +175,7 @@ function updateEntrySuccess (el, id){
   let entries = [].concat(el.state.entries);
   var entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
-  el.setState({
+  el.set({
     entry: Object.assign({}, entries[entryIndex]),
     entries: entries
   });
@@ -200,7 +200,7 @@ function deleteEntry (el, { id }){
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
 
-  el.setState({
+  el.set({
     entry: undefined,
     entries: [].concat(el.state.entries)
   }, () => {
@@ -216,7 +216,7 @@ function deleteEntry (el, { id }){
 
 function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  el.setState({ entries: removeObjectByIndex(entryIndex, el.state.entries) });
+  el.set({ entries: removeObjectByIndex(entryIndex, el.state.entries) });
 };
 
 function deleteEntryFailure (el, err){
@@ -237,7 +237,7 @@ function setEntry (el, { id }){
   var entryIndex = findObjectIndexById(parseInt(id), el.state[collection]);
   var entry = el.state[collection][entryIndex];
 
-  el.setState({
+  el.set({
     entry: entry,
     entryIndex: entryIndex
   });
@@ -252,7 +252,7 @@ function newEntry (el){
     newEntry: true
   };
 
-  el.setState({
+  el.set({
     entry: entry,
     entries: [entry].concat(el.state.entries)
   }, function(){
@@ -265,12 +265,12 @@ function filterByText (el, text, e){
   let query = text === undefined ? e.target.value : text;
   if(el.state.filterText === query) return;
   let filterText = query || '';
-  el.setState({ filterText });
+  el.set({ filterText });
 };
 
 function blurTextFilter (el){
   if(!el.state.filterText){
-    el.setState({showFilterInput: false});
+    el.set({showFilterInput: false});
   }
 };
 

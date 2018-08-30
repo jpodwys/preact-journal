@@ -34,7 +34,7 @@ function filterObjectsByText (query, list) {
   }, []);
 };
 
-function filterHiddenEntries (entries) {
+function filterHiddenEntries (entries = []) {
   return entries.filter(function(entry){
     return !entry.deleted;
   });
@@ -59,6 +59,11 @@ function getViewFromHref (href) {
     : href;
 };
 
+function merge (obj, props) {
+  for (let i in props) obj[i] = props[i];
+  return obj;
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
@@ -67,5 +72,6 @@ export {
   filterHiddenEntries,
   applyFilters,
   clearLocalStorage,
-  getViewFromHref
+  getViewFromHref,
+  merge
 };
