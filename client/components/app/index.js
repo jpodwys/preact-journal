@@ -68,7 +68,7 @@ export default class App extends Component {
             <Login path="/"/>
             <Entries path="/entries"
               scrollPosition={state.scrollPosition}
-              entries={state.viewEntries}/>
+              viewEntries={state.viewEntries}/>
             <Entry path="/entry/:id"
               view={state.view}
               entry={state.entry}
