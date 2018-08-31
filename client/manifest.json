@@ -9,8 +9,8 @@
   "description": "Private journal entries.",
   "icons": [
     {
-      "src": "/icon-384x384.png",
-      "sizes": "384x384",
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]
