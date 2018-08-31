@@ -1,7 +1,7 @@
 {
   "name": "Journalize",
   "short_name": "Journalize",
-  "theme_color": "#5776d0",
+  "theme_color": "#8fb5f3",
   "display": "standalone",
   "start_url": "/",
   "orientation": "portrait",
