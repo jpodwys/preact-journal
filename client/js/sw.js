@@ -3,7 +3,7 @@ let CACHE = 'preact-journal';
  
 self.addEventListener('install', function(e) {
   e.waitUntil(caches.open(CACHE).then(function (cache) {
-    cache.addAll(['/', '/manifest.json', '/favicon.ico', '/icon-128x128.png']);
+    cache.addAll(['/', '/manifest.json', '/favicon.ico', '/icon-512x512.png']);
   }));
 });
  
