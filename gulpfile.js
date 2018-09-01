@@ -56,6 +56,7 @@ function inline() {
   return gulp.src('client/index.html')
     .pipe(htmlmin({
       collapseWhitespace: true,
+      removeComments: true,
       minifyCSS: true
     }))
     .pipe(inlinesource({
