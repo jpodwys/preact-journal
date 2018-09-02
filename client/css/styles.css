@@ -1,3 +1,11 @@
+/* Variables */
+
+:root {
+  --theme-blue: #4285F4;
+  --theme-white: #fff;
+  --theme-dark-text: #ccc;
+}
+
 /* Global */
 
 * {
@@ -32,7 +40,7 @@ a, a:visited {
 }
 
 svg {
-  fill: #FFF;
+  fill: var(--theme-white);
   height: 24px;
   width: 24px;
   /*transition: fill .35s ease;*/
@@ -107,7 +115,7 @@ svg {
 .mdl-button {
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--theme-white);
   position: relative;
   height: 50px;
   padding: 0 16px;
@@ -153,8 +161,8 @@ svg {
 
 .login-form-wrapper input[type=submit] {
   cursor: pointer;
-  background-color: #0078e7;
-  color: #fff;
+  background-color: var(--theme-blue);
+  color: var(--theme-white);
   box-shadow: none;
   border: none;
 }
@@ -212,20 +220,20 @@ svg {
 }
 
 .entry-preview .entry-link {
-  color: #5776d0;
+  color: var(--theme-blue);
 }
 
 /* Header */
 
 header {
-  color: #fff;
+  color: var(--theme-white);
   position: fixed;
   z-index: 1;
   left: 0;
   top: 0;
   right: 0;
   height: 50px;
-  background-color: #5776d0;
+  background-color: var(--theme-blue);
 }
 
 header > .inner-header {
@@ -262,18 +270,18 @@ header .nav-set > *:not(h1) {
   border: none;
   outline: 0;
   border: 0;
-  color: #fff;
+  color: var(--theme-white);
 }
 
 .search-form input::placeholder {
-  color: #fff;
+  color: var(--theme-white);
 }
 
 .button--fab.add-entry {
   position: fixed;
   bottom: 25px;
   right: 25px;
-  background-color: #5776d0;
+  background-color: var(--theme-blue);
   transition: bottom linear .1s;
 }
 
@@ -340,7 +348,7 @@ toast {
   bottom: -50px;
   transition: bottom linear .1s;
   z-index: 2;
-  color: #fff;
+  color: var(--theme-white);
   width: 100%;
   max-width: 450px;
 }
@@ -359,7 +367,7 @@ toast.show {
 
 .app.dark {
   background-color: #000;
-  color: #fff;
+  color: var(--theme-white);
 }
 
 .app.dark header {
@@ -379,11 +387,11 @@ toast.show {
 }
 
 .app.dark .entry-text {
-  color: #ccc;
+  color: var(--theme-dark-text);
 }
 
 .app.dark .list-item .second-row {
-  color: #ccc;
+  color: var(--theme-dark-text);
 }
 
 .app.dark .button--fab.add-entry {
