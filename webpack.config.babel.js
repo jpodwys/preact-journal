@@ -1,7 +1,5 @@
-const webpack = require('webpack');
 const { resolve } = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
 const dist = resolve('dist');
 
 module.exports = {
@@ -34,7 +32,7 @@ module.exports = {
               }
             }],
             'stage-0'
-          ],
+          ]
         }
       }
     ]
