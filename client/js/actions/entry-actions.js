@@ -86,7 +86,7 @@ function applySyncPatch (el, entries){
 function persistSyncPatch (el, timestamp){
   el.set({
     entries: [].concat(el.state.entries),
-    timestamp: response.timestamp
+    timestamp: timestamp
   }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
