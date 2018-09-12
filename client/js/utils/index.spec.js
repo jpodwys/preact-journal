@@ -12,7 +12,7 @@ import {
 
 describe('utils', () => {
 
-	describe('findObjectIndexById', () => {
+  describe('findObjectIndexById', () => {
     const list = [ { id: 0 }, { id: 1 }, { id: 2 } ];
 
 		it('should return the index of the object with the provided id', () => {
