@@ -97,7 +97,7 @@ describe('utils', () => {
     });
   });
 
-  /* I need to spend more time with this test. It passes no matter what I provide to calledWithExactly. */
+  /* I need to spend more time with this test. The spies are incorrect somehow. */
   // describe('applyFilters', () => {
   //   const list = [ { deleted: '1' }, { date: '1', text: '' } ];
 
@@ -105,8 +105,8 @@ describe('utils', () => {
   //     const filterHiddenEntriesSpy = sinon.spy(filterHiddenEntries);
   //     const filterObjectsByTextSpy = sinon.spy(filterObjectsByText);
   //     applyFilters('query', list);
-  //     expect(filterHiddenEntriesSpy.calledWithExactly(list));
-  //     expect(filterObjectsByTextSpy.calledWithExactly('query', list));
+  //     expect(filterHiddenEntriesSpy.calledWithExactly(list)).to.be.true;
+  //     // expect(filterObjectsByTextSpy.calledWithExactly('query', list)).to.be.true;
   //   });
   // });
 
