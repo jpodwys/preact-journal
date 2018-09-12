@@ -15,19 +15,19 @@ describe('utils', () => {
   describe('findObjectIndexById', () => {
     const list = [ { id: 0 }, { id: 1 }, { id: 2 } ];
 
+    it('should return -1 when an object with the given id is not found', () => {
+      expect(findObjectIndexById(3, list)).to.equal(-1);
+    });
+
 		it('should return the index of the object with the provided id', () => {
 			expect(findObjectIndexById(1, list)).to.equal(1);
     });
-    
-    it('should return -1 when an object with the given id is not found', () => {
-			expect(findObjectIndexById(3, list)).to.equal(-1);
-		});
   });
 
   describe('removeObjectByIndex', () => {
     let list = [ { id: 0 }, { id: 1 }, { id: 2 } ];
     
-    it('should the item at the given index', () => {
+    it('should remove the item at the given index', () => {
       removeObjectByIndex(1, list);
 			expect(list[1].id).to.equal(2);
 		});

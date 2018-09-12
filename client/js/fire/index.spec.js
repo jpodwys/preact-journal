@@ -5,7 +5,7 @@ describe('fire', () => {
   const spy = sinon.spy();
   document.addEventListener(EVENT_NAME, spy);
 
-  it('should return a function and should not fire an event', () => {
+  it('should return a function without firing an event', () => {
     expect(typeof fire(EVENT_NAME)).to.equal('function');
     expect(spy.calledOnce).to.be.false;
   });
