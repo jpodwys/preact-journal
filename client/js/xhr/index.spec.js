@@ -15,7 +15,7 @@ describe('xhr', () => {
   });
 
   it('should add default config', (done) => {
-    xhr('get-200').then((response) => {
+    xhr('get-200').then(() => {
       const options = fetchMock.lastOptions();
       expect(options.credentials).to.equal('same-origin');
       expect(Object.keys(options.headers).length).to.equal(2);
