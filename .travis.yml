@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 
 language: node_js
 
@@ -8,6 +8,12 @@ node_js:
 cache:
   directories:
     - node_modules
+
+addons:
+  chrome: stable
+before_script:
+  - "sudo chown root /opt/google/chrome/chrome-sandbox"
+  - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
 
 # Make chrome browser available for testing
 before_install:
@@ -20,4 +26,3 @@ install:
 
 script:
   - npm test
-  
