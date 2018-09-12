@@ -6,7 +6,7 @@ module.exports = function(config) {
 		frameworks: [ 'mocha', 'chai', 'sinon' ],
 		reporters: [ 'mocha' ],
 		browsers: [ 'ChromeHeadless' ],
-    files: [ 'client/js/**/*.spec.js' ],
+		files: [ 'client/js/**/*.spec.js' ],
 		preprocessors: { 'client/js/**/*.js': [ 'webpack' ] }
 	});
 };
