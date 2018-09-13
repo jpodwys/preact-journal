@@ -1,9 +1,9 @@
 export default function(url, config = {}) {
   config.credentials = 'same-origin';
-  config.headers = new Headers({
+  config.headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  });
+  };
   if(config.body) config.body = JSON.stringify(config.body);
 
   return fetch(url, config).then(res => {
