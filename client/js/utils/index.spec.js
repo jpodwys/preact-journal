@@ -19,8 +19,8 @@ describe('utils', () => {
       expect(findObjectIndexById(3, list)).to.equal(-1);
     });
 
-		it('should return the index of the object with the provided id', () => {
-			expect(findObjectIndexById(1, list)).to.equal(1);
+    it('should return the index of the object with the provided id', () => {
+      expect(findObjectIndexById(1, list)).to.equal(1);
     });
   });
 
@@ -29,8 +29,8 @@ describe('utils', () => {
     
     it('should remove the item at the given index', () => {
       removeObjectByIndex(1, list);
-			expect(list[1].id).to.equal(2);
-		});
+      expect(list[1].id).to.equal(2);
+    });
   });
 
   describe('sortObjectsByDate', () => {
@@ -41,7 +41,7 @@ describe('utils', () => {
       expect(list[0].date).to.equal('2');
       expect(list[1].date).to.equal('1');
       expect(list[2].date).to.equal('0');
-		});
+    });
   });
 
   describe('filterObjectsByText', () => {
@@ -79,7 +79,7 @@ describe('utils', () => {
       expect(filtered.length).to.equal(2);
       expect(filtered[0].date).to.equal('2');
       expect(filtered[1].date).to.equal('c');
-		});
+    });
   });
 
   describe('filterHiddenEntries', () => {
@@ -117,7 +117,7 @@ describe('utils', () => {
       clearLocalStorage();
       expect(localStorage.clear.calledOnce);
       localStorage.clear.restore();
-		});
+    });
   });
 
   describe('getViewFromHref', () => {
