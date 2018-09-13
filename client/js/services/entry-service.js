@@ -15,8 +15,8 @@ function create (entry) {
   });
 };
 
-function update (entryId, entry) {
-  return xhr('/api/entry/' + entryId, {
+function update (id, entry) {
+  return xhr('/api/entry/' + id, {
     method: 'PATCH',
     body: entry
   });

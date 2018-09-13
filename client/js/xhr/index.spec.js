@@ -2,10 +2,16 @@ import fetchMock from 'fetch-mock';
 import xhr from './index';
 
 describe('xhr', () => {
-  fetchMock.get('get-200', { hello: 'world' });
-  fetchMock.get('get-204', 204);
-  fetchMock.post('post-204', 204);
-  fetchMock.get('get-300', 300);
+  before(() => {
+    fetchMock.get('get-200', { hello: 'world' });
+    fetchMock.get('get-204', 204);
+    fetchMock.post('post-204', 204);
+    fetchMock.get('get-300', 300);
+  });
+
+  after(() => {
+    fetchMock.restore();
+  });
 
   it('should make a GET request and receive a response that is automatically parsed as JSON', (done) => {
     xhr('get-200').then((response) => {
@@ -36,6 +42,7 @@ describe('xhr', () => {
     xhr('get-204', { body: { a: 'a' } }).then(() => {
       const options = fetchMock.lastOptions();
       expect(typeof options.body).to.equal('string');
+      expect(JSON.parse(options.body).a).to.equal('a');
       done();
     }).catch(done);
   });
