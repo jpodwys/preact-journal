@@ -22,7 +22,7 @@ module.exports = function(config) {
         ]
       }
     },
-    reporters: [ 'progress', 'coverage-istanbul' ],
+    reporters: [ 'mocha', 'coverage-istanbul' ],
 
     coverageIstanbulReporter: {
       reports: ['text', 'html' ],
