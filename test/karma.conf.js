@@ -1,19 +1,32 @@
-// require('babel-register');
+const path = require('path');
 
 module.exports = function(config) {
   config.set({
     basePath: '../',
+    files: [ './test/index.js' ],
+    preprocessors: { './test/index.js': 'webpack' },
     frameworks: [ 'mocha', 'chai', 'sinon' ],
-    reporters: [ 'mocha', /*'progress',*/ 'coverage' ],
     browsers: [ 'ChromeHeadless' ],
-    files: [ 'client/js/**/*.spec.js' ],
-    preprocessors: { 'client/js/**/*.js': [ 'webpack', 'coverage' ] },
-    /* Reporting is way off right now. */
-    // coverageReporter: {
-    //   reporters: [
-    //     { type: 'text' },
-    //     { type: 'html' }
-    //   ]
-    // }
+    webpack: {
+      module: {
+        rules: [
+          {
+            test: /\.js$/,
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            },
+            enforce: 'post',
+            exclude: /node_modules|\/test|\.spec\.js$/,
+          }
+        ]
+      }
+    },
+    reporters: [ 'progress', 'coverage-istanbul' ],
+
+    coverageIstanbulReporter: {
+      reports: ['text', 'html' ],
+      // fixWebpackSourcePaths: true
+    }
   });
 };
