@@ -33,7 +33,9 @@ describe('arrow', () => {
 
   beforeEach(() => {
     cb = sinon.spy();
-    document.addEventListener('shiftEntry', cb);
+    document.addEventListener('shiftEntry', (e) => {
+      cb(e.detail[0]);
+    });
   });
 
   afterEach(() => {
@@ -85,7 +87,7 @@ describe('arrow', () => {
     emit(LEFT);
     setTimeout(() => {
       expect(cb.called).to.be.true;
-      // expect(cb.args[0].detail).to.equal(-1);
+      expect(cb.calledWithExactly(-1)).to.be.true;
       done();
     });
   });
@@ -95,7 +97,7 @@ describe('arrow', () => {
     emit(RIGHT);
     setTimeout(() => {
       expect(cb.called).to.be.true;
-      // expect(cb.args[0].detail).to.equal(1);
+      expect(cb.calledWithExactly(1)).to.be.true;
       done();
     });
   });
