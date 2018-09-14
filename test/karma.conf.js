@@ -23,10 +23,25 @@ module.exports = function(config) {
       }
     },
     reporters: [ 'mocha', 'coverage-istanbul' ],
-
     coverageIstanbulReporter: {
       reports: ['text', 'html' ],
       // fixWebpackSourcePaths: true
-    }
+    },
+    /* This doesn't seem to do anything right now. */
+    // thresholds: {
+    //   emitWarning: false,
+    //   global: {
+    //     statements: 90,
+    //     lines: 90,
+    //     branches: 80,
+    //     functions: 90
+    //   },
+    //   each: {
+    //     statements: 90,
+    //     lines: 90,
+    //     branches: 50, // :(
+    //     functions: 90
+    //   }
+    // }
   });
 };
