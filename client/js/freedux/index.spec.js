@@ -28,6 +28,7 @@ describe('freedux', () => {
   it('should call the action with the fired event name', () => {
     fire('create')();
     expect(actions.create.calledOnce).to.be.true;
+    expect(actions.create.calledWithExactly(el, undefined, undefined)).to.be.true;
   });
 
   it('should pass the correct data to the action', () => {

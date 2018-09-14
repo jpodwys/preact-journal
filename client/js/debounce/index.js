@@ -11,6 +11,5 @@ export default function debounce (func, wait) {
     };
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
-    if (!timeout) func.apply(context, args);
   };
 };
