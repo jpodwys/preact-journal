@@ -14,7 +14,7 @@ exports.swipeStart = function(e) {
   e = e ? e : window.event;
   e = ('changedTouches' in e)?e.changedTouches[0] : e;
   touchStartCoords = {'x':e.pageX, 'y':e.pageY};
-  startTime = new Date().getTime();
+  startTime = Date.now();
 }
 
 exports.swipeEnd = function(e) {
