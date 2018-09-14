@@ -34,13 +34,18 @@ describe('utils', () => {
   });
 
   describe('sortObjectsByDate', () => {
-    const list = [ { date: '1' }, { date: '0' }, { date: '2' } ];
-    
+    it('should return an empty array when passed undefined', () => {
+      const sorted = sortObjectsByDate();
+      expect(Array.isArray(sorted)).to.be.true;
+      expect(sorted.length).to.equal(0);
+    });
+
     it('should sort object by descending date', () => {
+      const list = [ { date: '1' }, { date: '0' }, { date: '2' } ];
       const sorted = sortObjectsByDate(list);
-      expect(list[0].date).to.equal('2');
-      expect(list[1].date).to.equal('1');
-      expect(list[2].date).to.equal('0');
+      expect(sorted[0].date).to.equal('2');
+      expect(sorted[1].date).to.equal('1');
+      expect(sorted[2].date).to.equal('0');
     });
   });
 
@@ -80,6 +85,13 @@ describe('utils', () => {
       expect(filtered[0].date).to.equal('2');
       expect(filtered[1].date).to.equal('c');
     });
+
+    it('should chop entry text and prefix it with ellipses when the matched text query is > 40 characters into the entry', () => {
+      const list = [ { date: '1', text: 'should chop entry text and prefix it with ellipses' } ];
+      const filtered = filterObjectsByText('ellipses', list);
+      expect(filtered.length).to.equal(1);
+      expect(filtered[0].previewText).to.equal('...ould chop entry text and prefix it with ellipses');
+    });
   });
 
   describe('filterHiddenEntries', () => {
@@ -98,22 +110,26 @@ describe('utils', () => {
   });
 
   /* I need to spend more time with this test. The spies are incorrect somehow. */
-  // describe('applyFilters', () => {
-  //   const list = [ { deleted: '1' }, { date: '1', text: '' } ];
+  describe('applyFilters', () => {
+    const query = 'query';
+    const list = [
+      { deleted: '1' },
+      { date: '1', text: '' },
+      { date: '1', text: 'query' },
+      { date: 'query', text: '1' }
+    ];
 
-  //   it('should call filterHiddenEntries and filterObjectsByText', () => {
-  //     const filterHiddenEntriesSpy = sinon.spy(filterHiddenEntries);
-  //     const filterObjectsByTextSpy = sinon.spy(filterObjectsByText);
-  //     applyFilters('query', list);
-  //     expect(filterHiddenEntriesSpy.calledWithExactly(list)).to.be.true;
-  //     // expect(filterObjectsByTextSpy.calledWithExactly('query', list)).to.be.true;
-  //   });
-  // });
+    it('should call filterHiddenEntries and filterObjectsByText', () => {
+      const filtered = applyFilters(query, list);
+      expect(filtered.length).to.equal(2);
+      expect(filtered[0].text).to.equal(query);
+      expect(filtered[1].date).to.equal(query);
+    });
+  });
 
   describe('clearLocalStorage', () => {
-    sinon.spy(localStorage, 'clear');
-    
     it('should clear localStorage', () => {
+      sinon.spy(localStorage, 'clear');
       clearLocalStorage();
       expect(localStorage.clear.calledOnce);
       localStorage.clear.restore();
