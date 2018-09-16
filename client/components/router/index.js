@@ -40,7 +40,10 @@ const route = function(url, replace){
 };
 
 class Router extends Component {
-  state = {url: location.pathname};
+  constructor() {
+    super();
+    this.state = { url: location.pathname };
+  }
 
   shouldComponentUpdate({ onChange }, { url }) {
     return url !== this.props.url || onChange !== this.props.onChange;
