@@ -27,7 +27,7 @@ history.pushState = (a, b, url) => {
 export default class App extends Component {
   constructor() {
     super();
-    realState = this.state = getInitialState();
+    this.realState = this.state = getInitialState();
   }
   
   componentWillMount() {
