@@ -7,7 +7,10 @@ describe('actions', () => {
   let el;
 
   function getElStub() {
-    return { set: sinon.spy() };
+    return {
+      state: { bogus: 'value' },
+      set: sinon.spy()
+    };
   };
 
   beforeEach(() => {
@@ -41,7 +44,7 @@ describe('actions', () => {
 
     describe('login', () => {
 
-      it('should clear localStorage, login, and route to /entries', (done) => {
+      it('should clear localStorage, login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 204 }));
         localStorage.setItem('bogus', 'value');
         User.login(el, { username: 'bogus', password: 'value' });
@@ -53,6 +56,50 @@ describe('actions', () => {
           done();
         });
       });
+
+      // it('should fail login when...', (done) => {
+
+      // });
+
+    });
+
+    describe('create', () => {
+
+      it('should clear localStorage, create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
+        fetchMock.post('/api/user', Promise.resolve({ status: 204 }));
+        localStorage.setItem('bogus', 'value');
+        User.createAccount(el, { username: 'bogus', password: 'value' });
+        setTimeout(() => {
+          expect(localStorage.getItem('bogus')).to.be.null;
+          expect(el.set.called).to.be.true;
+          expect(el.set.args[0][0].loggedIn).to.be.true;
+          expect(typeof el.set.args[0][1]).to.equal('function');
+          done();
+        });
+      });
+
+      // it('should fail login when...', (done) => {
+
+      // });
+
+    });
+
+    describe('logout', () => {
+
+      it('should clear localStorage, reset state, and route back to / (the login page)', (done) => {
+        fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
+        localStorage.setItem('bogus', 'value');
+        User.logout(el);
+        setTimeout(() => {
+          expect(localStorage.getItem('bogus')).to.be.null;
+          expect(el.state.bogus).to.be.undefined;
+          done();
+        });
+      });
+
+      // it('should fail login when...', (done) => {
+
+      // });
 
     });
 
