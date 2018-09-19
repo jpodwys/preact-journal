@@ -11,6 +11,8 @@ var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or
     elapsedTime = 0;// Elapsed time between swipeStart and swipeEnd
 
 function swipeStart(e) {
+  e = e ? e : window.event;
+  e = ('changedTouches' in e) ? e.changedTouches[0] : e;
   touchStartCoords = { x: e.pageX, y: e.pageY };
   startTime = Date.now();
 }
@@ -18,6 +20,8 @@ function swipeStart(e) {
 function swipeEnd(e) {
   let el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
+  e = e ? e : window.event;
+  e = ('changedTouches' in e) ? e.changedTouches[0] : e;
   touchEndCoords = { x: e.pageX - touchStartCoords.x, y: e.pageY - touchStartCoords.y };
   elapsedTime = Date.now() - startTime;
   if (elapsedTime <= maxAllowedTime){
