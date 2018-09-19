@@ -7,17 +7,12 @@ describe('services', () => {
   describe('userService', () => {
     const fakeUser = { username: 'u', password: 'p' };
 
-    before(() => {
-      fetchMock.postOnce('/api/user', 204);
-      fetchMock.postOnce('/api/user/login', 204);
-      fetchMock.postOnce('/api/user/logout', 204);
-    });
-
-    after(() => {
+    afterEach(() => {
       fetchMock.restore();
     });
 
     it('should call the create endpoint with a user object', (done) => {
+      fetchMock.post('/api/user', 204);
       User.create(fakeUser).then(() => {
         const options = fetchMock.lastOptions();
         expect(typeof options.body).to.equal('string');
@@ -27,6 +22,7 @@ describe('services', () => {
     });
 
     it('should call the login endpoint with a user object', (done) => {
+      fetchMock.post('/api/user/login', 204);
       User.login(fakeUser).then(() => {
         const options = fetchMock.lastOptions();
         expect(typeof options.body).to.equal('string');
@@ -36,6 +32,7 @@ describe('services', () => {
     });
 
     it('should call the logout endpoint', (done) => {
+      fetchMock.post('/api/user/logout', 204);
       User.logout().then(done).catch(done);
     });
       
