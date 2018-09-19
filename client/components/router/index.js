@@ -29,18 +29,21 @@ const clickListener = function(e) {
 
 const popstateListener = function(e) {
   if(ONCHANGE) ONCHANGE(location.pathname);
-  if(ROUTER) ROUTER.setState({url: location.pathname});
+  if(ROUTER) ROUTER.setState({ url: location.pathname });
 };
 
 const route = function(url, replace){
   if(ONCHANGE) ONCHANGE(url);
-  if(ROUTER) ROUTER.setState({url: url});
+  if(ROUTER) ROUTER.setState({ url: url });
   let func = replace ? 'replace' : 'push';
   history[func + 'State'](null, null, url);
 };
 
 class Router extends Component {
-  state = {url: location.pathname};
+  constructor() {
+    super();
+    this.state = { url: location.pathname };
+  }
 
   shouldComponentUpdate({ onChange }, { url }) {
     return url !== this.props.url || onChange !== this.props.onChange;

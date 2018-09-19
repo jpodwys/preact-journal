@@ -5,9 +5,9 @@ import { route } from '../../components/router';
 export default function handleRouteChange (url) {
   let view = getViewFromHref(url);
   if(view !== '/' && !this.state.loggedIn) route('/', true);
-  this.set({view: view});
+  this.set({ view: view });
   handleRoute.call(this, view, url);
-  if(this.state.toastConfig) fire('linkstate', {key: 'toastConfig'})();
+  if(this.state.toastConfig) fire('linkstate', { key: 'toastConfig' })();
 };
 
 function handleRoute (view, url) {

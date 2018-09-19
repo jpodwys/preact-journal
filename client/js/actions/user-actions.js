@@ -5,14 +5,14 @@ import { clearLocalStorage } from '../utils';
 
 function login (el, user){
   clearLocalStorage();
-  User.login(user).then(user => {
-    loginSuccess(el, user);
+  User.login(user).then(() => {
+    loginSuccess(el);
   }).catch(err => {
     loginFailure(el, err);
   });
 };
 
-function loginSuccess (el, user){
+function loginSuccess (el){
   el.set({
     loggedIn: true,
   }, function(){
@@ -26,8 +26,8 @@ function loginFailure (el, err){
 
 function createAccount (el, user){
   clearLocalStorage();
-  User.create(user).then(user => {
-    loginSuccess(el, user);
+  User.create(user).then(() => {
+    loginSuccess(el);
   }).catch(err => {
     createAccountFailure(el, err);
   });
