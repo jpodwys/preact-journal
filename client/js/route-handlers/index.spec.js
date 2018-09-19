@@ -1,7 +1,7 @@
 import handleRouteChange from './index';
   
 describe('routeHandlers', () => {
-	it('should', () => {
+  it('should', () => {
     expect(true).to.be.true;
   });
 });

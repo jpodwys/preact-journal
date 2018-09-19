@@ -1,7 +1,7 @@
 import getInitialState from './index';
   
 describe('appState', () => {
-	it('should', () => {
+  it('should', () => {
     expect(true).to.be.true;
   });
 });

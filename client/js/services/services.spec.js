@@ -47,17 +47,17 @@ describe('services', () => {
     after(() => {
       fetchMock.restore();
     });
-    
+
     it('should call the getAll endpoint', (done) => {
       fetchMock.get('/api/entries', 204);
       Entry.getAll().then(done).catch(done);
     });
-    
+
     it('should call the sync endpoint', (done) => {
       fetchMock.get('/api/entries/sync/1234', 204);
       Entry.sync(1234).then(done).catch(done);
     });
-    
+
     it('should call the create endpoint with an entry object', (done) => {
       fetchMock.post('/api/entry', 204);
       Entry.create(fakeEntry).then(() => {
