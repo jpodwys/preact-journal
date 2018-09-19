@@ -41,7 +41,7 @@ describe('swipe', () => {
     document.removeEventListener('shiftEntry', cb);
   });
 
-	it('should do nothing when the swipe\'s x distance is below 30px', (done) => {
+  it('should do nothing when the swipe\'s x distance is below 30px', (done) => {
     emit('mousedown', 0, 0);
     emit('mouseup', 29, 0);
     setTimeout(() => {
