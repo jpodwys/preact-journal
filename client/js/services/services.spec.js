@@ -41,7 +41,7 @@ describe('services', () => {
   describe('entryService', () => {
     const fakeEntry = { date: '1234', text: 'bogus' };
     
-    after(() => {
+    afterEach(() => {
       fetchMock.restore();
     });
 
