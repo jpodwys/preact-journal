@@ -81,7 +81,6 @@ describe('swipe', () => {
 
   it('should do nothing when document.activeElement has the contenteditable attribute', (done) => {
     appendAndFocus('div', 'contentEditable');
-    appendAndFocus('input');
     emit('touchstart', 0, 0);
     emit('touchend', 30, 21);
     setTimeout(() => {
@@ -98,7 +97,7 @@ describe('swipe', () => {
         expect(cb.called).to.be.false;
         done();
       });
-    }, 1000);
+    }, 1010); // This test occasionally fails with exactly 1000ms as the timeout
   });
 
   it('should fire `shiftEntry` with -1 when swiping to the right', (done) => {
