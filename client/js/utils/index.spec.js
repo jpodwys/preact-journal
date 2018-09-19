@@ -73,8 +73,12 @@ describe('utils', () => {
       expect(filtered[0].date).to.equal('0');
     });
     
-    it('should find entries with matching text content', () => {
-      const filtered = filterObjectsByText('b', list);
+    it('should find entries with matching text content even when the query is capitalized', () => {
+      let filtered = filterObjectsByText('b', list);
+      expect(filtered.length).to.equal(1);
+      expect(filtered[0].date).to.equal('1');
+
+      filtered = filterObjectsByText('B', list);
       expect(filtered.length).to.equal(1);
       expect(filtered[0].date).to.equal('1');
     });

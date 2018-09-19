@@ -45,9 +45,11 @@ export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearLocalStorage();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  if(entries) entries = sortObjectsByDate(entries);
   let viewEntries;
-  if(entries) viewEntries = filterHiddenEntries(entries);
+  if(entries){
+    entries = sortObjectsByDate(entries);
+    viewEntries = filterHiddenEntries(entries);
+  }
   let timestamp = localStorage.getItem('timestamp') || undefined;
 
   let state = {
