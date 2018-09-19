@@ -8,7 +8,7 @@ describe('actions', () => {
 
   function getElStub() {
     return {
-      state: { bogus: 'value' },
+      state: { entries: [], bogus: 'value' },
       set: sinon.spy()
     };
   };
@@ -117,6 +117,55 @@ describe('actions', () => {
     // blurTextFilter,
     // shiftEntry
 
+    describe('setEntry', () => {
+
+      it('should do nothing when there is no id or id is -1', () => {
+        Entry.setEntry(el, {});
+        expect(el.set.called).to.be.false;
+
+        Entry.setEntry(el, { id: -1 });
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should find an entry in el.state.entries when view is /new', () => {
+        el.state.view = '/new';
+        el.state.entries = [ { id: 0 }, { id: 1 } ];
+        el.state.viewEntries = [ { id: 2 }, { id: 3 } ];
+
+        Entry.setEntry(el, { id: '0' });
+        const entry = el.set.args[0][0].entry;
+        const entryIndex = el.set.args[0][0].entryIndex;
+        expect(entry).to.equal(el.state.entries[0]);
+        expect(entryIndex).to.equal(0);
+      });
+
+      it('should find an entry in el.state.viewEntries when view is not /new', () => {
+        el.state.view = '/entries';
+        el.state.entries = [ { id: 0 }, { id: 1 } ];
+        el.state.viewEntries = [ { id: 2 }, { id: 3 } ];
+
+        Entry.setEntry(el, { id: '3' });
+        const entry = el.set.args[0][0].entry;
+        const entryIndex = el.set.args[0][0].entryIndex;
+        expect(entry).to.equal(el.state.viewEntries[1]);
+        expect(entryIndex).to.equal(1);
+      });
+
+    });
+
+    describe('newEntry', () => {
+
+      it('should set entry and entries while also passing a cb', () => {
+        Entry.newEntry(el);
+        const entry = el.set.args[0][0].entry;
+        const entries = el.set.args[0][0].entries;
+        expect(entry).to.exist;
+        expect(entries[0]).to.equal(entry);
+        expect(typeof el.set.args[0][1]).to.equal('function');
+      });
+
+    });
+
     describe('filterByText', () => {
 
       it('should set filterText when appropriate', () => {
@@ -156,6 +205,15 @@ describe('actions', () => {
       });
 
     });
+
+    // Can't really test this as currently written. I don't think spying on route will work here.
+    // describe('shiftEntry', () => {
+
+    //   it('should route to the next or prior entry when appropriate', () => {
+        
+    //   });
+
+    // });
 
   });
 
