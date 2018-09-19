@@ -107,10 +107,52 @@ describe('actions', () => {
 
   describe('entryActions', () => {
 
-    describe('getEntries', () => {
+    // getEntries,
+    // createEntry,
+    // updateEntry,
+    // deleteEntry,
+    // setEntry,
+    // newEntry,
+    // filterByText,
+    // blurTextFilter,
+    // shiftEntry
 
-      it('should', () => {
-        
+    describe('filterByText', () => {
+
+      it('should set filterText when appropriate', () => {
+        el.state.filterText = 'bogus';
+
+        Entry.filterByText(el);
+        expect(el.set.called).to.be.false;
+
+        Entry.filterByText(el, undefined, {});
+        expect(el.set.called).to.be.false;
+
+        Entry.filterByText(el, 'bogus');
+        expect(el.set.called).to.be.false;
+
+        Entry.filterByText(el, undefined, { target: { value: 'bogus' } });
+        expect(el.set.called).to.be.false;
+
+        Entry.filterByText(el, 'one');
+        expect(el.set.args[0][0].filterText).to.equal('one');
+
+        Entry.filterByText(el, undefined, { target: { value: 'two' } });
+        expect(el.set.args[1][0].filterText).to.equal('two');
+      });
+
+    });
+
+    describe('blurTextFilter', () => {
+
+      it('should set showFilterInput to false when there is no filter text', () => {
+        el.state.filterText = 'bogus';
+        Entry.blurTextFilter(el);
+        expect(el.set.called).to.be.false;
+
+        el.state.filterText = '';
+        Entry.blurTextFilter(el);
+        expect(el.set.args[0][0].showFilterInput).to.be.false;
       });
 
     });

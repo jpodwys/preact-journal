@@ -270,7 +270,7 @@ function filterByText (el, text, e){
 
 function blurTextFilter (el){
   if(!el.state.filterText){
-    el.set({showFilterInput: false});
+    el.set({ showFilterInput: false });
   }
 };
 
