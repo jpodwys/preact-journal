@@ -6,6 +6,7 @@ describe('arrow', () => {
   const ENTER = 13;
   const SPACE = 19;
   const ID = 'bogus-id';
+  let handler;
   let cb;
 
   function appendAndFocus(type, attr) {
@@ -33,14 +34,13 @@ describe('arrow', () => {
 
   beforeEach(() => {
     cb = sinon.spy();
-    document.addEventListener('shiftEntry', (e) => {
-      cb(e.detail[0]);
-    });
+    handler = (e) => { cb(e.detail[0]); };
+    document.addEventListener('shiftEntry', handler);
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('shiftEntry', cb);
+    document.removeEventListener('shiftEntry', handler);
   });
 
   it('should do nothing when the key pressed is not left or right', (done) => {

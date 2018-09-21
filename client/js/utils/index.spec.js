@@ -99,7 +99,7 @@ describe('utils', () => {
   });
 
   describe('filterHiddenEntries', () => {
-    const list = [ { deleted: '1' }, {  } ];
+    const list = [ { id: 0, deleted: '1' }, { id: 1 } ];
     
     it('should return an empty array if passed undefined', () => {
       const filtered = filterHiddenEntries();

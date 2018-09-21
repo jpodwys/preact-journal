@@ -7,7 +7,7 @@ var express = require('express'),
   strictTransportSecurity = require('./server/middleware/strict-transport-security'),
   forceSsl = require('force-ssl-heroku'),
   jwtMW = require('express-jwt'),
-  resMods = require('./server/middleware/response-mods'),
+  // resMods = require('./server/middleware/response-mods'),
   AES = require('./server/utils/aes'),
   PORT = process.env.PORT || 3000;
 

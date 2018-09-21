@@ -47,7 +47,7 @@ export default class Entry extends Component {
       entryId: this.props.entry.id,
       entry: {}
     }
-    obj.entry[property] = e.target.innerText;
+    obj.entry[property] = e.target.innerText.trim();
 
     fire('updateEntry', obj)();
   }
