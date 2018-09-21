@@ -155,9 +155,18 @@ describe('actions', () => {
 
       it('should do nothing when no entry with the given id exists', () => {
         Entry.updateEntry(el, {
-          entry: { date: 'b' },
+          entry: { date: '2017-01-01' },
           property: 'date',
           entryId: 1
+        });
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing when there was no change', () => {
+        Entry.updateEntry(el, {
+          entry: { date: el.state.entry.date },
+          property: 'date',
+          entryId: 0
         });
         expect(el.set.called).to.be.false;
       });
