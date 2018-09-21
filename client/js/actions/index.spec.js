@@ -15,10 +15,12 @@ describe('actions', () => {
 
   beforeEach(() => {
     el = getElStub();
+    sinon.spy(console, 'log');
   });
 
   afterEach(() => {
-
+    fetchMock.restore();
+    console.log.restore();
   });
 
   describe('globalActions', () => {
@@ -40,12 +42,11 @@ describe('actions', () => {
     const USER = { username: 'bogus', password: 'value' };
 
     beforeEach(() => {
-      sinon.spy(console, 'log');
+      
     });
 
     afterEach(() => {
-      fetchMock.restore();
-      console.log.restore();
+      
     });
 
     describe('login', () => {
@@ -137,13 +138,63 @@ describe('actions', () => {
 
     // getEntries,
     // createEntry,
-    // updateEntry,
-    // deleteEntry,
-    // setEntry,
-    // newEntry,
-    // filterByText,
-    // blurTextFilter,
-    // shiftEntry
+    // updateEntry
+
+    describe('deleteEntry', () => {
+
+      beforeEach(() => {
+        const entry = { id: 0 };
+        el.state.entry = entry;
+        el.state.entries.push(entry);
+      });
+
+      it('should do nothing when id is not passed', () => {
+        Entry.deleteEntry(el, {});
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing when no entry with the given id exists', () => {
+        Entry.deleteEntry(el, { id: 1 });
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should set state.entry to undefined, mark state.entries[entryIndex] for deletion, provide a callback to set, and remove the correct entry when the network call succeedes', (done) => {
+        fetchMock.delete('/api/entry/0', 204);
+        Entry.deleteEntry(el, { id: 0 });
+
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry).to.be.undefined;
+        expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
+        expect(firstCallArgs[0].entries[0].deleted).to.be.true;
+        expect(typeof firstCallArgs[1]).to.equal('function');
+
+        
+        setTimeout(() => {
+          const secondCallArgs = el.set.args[1];
+          expect(secondCallArgs[0].entries.length).to.equal(0);
+          done();
+        });
+      });
+
+      it('should set state.entry to undefined, mark state.entries[entryIndex] for deletion, provide a callback to set, and not remove the entry when the network call fails', (done) => {
+        fetchMock.delete('/api/entry/0', 500);
+        Entry.deleteEntry(el, { id: 0 });
+
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry).to.be.undefined;
+        expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
+        expect(firstCallArgs[0].entries[0].deleted).to.be.true;
+        expect(typeof firstCallArgs[1]).to.equal('function');
+
+        
+        setTimeout(() => {
+          expect(el.set.calledTwice).to.be.false;
+          expect(console.log.calledWith('deleteEntryFailure')).to.be.true;
+          done();
+        });
+      });
+
+    });
 
     describe('setEntry', () => {
 
@@ -234,7 +285,7 @@ describe('actions', () => {
 
     });
 
-    // Can't really test this as currently written. I don't think spying on route will work here.
+    // Can't really test this ATM due to it simply calling route. I don't think spying on route will work here.
     // describe('shiftEntry', () => {
 
     //   it('should route to the next or prior entry when appropriate', () => {

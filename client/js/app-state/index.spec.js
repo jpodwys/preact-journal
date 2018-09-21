@@ -4,6 +4,10 @@ import getInitialState from './index';
 describe('appState', () => {
   let state;
 
+  const deleteCookie = (name) => {
+    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+  };
+
   beforeEach(() => {
     state = getInitialState();
   });
@@ -13,32 +17,36 @@ describe('appState', () => {
   });
 
   it('should return correct defaults', () => {
-    // scrollPosition: 0,
-    // view: getViewFromHref(location.href),
-    // showFilterInput: false,
-    // filterText: '',
-    // loggedIn: loggedIn,
-    // timestamp: timestamp,
-    // entry: undefined,
-    // entryIndex: -1,
-    // entries: entries,
-    // viewEntries: viewEntries || entries,
-    // toastConfig: undefined,
-    // dark: localStorage.getItem('dark') === 'true'
+    localStorage.setItem('bogus', 'hi');
+    state = getInitialState();
 
+    expect(localStorage.getItem('bogus')).to.be.null;
     expect(typeof state).to.equal('object');
     expect(state.scrollPosition).to.equal(0);
-    // expect(state.view).to.equal(0);
+    // expect(state.view).to.equal('/');
     expect(state.showFilterInput).to.be.false;
     expect(state.filterText).to.equal('');
-    // expect(state.loggedIn).to.equal(0);
-    // expect(state.timestamp).to.equal(0);
+    expect(state.loggedIn).to.be.false;
+    expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
     expect(state.entryIndex).to.equal(-1);
-    // expect(state.entries).to.equal(0);
-    // expect(state.viewEntries).to.equal(0);
+    expect(state.entries).to.be.undefined;
+    expect(state.viewEntries).to.be.undefined;
     expect(state.toastConfig).to.be.undefined;
-    // expect(state.dark).to.equal(0);
+    expect(state.dark).to.be.false;
+
+    document.cookie = 'logged_in=true;';
+    localStorage.setItem('entries', JSON.stringify([ { id: 0, date: '2018-01-01', text: 'yo' } ]));
+    localStorage.setItem('timestamp', '1234');
+    localStorage.setItem('dark', 'true');
+    state = getInitialState();
+
+    expect(state.loggedIn).to.be.true;
+    expect(state.entries[0].id).to.equal(0);
+    expect(state.timestamp).to.equal('1234');
+    expect(state.dark).to.be.true;
+
+    deleteCookie('logged_in');
   });
 
   it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', () => {

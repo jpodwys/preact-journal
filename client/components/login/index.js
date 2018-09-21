@@ -32,16 +32,16 @@ export default class Login extends Component {
             <form action="/api/user" method="POST" onsubmit={this.join} class="full-width full-width--all">
               <fieldset>
                 <legend>Create an Account</legend>
-                <input id="cuser" placeholder="username" autocapitalize="off" required/>
-                <input id="cpass" type="password" placeholder="password" required/>
+                <input id="cuser" placeholder="username" autocapitalize="off"/>
+                <input id="cpass" type="password" placeholder="password"/>
                 <input type="submit"/>
               </fieldset>
             </form>
             <form action="/api/user/login" method="POST" onsubmit={this.login} class="full-width full-width--all">
               <fieldset>
                 <legend>or Login</legend>
-                <input id="luser" placeholder="username" autocapitalize="off" required/>
-                <input id="lpass" type="password" placeholder="password" required/>
+                <input id="luser" placeholder="username" autocapitalize="off"/>
+                <input id="lpass" type="password" placeholder="password"/>
                 <input type="submit"/>
               </fieldset>
             </form>

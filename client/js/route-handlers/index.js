@@ -4,29 +4,29 @@ import { route } from '../../components/router';
 
 export default function handleRouteChange (url) {
   let view = getViewFromHref(url);
-  if(view !== '/' && !this.state.loggedIn) route('/', true);
-  this.set({ view: view });
+  if(view !== '/' && !this.state.loggedIn) return route('/', true);
+  this.set({ view });
   handleRoute.call(this, view, url);
   if(this.state.toastConfig) fire('linkstate', { key: 'toastConfig' })();
 };
 
 function handleRoute (view, url) {
   switch(view) {
-    case '/':         handleLoginView.call(this, url);    break;
-    case '/entries':  handleEntriesView.call(this, url);  break;
+    case '/':         handleLoginView.call(this);       break;
+    case '/entries':  handleEntriesView.call(this);     break;
     case '/entry':    // Fallthrough 
-    case '/new':      handleEntryView.call(this, url);    break;
-    default:          route('/');                         break;
+    case '/new':      handleEntryView.call(this, url);  break;
+    default:          route('/');                       break;
   }
 };
 
-function handleLoginView (url) {
+function handleLoginView () {
   if(this.state.loggedIn) route('/entries', true);
 };
 
-function handleEntriesView (url) {
+function handleEntriesView () {
   if(Array.isArray(this.state.entries)){
-    let entry = this.state.entries[0];
+    const entry = this.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
       this.set({
         entries: removeObjectByIndex(0, this.state.entries)
@@ -36,15 +36,10 @@ function handleEntriesView (url) {
 };
 
 function handleEntryView (url) {
-  if(!url) return;
-
-  let id = url.substr(url.lastIndexOf('/') + 1);
-  if(!id) return;
-
-  // This is a brand new entry
+  const id = url.substr(url.lastIndexOf('/') + 1);
   if(id === 'new'){
     fire('newEntry')();
   } else {
-    fire('setEntry', {id: id})();
+    fire('setEntry', { id })();
   }
 };

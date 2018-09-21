@@ -194,9 +194,11 @@ function putEntry (el, { entry }){
 };
 
 function deleteEntry (el, { id }){
-  if(!id) return;
+  if(typeof id !== 'number') return;
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
+  if(entryIndex === -1) return;
+  
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
 
