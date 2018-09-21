@@ -146,21 +146,22 @@ function createEntryFailure (el, oldId, err){
 };
 
 function updateEntry (el, { entry, property, entryId }){
-  var val = entry[property];
-  if(typeof val === 'string'){
-    val = val.trim();
-  }
-
-  entry[property] = entry[property];
+  if(!entry || !property || typeof entryId !== 'number') return;
   var entryIndex = findObjectIndexById(entryId, el.state.entries);
-  var current = el.state.entries[entryIndex][property];
+  if(entryIndex === -1) return;
+  var activeEntry = el.state.entries[entryIndex];
+  var current = activeEntry[property];
+  // Don't need this right now since the only values users can
+  // edit are strings. Will need this if I add favorites or
+  // other user-editable non-string values.
+  // if(typeof current === 'string') current = current.trim();
   var next = entry[property];
   if(current === next) return;
 
-  el.state.entries[entryIndex][property] = entry[property];
-  el.state.entries[entryIndex].needsSync = true;
+  activeEntry[property] = entry[property];
+  activeEntry.needsSync = true;
   el.set({
-    entry: Object.assign({}, el.state.entries[entryIndex]),
+    entry: Object.assign({}, activeEntry),
     entries: [].concat(el.state.entries)
   });
 
@@ -172,8 +173,8 @@ function updateEntry (el, { entry, property, entryId }){
 };
 
 function updateEntrySuccess (el, id){
-  let entries = [].concat(el.state.entries);
-  var entryIndex = findObjectIndexById(id, entries);
+  const entries = [].concat(el.state.entries);
+  const entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
   el.set({
     entry: Object.assign({}, entries[entryIndex]),

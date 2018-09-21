@@ -140,6 +140,102 @@ describe('actions', () => {
     // createEntry,
     // updateEntry
 
+    describe('updateEntry', () => {
+
+      beforeEach(() => {
+        const entry = { id: 0, date: '2018-01-01', text: 'a' };
+        el.state.entry = entry;
+        el.state.entries.push(entry);
+      });
+
+      it('should do nothing when entry, property, or entryId is missing', () => {
+        Entry.updateEntry(el, {});
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing when no entry with the given id exists', () => {
+        Entry.updateEntry(el, {
+          entry: { date: 'b' },
+          property: 'date',
+          entryId: 1
+        });
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should set state.entry.date, mark state.entries[entryIndex] for update, and remove the needsSync flag when the network call succeedes', (done) => {
+        fetchMock.patch('/api/entry/0', 204);
+        const updateObj = {
+          entry: { date: '2017-01-01' },
+          property: 'date',
+          entryId: 0
+        };
+        Entry.updateEntry(el, updateObj);
+
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry.date).to.equal(updateObj.entry.date);
+        expect(firstCallArgs[0].entry.needsSync).to.be.true;
+        expect(firstCallArgs[0].entries[0].date).to.equal(updateObj.entry.date);
+        expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
+        
+        setTimeout(() => {
+          const secondCallArgs = el.set.args[1];
+          expect(secondCallArgs[0].entry.date).to.equal(updateObj.entry.date);
+          expect(secondCallArgs[0].entry.needsSync).to.be.undefined;
+          expect(secondCallArgs[0].entries[0].date).to.equal(updateObj.entry.date);
+          expect(secondCallArgs[0].entries[0].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should set state.entry.text, mark state.entries[entryIndex] for update, and remove the needsSync flag when the network call succeedes', (done) => {
+        fetchMock.patch('/api/entry/0', 204);
+        const updateObj = {
+          entry: { text: 'b' },
+          property: 'text',
+          entryId: 0
+        };
+        Entry.updateEntry(el, updateObj);
+
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry.text).to.equal(updateObj.entry.text);
+        expect(firstCallArgs[0].entry.needsSync).to.be.true;
+        expect(firstCallArgs[0].entries[0].text).to.equal(updateObj.entry.text);
+        expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
+        
+        setTimeout(() => {
+          const secondCallArgs = el.set.args[1];
+          expect(secondCallArgs[0].entry.text).to.equal(updateObj.entry.text);
+          expect(secondCallArgs[0].entry.needsSync).to.be.undefined;
+          expect(secondCallArgs[0].entries[0].text).to.equal(updateObj.entry.text);
+          expect(secondCallArgs[0].entries[0].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should set state.entry.text, mark state.entries[entryIndex] for update, and not remove the needsSync flag when the network call fails', (done) => {
+        fetchMock.patch('/api/entry/0', 500);
+        const updateObj = {
+          entry: { text: 'b' },
+          property: 'text',
+          entryId: 0
+        };
+        Entry.updateEntry(el, updateObj);
+
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry.text).to.equal(updateObj.entry.text);
+        expect(firstCallArgs[0].entry.needsSync).to.be.true;
+        expect(firstCallArgs[0].entries[0].text).to.equal(updateObj.entry.text);
+        expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
+        
+        setTimeout(() => {
+          expect(el.set.calledTwice).to.be.false;
+          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
+          done();
+        });
+      });
+
+    });
+
     describe('deleteEntry', () => {
 
       beforeEach(() => {
@@ -167,7 +263,6 @@ describe('actions', () => {
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
         expect(typeof firstCallArgs[1]).to.equal('function');
-
         
         setTimeout(() => {
           const secondCallArgs = el.set.args[1];
@@ -185,7 +280,6 @@ describe('actions', () => {
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
         expect(typeof firstCallArgs[1]).to.equal('function');
-
         
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
