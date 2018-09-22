@@ -11,11 +11,13 @@ var express = require('express'),
   AES = require('./server/utils/aes'),
   PORT = process.env.PORT || 3000;
 
-// Keep the dyno awake
-var http = require('http');
-setInterval(function() {
-  http.get('https://preact-journal.herokuapp.com');
-}, 900000); // Every 15 minutes
+// Keep the dyno awake when in production
+if(process.env.NODE_ENV === 'production'){
+  var https = require('http');
+  setInterval(function() {
+    https.get('https://preact-journal.herokuapp.com');
+  }, 900000); // Every 15 minutes
+}
 
 app.disable('x-powered-by');
 app.use(forceSsl);
