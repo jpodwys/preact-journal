@@ -64,7 +64,7 @@ function merge (obj, props) {
   return obj;
 };
 
-function isActiveEntry (el, id) {
+function isActiveEntryId (el, id) {
   if(!el.state.entry) return false;
   return el.state.entry.id === id;
 };
@@ -79,5 +79,5 @@ export {
   clearLocalStorage,
   getViewFromHref,
   merge,
-  isActiveEntry
+  isActiveEntryId
 };

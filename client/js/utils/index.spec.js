@@ -8,7 +8,7 @@ import {
   clearLocalStorage,
   getViewFromHref,
   merge,
-  isActiveEntry
+  isActiveEntryId
 } from './index';
 
 describe('utils', () => {
@@ -176,7 +176,7 @@ describe('utils', () => {
     });
   });
 
-  describe('isActiveEntry', () => {
+  describe('isActiveEntryId', () => {
     let el;
 
     beforeEach(() => {
@@ -186,17 +186,17 @@ describe('utils', () => {
     });
 
     it('should return false when entry is undefined', () => {
-      expect(isActiveEntry(el, 0)).to.be.false;
+      expect(isActiveEntryId(el, 0)).to.be.false;
     });
 
     it('should return false when the given ids don\'t match', () => {
       el.state.entry = { id: 1 };
-      expect(isActiveEntry(el, 0)).to.be.false;
+      expect(isActiveEntryId(el, 0)).to.be.false;
     });
 
     it('should return true when the given ids match', () => {
       el.state.entry = { id: 0 };
-      expect(isActiveEntry(el, 0)).to.be.true;
+      expect(isActiveEntryId(el, 0)).to.be.true;
     });
 
   });

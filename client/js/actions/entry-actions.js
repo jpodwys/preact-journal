@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex, isActiveEntry } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -161,7 +161,7 @@ function createEntrySuccess (el, oldId, response){
    * Only update state.entry if the entry we just
    * modified is still active.
    */
-  if(isActiveEntry(el, oldId)) el.state.entry.id = response.id;
+  if(isActiveEntryId(el, oldId)) el.state.entry.id = response.id;
 
   el.state.entries[entryIndex].id = response.id;
   delete el.state.entries[entryIndex].postPending;
@@ -196,7 +196,7 @@ function createEntryFailure (el, oldId, err){
    * Only update state.entry if the entry we just
    * modified is still active.
    */
-  if(isActiveEntry(el, oldId)) delete el.state.entry.postPending;
+  if(isActiveEntryId(el, oldId)) delete el.state.entry.postPending;
 
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
@@ -243,7 +243,7 @@ function updateEntrySuccess (el, id){
    * Only update state.entry if the entry we just
    * modified is still active.
    */
-  const entry = isActiveEntry(el, id)
+  const entry = isActiveEntryId(el, id)
     ? Object.assign({}, entries[entryIndex])
     : el.state.entry;
 
