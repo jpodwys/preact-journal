@@ -29,9 +29,7 @@ module.exports = function(Entry){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
         if(!entry) return reject({status: 404, message: 'Entry not found.'});
-        if(!entry.isPublic && (!user || (user.id !== entry.ownerId))){
-          return reject({status: 404, message: 'Entry not found.'});
-        }
+        if(user.id !== entry.ownerId) return reject({status: 404, message: 'Entry not found.'});
         entry.isOwner = (user && user.id == entry.ownerId);
         delete entry.ownerId;
         return resolve(entry);

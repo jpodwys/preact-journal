@@ -137,8 +137,148 @@ describe('actions', () => {
   describe('entryActions', () => {
 
     // getEntries,
-    // createEntry,
-    // updateEntry
+    // createEntry
+
+    describe('createEntry', () => {
+      let entry;
+      let postPendingEntry;
+
+      beforeEach(() => {
+        entry = { id: 0, date: '2018-01-01', text: '', needsSync: true, newEntry: true };
+        postPendingEntry = { id: 0, date: '2018-01-01', text: '', needsSync: true, newEntry: true, postPending: true };
+        el.state.entry = entry;
+        el.state.entries.push(entry);
+      });
+
+      it('should do nothing when entry is missing, or entry.id is missing or is not a number, or the provided id is not found', () => {
+        Entry.createEntry(el, {});
+        expect(el.set.called).to.be.false;
+
+        Entry.createEntry(el, { entry: {} });
+        expect(el.set.called).to.be.false;
+
+        Entry.createEntry(el, { entry: { id: '0' } });
+        expect(el.set.called).to.be.false;
+
+        Entry.createEntry(el, { entry: { id: 1 } });
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should call set only once (with the correct params, of course) and make no network call if !clientSync && postPending', (done) => {
+        el.state.entry = postPendingEntry;
+        Entry.createEntry(el, { entry: postPendingEntry });
+
+        const arg = el.set.args[0][0];
+        expect(arg.entry).to.equal(postPendingEntry);
+        expect(arg.entries[0].postPending).to.be.true;
+
+        setTimeout(() => {
+          expect(el.set.calledTwice).to.be.false;
+          expect()
+          done();
+        });
+      });
+
+      it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
+        fetchMock.post('/api/entry', {
+          status: 200,
+          body: { id: 1 } 
+        });
+        Entry.createEntry(el, { entry: entry });
+
+        const firstCallArg = el.set.args[0][0];
+        expect(firstCallArg.entry).to.equal(entry);
+        expect(firstCallArg.entries[0].postPending).to.be.true;
+
+        setTimeout(() => {
+          const secondCallArg = el.set.args[1][0];
+          expect(secondCallArg.entry.id).to.equal(1);
+          expect(secondCallArg.entry.postPending).to.be.undefined;
+          expect(secondCallArg.entry.newEntry).to.be.undefined;
+          expect(secondCallArg.entry.needsSync).to.be.undefined;
+          expect(secondCallArg.entries[0].id).to.equal(1);
+          expect(secondCallArg.entries[0].postPending).to.be.undefined;
+          expect(secondCallArg.entries[0].newEntry).to.be.undefined;
+          expect(secondCallArg.entries[0].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should call set twice (with the correct params, of course) and set postPending to true if clientSync is true even when postPending is true', (done) => {
+        fetchMock.post('/api/entry', {
+          status: 200,
+          body: { id: 1 } 
+        });
+        el.state.entry = postPendingEntry;
+        Entry.createEntry(el, { entry: postPendingEntry, clientSync: true });
+
+        const firstCallArg = el.set.args[0][0];
+        expect(firstCallArg.entry).to.equal(postPendingEntry);
+        expect(firstCallArg.entries[0].postPending).to.be.true;
+
+        setTimeout(() => {
+          const secondCallArg = el.set.args[1][0];
+          expect(secondCallArg.entry.id).to.equal(1);
+          expect(secondCallArg.entry.postPending).to.be.undefined;
+          expect(secondCallArg.entry.newEntry).to.be.undefined;
+          expect(secondCallArg.entry.needsSync).to.be.undefined;
+          expect(secondCallArg.entries[0].id).to.equal(1);
+          expect(secondCallArg.entries[0].postPending).to.be.undefined;
+          expect(secondCallArg.entries[0].newEntry).to.be.undefined;
+          expect(secondCallArg.entries[0].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
+        fetchMock.post('/api/entry', {
+          status: 200,
+          body: { id: 1 } 
+        });
+        Entry.createEntry(el, { entry: entry });
+
+        const firstCallArg = el.set.args[0][0];
+        expect(firstCallArg.entry).to.equal(entry);
+        expect(firstCallArg.entries[0].postPending).to.be.true;
+
+        setTimeout(() => {
+          const secondCallArg = el.set.args[1][0];
+          expect(secondCallArg.entry.id).to.equal(1);
+          expect(secondCallArg.entry.postPending).to.be.undefined;
+          expect(secondCallArg.entry.newEntry).to.be.undefined;
+          expect(secondCallArg.entry.needsSync).to.be.undefined;
+          expect(secondCallArg.entries[0].id).to.equal(1);
+          expect(secondCallArg.entries[0].postPending).to.be.undefined;
+          expect(secondCallArg.entries[0].newEntry).to.be.undefined;
+          expect(secondCallArg.entries[0].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should handle a network call failure correctly', (done) => {
+        fetchMock.post('/api/entry', 500);
+        Entry.createEntry(el, { entry: entry });
+
+        const firstCallArg = el.set.args[0][0];
+        expect(firstCallArg.entry).to.equal(entry);
+        expect(firstCallArg.entries[0].postPending).to.be.true;
+
+        setTimeout(() => {
+          const secondCallArg = el.set.args[1][0];
+          expect(secondCallArg.entry.id).to.equal(0);
+          expect(secondCallArg.entry.postPending).to.be.undefined;
+          expect(secondCallArg.entry.newEntry).to.be.true;
+          expect(secondCallArg.entry.needsSync).to.be.true;
+          expect(secondCallArg.entries[0].id).to.equal(0);
+          expect(secondCallArg.entries[0].postPending).to.be.undefined;
+          expect(secondCallArg.entries[0].newEntry).to.be.true;
+          expect(secondCallArg.entries[0].needsSync).to.be.true;
+          expect(console.log.calledWith('createEntryFailure')).to.be.true;
+          done();
+        });
+      });
+
+    });
 
     describe('updateEntry', () => {
 
@@ -271,6 +411,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entry).to.be.undefined;
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
+        expect(firstCallArgs[0].entries[0].text).to.equal('');
         expect(typeof firstCallArgs[1]).to.equal('function');
         
         setTimeout(() => {
@@ -288,6 +429,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entry).to.be.undefined;
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
+        expect(firstCallArgs[0].entries[0].text).to.equal('');
         expect(typeof firstCallArgs[1]).to.equal('function');
         
         setTimeout(() => {
@@ -337,12 +479,17 @@ describe('actions', () => {
 
     describe('newEntry', () => {
 
-      it('should set entry and entries while also passing a cb', () => {
+      it('should set new empty entry and unshift it onto entries while also passing a cb', () => {
+        el.state.entries.push({ id: 0 });
+
         Entry.newEntry(el);
         const entry = el.set.args[0][0].entry;
         const entries = el.set.args[0][0].entries;
-        expect(entry).to.exist;
+        expect(entry.text).to.equal('');
+        expect(entry.needsSync).to.be.true;
+        expect(entry.newEntry).to.be.true;
         expect(entries[0]).to.equal(entry);
+        expect(entries[1].id).to.equal(0);
         expect(typeof el.set.args[0][1]).to.equal('function');
       });
 

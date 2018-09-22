@@ -7,7 +7,8 @@ import {
   applyFilters,
   clearLocalStorage,
   getViewFromHref,
-  merge
+  merge,
+  isActiveEntry
 } from './index';
 
 describe('utils', () => {
@@ -173,6 +174,31 @@ describe('utils', () => {
       expect(keys.includes('a'));
       expect(keys.includes('b'));
     });
+  });
+
+  describe('isActiveEntry', () => {
+    let el;
+
+    beforeEach(() => {
+      el = {
+        state: {}
+      };
+    });
+
+    it('should return false when entry is undefined', () => {
+      expect(isActiveEntry(el, 0)).to.be.false;
+    });
+
+    it('should return false when the given ids don\'t match', () => {
+      el.state.entry = { id: 1 };
+      expect(isActiveEntry(el, 0)).to.be.false;
+    });
+
+    it('should return true when the given ids match', () => {
+      el.state.entry = { id: 0 };
+      expect(isActiveEntry(el, 0)).to.be.true;
+    });
+
   });
   
 });

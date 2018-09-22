@@ -64,6 +64,11 @@ function merge (obj, props) {
   return obj;
 };
 
+function isActiveEntry (el, id) {
+  if(!el.state.entry) return false;
+  return el.state.entry.id === id;
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
@@ -73,5 +78,6 @@ export {
   applyFilters,
   clearLocalStorage,
   getViewFromHref,
-  merge
+  merge,
+  isActiveEntry
 };

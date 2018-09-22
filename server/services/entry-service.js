@@ -90,6 +90,8 @@ module.exports = function(Entry, sequelize){
   }
 
   self.getEntryCount = function(){
-    return Entry.count();
+    return Entry.count({
+      where: { deleted: 0 }
+    });
   }
 }

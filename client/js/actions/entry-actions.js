@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, isActiveEntry } from '../utils';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -99,7 +99,21 @@ function syncEntriesFailure (el, err){
 };
 
 function createEntry (el, { entry, clientSync }){
+  if(!entry || typeof entry.id !== 'number') return;
+  /**
+   * When a user navigates to the new entry page,
+   * I automatically unshift a blank entry onto
+   * the entries array. I had good reasons for
+   * doing this that I don't want to explain here.
+   * Regardless, when we create an entry, we are
+   * really just updating the existing empty entry
+   * then POSTing it to the back end.
+   */
   var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+  if(entryIndex === -1) return;
+
+  const postPending = entry.postPending;
+  entry.postPending = true;
   el.state.entries[entryIndex] = entry;
 
   el.set({
@@ -107,10 +121,31 @@ function createEntry (el, { entry, clientSync }){
     entries: [].concat(el.state.entries)
   });
 
-  if(!clientSync && entry.postPending) return;
-
-  el.state.entries[entryIndex].postPending = true;
-  el.set({ entries: [].concat(el.state.entries) });
+  /**
+   * clientSync overrides postPending here to account
+   * for the edge case where postPending is set and
+   * the user closes the app before the POST call
+   * returns. In the event that the original POST
+   * succeeded, this results in duplicate entries.
+   * In the event that the original POST failed for
+   * whatever reason, results in the behavior you
+   * would expect.
+   * 
+   * My original thought was to allow the client
+   * to generate the ID that ends up getting used in
+   * the database as the entry's id. I settled on
+   * this plan to avoid entry id collisions.
+   * 
+   * I would like to revisit this at some point. It
+   * makes sense that if an entry has the newEntry,
+   * needsSync, and postPending flags all set to true,
+   * then the front end would call an endpoint to
+   * upsert than POST.
+   * 
+   * For now, however, this is why clientSync
+   * overrides postPending.
+   */
+  if(!clientSync && postPending) return;
 
   Entry.create(entry).then(response => {
     createEntrySuccess(el, entry.id, response);
@@ -122,12 +157,32 @@ function createEntry (el, { entry, clientSync }){
 function createEntrySuccess (el, oldId, response){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
-  if(el.state.entry.id === oldId){
-    el.state.entry.id = response.id;
-  }
+  /**
+   * Only update state.entry if the entry we just
+   * modified is still active.
+   */
+  if(isActiveEntry(el, oldId)) el.state.entry.id = response.id;
+
   el.state.entries[entryIndex].id = response.id;
   delete el.state.entries[entryIndex].postPending;
   delete el.state.entries[entryIndex].newEntry;
+  /**
+   * Because needsSync is a boolean, removing it here
+   * can introduce a problem.
+   * 
+   * For example, if I type one character and pause,
+   * thereby triggering a POST, that will add the
+   * needsSync and postPending flags to the entry. As
+   * a result, anything I type while the POST is
+   * pending (which would normally trigger adding the
+   * needsSync flag to the entry) will be ignored when
+   * the POST returns and triggers a removal of the
+   * entry's needsSync flag.
+   * 
+   * A potential solution could be to make needsSync
+   * an integer so I can increment it when it needs
+   * both a POST and a PATCH.
+   */
   delete el.state.entries[entryIndex].needsSync;
 
   el.set({
@@ -137,9 +192,16 @@ function createEntrySuccess (el, oldId, response){
 };
 
 function createEntryFailure (el, oldId, err){
+  /**
+   * Only update state.entry if the entry we just
+   * modified is still active.
+   */
+  if(isActiveEntry(el, oldId)) delete el.state.entry.postPending;
+
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
   delete el.state.entries[entryIndex].postPending;
   el.set({
+    entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
   console.log('createEntryFailure', err);
@@ -176,8 +238,17 @@ function updateEntrySuccess (el, id){
   const entries = [].concat(el.state.entries);
   const entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
+
+  /**
+   * Only update state.entry if the entry we just
+   * modified is still active.
+   */
+  const entry = isActiveEntry(el, id)
+    ? Object.assign({}, entries[entryIndex])
+    : el.state.entry;
+
   el.set({
-    entry: Object.assign({}, entries[entryIndex]),
+    entry: entry,
     entries: entries
   });
 };
@@ -202,6 +273,7 @@ function deleteEntry (el, { id }){
   
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
+  el.state.entries[entryIndex].text = '';
 
   el.set({
     entry: undefined,
@@ -219,7 +291,9 @@ function deleteEntry (el, { id }){
 
 function deleteEntrySuccess (el, id){
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  el.set({ entries: removeObjectByIndex(entryIndex, el.state.entries) });
+  el.set({
+    entries: removeObjectByIndex(entryIndex, el.state.entries)
+  });
 };
 
 function deleteEntryFailure (el, err){
