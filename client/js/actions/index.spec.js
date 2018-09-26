@@ -150,7 +150,7 @@ describe('actions', () => {
         expect(el.set.called).to.be.false;
       });
 
-      it('should do nothing while logged in if entries is not undefined', () => {
+      it('should do nothing while logged in if el.state.entries is defined', () => {
         el.state.loggedIn = true;
         Entry.getEntries(el);
         expect(el.set.called).to.be.false;
