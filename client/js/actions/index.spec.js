@@ -136,8 +136,149 @@ describe('actions', () => {
 
   describe('entryActions', () => {
 
-    // getEntries,
-    // createEntry
+    describe('getEntries', () => {
+
+      beforeEach(() => {
+        // This resets the private dataFetched variable inside of entry-actions
+        el.state.loggedIn = false;
+        Entry.getEntries(el);
+      });
+
+      it('should do nothing while logged out', () => {
+        el.state.loggedIn = false;
+        Entry.getEntries(el);
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing while logged in if entries is not undefined', () => {
+        el.state.loggedIn = true;
+        Entry.getEntries(el);
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing on the second call (when the private dataFetched variable is true)', (done) => {
+        el.state.loggedIn = true;
+        Entry.getEntries(el);
+        setTimeout(() => {
+          Entry.getEntries(el);
+          setTimeout(() => {
+            expect(el.set.called).to.be.false;
+            done();
+          });
+        });
+      });
+
+      it('should fetch entries and timestamp when timestamp is undefined', (done) => {
+        fetchMock.get('/api/entries', {
+          status: 200,
+          body: {
+            entries: [ { id: 0, date: '2018-01-01', text: 'bogus' } ],
+            timestamp: 1234
+          }
+        });
+        
+        delete el.state.entries;
+        el.state.loggedIn = true;
+        Entry.getEntries(el);
+        setTimeout(() => {
+          const arg = el.set.args[0][0];
+          expect(arg.entries[0].id).to.equal(0);
+          expect(arg.timestamp).to.equal(1234);
+          done();
+        });
+      });
+
+      it('should handle an error when fetching entries and timestamp when timestamp is undefined', (done) => {
+        fetchMock.get('/api/entries', 500);
+        
+        delete el.state.entries;
+        el.state.loggedIn = true;
+        Entry.getEntries(el);
+        setTimeout(() => {
+          expect(console.log.calledWith('getAllEntriesError')).to.be.true;
+          done();
+        });
+      });
+
+      it('should sync entries from the server to the cleint when there is a timestamp', (done) => {
+        fetchMock.get('/api/entries/sync/1234', {
+          status: 200,
+          body: {
+            entries: [ { id: 0, deleted: 1 }, { id: 1, date: '2018-01-01' }, { id: 2, date: '2017-01-01' } ],
+            timestamp: 4321
+          }
+        });
+        
+        el.state.loggedIn = true;
+        el.state.timestamp = 1234;
+        el.state.entries = [ { id: 0 }, { id: 1 } ];
+        Entry.getEntries(el);
+        setTimeout(() => {
+          const arg = el.set.args[0][0];
+          expect(arg.entries[0].id).to.equal(2);
+          expect(arg.entries[0].date).to.equal('2017-01-01');
+          expect(arg.entries[1].id).to.equal(1);
+          expect(arg.entries[1].date).to.equal('2018-01-01');
+          expect(arg.timestamp).to.equal(4321);
+          done();
+        });
+      });
+
+      it('should set timestamp to localStorage without calling el.set when the sync response contains no entries', (done) => {
+        fetchMock.get('/api/entries/sync/1234', {
+          status: 200,
+          body: {
+            entries: [],
+            timestamp: 4321
+          }
+        });
+        
+        el.state.loggedIn = true;
+        el.state.timestamp = 1234;
+        localStorage.setItem('timestamp', 1234);
+        Entry.getEntries(el);
+        setTimeout(() => {
+          expect(el.set.called).to.be.false;
+          expect(localStorage.getItem('timestamp')).to.equal('4321');
+          done();
+        });
+      });
+
+      it('should sync entries from the client to the server when one or more entries has the needsSync flag', (done) => {
+        fetchMock.get('/api/entries/sync/1234', {
+          status: 200,
+          body: {
+            entries: [],
+            timestamp: 4321
+          }
+        });
+        fetchMock.post('/api/entry', {
+          status: 200,
+          body: { id: 3 }
+        });
+        fetchMock.patch('/api/entry/1', 204);
+        fetchMock.delete('/api/entry/2', 204);
+        
+        el.state.loggedIn = true;
+        el.state.timestamp = 1234;
+        el.state.entries = [
+          { id: 0, date: '2018-01-01', text: 'bogus', newEntry: true, needsSync: true  },
+          { id: 1, date: '2017-01-01', text: 'what', needsSync: true },
+          { id: 2, deleted: true, needsSync: true },
+        ];
+        Entry.getEntries(el);
+        setTimeout(() => {
+          const entries = el.state.entries;
+          expect(entries.length).to.equal(2);
+          expect(entries[0].id).to.equal(3);
+          expect(entries[0].newEntry).to.be.undefined;
+          expect(entries[0].needsSync).to.be.undefined;
+          expect(entries[1].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+    });
 
     describe('createEntry', () => {
       let entry;
@@ -182,7 +323,7 @@ describe('actions', () => {
       it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
         fetchMock.post('/api/entry', {
           status: 200,
-          body: { id: 1 } 
+          body: { id: 1 }
         });
         Entry.createEntry(el, { entry: entry });
 
@@ -207,7 +348,7 @@ describe('actions', () => {
       it('should call set twice (with the correct params, of course) and set postPending to true if clientSync is true even when postPending is true', (done) => {
         fetchMock.post('/api/entry', {
           status: 200,
-          body: { id: 1 } 
+          body: { id: 1 }
         });
         el.state.entry = postPendingEntry;
         Entry.createEntry(el, { entry: postPendingEntry, clientSync: true });
@@ -233,7 +374,7 @@ describe('actions', () => {
       it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
         fetchMock.post('/api/entry', {
           status: 200,
-          body: { id: 1 } 
+          body: { id: 1 }
         });
         Entry.createEntry(el, { entry: entry });
 

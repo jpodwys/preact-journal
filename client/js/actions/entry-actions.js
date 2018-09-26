@@ -72,7 +72,7 @@ function syncEntriesSuccess (el, response){
 };
 
 function applySyncPatch (el, entries){
-  entries.forEach((entry, i) => {
+  entries.forEach((entry) => {
     var entryIndex = findObjectIndexById(entry.id, el.state.entries);
     if(entryIndex > -1){
       if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
