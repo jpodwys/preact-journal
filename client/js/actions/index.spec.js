@@ -244,6 +244,18 @@ describe('actions', () => {
         });
       });
 
+      it('should handle an error when syncing entries', (done) => {
+        fetchMock.get('/api/entries/sync/1234', 500);
+        
+        el.state.loggedIn = true;
+        el.state.timestamp = 1234;
+        Entry.getEntries(el);
+        setTimeout(() => {
+          expect(console.log.calledWith('syncEntriesFailure')).to.be.true;
+          done();
+        });
+      });
+
       it('should sync entries from the client to the server when one or more entries has the needsSync flag', (done) => {
         fetchMock.get('/api/entries/sync/1234', {
           status: 200,
@@ -274,6 +286,26 @@ describe('actions', () => {
           expect(entries[0].newEntry).to.be.undefined;
           expect(entries[0].needsSync).to.be.undefined;
           expect(entries[1].needsSync).to.be.undefined;
+          done();
+        });
+      });
+
+      it('should handle a failure to update an entry from client to server', (done) => {
+        fetchMock.get('/api/entries/sync/1234', {
+          status: 200,
+          body: {
+            entries: [],
+            timestamp: 4321
+          }
+        });
+        fetchMock.patch('/api/entry/0', 500);
+        
+        el.state.loggedIn = true;
+        el.state.timestamp = 1234;
+        el.state.entries = [ { id: 0, date: '2017-01-01', text: 'what', needsSync: true } ];
+        Entry.getEntries(el);
+        setTimeout(() => {
+          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
       });
