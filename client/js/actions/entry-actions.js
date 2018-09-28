@@ -360,7 +360,7 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id);
 };
 
-function cleanEntries (el) {
+function removeSlideInProp (el) {
   const entries = el.state.entries.map(entry => {
     delete entry.slideIn;
     return entry;
@@ -379,5 +379,5 @@ export default {
   filterByText,
   blurTextFilter,
   shiftEntry,
-  cleanEntries
+  removeSlideInProp
 };
