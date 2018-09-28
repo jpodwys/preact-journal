@@ -79,7 +79,7 @@ function applySyncPatch (el, entries){
       else el.state.entries[entryIndex] = entry;
     } else {
       entry.slideIn = true;
-      el.state.entries.push(entry);
+      el.state.entries.unshift(entry);
     }
   });
 };
