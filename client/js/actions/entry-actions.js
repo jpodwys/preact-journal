@@ -78,7 +78,8 @@ function applySyncPatch (el, entries){
       if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
       else el.state.entries[entryIndex] = entry;
     } else {
-      el.state.entries.unshift(entry);
+      entry.slideIn = true;
+      el.state.entries.push(entry);
     }
   });
 };
@@ -326,7 +327,8 @@ function newEntry (el){
     date: new Date().toISOString().slice(0, 10),
     text: '',
     needsSync: true,
-    newEntry: true
+    newEntry: true,
+    slideIn: true
   };
 
   el.set({
@@ -358,6 +360,15 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id);
 };
 
+function cleanEntries (el) {
+  const entries = el.state.entries.map(entry => {
+    delete entry.slideIn;
+    return entry;
+  });
+
+  el.set({ entries });
+};
+
 export default {
   getEntries,
   createEntry,
@@ -367,5 +378,6 @@ export default {
   newEntry,
   filterByText,
   blurTextFilter,
-  shiftEntry
+  shiftEntry,
+  cleanEntries
 };

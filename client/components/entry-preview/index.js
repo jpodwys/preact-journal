@@ -13,8 +13,10 @@ export default class EntryPreview extends Component {
   }
 
   render({ entry }) {
+    const fadeRight = entry.slideIn ? 'fade-right' : '';
+
     return (
-      <div class="entry-preview">
+      <div class={`entry-preview ${fadeRight}`}>
         <a href={"/entry/" + entry.id}>
           <div class="list-item">
             <div class="first-row">

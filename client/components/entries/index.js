@@ -9,6 +9,7 @@ export default class Entries extends Component {
     document.body.onscroll = debounce(() => {
       fire('linkstate', {key: 'scrollPosition', val: document.body.scrollTop})();
     }, 50);
+    setTimeout(fire('cleanEntries'), 500);
   }
 
   componentWillUnmount() {
