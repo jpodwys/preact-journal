@@ -7,17 +7,9 @@ var express = require('express'),
   strictTransportSecurity = require('./server/middleware/strict-transport-security'),
   forceSsl = require('force-ssl-heroku'),
   jwtMW = require('express-jwt'),
-  // resMods = require('./server/middleware/response-mods'),
-  AES = require('./server/utils/aes'),
+  AES = require('./server/utils/aes')
+  cron = require('./server/cron'),
   PORT = process.env.PORT || 3000;
-
-// Keep the dyno awake when in production
-if(process.env.NODE_ENV === 'production'){
-  var https = require('http');
-  setInterval(function() {
-    https.get('https://preact-journal.herokuapp.com');
-  }, 900000); // Every 15 minutes
-}
 
 app.disable('x-powered-by');
 app.use(forceSsl);
@@ -26,7 +18,6 @@ app.use(compress({threshold: '1.4kb'}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
-// app.use(resMods.vary);
 app.use(jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,
@@ -48,4 +39,5 @@ app.use(express.static('dist', {maxAge: '0h'}));
 require('./server/middleware/app-middleware')(app);
 require('./server/routes')(app);
 
-var server = app.listen(PORT);
+app.listen(PORT);
+cron();
