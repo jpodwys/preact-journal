@@ -7,7 +7,7 @@ var express = require('express'),
   strictTransportSecurity = require('./server/middleware/strict-transport-security'),
   forceSsl = require('force-ssl-heroku'),
   jwtMW = require('express-jwt'),
-  AES = require('./server/utils/aes')
+  AES = require('./server/utils/aes'),
   cron = require('./server/cron'),
   PORT = process.env.PORT || 3000;
 
