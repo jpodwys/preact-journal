@@ -455,7 +455,7 @@ toast.show {
 }
 
 .fade-right {
-  animation: fade-right ease .2s forwards;
+  animation: fade-right ease .35s forwards;
 }
 
 .grow {
