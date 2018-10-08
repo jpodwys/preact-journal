@@ -208,15 +208,12 @@ svg {
 .entry-preview--icons {
   position: absolute;
   top: 0;
-  right: 0;
+  right: -12.5px;
 }
 
 .entry-preview--icons svg {
   padding-top: 10px;
-}
-
-.entry-preview--icons svg:last-child {
-  padding-right: 0;
+  padding-bottom: 5px;
 }
 
 .entry-preview .entry-link {
