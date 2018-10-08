@@ -1,5 +1,6 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
+import debounce from '../debounce';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -78,6 +79,7 @@ function applySyncPatch (el, entries){
       if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
       else el.state.entries[entryIndex] = entry;
     } else {
+      entry.slideIn = true;
       el.state.entries.unshift(entry);
     }
   });
@@ -326,7 +328,8 @@ function newEntry (el){
     date: new Date().toISOString().slice(0, 10),
     text: '',
     needsSync: true,
-    newEntry: true
+    newEntry: true,
+    slideIn: true
   };
 
   el.set({
@@ -358,6 +361,15 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id);
 };
 
+function removeSlideInProp (el) {
+  const entries = el.state.entries.map(entry => {
+    delete entry.slideIn;
+    return entry;
+  });
+
+  el.set({ entries });
+};
+
 export default {
   getEntries,
   createEntry,
@@ -367,5 +379,6 @@ export default {
   newEntry,
   filterByText,
   blurTextFilter,
-  shiftEntry
+  shiftEntry,
+  removeSlideInProp: debounce(removeSlideInProp, 50)
 };

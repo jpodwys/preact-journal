@@ -423,6 +423,17 @@ toast.show {
   }
 }
 
+@keyframes fade-right {
+  from {
+    opacity: .25;
+    transform: translateX(-250px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes grow {
   from {
     transform: scale(.2);
@@ -438,6 +449,10 @@ toast.show {
 
 .fade-down {
   animation: fade-down ease .2s forwards;
+}
+
+.fade-right {
+  animation: fade-right ease .35s forwards;
 }
 
 .grow {

@@ -717,6 +717,27 @@ describe('actions', () => {
 
     // });
 
+    describe('removeSlideInProp', () => {
+
+      it('should remove the slideIn prop from all entries after a 50ms debounce', (done) => {
+        el.state.entries.push({ id: 0, date: '2018-01-01' });
+        el.state.entries.push({ id: 1, date: '2017-01-01', slideIn: true });
+        Entry.removeSlideInProp(el);
+        expect(el.set.called).to.be.false;
+
+        setTimeout(() => {
+          expect(el.state.entries.length).to.equal(2);
+          const entries = el.set.args[0][0].entries;
+          expect(entries[0].id).to.equal(0);
+          expect(entries[0].slideIn).to.be.undefined;
+          expect(entries[1].id).to.equal(1);
+          expect(entries[1].slideIn).to.be.undefined;
+          done();
+        }, 60);
+      });
+
+    });
+
   });
 
 });
