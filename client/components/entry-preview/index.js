@@ -14,6 +14,7 @@ export default class EntryPreview extends Component {
 
   render({ entry }) {
     const fadeRight = entry.slideIn ? 'fade-right' : '';
+    if(fadeRight) setTimeout(fire('removeSlideInProp'), 450);
 
     return (
       <div class={`entry-preview ${fadeRight}`}>

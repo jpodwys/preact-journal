@@ -1,5 +1,6 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
+import debounce from '../debounce';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -379,5 +380,5 @@ export default {
   filterByText,
   blurTextFilter,
   shiftEntry,
-  removeSlideInProp
+  removeSlideInProp: debounce(removeSlideInProp, 50)
 };

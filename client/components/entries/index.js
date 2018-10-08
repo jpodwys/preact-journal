@@ -7,19 +7,16 @@ import debounce from '../../js/debounce';
 export default class Entries extends Component {
   componentDidMount() {
     document.body.onscroll = debounce(() => {
-      fire('linkstate', {key: 'scrollPosition', val: document.body.scrollTop})();
+      fire('linkstate', { key: 'scrollPosition', val: document.body.scrollTop })();
     }, 50);
-    setTimeout(fire('removeSlideInProp'), 500);
   }
-
+  
   componentWillUnmount() {
     document.body.onscroll = null;
   }
 
   shouldComponentUpdate(np) {
-    let op = this.props;
-    return op.viewEntries !== np.viewEntries
-      || op.scrollPosition === np.scrollPosition;
+    return this.props.viewEntries !== np.viewEntries;
   }
 
   render({ viewEntries, scrollPosition }) {
