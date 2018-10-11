@@ -81,7 +81,7 @@ class Router extends Component {
     });
   }
 
-  render({ children, path, onChange }, { url }) {
+  render({ children }, { url }) {
     return this.matchPath(url, children)[0];
   }
 }
