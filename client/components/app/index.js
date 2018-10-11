@@ -18,7 +18,7 @@ import { merge } from '../../js/utils';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
-let { pushState } = history;
+const { pushState } = history;
 history.pushState = (a, b, url) => {
   pushState.call(history, a, b, url);
   scrollTo(0, 0);
@@ -48,7 +48,7 @@ export default class App extends Component {
 
   set(delta, cb) {
     merge(this.realState, delta);
-    this.setState(this.realState, cb);
+    this.setState(delta, cb);
     this.state = this.realState;
   }
 

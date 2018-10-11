@@ -16,7 +16,9 @@ export default class Entries extends Component {
   }
 
   shouldComponentUpdate(np) {
-    return this.props.viewEntries !== np.viewEntries;
+    const op = this.props;
+    return op.viewEntries !== np.viewEntries
+      || op.scrollPosition === np.scrollPosition;
   }
 
   render({ viewEntries, scrollPosition }) {
