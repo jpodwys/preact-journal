@@ -45,13 +45,6 @@ function applyFilters (query, list) {
   return filterObjectsByText(query, list);
 };
 
-function clearLocalStorage () {
-  localStorage.clear();
-  // localStorage.removeItem('entries');
-  // localStorage.removeItem('timestamp');
-  // localStorage.removeItem('dark');
-};
-
 function getViewFromHref (href) {
   if(~href.indexOf('/new')) return '/new';
   return href.lastIndexOf('/') > 0
@@ -76,7 +69,6 @@ export {
   filterObjectsByText,
   filterHiddenEntries,
   applyFilters,
-  clearLocalStorage,
   getViewFromHref,
   merge,
   isActiveEntryId

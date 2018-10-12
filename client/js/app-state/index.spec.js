@@ -1,4 +1,3 @@
-import { clearLocalStorage } from '../utils';
 import getInitialState from './index';
   
 describe('appState', () => {
@@ -13,7 +12,7 @@ describe('appState', () => {
   });
 
   afterEach(() => {
-    clearLocalStorage();
+    localStorage.clear();
   });
 
   it('should return correct defaults', () => {

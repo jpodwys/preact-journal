@@ -215,10 +215,12 @@ function updateEntry (el, { entry, property, entryId }){
   if(entryIndex === -1) return;
   var activeEntry = el.state.entries[entryIndex];
   var current = activeEntry[property];
-  // Don't need this right now since the only values users can
-  // edit are strings. Will need this if I add favorites or
-  // other user-editable non-string values.
-  // if(typeof current === 'string') current = current.trim();
+  /**
+   * Don't need this right now since the only values users can
+   * edit are strings. Will need this if I add favorites or
+   * other user-editable non-string values.
+   * if(typeof current === 'string') current = current.trim();
+   */
   var next = entry[property];
   if(current === next) return;
 
@@ -229,9 +231,9 @@ function updateEntry (el, { entry, property, entryId }){
     entries: [].concat(el.state.entries)
   });
 
-  Entry.update(entryId, entry).then(function(){
+  Entry.update(entryId, entry).then(() => {
     updateEntrySuccess(el, entryId);
-  }).catch(function(err){
+  }).catch(err => {
     updateEntryFailure(el, err);
   });
 };
@@ -260,9 +262,9 @@ function updateEntryFailure (el, err){
 };
 
 function putEntry (el, { entry }){
-  Entry.update(entry.id, entry).then(function(){
+  Entry.update(entry.id, entry).then(() => {
     updateEntrySuccess(el, entry.id);
-  }).catch(function(err){
+  }).catch(err => {
     updateEntryFailure(el, err);
   });
 };
@@ -284,7 +286,7 @@ function deleteEntry (el, { id }){
     if(el.state.view !== '/entries') route('/entries', true);
   });
 
-  Entry.del(id).then(function(){
+  Entry.del(id).then(() => {
     deleteEntrySuccess(el, id);
   }).catch(err => {
     deleteEntryFailure(el, err);

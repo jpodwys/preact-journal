@@ -1,5 +1,5 @@
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, clearLocalStorage, getViewFromHref, applyFilters } from '../utils';
+import { sortObjectsByDate, filterHiddenEntries, getViewFromHref, applyFilters } from '../utils';
 
 const persist = (obj, prop, value/*, oldVal*/) => {
   switch(prop) {
@@ -43,7 +43,7 @@ const handler = {
 
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) clearLocalStorage();
+  if(!loggedIn) localStorage.clear();
   let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
   let viewEntries;
   if(entries){
