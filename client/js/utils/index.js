@@ -1,3 +1,5 @@
+import { clear } from 'idb-keyval';
+
 function findObjectIndexById (id, list) {
   return list.map(function(obj){
     return obj.id;
@@ -10,7 +12,7 @@ function removeObjectByIndex (index, list) {
 };
 
 function sortObjectsByDate (list) {
-  if(!list) return [];
+  if(!list) return;
   return list.sort(function(a, b){
     return new Date(b.date) - new Date(a.date);
   });
@@ -62,6 +64,11 @@ function isActiveEntryId (el, id) {
   return el.state.entry.id === id;
 };
 
+function clearData () {
+  clear();
+  localStorage.clear();
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
@@ -71,5 +78,6 @@ export {
   applyFilters,
   getViewFromHref,
   merge,
-  isActiveEntryId
+  isActiveEntryId,
+  clearData
 };

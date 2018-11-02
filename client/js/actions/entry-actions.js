@@ -1,3 +1,4 @@
+import { set } from 'idb-keyval';
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
@@ -10,7 +11,7 @@ function getEntries (el){
   if(dataFetched) return;
   dataFetched = true;
   if(el.state.timestamp){
-    syncEntries(el, el.state.timestamp);
+    // syncEntries(el, el.state.timestamp);
   } else {
     getAllEntries(el);
   }
@@ -53,8 +54,8 @@ function syncClientEntries (el){
 };
 
 // Get updates from the server
-function syncEntries (el, timestamp){
-  Entry.sync(timestamp).then(response => {
+function syncEntries (el){
+  Entry.sync(el.state.timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
     syncEntriesFailure(el, err);
@@ -64,7 +65,7 @@ function syncEntries (el, timestamp){
 
 function syncEntriesSuccess (el, response){
   if(response.entries.length === 0){
-    localStorage.setItem('timestamp', response.timestamp);
+    set('timestamp', response.timestamp);
     return;
   }
 
@@ -374,6 +375,7 @@ function removeSlideInProp (el) {
 
 export default {
   getEntries,
+  syncEntries,
   createEntry,
   updateEntry,
   deleteEntry,

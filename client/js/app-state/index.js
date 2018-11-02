@@ -1,5 +1,7 @@
+import { get, set } from 'idb-keyval';
 import cookie from '../cookie';
-import { sortObjectsByDate, filterHiddenEntries, getViewFromHref, applyFilters } from '../utils';
+import { sortObjectsByDate, getViewFromHref, applyFilters, clearData } from '../utils';
+import fire from '../fire';
 
 const persist = (obj, prop, value/*, oldVal*/) => {
   switch(prop) {
@@ -7,7 +9,7 @@ const persist = (obj, prop, value/*, oldVal*/) => {
     case 'timestamp':   localStorage.setItem('timestamp', value);   return;
     case 'entries': {
       obj.entries = sortObjectsByDate(value);
-      localStorage.setItem('entries', JSON.stringify(obj.entries));
+      set('entries', obj.entries);
       return;
     }
   }
@@ -41,16 +43,9 @@ const handler = {
   }
 };
 
-export default function getInitialState () {
+export default function getInitialState (el) {
   let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) localStorage.clear();
-  let entries = JSON.parse(localStorage.getItem('entries')) || undefined;
-  let viewEntries;
-  if(entries){
-    entries = sortObjectsByDate(entries);
-    viewEntries = filterHiddenEntries(entries);
-  }
-  let timestamp = localStorage.getItem('timestamp') || undefined;
+  if(!loggedIn) clearData();
 
   let state = {
     scrollPosition: 0,
@@ -58,14 +53,21 @@ export default function getInitialState () {
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
-    timestamp: timestamp,
     entry: undefined,
     entryIndex: -1,
-    entries: entries,
-    viewEntries: viewEntries || entries,
     toastConfig: undefined,
-    dark: localStorage.getItem('dark') === 'true'
+    dark: localStorage.getItem('dark') === 'true',
+    timestamp: localStorage.getItem('timestamp') || undefined
   };
 
-  return new Proxy(state, handler);
+  const proxy = new Proxy(state, handler);
+
+  get('entries').then(entries => {
+    proxy.entries = entries;
+    el.set({ entries }, () => {
+      if(entries) fire('syncEntries')();
+    });
+  });
+
+  return proxy;
 };

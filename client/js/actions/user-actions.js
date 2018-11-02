@@ -1,9 +1,10 @@
+import { clearData } from '../utils';
 import User from '../services/user-service';
 import getInitialState from '../app-state';
 import { route } from '../../components/router';
 
 function login (el, user){
-  localStorage.clear();
+  clearData();
   User.login(user).then(() => {
     loginSuccess(el);
   }).catch(err => {
@@ -24,7 +25,7 @@ function loginFailure (el, err){
 };
 
 function createAccount (el, user){
-  localStorage.clear();
+  clearData();
   User.create(user).then(() => {
     loginSuccess(el);
   }).catch(err => {
@@ -45,7 +46,7 @@ function logout (el){
 };
 
 function logoutSuccess (el){
-  localStorage.clear();
+  clearData();
   el.realState = el.state = getInitialState();
   route('/');
 };
