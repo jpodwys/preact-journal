@@ -306,7 +306,7 @@ function deleteEntryFailure (el, err){
 };
 
 function setEntry (el, { id }){
-  if(!id || id === -1) return;
+  if(!id || id === -1 || !el.state.entries || !el.state.entries.length) return;
 
   // If writing a new entry, look in state.entries,
   // otherwise look in state.viewEntries.

@@ -46,10 +46,12 @@ const handler = {
 export default function getInitialState (el) {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearData();
+  let view = getViewFromHref(location.pathname);
 
   let state = {
+    loading: true,
     scrollPosition: 0,
-    view: getViewFromHref(location.href),
+    view,
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
@@ -63,11 +65,17 @@ export default function getInitialState (el) {
   const proxy = new Proxy(state, handler);
 
   get('entries').then(entries => {
-    proxy.entries = entries;
-    el.set({ entries }, () => {
-      if(entries) fire('syncEntries')();
-    });
-  });
+    setTimeout(() => {
+      el.set({ entries }, () => {
+        if(entries && el.state.timestamp){
+          fire('syncEntries')();
+        }
+        if(el.state.view === '/entry'){
+          fire('executeRoute')();
+        }
+      })
+    }, 1000);
+  }).catch();
 
   return proxy;
 };
