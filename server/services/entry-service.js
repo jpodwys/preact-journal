@@ -89,6 +89,12 @@ module.exports = function(Entry, sequelize){
     });
   }
 
+  self.removeAllDeletedEntries = function(){
+    return Entry.destroy({
+      where: { deleted: 1 }
+    });
+  }
+
   self.getEntryCount = function(){
     return Entry.count({
       where: { deleted: 0 }
