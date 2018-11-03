@@ -65,16 +65,14 @@ export default function getInitialState (el) {
   const proxy = new Proxy(state, handler);
 
   get('entries').then(entries => {
-    setTimeout(() => {
-      el.set({ entries }, () => {
-        if(entries && el.state.timestamp){
-          fire('syncEntries')();
-        }
-        if(el.state.view === '/entry'){
-          fire('executeRoute')();
-        }
-      })
-    }, 1000);
+    el.set({ entries }, () => {
+      if(entries && el.state.timestamp){
+        fire('syncEntries')();
+      }
+      if(el.state.view === '/entry'){
+        fire('executeRoute')();
+      }
+    });
   }).catch();
 
   return proxy;
