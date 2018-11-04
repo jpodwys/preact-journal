@@ -46,18 +46,16 @@ const handler = {
 export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearData();
-  let view = getViewFromHref(location.pathname);
 
   let state = {
-    loading: true,
     scrollPosition: 0,
-    view,
     showFilterInput: false,
     filterText: '',
     loggedIn: loggedIn,
     entry: undefined,
     entryIndex: -1,
     toastConfig: undefined,
+    view: getViewFromHref(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
   };
