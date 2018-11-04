@@ -43,7 +43,7 @@ const handler = {
   }
 };
 
-export default function getInitialState (el) {
+export default function getInitialState () {
   let loggedIn = !!cookie.get('logged_in');
   if(!loggedIn) clearData();
   let view = getViewFromHref(location.pathname);
@@ -65,14 +65,7 @@ export default function getInitialState (el) {
   const proxy = new Proxy(state, handler);
 
   get('entries').then(entries => {
-    el.set({ entries }, () => {
-      if(entries && el.state.timestamp){
-        fire('syncEntries')();
-      }
-      if(el.state.view === '/entry'){
-        fire('executeRoute')();
-      }
-    });
+    fire('boot', { entries })();
   }).catch();
 
   return proxy;

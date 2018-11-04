@@ -2,16 +2,26 @@ import { set } from 'idb-keyval';
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
+import handleRouteChange from '../route-handlers';
 import { route } from '../../components/router';
 
 let dataFetched = false;
+
+function boot (el, { entries }){
+  el.set({ entries }, () => {
+    getEntries(el);
+    if(el.state.view === '/entry'){
+      handleRouteChange.call(el, location.pathname);
+    }
+  });
+};
 
 function getEntries (el){
   if(!el.state.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
   if(el.state.timestamp){
-    // syncEntries(el, el.state.timestamp);
+    syncEntries(el, el.state.timestamp);
   } else {
     getAllEntries(el);
   }
@@ -40,6 +50,7 @@ function getAllEntriesError (el, err){
 // Send updates to the server
 function syncClientEntries (el){
   var entries = el.state.entries;
+  if(!entries || !entries.length) return;
   entries.forEach(entry => {
     if(entry.needsSync){
       var func;
@@ -374,6 +385,7 @@ function removeSlideInProp (el) {
 };
 
 export default {
+  boot,
   getEntries,
   syncEntries,
   createEntry,
