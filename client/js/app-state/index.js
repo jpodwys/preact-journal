@@ -60,11 +60,9 @@ export default function getInitialState () {
     timestamp: localStorage.getItem('timestamp') || undefined
   };
 
-  const proxy = new Proxy(state, handler);
-
   get('entries').then(entries => {
     fire('boot', { entries })();
   }).catch();
 
-  return proxy;
+  return new Proxy(state, handler);
 };
