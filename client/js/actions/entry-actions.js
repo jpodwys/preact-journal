@@ -76,7 +76,7 @@ function syncEntries (el){
 
 function syncEntriesSuccess (el, response){
   if(response.entries.length === 0){
-    set('timestamp', response.timestamp);
+    localStorage.setItem('timestamp', response.timestamp);
     return;
   }
 

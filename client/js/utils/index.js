@@ -47,7 +47,7 @@ function applyFilters (query, list) {
   return filterObjectsByText(query, list);
 };
 
-function getViewFromHref (href) {
+function getViewFromPathname (href) {
   if(~href.indexOf('/new')) return '/new';
   return href.lastIndexOf('/') > 0
     ? href.substr(0, href.lastIndexOf('/'))
@@ -76,7 +76,7 @@ export {
   filterObjectsByText,
   filterHiddenEntries,
   applyFilters,
-  getViewFromHref,
+  getViewFromPathname,
   merge,
   isActiveEntryId,
   clearData

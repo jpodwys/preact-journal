@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval';
 import cookie from '../cookie';
-import { sortObjectsByDate, getViewFromHref, applyFilters, clearData } from '../utils';
+import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import fire from '../fire';
 
 const persist = (obj, prop, value/*, oldVal*/) => {
@@ -55,7 +55,7 @@ export default function getInitialState () {
     entry: undefined,
     entryIndex: -1,
     toastConfig: undefined,
-    view: getViewFromHref(location.pathname),
+    view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
   };

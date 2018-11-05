@@ -1,3 +1,4 @@
+import { get, set } from 'idb-keyval';
 import {
   findObjectIndexById,
   removeObjectByIndex,
@@ -5,9 +6,10 @@ import {
   filterObjectsByText,
   filterHiddenEntries,
   applyFilters,
-  getViewFromHref,
+  getViewFromPathname,
   merge,
-  isActiveEntryId
+  isActiveEntryId,
+  clearData
 } from './index';
 
 describe('utils', () => {
@@ -34,10 +36,9 @@ describe('utils', () => {
   });
 
   describe('sortObjectsByDate', () => {
-    it('should return an empty array when passed undefined', () => {
+    it('should return a falsey when passed falsey', () => {
       const sorted = sortObjectsByDate();
-      expect(Array.isArray(sorted)).to.be.true;
-      expect(sorted.length).to.equal(0);
+      expect(!!sorted).to.be.false;
     });
 
     it('should sort object by descending date', () => {
@@ -131,26 +132,26 @@ describe('utils', () => {
     });
   });
 
-  describe('getViewFromHref', () => {
+  describe('getViewFromPathname', () => {
     const rootHref = '/';
     const newHref = '/entry/new';
     const entriesHref = '/entries'
     const entryHref = '/entry/1234'
     
     it('should return /new if href contains /new', () => {
-      expect(getViewFromHref(newHref)).to.equal('/new');
+      expect(getViewFromPathname(newHref)).to.equal('/new');
     });
 
     it('should return /entry when passed /entry/1234', () => {
-      expect(getViewFromHref(entryHref)).to.equal('/entry');
+      expect(getViewFromPathname(entryHref)).to.equal('/entry');
     });
 
     it('should return /entries when passed /entries', () => {
-      expect(getViewFromHref(entriesHref)).to.equal('/entries');
+      expect(getViewFromPathname(entriesHref)).to.equal('/entries');
     });
     
     it('should return / when passed /', () => {
-      expect(getViewFromHref(rootHref)).to.equal('/');
+      expect(getViewFromPathname(rootHref)).to.equal('/');
     });
   });
 
@@ -189,6 +190,20 @@ describe('utils', () => {
       expect(isActiveEntryId(el, 0)).to.be.true;
     });
 
+  });
+
+  describe('clearData', () => {
+    it('should clear indexedDB and localStorage', (done) => {
+      localStorage.setItem('bogus', 'value');
+      set('bogus', 'value').then(() => {
+        clearData();
+        get('bogus').then(value => {
+          expect(value).to.be.undefined;
+          expect(localStorage.getItem('bogus')).to.be.null;
+          done();
+        });
+      });
+    });
   });
   
 });

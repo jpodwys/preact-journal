@@ -1,9 +1,9 @@
 import fire from '../fire';
-import { removeObjectByIndex, getViewFromHref } from '../utils';
+import { removeObjectByIndex, getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
 
 export default function handleRouteChange (url) {
-  let view = getViewFromHref(url);
+  let view = getViewFromPathname(url);
   if(view !== '/' && !this.state.loggedIn) return route('/', true);
   this.set({ view });
   handleRoute.call(this, view, url);

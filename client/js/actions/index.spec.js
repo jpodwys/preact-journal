@@ -136,6 +136,14 @@ describe('actions', () => {
 
   describe('entryActions', () => {
 
+    describe('boot', () => {
+
+      it('should', () => {
+
+      });
+
+    });
+
     describe('getEntries', () => {
 
       beforeEach(() => {
