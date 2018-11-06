@@ -1,4 +1,3 @@
-import { set } from 'idb-keyval';
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
@@ -10,6 +9,18 @@ let dataFetched = false;
 function boot (el, { entries }){
   el.set({ entries }, () => {
     getEntries(el);
+    /**
+     * If the user is trying to view a specific entry,
+     * I need to rerun the route handler once the
+     * entries have been loaded from indexedDB.
+     * 
+     * There may be a better way to manage this.
+     * Perhaps I can make entry a computed property
+     * that depends on view and entries.
+     * 
+     * I'll think about it, but for now I'm going to
+     * leave this here.
+     */
     if(el.state.view === '/entry'){
       handleRouteChange.call(el, location.pathname);
     }
@@ -386,8 +397,6 @@ function removeSlideInProp (el) {
 
 export default {
   boot,
-  getEntries,
-  syncEntries,
   createEntry,
   updateEntry,
   deleteEntry,

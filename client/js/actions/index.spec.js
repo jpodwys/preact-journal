@@ -139,7 +139,10 @@ describe('actions', () => {
     describe('boot', () => {
 
       it('should', () => {
-
+        const entries = [];
+        Entry.boot(el, { entries });
+        const arg = el.set.args[0][0];
+        expect(arg.entries).to.equal(entries);
       });
 
     });

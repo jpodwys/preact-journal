@@ -32,7 +32,6 @@ export default class App extends Component {
   
   componentWillMount() {
     freedux(this, actions);
-    fire('getEntries')();
     // window.app = this;
   }
 
@@ -43,6 +42,7 @@ export default class App extends Component {
   }
 
   componentWillUpdate() {
+    // THIS SEEMS WASTEFUL. I ONLY NEED THIS ONE TIME UPON LOGIN.
     fire('getEntries')();
   }
 
