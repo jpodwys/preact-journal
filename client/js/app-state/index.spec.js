@@ -85,4 +85,9 @@ describe('appState', () => {
     expect(state.viewEntries.length).to.equal(0);
   });
 
+  it('should get entries from indexedDB and fire the boot event', (done) => {
+    // NEED TO ADD ANOTHER TEST HERE
+    done();
+  });
+
 });
