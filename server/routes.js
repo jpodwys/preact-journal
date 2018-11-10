@@ -1,8 +1,7 @@
 var Sequelize = require('sequelize'),
   db = require('./db')(Sequelize),
   user = require('./middleware/userMW')(db, Sequelize),
-  entry = require('./middleware/entryMW')(db, Sequelize),
-  fs = require('fs');
+  entry = require('./middleware/entryMW')(db, Sequelize);
 
 module.exports = function(app){
   /* REST endpoints */
