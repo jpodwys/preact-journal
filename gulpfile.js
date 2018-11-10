@@ -32,6 +32,12 @@ function sw() {
     .pipe(gulp.dest('./dist'));   
 }
 
+function version() {
+  return gulp.src('client/js/version.json')
+    .pipe(replace('""', '"' + Date.now() + '"'))
+    .pipe(gulp.dest('./dist'));
+}
+
 function images() {
   return gulp.src('client/images/**.*')
     .pipe(gulp.dest('./dist'));
@@ -69,8 +75,8 @@ function inline() {
 function build() {
   return gulp.series(
     clean,
+    gulp.parallel(scripts, sw, version, manifest, images),
     serve,
-    gulp.parallel(scripts, sw, manifest, images),
     styles,
     inline
   )();
