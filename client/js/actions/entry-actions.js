@@ -397,6 +397,7 @@ function removeSlideInProp (el) {
 
 export default {
   boot,
+  getEntries,
   createEntry,
   updateEntry,
   deleteEntry,
