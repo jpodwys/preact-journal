@@ -26,6 +26,7 @@ export default class Login extends Component {
   render() {
     return (
       <div class="login-page-wrapper">
+        <h1>BOGUS</h1>
         <h1 class="center-text">Journalize</h1>
         <h4 class="center-text">Private journal entries</h4>
           <div class="login-form-wrapper">
