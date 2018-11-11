@@ -30,8 +30,8 @@ describe('appState', () => {
     expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
     expect(state.entryIndex).to.equal(-1);
-    expect(state.entries).to.be.undefined;
-    expect(state.viewEntries).to.be.undefined;
+    expect(state.entries.length).to.equal(0);
+    expect(state.viewEntries.length).to.equal(0);
     expect(state.toastConfig).to.be.undefined;
     expect(state.dark).to.be.false;
 
@@ -84,7 +84,7 @@ describe('appState', () => {
   });
 
   it('should compute and set viewEntries whenever entries or filterText change', () => {
-    expect(state.viewEntries).to.be.undefined;
+    expect(state.viewEntries.length).to.equal(0);
 
     state.entries = [ { date: '2018-01-01', text: 'hi' } ];
     expect(state.viewEntries[0].text).to.equal('hi');

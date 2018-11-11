@@ -188,7 +188,7 @@ describe('actions', () => {
           }
         });
         
-        delete el.state.entries;
+        el.state.entries = [];
         el.state.loggedIn = true;
         Entry.getEntries(el);
         setTimeout(() => {

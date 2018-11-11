@@ -39,7 +39,6 @@ function getEntries (el){
 };
 
 function getAllEntries (el){
-  if(el.state.entries) return;
   Entry.getAll().then(response => {
     getAllEntriesSuccess(el, response);
   }).catch(err => {
@@ -49,8 +48,8 @@ function getAllEntries (el){
 
 function getAllEntriesSuccess (el, response){
   el.set({
-    entries: response.entries,
-    timestamp: response.timestamp
+    timestamp: response.timestamp,
+    entries: [].concat(el.state.entries, response.entries)
   });
 };
 
@@ -61,7 +60,7 @@ function getAllEntriesError (el, err){
 // Send updates to the server
 function syncClientEntries (el){
   var entries = el.state.entries;
-  if(!entries || !entries.length) return;
+  if(!entries.length) return;
   entries.forEach(entry => {
     if(entry.needsSync){
       var func;
@@ -328,7 +327,7 @@ function deleteEntryFailure (el, err){
 };
 
 function setEntry (el, { id }){
-  if(!id || id === -1 || !el.state.entries || !el.state.entries.length) return;
+  if(!id || id === -1 || !el.state.entries.length) return;
 
   // If writing a new entry, look in state.entries,
   // otherwise look in state.viewEntries.
@@ -380,7 +379,7 @@ function blurTextFilter (el){
 };
 
 function shiftEntry (el, count){
-  if(el.state.view !== '/entry' || !count || !el.state.entries || !el.state.entry) return;
+  if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);

@@ -21,7 +21,7 @@ function sortObjectsByDate (list) {
 function filterObjectsByText (query, list) {
   if(!query) return list;
   query = query.toLowerCase();
-  return list.reduce(function(accumulator, obj){
+  return list.reduce((accumulator, obj) => {
     var index = obj.text.toLowerCase().indexOf(query);
     if(~index){
       obj = Object.assign({}, obj);
@@ -36,8 +36,8 @@ function filterObjectsByText (query, list) {
   }, []);
 };
 
-function filterHiddenEntries (entries = []) {
-  return entries.filter(function(entry){
+function filterHiddenEntries (entries) {
+  return entries.filter(entry => {
     return !entry.deleted;
   });
 };

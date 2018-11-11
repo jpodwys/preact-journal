@@ -48,6 +48,8 @@ export default function getInitialState () {
   if(!loggedIn) clearData();
 
   let state = {
+    entries: [],
+    viewEntries: [],
     scrollPosition: 0,
     showFilterInput: false,
     filterText: '',
@@ -60,7 +62,7 @@ export default function getInitialState () {
     timestamp: localStorage.getItem('timestamp') || undefined
   };
 
-  get('entries').then(entries => {
+  get('entries').then((entries = []) => {
     fire('boot', { entries })();
   }).catch();
 
