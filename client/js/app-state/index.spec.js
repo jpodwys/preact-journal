@@ -35,8 +35,8 @@ describe('appState', () => {
     expect(state.toastConfig).to.be.undefined;
     expect(state.dark).to.be.false;
 
-    const cb = sinon.spy();
-    document.addEventListener('boot', cb);
+    // const cb = sinon.spy();
+    // document.addEventListener('boot', cb);
     document.cookie = 'logged_in=true;';
     set('entries', [ { id: 0, date: '2018-01-01', text: 'yo' } ]);
     localStorage.setItem('timestamp', '1234');

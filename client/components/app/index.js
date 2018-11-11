@@ -42,7 +42,7 @@ export default class App extends Component {
   }
 
   componentWillUpdate() {
-    // THIS SEEMS WASTEFUL. I ONLY NEED THIS ONE TIME UPON LOGIN.
+    // THIS SEEMS WASTEFUL. I ONLY NEED THIS WHEN STATE.LOGGEDIN CHANGES.
     fire('getEntries')();
   }
 
