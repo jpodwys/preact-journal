@@ -41,14 +41,6 @@ describe('actions', () => {
   describe('userActions', () => {
     const USER = { username: 'bogus', password: 'value' };
 
-    beforeEach(() => {
-      
-    });
-
-    afterEach(() => {
-      
-    });
-
     describe('login', () => {
 
       it('should clear localStorage, login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
@@ -136,6 +128,25 @@ describe('actions', () => {
 
   describe('entryActions', () => {
 
+    describe('boot', () => {
+
+      it('should set entries', () => {
+        const entries = [];
+        Entry.boot(el, { entries });
+        const arg = el.set.args[0][0];
+        expect(arg.entries).to.equal(entries);
+      });
+
+      // it('should call get entries in a callback', () => {
+        
+      // });
+
+      // it('should run handleRouteChange when state.view === "/entry"', () => {
+        
+      // });
+
+    });
+
     describe('getEntries', () => {
 
       beforeEach(() => {
@@ -177,7 +188,7 @@ describe('actions', () => {
           }
         });
         
-        delete el.state.entries;
+        el.state.entries = [];
         el.state.loggedIn = true;
         Entry.getEntries(el);
         setTimeout(() => {

@@ -1,9 +1,31 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
+import handleRouteChange from '../route-handlers';
 import { route } from '../../components/router';
 
 let dataFetched = false;
+
+function boot (el, { entries }){
+  el.set({ entries }, () => {
+    getEntries(el);
+    /**
+     * If the user is trying to view a specific entry,
+     * I need to rerun the route handler once the
+     * entries have been loaded from indexedDB.
+     * 
+     * There may be a better way to manage this.
+     * Perhaps I can make entry a computed property
+     * that depends on view and entries.
+     * 
+     * I'll think about it, but for now I'm going to
+     * leave this here.
+     */
+    if(el.state.view === '/entry'){
+      handleRouteChange.call(el, location.pathname);
+    }
+  });
+};
 
 function getEntries (el){
   if(!el.state.loggedIn) return dataFetched = false;
@@ -17,7 +39,6 @@ function getEntries (el){
 };
 
 function getAllEntries (el){
-  if(el.state.entries) return;
   Entry.getAll().then(response => {
     getAllEntriesSuccess(el, response);
   }).catch(err => {
@@ -27,8 +48,8 @@ function getAllEntries (el){
 
 function getAllEntriesSuccess (el, response){
   el.set({
-    entries: response.entries,
-    timestamp: response.timestamp
+    timestamp: response.timestamp,
+    entries: [].concat(el.state.entries, response.entries)
   });
 };
 
@@ -39,6 +60,7 @@ function getAllEntriesError (el, err){
 // Send updates to the server
 function syncClientEntries (el){
   var entries = el.state.entries;
+  if(!entries.length) return;
   entries.forEach(entry => {
     if(entry.needsSync){
       var func;
@@ -53,8 +75,8 @@ function syncClientEntries (el){
 };
 
 // Get updates from the server
-function syncEntries (el, timestamp){
-  Entry.sync(timestamp).then(response => {
+function syncEntries (el){
+  Entry.sync(el.state.timestamp).then(response => {
     syncEntriesSuccess(el, response);
   }).catch(err => {
     syncEntriesFailure(el, err);
@@ -305,7 +327,7 @@ function deleteEntryFailure (el, err){
 };
 
 function setEntry (el, { id }){
-  if(!id || id === -1) return;
+  if(!id || id === -1 || !el.state.entries.length) return;
 
   // If writing a new entry, look in state.entries,
   // otherwise look in state.viewEntries.
@@ -357,7 +379,7 @@ function blurTextFilter (el){
 };
 
 function shiftEntry (el, count){
-  if(el.state.view !== '/entry' || !count || !el.state.entries || !el.state.entry) return;
+  if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);
@@ -373,6 +395,7 @@ function removeSlideInProp (el) {
 };
 
 export default {
+  boot,
   getEntries,
   createEntry,
   updateEntry,

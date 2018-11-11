@@ -1,3 +1,5 @@
+import { clear } from 'idb-keyval';
+
 function findObjectIndexById (id, list) {
   return list.map(function(obj){
     return obj.id;
@@ -10,7 +12,7 @@ function removeObjectByIndex (index, list) {
 };
 
 function sortObjectsByDate (list) {
-  if(!list) return [];
+  if(!list) return;
   return list.sort(function(a, b){
     return new Date(b.date) - new Date(a.date);
   });
@@ -19,7 +21,7 @@ function sortObjectsByDate (list) {
 function filterObjectsByText (query, list) {
   if(!query) return list;
   query = query.toLowerCase();
-  return list.reduce(function(accumulator, obj){
+  return list.reduce((accumulator, obj) => {
     var index = obj.text.toLowerCase().indexOf(query);
     if(~index){
       obj = Object.assign({}, obj);
@@ -34,8 +36,8 @@ function filterObjectsByText (query, list) {
   }, []);
 };
 
-function filterHiddenEntries (entries = []) {
-  return entries.filter(function(entry){
+function filterHiddenEntries (entries) {
+  return entries.filter(entry => {
     return !entry.deleted;
   });
 };
@@ -45,7 +47,7 @@ function applyFilters (query, list) {
   return filterObjectsByText(query, list);
 };
 
-function getViewFromHref (href) {
+function getViewFromPathname (href) {
   if(~href.indexOf('/new')) return '/new';
   return href.lastIndexOf('/') > 0
     ? href.substr(0, href.lastIndexOf('/'))
@@ -62,6 +64,11 @@ function isActiveEntryId (el, id) {
   return el.state.entry.id === id;
 };
 
+function clearData () {
+  clear();
+  localStorage.clear();
+};
+
 export {
   findObjectIndexById,
   removeObjectByIndex,
@@ -69,7 +76,8 @@ export {
   filterObjectsByText,
   filterHiddenEntries,
   applyFilters,
-  getViewFromHref,
+  getViewFromPathname,
   merge,
-  isActiveEntryId
+  isActiveEntryId,
+  clearData
 };
