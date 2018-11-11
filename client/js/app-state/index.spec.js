@@ -16,7 +16,7 @@ describe('appState', () => {
     localStorage.clear();
   });
 
-  it('should return correct defaults', () => {
+  it('should return correct defaults', (done) => {
     localStorage.setItem('bogus', 'hi');
     state = getInitialState();
 
@@ -35,6 +35,8 @@ describe('appState', () => {
     expect(state.toastConfig).to.be.undefined;
     expect(state.dark).to.be.false;
 
+    const cb = sinon.spy();
+    document.addEventListener('boot', cb);
     document.cookie = 'logged_in=true;';
     set('entries', [ { id: 0, date: '2018-01-01', text: 'yo' } ]);
     localStorage.setItem('timestamp', '1234');
@@ -46,8 +48,13 @@ describe('appState', () => {
     expect(state.dark).to.be.true;
     // Should ensure that the boot event is fired with the expected entries
     // expect(state.entries[0].id).to.equal(0);
+    setTimeout(() => {
+      expect(cb.called).to.be.true;
+      document.removeEventListener('boot', cb);
+      deleteCookie('logged_in');
+      done();
+    });
     
-    deleteCookie('logged_in');
   });
 
   it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', (done) => {

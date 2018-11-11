@@ -13,9 +13,9 @@ module.exports = function(){
   // session lifetime which is currently 30 days.
   if(new Date().getDate() === 31){
     var Sequelize = require('sequelize'),
-      db = require('./server/db')(Sequelize),
-      entryModel = require('./server/models/entry-model')(db, Sequelize),
-      entryService = new (require('./server/services/entry-service'))(entryModel, db);
+      db = require('./db')(Sequelize),
+      entryModel = require('./models/entry-model')(db, Sequelize),
+      entryService = new (require('./services/entry-service'))(entryModel, db);
     
     entryService.removeAllDeletedEntries();
   }
