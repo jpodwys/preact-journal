@@ -101,11 +101,6 @@ describe('utils', () => {
 
   describe('filterHiddenEntries', () => {
     const list = [ { id: 0, deleted: '1' }, { id: 1 } ];
-    
-    it('should return an empty array if passed undefined', () => {
-      const filtered = filterHiddenEntries();
-      expect(filtered.length).to.equal(0);
-    });
 
     it('should filter deleted entries', () => {
       const filtered = filterHiddenEntries(list);
