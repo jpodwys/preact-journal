@@ -3,7 +3,7 @@ import { fire } from '../../components/unifire';
 
 let textarea = document.createElement('textarea');
 textarea.setAttribute('tabindex', '-1');
-textarea.setAttribute('style', 'position:absolute;height:1px;width:1px;bottom:-100px;left:-100px;');
+textarea.setAttribute('style', 'position:absolute;height:1px;width:1px;left:-100px;');
 document.body.appendChild(textarea);
 
 function hideKeyboard (el) {
