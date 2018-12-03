@@ -25,13 +25,11 @@ function handleLoginView () {
 };
 
 function handleEntriesView () {
-  if(Array.isArray(this.state.entries)){
-    const entry = this.state.entries[0];
-    if(entry && entry.newEntry && !entry.text){
-      this.set({
-        entries: removeObjectByIndex(0, this.state.entries)
-      });
-    }
+  const entry = this.state.entries[0];
+  if(entry && entry.newEntry && !entry.text){
+    this.set({
+      entries: removeObjectByIndex(0, this.state.entries)
+    });
   }
 };
 

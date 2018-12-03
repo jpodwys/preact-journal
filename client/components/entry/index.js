@@ -85,6 +85,10 @@ export default class Entry extends Component {
           }
         </div>
 
+        <div>
+          <input type="file"/>
+        </div>
+
         <div
           id="entryText"
           contenteditable

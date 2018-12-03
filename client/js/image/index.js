@@ -1,4 +1,4 @@
-export default optimizeImage = file => {
+export default function optimizeImage (file) {
   return new Promise (resolve => {
     const canvas = document.createElement('canvas');
     const canvasContext = canvas.getContext('2d');
