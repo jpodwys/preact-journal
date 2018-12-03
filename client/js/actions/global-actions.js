@@ -8,7 +8,8 @@ function linkstate (el, { key, val, cb }){
   el.set(obj, cb);
 };
 
-function handleRouteChange (el, _, url) {
+function handleRouteChange (el, e, url) {
+  url = url || e.url;
   let view = getViewFromPathname(url);
   if(view !== '/' && !el.state.loggedIn) return route('/', true);
   el.set({ view });

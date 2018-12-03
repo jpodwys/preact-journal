@@ -22,7 +22,7 @@ function boot (el, { entries }){
      * leave this here.
      */
     if(el.state.view === '/entry'){
-      fire('handleRouteChange')(el, null, location.pathname);
+      fire('handleRouteChange', { url: location.pathname })();
     }
   });
 };

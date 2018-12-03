@@ -2,7 +2,7 @@ const CACHE = 'preact-journal';
  
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(cache => {
-    cache.addAll(['/', '/manifest.json', '/version', '/favicon-16.ico', '/icon-512x512.png']);
+    cache.addAll(['/', '/manifest.json', '/version', '/favicon.ico', '/icon-512x512.png']);
   }));
 });
  
@@ -21,10 +21,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(fromCache(reqUrl || e.request));
 
   if(~url.indexOf('manifest') || ~url.indexOf('icon')) return;
-  e.waitUntil(
-    update(reqUrl || e.request)
-    // .then(refresh)
-  );
+  e.waitUntil(update(reqUrl || e.request));
 });
  
 function fromCache(request) {
@@ -59,12 +56,3 @@ function update(request) {
     }).catch(err => console.log(err));
   });
 }
- 
-// function refresh(response) {
-//   if(!response) return;
-//   return self.clients.matchAll().then(clients => {
-//     clients.forEach(client => {
-//       client.postMessage(response.headers.get('ETag'));
-//     });
-//   });
-// }
