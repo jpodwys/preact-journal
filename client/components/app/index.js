@@ -6,15 +6,10 @@ import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
 import Toast from '../toast';
+import { fire } from '../unifire';
 
-import freedux from '../../js/freedux';
-import getInitialState from '../../js/app-state';
-import actions from '../../js/actions';
-import fire from '../../js/fire';
-import handleRouteChange from '../../js/route-handlers';
 import swipe from '../../js/swipe';
 import arrow from '../../js/arrow';
-import { merge } from '../../js/utils';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -25,16 +20,6 @@ history.pushState = (a, b, url) => {
 };
 
 export default class App extends Component {
-  constructor() {
-    super();
-    this.realState = this.state = getInitialState();
-  }
-  
-  componentWillMount() {
-    freedux(this, actions);
-    // window.app = this;
-  }
-
   componentDidMount() {
     swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
     swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
@@ -46,39 +31,33 @@ export default class App extends Component {
     fire('getEntries')();
   }
 
-  set(delta, cb) {
-    merge(this.realState, delta);
-    this.setState(delta, cb);
-    this.state = this.realState;
-  }
-
-  render(props, state) {
-    const dark = state.dark ? 'dark' : '';
-    const toast = state.toastConfig ? 'toast' : '';
+  render(props) {
+    const dark = props.dark ? 'dark' : '';
+    const toast = props.toastConfig ? 'toast' : '';
     
     return (
       <div class={`app ${dark} ${toast}`}>
         <Header
-          view={state.view}
-          loggedIn={state.loggedIn}
-          viewEntries={state.viewEntries}
-          entry={state.entry}
-          filterText={state.filterText}
-          showFilterInput={state.showFilterInput}
-          dark={state.dark}/>
+          view={props.view}
+          loggedIn={props.loggedIn}
+          viewEntries={props.viewEntries}
+          entry={props.entry}
+          filterText={props.filterText}
+          showFilterInput={props.showFilterInput}
+          dark={props.dark}/>
         <main>
-          <Router onChange={handleRouteChange.bind(this)}>
+          <Router onChange={fire('handleRouteChange')}>
             <Login path="/"/>
             <Entries path="/entries"
-              scrollPosition={state.scrollPosition}
-              viewEntries={state.viewEntries}/>
+              scrollPosition={props.scrollPosition}
+              viewEntries={props.viewEntries}/>
             <Entry path="/entry/:id"
-              view={state.view}
-              entry={state.entry}
-              viewEntries={state.viewEntries}
-              entryIndex={state.entryIndex}/>
+              view={props.view}
+              entry={props.entry}
+              viewEntries={props.viewEntries}
+              entryIndex={props.entryIndex}/>
           </Router>
-          <Toast config={state.toastConfig}/>
+          <Toast config={props.toastConfig}/>
         </main>
       </div>
     );

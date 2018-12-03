@@ -54,11 +54,6 @@ function getViewFromPathname (href) {
     : href;
 };
 
-function merge (obj, props) {
-  for (let i in props) obj[i] = props[i];
-  return obj;
-};
-
 function isActiveEntryId (el, id) {
   if(!el.state.entry) return false;
   return el.state.entry.id === id;
@@ -77,7 +72,6 @@ export {
   filterHiddenEntries,
   applyFilters,
   getViewFromPathname,
-  merge,
   isActiveEntryId,
   clearData
 };
