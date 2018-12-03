@@ -25,7 +25,6 @@ export function fire (name, detail) {
 export class Provider extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
     STATE = this.props.state;
     this.child = props.children[0];
     listen(this, this.props.actions);
