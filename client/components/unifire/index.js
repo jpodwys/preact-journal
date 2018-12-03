@@ -16,10 +16,10 @@ function merge (obj, props) {
 };
 
 export function fire (name, detail) {
-	return (e) => {
-	  const event = new CustomEvent(name, { detail: [ detail, e ] });
-	  document.dispatchEvent(event);
-	}
+  return (e) => {
+    const event = new CustomEvent(name, { detail: [ detail, e ] });
+    document.dispatchEvent(event);
+  }
 };
 
 export class Provider extends Component {
