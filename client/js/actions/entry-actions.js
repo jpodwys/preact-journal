@@ -1,8 +1,8 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
-import handleRouteChange from '../route-handlers';
 import { route } from '../../components/router';
+import { fire } from '../../components/unifire';
 
 let dataFetched = false;
 
@@ -22,7 +22,7 @@ function boot (el, { entries }){
      * leave this here.
      */
     if(el.state.view === '/entry'){
-      handleRouteChange.call(el, location.pathname);
+      fire('handleRouteChange')(el, null, location.pathname);
     }
   });
 };

@@ -1,4 +1,4 @@
-import fire from '../fire';
+import { fire } from '../../components/unifire';
 import { removeObjectByIndex, getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
 

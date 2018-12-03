@@ -1,6 +1,5 @@
 import { h, Component } from 'preact';
-import Icon from '../icon';
-import fire from '../../js/fire';
+import { fire } from '../unifire';
 
 let timeout;
 

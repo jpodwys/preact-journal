@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import Icon from '../icon';
-import fire from '../../js/fire';
+import { fire } from '../unifire';
 import copyText from '../../js/copy-text';
 
 export default class EntryPreview extends Component {

@@ -1,5 +1,5 @@
 import select from 'select';
-import fire from '../fire';
+import { fire } from '../../components/unifire';
 
 let textarea = document.createElement('textarea');
 textarea.setAttribute('tabindex', '-1');

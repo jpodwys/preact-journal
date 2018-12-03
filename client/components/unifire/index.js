@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import { h, Component, cloneElement } from 'preact';
 
 let STATE;
 
@@ -25,6 +25,7 @@ export function fire (name, detail) {
 export class Provider extends Component {
   constructor(props) {
     super(props);
+    this.state = {};
     STATE = this.props.state;
     this.child = props.children[0];
     listen(this, this.props.actions);
@@ -42,6 +43,6 @@ export class Provider extends Component {
   }
 
   render() {
-    return merge(this.child, STATE);
+    return cloneElement(this.child, STATE);
   }
 }

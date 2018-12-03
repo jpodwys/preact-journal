@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import ScrollViewport from 'preact-scroll-viewport';
 import EntryPreview from '../entry-preview';
-import fire from '../../js/fire';
+import { fire } from '../unifire';
 import debounce from '../../js/debounce';
 
 export default class Entries extends Component {

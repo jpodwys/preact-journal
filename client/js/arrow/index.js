@@ -1,4 +1,4 @@
-import fire from '../fire';
+import { fire } from '../../components/unifire';
 
 const LEFT = 37;
 const RIGHT = 39;

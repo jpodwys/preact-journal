@@ -1,4 +1,4 @@
-import fire from '../fire';
+import { fire } from '../../components/unifire';
 
 // Adapted from here: http://codepen.io/yzubizarreta/pen/ojJBQp
 var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or touchstart events.
