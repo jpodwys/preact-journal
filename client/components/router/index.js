@@ -1,5 +1,13 @@
 import { h, Component } from 'preact';
 
+// Make sure new pages are always scrolled to the top
+// while history entries maintain their scroll position.
+const { pushState } = history;
+history.pushState = (a, b, url) => {
+  pushState.call(history, a, b, url);
+  scrollTo(0, 0);
+};
+
 let ROUTER;
 let ONCHANGE;
 
