@@ -25,7 +25,7 @@ const compute = (obj, prop, value) => {
   }
 };
 
-const watch = (obj, prop, value) => {
+const observe = (obj, prop, value) => {
   switch(prop) {
     case 'loggedIn':  fire('getEntries')();   return;
   }
@@ -36,7 +36,7 @@ const handler = {
     obj[prop] = value;
     persist(obj, prop, value);
     compute(obj, prop, value);
-    watch(obj, prop, value);
+    observe(obj, prop, value);
     return true;
   }
 };
