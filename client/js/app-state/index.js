@@ -3,18 +3,6 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const persist = (obj, prop, value) => {
-  switch(prop) {
-    case 'dark':        localStorage.setItem('dark', !!value);      return;
-    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
-    case 'entries': {
-      obj.entries = sortObjectsByDate(value);
-      set('entries', obj.entries);
-      return;
-    }
-  }
-};
-
 const compute = (obj, prop, value) => {
   switch(prop) {
     case 'entries': // Fallthrough
@@ -27,14 +15,20 @@ const compute = (obj, prop, value) => {
 
 const observe = (obj, prop, value) => {
   switch(prop) {
-    case 'loggedIn':  fire('getEntries')();   return;
+    case 'entries': {
+      obj.entries = sortObjectsByDate(value);
+      set('entries', obj.entries);
+      return;
+    }
+    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
+    case 'dark':        localStorage.setItem('dark', !!value);      return;
+    case 'loggedIn':    if(value) fire('getEntries')();             return;
   }
 };
 
 const handler = {
   set: function(obj, prop, value) {
     obj[prop] = value;
-    persist(obj, prop, value);
     compute(obj, prop, value);
     observe(obj, prop, value);
     return true;
@@ -46,12 +40,12 @@ export default function getInitialState () {
   if(!loggedIn) clearData();
 
   let state = {
+    loggedIn,
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
     showFilterInput: false,
     filterText: '',
-    loggedIn: loggedIn,
     entry: undefined,
     entryIndex: -1,
     toastConfig: undefined,

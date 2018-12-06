@@ -16,7 +16,9 @@ function boot (el, { entries }){
      * 
      * There may be a better way to manage this.
      * Perhaps I can make entry a computed property
-     * that depends on view and entries.
+     * that depends on view and entries. But that
+     * would be wasteful since I only need to check
+     * this on boot.
      * 
      * I'll think about it, but for now I'm going to
      * leave this here.
