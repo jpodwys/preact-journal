@@ -22,7 +22,7 @@ const observe = (obj, prop, value) => {
     }
     case 'timestamp':   localStorage.setItem('timestamp', value);   return;
     case 'dark':        localStorage.setItem('dark', !!value);      return;
-    case 'loggedIn':    if(value) fire('getEntries')();             return;
+    case 'loggedIn':    if(value) setTimeout(fire('getEntries'));   return;
   }
 };
 
