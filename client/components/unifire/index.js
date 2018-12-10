@@ -23,8 +23,8 @@ export function fire (name, detail) {
 };
 
 export class Provider extends Component {
-  // Provider expects props.state to be a proxy object.
-  // The proxy handles computed properties and local persistence.
+  // Provider expects props.state to be a Proxy object.
+  // The Proxy handles computed properties and local persistence.
   constructor(props) {
     super(props);
     STATE = this.props.state;
