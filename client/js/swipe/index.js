@@ -39,11 +39,11 @@ function swipeEnd(e) {
   }
 }
 
-function listen(el, s, fn) {
+function swipeListen(el, s, fn) {
   var evts = s.split(' ');
   for (var i = 0, iLen = evts.length; i < iLen; i++) {
     el.addEventListener(evts[i], fn, false);
   }
 }
 
-export default { swipeStart, swipeEnd, listen };
+export default { swipeListen, swipeStart, swipeEnd };
