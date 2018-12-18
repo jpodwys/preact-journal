@@ -3,7 +3,7 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const compute = (obj, prop, value) => {
+const compute = (obj, prop) => {
   switch(prop) {
     case 'entries': // Fallthrough
     case 'filterText': {
@@ -29,7 +29,7 @@ const observe = (obj, prop, value) => {
 const handler = {
   set: function(obj, prop, value) {
     obj[prop] = value;
-    compute(obj, prop, value);
+    compute(obj, prop);
     observe(obj, prop, value);
     return true;
   }
@@ -44,11 +44,12 @@ export default function getInitialState () {
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
-    showFilterInput: false,
     filterText: '',
-    entry: undefined,
     entryIndex: -1,
-    toastConfig: undefined,
+    // Included for documentation purporses
+    // entry: undefined,
+    // toastConfig: undefined,
+    // showFilterInput: false,
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined

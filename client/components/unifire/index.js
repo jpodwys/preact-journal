@@ -1,23 +1,24 @@
 import { h, Component, cloneElement } from 'preact';
 
 let STATE;
+const NAME = 'UNIFIRE';
 
 function listen (el, actions) {
-  Object.keys(actions).forEach(action => {
-    document.addEventListener(action, (e) => {
-      actions[action](el, e.detail[0], e.detail[1]);
-    });
+  document.addEventListener(NAME, e => {
+    // Array destructuring adds .19kb to the bundle.
+    // Doing it the less attractive way for now.
+    const d = e.detail;
+    actions[d[0]](el, d[1], d[2]);
   });
 };
 
 function merge (obj, props) {
   for (let i in props) obj[i] = props[i];
-  return obj;
 };
 
 export function fire (name, detail) {
   return (e) => {
-    const event = new CustomEvent(name, { detail: [ detail, e ] });
+    const event = new CustomEvent(NAME, { detail: [ name, detail, e ] });
     document.dispatchEvent(event);
   }
 };
