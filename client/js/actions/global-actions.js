@@ -13,30 +13,30 @@ function handleRouteChange (el, e, url) {
   let view = getViewFromPathname(url);
   if(view !== '/' && !el.state.loggedIn) return route('/', true);
   el.set({ view });
-  handleRoute.call(el, view, url);
+  handleRoute(el, view, url);
   if(el.state.toastConfig) fire('linkstate', { key: 'toastConfig' })();
 };
 
-function handleRoute (view, url) {
+function handleRoute (el, view, url) {
   switch(view) {
-    case '/':         handleLoginView.call(this);       break;
-    case '/entries':  handleEntriesView.call(this);     break;
+    case '/':         handleLoginView(el);    break;
+    case '/entries':  handleEntriesView(el);  break;
     case '/entry':    // Fallthrough 
-    case '/new':      handleEntryView.call(this, url);  break;
-    default:          route('/');                       break;
+    case '/new':      handleEntryView(url);   break;
+    default:          route('/');             break;
   }
 };
 
-function handleLoginView () {
-  if(this.state.loggedIn) route('/entries', true);
+function handleLoginView (el) {
+  if(el.state.loggedIn) route('/entries', true);
 };
 
-function handleEntriesView () {
-  if(Array.isArray(this.state.entries)){
-    const entry = this.state.entries[0];
+function handleEntriesView (el) {
+  if(Array.isArray(el.state.entries)){
+    const entry = el.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
-      this.set({
-        entries: removeObjectByIndex(0, this.state.entries)
+      el.set({
+        entries: removeObjectByIndex(0, el.state.entries)
       });
     }
   }
