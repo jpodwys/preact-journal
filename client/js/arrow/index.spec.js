@@ -13,9 +13,7 @@ describe('arrow', () => {
     const el = document.createElement(type);
     el.id = ID;
     if(attr) el[attr] = true;
-    const node = document.body.appendChild(el);
-    node.focus();
-    node.focus();
+    document.body.appendChild(el).focus();
   };
 
   function removeEl() {

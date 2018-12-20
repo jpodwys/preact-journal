@@ -68,7 +68,11 @@ describe('actions', () => {
 
       it('should reset toastConfig if it is set', (done) => {
         const cb = sinon.spy();
-        const handler = (e) => { cb(e.detail[1]); };
+        const handler = (e) => {
+          if(e.detail[0] === 'linkstate'){
+            cb(e.detail[1]);
+          }
+        };
         document.addEventListener('UNIFIRE', handler);
         el.state.toastConfig = {};
         Global.handleRouteChange(el, null, '/');
@@ -117,7 +121,11 @@ describe('actions', () => {
 
       it('should fire setEntry on /entry/:id', (done) => {
         const cb = sinon.spy();
-        const handler = (e) => { cb(e.detail[1]); };
+        const handler = (e) => {
+          if(e.detail[0] === 'setEntry'){
+            cb(e.detail[1]);
+          }
+        };
         document.addEventListener('UNIFIRE', handler);
 
         el.state.loggedIn = true;

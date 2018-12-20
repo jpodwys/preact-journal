@@ -4,7 +4,11 @@ describe('copyText', () => {
 
   it('should fire linkstate', (done) => {
     const cb = sinon.spy();
-    const handler = (e) => { cb(e.detail); };
+    const handler = (e) => {
+      if(e.detail[0] === 'linkstate'){
+        cb(e.detail);
+      }
+    };
     document.execCommand = () => true;
     document.addEventListener('UNIFIRE', handler);
     copyText('bogus');
