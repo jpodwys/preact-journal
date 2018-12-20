@@ -13,8 +13,7 @@ describe('arrow', () => {
     const el = document.createElement(type);
     el.id = ID;
     if(attr) el[attr] = true;
-    document.body.appendChild(el);
-    document.getElementById(ID).focus();
+    document.body.appendChild(el).focus();
   };
 
   function removeEl() {
@@ -69,7 +68,7 @@ describe('arrow', () => {
     setTimeout(() => {
       expect(cb.called).to.be.false;
       done();
-    }, 50);
+    });
   });
 
   it('should do nothing when document.activeElement has the contenteditable attribute', (done) => {
@@ -79,7 +78,7 @@ describe('arrow', () => {
     setTimeout(() => {
       expect(cb.called).to.be.false;
       done();
-    }, 100);
+    });
   });
 
   it('should fire shiftEntry with -1 when left is pressed', (done) => {
