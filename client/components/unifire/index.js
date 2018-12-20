@@ -1,3 +1,15 @@
+/**
+ * This file is a combination of:
+ * 
+ * client/js/fire
+ * client/js/freedux
+ * client/js/utils::merge
+ * 
+ * I need to pull the unit tests from those locations into this
+ * folder when I add tests to client/components. For now, I'm
+ * leaving those tests and legacy folders where they are.
+ */
+
 import { h, Component, cloneElement } from 'preact';
 
 let STATE;
