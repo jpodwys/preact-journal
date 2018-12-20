@@ -41,11 +41,9 @@ function getEntries (el){
 };
 
 function getAllEntries (el){
-  Entry.getAll().then(response => {
-    getAllEntriesSuccess(el, response);
-  }).catch(err => {
-    getAllEntriesError(el, err);
-  });
+  Entry.getAll()
+    .then(response => getAllEntriesSuccess(el, response))
+    .catch(err => getAllEntriesError(el, err));
 };
 
 function getAllEntriesSuccess (el, response){
@@ -78,11 +76,9 @@ function syncClientEntries (el){
 
 // Get updates from the server
 function syncEntries (el){
-  Entry.sync(el.state.timestamp).then(response => {
-    syncEntriesSuccess(el, response);
-  }).catch(err => {
-    syncEntriesFailure(el, err);
-  });
+  Entry.sync(el.state.timestamp)
+    .then(response => syncEntriesSuccess(el, response))
+    .catch(err => syncEntriesFailure(el, err));
   syncClientEntries(el);
 };
 
@@ -173,11 +169,9 @@ function createEntry (el, { entry, clientSync }){
    */
   if(!clientSync && postPending) return;
 
-  Entry.create(entry).then(response => {
-    createEntrySuccess(el, entry.id, response);
-  }).catch(err => {
-    createEntryFailure(el, entry.id, err);
-  });
+  Entry.create(entry)
+    .then(response => createEntrySuccess(el, entry.id, response))
+    .catch(err => createEntryFailure(el, entry.id, err));
 };
 
 function createEntrySuccess (el, oldId, response){
@@ -255,11 +249,9 @@ function updateEntry (el, { entry, property, entryId }){
     entries: [].concat(el.state.entries)
   });
 
-  Entry.update(entryId, entry).then(() => {
-    updateEntrySuccess(el, entryId);
-  }).catch(err => {
-    updateEntryFailure(el, err);
-  });
+  Entry.update(entryId, entry)
+    .then(() => updateEntrySuccess(el, entryId))
+    .catch(err => updateEntryFailure(el, err));
 };
 
 function updateEntrySuccess (el, id){
@@ -286,11 +278,9 @@ function updateEntryFailure (el, err){
 };
 
 function putEntry (el, { entry }){
-  Entry.update(entry.id, entry).then(() => {
-    updateEntrySuccess(el, entry.id);
-  }).catch(err => {
-    updateEntryFailure(el, err);
-  });
+  Entry.update(entry.id, entry)
+    .then(() => updateEntrySuccess(el, entry.id))
+    .catch(err => updateEntryFailure(el, err));
 };
 
 function deleteEntry (el, { id }){
@@ -310,11 +300,9 @@ function deleteEntry (el, { id }){
     if(el.state.view !== '/entries') route('/entries', true);
   });
 
-  Entry.del(id).then(() => {
-    deleteEntrySuccess(el, id);
-  }).catch(err => {
-    deleteEntryFailure(el, err);
-  });
+  Entry.del(id)
+    .then(() => deleteEntrySuccess(el, id))
+    .catch(err => deleteEntryFailure(el, err));
 };
 
 function deleteEntrySuccess (el, id){

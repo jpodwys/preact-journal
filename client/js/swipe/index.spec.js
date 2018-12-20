@@ -25,25 +25,24 @@ describe('swipe', () => {
   };
 
   before(() => {
-    swipe.listen(document, 'mousedown touchstart', swipe.swipeStart);
-    swipe.listen(document, 'mouseup touchend', swipe.swipeEnd);
+    swipe(document);
   });
 
   beforeEach(() => {
     cb = sinon.spy();
-    document.addEventListener('shiftEntry', (e) => {
-      cb(e.detail[0]);
+    document.addEventListener('UNIFIRE', (e) => {
+      cb(e.detail[1]);
     });
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('shiftEntry', cb);
+    document.removeEventListener('UNIFIRE', cb);
   });
 
   it('should do nothing when the swipe\'s x distance is below 30px', (done) => {
-    emit('mousedown', 0, 0);
-    emit('mouseup', 29, 0);
+    emit('touchstart', 0, 0);
+    emit('touchend', 29, 0);
     setTimeout(() => {
       expect(cb.called).to.be.false;
       done();
@@ -90,9 +89,9 @@ describe('swipe', () => {
   });
 
   it('should do nothing when the swipe ends >= 1000ms after starting', (done) => {
-    emit('mousedown', 0, 0);
+    emit('touchstart', 0, 0);
     setTimeout(() => {
-      emit('mouseup', 30, 0);
+      emit('touchend', 30, 0);
       setTimeout(() => {
         expect(cb.called).to.be.false;
         done();
@@ -101,9 +100,9 @@ describe('swipe', () => {
   });
 
   it('should fire `shiftEntry` with -1 when swiping to the right', (done) => {
-    emit('mousedown', 0, 0);
+    emit('touchstart', 0, 0);
     setTimeout(() => {
-      emit('mouseup', 30, 19);
+      emit('touchend', 30, 19);
       setTimeout(() => {
         expect(cb.calledWithExactly(-1)).to.be.true;
         done();

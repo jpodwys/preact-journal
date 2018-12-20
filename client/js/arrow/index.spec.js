@@ -34,13 +34,13 @@ describe('arrow', () => {
 
   beforeEach(() => {
     cb = sinon.spy();
-    handler = (e) => { cb(e.detail[0]); };
-    document.addEventListener('shiftEntry', handler);
+    handler = (e) => { cb(e.detail[1]); };
+    document.addEventListener('UNIFIRE', handler);
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('shiftEntry', handler);
+    document.removeEventListener('UNIFIRE', handler);
   });
 
   it('should do nothing when the key pressed is not left or right', (done) => {

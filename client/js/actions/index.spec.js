@@ -9,7 +9,10 @@ describe('actions', () => {
   function getElStub() {
     return {
       state: { entries: [], bogus: 'value' },
-      set: sinon.spy()
+      set: sinon.spy(),
+      reset () {
+        this.state = { entries: [] };
+      }
     };
   };
 
@@ -32,6 +35,100 @@ describe('actions', () => {
         const delta = { key: 'bogus', val: 'value', cb: cb };
         Global.linkstate(el, delta);
         expect(el.set.args[0][0][delta.key]).to.equal(delta.val);
+      });
+
+    });
+
+    describe('handleRouteChange', () => {
+
+      it('should set view when appropriate', () => {
+        Global.handleRouteChange(el, null, '/entries');
+        expect(el.set.called).to.be.false;
+    
+        Global.handleRouteChange(el, null, '/');
+        expect(el.set.args[0][0].view).to.equal('/');
+      });
+
+      /* Can't currently test whether route was called. I'll look more into this later. */
+
+      // it('should route back to / when passed an unkown path', () => {
+      //   Global.handleRouteChange(el, null, '/bogus');
+      //   expect(el.set.args[0][0].view).to.equal('/');
+      // });
+
+      // it('should route back to / while logged out', () => {
+      //   Global.handleRouteChange(el, null, '/entries');
+      //   expect(el.set.args[0][0].view).to.equal('/');
+      // });
+
+      // it('should route to /entries when visiting / while logged in', () => {
+      //   Global.handleRouteChange(el, null, '/entries');
+      //   expect(el.set.args[0][0].view).to.equal('/');
+      // });
+
+      it('should reset toastConfig if it is set', (done) => {
+        const cb = sinon.spy();
+        const handler = (e) => { cb(e.detail[1]); };
+        document.addEventListener('UNIFIRE', handler);
+        el.state.toastConfig = {};
+        Global.handleRouteChange(el, null, '/');
+        setTimeout(() => {
+          const detail = cb.args[0][0];
+          expect(detail.key).to.equal('toastConfig');
+          expect(detail.val).to.be.undefined;
+          document.removeEventListener('UNIFIRE', handler);
+          done();
+        });
+      });
+
+      it('should remove first entry from entries when appropriate when going to /entries', () => {
+        el.state.loggedIn = true;
+
+        el.state.entries = undefined;
+        Global.handleRouteChange(el, null, '/entries');
+        // set was already called once at this point
+        expect(el.set.calledTwice).to.be.false;
+
+        el.state.entries = [ { text: 'hi' } ];
+        Global.handleRouteChange(el, null, '/entries');
+        // set was already called twice at this point
+        expect(el.set.calledThrice).to.be.false;
+
+        el.state.entries = [ { newEntry: true, text: '' } ];
+        Global.handleRouteChange(el, null, '/entries');
+        // set was already called thrice at this point
+        const args = el.set.args[3][0];
+        expect(args.entries.length).to.equal(0);
+      });
+
+      it('should fire newEntry on /new', (done) => {
+        const cb = sinon.spy();
+        document.addEventListener('UNIFIRE', cb);
+
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, null, '/entry/new');
+
+        setTimeout(() => {
+          expect(cb.called).to.be.true
+          document.removeEventListener('UNIFIRE', cb);
+          done();
+        });
+      });
+
+      it('should fire setEntry on /entry/:id', (done) => {
+        const cb = sinon.spy();
+        const handler = (e) => { cb(e.detail[1]); };
+        document.addEventListener('UNIFIRE', handler);
+
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, null, '/entry/10');
+
+        setTimeout(() => {
+          const args = cb.args[0][0];
+          expect(args.id).to.equal('10');
+          document.removeEventListener('UNIFIRE', handler);
+          done();
+        });
       });
 
     });

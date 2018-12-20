@@ -150,17 +150,17 @@ describe('utils', () => {
     });
   });
 
-  describe('merge', () => {
-    let a = { a: 'a' };
-    let b = { b: 'b' };
+  // describe('merge', () => {
+  //   let a = { a: 'a' };
+  //   let b = { b: 'b' };
 
-    it('should add b\'s props to a without changing a\'s reference', () => {
-      const keys = Object.keys(merge(a, b));
-      expect(keys.length).to.equal(2);
-      expect(keys.includes('a'));
-      expect(keys.includes('b'));
-    });
-  });
+  //   it('should add b\'s props to a without changing a\'s reference', () => {
+  //     const keys = Object.keys(merge(a, b));
+  //     expect(keys.length).to.equal(2);
+  //     expect(keys.includes('a'));
+  //     expect(keys.includes('b'));
+  //   });
+  // });
 
   describe('isActiveEntryId', () => {
     let el;

@@ -24,7 +24,7 @@ describe('appState', () => {
     expect(typeof state).to.equal('object');
     expect(state.scrollPosition).to.equal(0);
     // expect(state.view).to.equal('/');
-    expect(state.showFilterInput).to.be.false;
+    // expect(state.showFilterInput).to.be.false;
     expect(state.filterText).to.equal('');
     expect(state.loggedIn).to.be.false;
     expect(state.timestamp).to.be.undefined;
