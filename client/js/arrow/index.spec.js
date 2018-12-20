@@ -62,15 +62,15 @@ describe('arrow', () => {
     });
   });
 
-  it('should do nothing when document.activeElement is a textarea', (done) => {
-    appendAndFocus('textarea');
-    emit(LEFT);
-    emit(RIGHT);
-    setTimeout(() => {
-      expect(cb.called).to.be.false;
-      done();
-    });
-  });
+  // it('should do nothing when document.activeElement is a textarea', (done) => {
+  //   appendAndFocus('textarea');
+  //   emit(LEFT);
+  //   emit(RIGHT);
+  //   setTimeout(() => {
+  //     expect(cb.called).to.be.false;
+  //     done();
+  //   });
+  // });
 
   it('should do nothing when document.activeElement has the contenteditable attribute', (done) => {
     appendAndFocus('div', 'contentEditable');
