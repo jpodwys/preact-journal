@@ -3,6 +3,7 @@ import swipe from './index';
 describe('swipe', () => {
   const ID = 'bogus-id';
   let cb;
+  let handler;
 
   function appendAndFocus(type, attr) {
     const el = document.createElement(type);
@@ -30,14 +31,17 @@ describe('swipe', () => {
 
   beforeEach(() => {
     cb = sinon.spy();
-    document.addEventListener('UNIFIRE', (e) => {
-      cb(e.detail[1]);
-    });
+    handler = (e) => {
+      if(e.detail[0] === 'shiftEntry'){
+        cb(e.detail[1]);
+      }
+    }
+    document.addEventListener('UNIFIRE', handler);
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('UNIFIRE', cb);
+    document.removeEventListener('UNIFIRE', handler);
   });
 
   it('should do nothing when the swipe\'s x distance is below 30px', (done) => {

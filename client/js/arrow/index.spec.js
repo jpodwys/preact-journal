@@ -35,7 +35,11 @@ describe('arrow', () => {
 
   beforeEach(() => {
     cb = sinon.spy();
-    handler = (e) => { cb(e.detail[1]); };
+    handler = (e) => {
+      if(e.detail[0] === 'shiftEntry'){
+        cb(e.detail[1]);
+      }
+    }
     document.addEventListener('UNIFIRE', handler);
   });
 
