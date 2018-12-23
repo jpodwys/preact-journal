@@ -4,6 +4,7 @@ import User from './user-actions';
 import Entry from './entry-actions';
   
 describe('actions', () => {
+  const NAME = 'UNIFIRE';
   let el;
 
   function getElStub() {
@@ -73,14 +74,14 @@ describe('actions', () => {
             cb(e.detail[1]);
           }
         };
-        document.addEventListener('UNIFIRE', handler);
+        document.addEventListener(NAME, handler);
         el.state.toastConfig = {};
         Global.handleRouteChange(el, null, '/');
         setTimeout(() => {
           const detail = cb.args[0][0];
           expect(detail.key).to.equal('toastConfig');
           expect(detail.val).to.be.undefined;
-          document.removeEventListener('UNIFIRE', handler);
+          document.removeEventListener(NAME, handler);
           done();
         });
       });
@@ -107,14 +108,14 @@ describe('actions', () => {
 
       it('should fire newEntry on /new', (done) => {
         const cb = sinon.spy();
-        document.addEventListener('UNIFIRE', cb);
+        document.addEventListener(NAME, cb);
 
         el.state.loggedIn = true;
         Global.handleRouteChange(el, null, '/entry/new');
 
         setTimeout(() => {
           expect(cb.called).to.be.true
-          document.removeEventListener('UNIFIRE', cb);
+          document.removeEventListener(NAME, cb);
           done();
         });
       });
@@ -126,7 +127,7 @@ describe('actions', () => {
             cb(e.detail[1]);
           }
         };
-        document.addEventListener('UNIFIRE', handler);
+        document.addEventListener(NAME, handler);
 
         el.state.loggedIn = true;
         Global.handleRouteChange(el, null, '/entry/10');
@@ -134,7 +135,7 @@ describe('actions', () => {
         setTimeout(() => {
           const args = cb.args[0][0];
           expect(args.id).to.equal('10');
-          document.removeEventListener('UNIFIRE', handler);
+          document.removeEventListener(NAME, handler);
           done();
         });
       });

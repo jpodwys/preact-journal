@@ -3,6 +3,7 @@ import copyText from './index';
 describe('copyText', () => {
 
   it('should fire linkstate', (done) => {
+    const NAME = 'UNIFIRE';
     const cb = sinon.spy();
     const handler = (e) => {
       if(e.detail[0] === 'linkstate'){
@@ -10,7 +11,7 @@ describe('copyText', () => {
       }
     };
     document.execCommand = () => true;
-    document.addEventListener('UNIFIRE', handler);
+    document.addEventListener(NAME, handler);
     copyText('bogus');
     setTimeout(() => {
       expect(cb.called).to.be.true;
@@ -18,7 +19,7 @@ describe('copyText', () => {
       expect(args[0]).to.equal('linkstate');
       expect(args[1].key).to.equal('toastConfig');
       expect(args[1].val.type).to.equal('text copied');
-      document.addEventListener('UNIFIRE', handler);
+      document.addEventListener(NAME, handler);
       done();
     });
   });

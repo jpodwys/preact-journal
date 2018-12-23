@@ -1,6 +1,7 @@
 import swipe from './index';
   
 describe('swipe', () => {
+  const NAME = 'UNIFIRE';
   const ID = 'bogus-id';
   let cb;
   let handler;
@@ -36,12 +37,12 @@ describe('swipe', () => {
         cb(e.detail[1]);
       }
     }
-    document.addEventListener('UNIFIRE', handler);
+    document.addEventListener(NAME, handler);
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('UNIFIRE', handler);
+    document.removeEventListener(NAME, handler);
   });
 
   it('should do nothing when the swipe\'s x distance is below 30px', (done) => {

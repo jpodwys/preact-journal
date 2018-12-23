@@ -1,6 +1,7 @@
 import arrow from './index';
 
 describe('arrow', () => {
+  const NAME = 'UNIFIRE';
   const LEFT = 37;
   const RIGHT = 39;
   const ENTER = 13;
@@ -38,12 +39,12 @@ describe('arrow', () => {
         cb(e.detail[1]);
       }
     }
-    document.addEventListener('UNIFIRE', handler);
+    document.addEventListener(NAME, handler);
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener('UNIFIRE', handler);
+    document.removeEventListener(NAME, handler);
   });
 
   it('should do nothing when the key pressed is not left or right', (done) => {

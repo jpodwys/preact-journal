@@ -17,7 +17,7 @@ module.exports = function(config) {
               options: { esModules: true }
             },
             enforce: 'post',
-            exclude: /node_modules|\/test|\/components|\.spec\.js$/,
+            exclude: /node_modules|\/test|\.spec\.js$/,
           }
         ]
       }
