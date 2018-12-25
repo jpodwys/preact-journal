@@ -41,7 +41,7 @@ function logout (el){
 
 function logoutSuccess (el){
   clearData();
-  el.reset(getInitialState());
+  el.set(getInitialState());
   route('/');
 };
 
