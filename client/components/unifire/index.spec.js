@@ -1,7 +1,7 @@
 import { Provider, fire } from './index';
 import TestUtils from '../../../test/test-utils';
 
-describe.only('unifire', () => {
+describe('unifire', () => {
 
   describe('Provider', () => {
     const state = { a: 'a' };
