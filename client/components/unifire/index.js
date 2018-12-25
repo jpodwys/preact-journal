@@ -20,12 +20,14 @@ function listen (el, actions) {
     // Array destructuring adds .19kb to the bundle.
     // Doing it the less attractive way for now.
     const d = e.detail;
+    if(!d[0] || !actions[d[0]]) return;
     actions[d[0]](el, d[1], d[2]);
   });
 };
 
 function merge (obj, props) {
-  for (let i in props) obj[i] = props[i];
+  // for (let i in props) obj[i] = props[i];
+  Object.assign(obj, props);
 };
 
 export function fire (name, detail) {
@@ -49,11 +51,6 @@ export class Provider extends Component {
   set(delta, cb) {
     merge(STATE, delta);
     this.setState(STATE, cb);
-  }
-
-  reset(state) {
-    STATE = state;
-    this.setState(STATE);
   }
 
   render() {

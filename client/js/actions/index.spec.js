@@ -9,7 +9,7 @@ describe('actions', () => {
 
   function getElStub() {
     return {
-      state: { entries: [], bogus: 'value' },
+      state: { entries: [], showFilterInput: false },
       set: sinon.spy(),
       reset () {
         this.state = { entries: [] };
@@ -208,10 +208,12 @@ describe('actions', () => {
       it('should clear localStorage, reset state, and route back to / (the login page)', (done) => {
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
         localStorage.setItem('bogus', 'value');
+        el.state.showFilterInput = true;
         User.logout(el);
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.be.null;
-          expect(el.state.bogus).to.be.undefined;
+          expect(el.set.calledOnce).to.be.true;
+          expect(el.set.args[0][0].showFilterInput).to.be.false;
           done();
         });
       });
