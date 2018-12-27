@@ -51,6 +51,7 @@ describe('unifire', () => {
     it('should listen for the UNIFIRE event on the document and execute the appropriate actions', (done) => {
       const action1 = sinon.spy();
       const action2 = sinon.spy();
+      const action3 = sinon.spy();
       new Provider({
         state: {},
         actions: { action1, action2 },
@@ -63,6 +64,7 @@ describe('unifire', () => {
       setTimeout(() => {
         expect(action1.calledOnce).to.be.true;
         expect(action2.calledOnce).to.be.true;
+        expect(action3.calledOnce).to.be.false;
         done();
       });
     });
