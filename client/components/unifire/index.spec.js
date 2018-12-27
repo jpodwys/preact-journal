@@ -1,24 +1,7 @@
 import { Provider, fire } from './index';
 
 describe('unifire', () => {
-  const NAME = 'UNIFIRE';
-  const ACTION = 'BOGUS';
-  const handler = (e) => {
-    if(e.detail[0] === ACTION){
-      cb(e.detail[1], e.detail[2]);
-    }
-  };
-  let cb;
 
-  beforeEach(() => {
-    cb = sinon.spy();
-    document.addEventListener(NAME, handler);
-  });
-
-  afterEach(() => {
-    document.removeEventListener(NAME, handler);
-  });
-  
   describe('Provider', () => {
     it('should have set, render, and setState methods', () => {
       const provider = new Provider({
@@ -71,6 +54,25 @@ describe('unifire', () => {
   });
 
   describe('fire', () => {
+
+    const NAME = 'UNIFIRE';
+    const ACTION = 'BOGUS';
+    const handler = (e) => {
+      if(e.detail[0] === ACTION){
+        cb(e.detail[1], e.detail[2]);
+      }
+    };
+    let cb;
+
+    beforeEach(() => {
+      cb = sinon.spy();
+      document.addEventListener(NAME, handler);
+    });
+
+    afterEach(() => {
+      document.removeEventListener(NAME, handler);
+    });
+
     it('should return a function without firing an event', (done) => {
       expect(typeof fire(ACTION)).to.equal('function');
       setTimeout(() => {
