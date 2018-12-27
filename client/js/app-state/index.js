@@ -47,8 +47,9 @@ export default function getInitialState () {
     filterText: '',
     entryIndex: -1,
     entry: undefined,
-    toastConfig: undefined,
-    showFilterInput: false,
+    // Included for documentation purporses
+    // toastConfig: undefined,
+    // showFilterInput: false,
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
