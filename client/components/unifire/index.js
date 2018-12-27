@@ -27,11 +27,6 @@ function listen (el, actions) {
   });
 };
 
-function merge (obj, props) {
-  // for (let i in props) obj[i] = props[i];
-  Object.assign(obj, props);
-};
-
 export function fire (name, detail) {
   return (e) => {
     const event = new CustomEvent(NAME, { detail: [ name, detail, e ] });
@@ -51,7 +46,7 @@ export class Provider extends Component {
   }
 
   set(delta, cb) {
-    merge(STATE, delta);
+    Object.assign(STATE, delta);
     this.setState(STATE, cb);
   }
 
