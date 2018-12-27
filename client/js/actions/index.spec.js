@@ -213,7 +213,7 @@ describe('actions', () => {
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.calledOnce).to.be.true;
-          expect(el.set.args[0][0].showFilterInput).to.be.false;
+          expect(el.set.args[0][0].showFilterInput).to.be.undefined;
           done();
         });
       });
