@@ -45,9 +45,9 @@ function update() {
           .then(res => res.json())
           .then(match => {
             if(version.version === match.version) return;
-            cache.put('/version', versionRes.clone());
             return fetch('/').then(res => {
               if(res.status >= 300) return;
+              cache.put('/version', versionRes.clone());
               return cache.put('/', res.clone()).then(() => {
                 return res;
               });

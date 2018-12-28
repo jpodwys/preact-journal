@@ -46,8 +46,8 @@ export default function getInitialState () {
     scrollPosition: 0,
     filterText: '',
     entryIndex: -1,
+    entry: undefined,
     // Included for documentation purporses
-    // entry: undefined,
     // toastConfig: undefined,
     // showFilterInput: false,
     view: getViewFromPathname(location.pathname),

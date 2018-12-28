@@ -1,45 +1,78 @@
 import { Provider, fire } from './index';
 
 describe('unifire', () => {
-  const NAME = 'UNIFIRE';
-  const ACTION = 'BOGUS';
-  const handler = (e) => {
-    if(e.detail[0] === ACTION){
-      cb(e.detail[1], e.detail[2]);
-    }
-  };
-  let cb;
 
-  beforeEach(() => {
-    cb = sinon.spy();
-    document.addEventListener(NAME, handler);
+  describe('Provider', () => {
+    it('should have set, render, and setState methods', () => {
+      const provider = new Provider({
+        state: {},
+        actions: {},
+        children: []
+      });
+
+      expect(typeof provider.set).to.equal('function');
+      expect(typeof provider.render).to.equal('function');
+      expect(typeof provider.setState).to.equal('function');
+    });
+
+    it('should merge state when calling set', () => {
+      const provider = new Provider({
+        state: {},
+        actions: {},
+        children: []
+      });
+
+      provider.set({ a: 'z', b: 'b' });
+      expect(provider.state.a).to.equal('z');
+      expect(provider.state.b).to.equal('b');
+
+      provider.set({ a: 'y', b: 'b' });
+      expect(provider.state.a).to.equal('y');
+      expect(provider.state.b).to.equal('b');
+    });
+
+    it('should listen for the UNIFIRE event on the document and execute the appropriate actions', (done) => {
+      const action1 = sinon.spy();
+      const action2 = sinon.spy();
+      const action3 = sinon.spy();
+      new Provider({
+        state: {},
+        actions: { action1, action2 },
+        children: []
+      });
+
+      fire('action1')();
+      fire('action2')();
+
+      setTimeout(() => {
+        expect(action1.calledOnce).to.be.true;
+        expect(action2.calledOnce).to.be.true;
+        expect(action3.calledOnce).to.be.false;
+        done();
+      });
+    });
   });
-
-  afterEach(() => {
-    document.removeEventListener(NAME, handler);
-  });
-
-  /**
-   * I CAN'T TEST PROVIDER RIGHT NOW. IT ATTACHES A UNIFIRE EVENT LISTENER
-   * WHICH ENDS UP OVERWRITING EVENT LISTENERS FROM OTHER TESTS. IF I EXPORT
-   * THE LISTEN FUNCTION AND MAKE IT ACCEPT THE EVENT NAME PARAM, THEN I CAN
-   * TEST IT INDEPENDENTLY. I COULD ALSO MOVE THE MERGE FUNCTION BACK INTO
-   * THE UTILS FILE. BUT EVEN THEN, I'M NOT SURE HOW I'LL TEST PROVIDER.
-   */
-  // describe('Provider', () => {
-  //   it('should have set, reset, and render methods', () => {
-  //     const provider = new Provider({
-  //       state: {},
-  //       actions: {},
-  //       children: []
-  //     });
-  //     expect(typeof provider.set).to.equal('function');
-  //     expect(typeof provider.reset).to.equal('function');
-  //     expect(typeof provider.render).to.equal('function');
-  //   });
-  // });
 
   describe('fire', () => {
+
+    const NAME = 'UNIFIRE';
+    const ACTION = 'BOGUS';
+    const handler = (e) => {
+      if(e.detail[0] === ACTION){
+        cb(e.detail[1], e.detail[2]);
+      }
+    };
+    let cb;
+
+    beforeEach(() => {
+      cb = sinon.spy();
+      document.addEventListener(NAME, handler);
+    });
+
+    afterEach(() => {
+      document.removeEventListener(NAME, handler);
+    });
+
     it('should return a function without firing an event', (done) => {
       expect(typeof fire(ACTION)).to.equal('function');
       setTimeout(() => {
