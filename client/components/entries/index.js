@@ -39,7 +39,7 @@ export default class Entries extends Component {
       );
     }
     return (
-      <ScrollViewport class="entry-list fade-down" rowHeight={82} overscan={20}>
+      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
         {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );
