@@ -20,7 +20,7 @@ function listen (el, actions) {
     // Array destructuring adds .19kb to the bundle.
     // Doing it the less attractive way for now.
     const d = e.detail;
-    // This line needs to be here for due to how unifre and unit
+    // This line needs to be here due to how unifre and unit
     // tests currently work.
     if(!actions[d[0]]) return;
     actions[d[0]](el, d[1], d[2]);

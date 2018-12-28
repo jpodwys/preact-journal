@@ -169,7 +169,7 @@ function createEntry (el, { entry, clientSync }){
    */
   if(!clientSync && postPending) return;
 
-  Entry.create(entry)
+  Entry.create({ date: entry.date, text: entry.text })
     .then(response => createEntrySuccess(el, entry.id, response))
     .catch(err => createEntryFailure(el, entry.id, err));
 };
