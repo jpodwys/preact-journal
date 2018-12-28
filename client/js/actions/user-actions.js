@@ -5,17 +5,15 @@ import { route } from '../../components/router';
 
 function login (el, user){
   clearData();
-  User.login(user).then(() => {
-    loginSuccess(el);
-  }).catch(err => {
-    loginFailure(el, err);
-  });
+  User.login(user)
+    .then(() => loginSuccess(el))
+    .catch(err => loginFailure(el, err));
 };
 
 function loginSuccess (el){
   el.set({
     loggedIn: true,
-  }, function(){
+  }, () => {
     route('/entries', true);
   });
 };
@@ -26,11 +24,9 @@ function loginFailure (el, err){
 
 function createAccount (el, user){
   clearData();
-  User.create(user).then(() => {
-    loginSuccess(el);
-  }).catch(err => {
-    createAccountFailure(el, err);
-  });
+  User.create(user)
+    .then(() => loginSuccess(el))
+    .catch(err => createAccountFailure(el, err));
 };
 
 function createAccountFailure (el, err){
@@ -38,16 +34,14 @@ function createAccountFailure (el, err){
 };
 
 function logout (el){
-  User.logout().then(() => {
-    logoutSuccess(el);
-  }).catch(err => {
-    logoutFailure(el, err);
-  });
+  User.logout()
+    .then(() => logoutSuccess(el))
+    .catch(err => logoutFailure(el, err));
 };
 
 function logoutSuccess (el){
   clearData();
-  el.realState = el.state = getInitialState();
+  el.set(getInitialState());
   route('/');
 };
 

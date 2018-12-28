@@ -1,11 +1,10 @@
 import { h, Component } from 'preact';
-import Icon from '../icon';
-import fire from '../../js/fire';
+import { fire } from '../unifire';
 
 let timeout;
 
 export default class Toast extends Component {
-  componentDidUpdate(props) {
+  componentDidUpdate() {
     if(timeout) clearTimeout(timeout);
     let config = this.props.config;
     if(!config) return;

@@ -1,8 +1,8 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
 import debounce from '../debounce';
-import handleRouteChange from '../route-handlers';
 import { route } from '../../components/router';
+import { fire } from '../../components/unifire';
 
 let dataFetched = false;
 
@@ -16,13 +16,15 @@ function boot (el, { entries }){
      * 
      * There may be a better way to manage this.
      * Perhaps I can make entry a computed property
-     * that depends on view and entries.
+     * that depends on view and entries. But that
+     * would be wasteful since I only need to check
+     * this on boot.
      * 
      * I'll think about it, but for now I'm going to
      * leave this here.
      */
     if(el.state.view === '/entry'){
-      handleRouteChange.call(el, location.pathname);
+      fire('handleRouteChange', { url: location.pathname })();
     }
   });
 };
@@ -39,11 +41,9 @@ function getEntries (el){
 };
 
 function getAllEntries (el){
-  Entry.getAll().then(response => {
-    getAllEntriesSuccess(el, response);
-  }).catch(err => {
-    getAllEntriesError(el, err);
-  });
+  Entry.getAll()
+    .then(response => getAllEntriesSuccess(el, response))
+    .catch(err => getAllEntriesError(el, err));
 };
 
 function getAllEntriesSuccess (el, response){
@@ -76,11 +76,9 @@ function syncClientEntries (el){
 
 // Get updates from the server
 function syncEntries (el){
-  Entry.sync(el.state.timestamp).then(response => {
-    syncEntriesSuccess(el, response);
-  }).catch(err => {
-    syncEntriesFailure(el, err);
-  });
+  Entry.sync(el.state.timestamp)
+    .then(response => syncEntriesSuccess(el, response))
+    .catch(err => syncEntriesFailure(el, err));
   syncClientEntries(el);
 };
 
@@ -171,11 +169,9 @@ function createEntry (el, { entry, clientSync }){
    */
   if(!clientSync && postPending) return;
 
-  Entry.create(entry).then(response => {
-    createEntrySuccess(el, entry.id, response);
-  }).catch(err => {
-    createEntryFailure(el, entry.id, err);
-  });
+  Entry.create({ date: entry.date, text: entry.text })
+    .then(response => createEntrySuccess(el, entry.id, response))
+    .catch(err => createEntryFailure(el, entry.id, err));
 };
 
 function createEntrySuccess (el, oldId, response){
@@ -253,11 +249,9 @@ function updateEntry (el, { entry, property, entryId }){
     entries: [].concat(el.state.entries)
   });
 
-  Entry.update(entryId, entry).then(() => {
-    updateEntrySuccess(el, entryId);
-  }).catch(err => {
-    updateEntryFailure(el, err);
-  });
+  Entry.update(entryId, entry)
+    .then(() => updateEntrySuccess(el, entryId))
+    .catch(err => updateEntryFailure(el, err));
 };
 
 function updateEntrySuccess (el, id){
@@ -284,11 +278,9 @@ function updateEntryFailure (el, err){
 };
 
 function putEntry (el, { entry }){
-  Entry.update(entry.id, entry).then(() => {
-    updateEntrySuccess(el, entry.id);
-  }).catch(err => {
-    updateEntryFailure(el, err);
-  });
+  Entry.update(entry.id, entry)
+    .then(() => updateEntrySuccess(el, entry.id))
+    .catch(err => updateEntryFailure(el, err));
 };
 
 function deleteEntry (el, { id }){
@@ -308,11 +300,9 @@ function deleteEntry (el, { id }){
     if(el.state.view !== '/entries') route('/entries', true);
   });
 
-  Entry.del(id).then(() => {
-    deleteEntrySuccess(el, id);
-  }).catch(err => {
-    deleteEntryFailure(el, err);
-  });
+  Entry.del(id)
+    .then(() => deleteEntrySuccess(el, id))
+    .catch(err => deleteEntryFailure(el, err));
 };
 
 function deleteEntrySuccess (el, id){

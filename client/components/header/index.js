@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import Icon from '../icon';
-import fire from '../../js/fire';
+import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 

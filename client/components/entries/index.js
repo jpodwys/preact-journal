@@ -1,7 +1,7 @@
 import { h, Component } from 'preact';
 import ScrollViewport from 'preact-scroll-viewport';
 import EntryPreview from '../entry-preview';
-import fire from '../../js/fire';
+import { fire } from '../unifire';
 import debounce from '../../js/debounce';
 
 export default class Entries extends Component {
@@ -39,7 +39,7 @@ export default class Entries extends Component {
       );
     }
     return (
-      <ScrollViewport class="entry-list fade-down" rowHeight={84} overscan={20}>
+      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
         {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );

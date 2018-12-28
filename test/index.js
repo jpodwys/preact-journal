@@ -1,2 +1,2 @@
-const tests = require.context('../client/js/', true, /\.spec.js$/);
+const tests = require.context('../client/', true, /\.spec.js$/);
 tests.keys().forEach(tests);

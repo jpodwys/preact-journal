@@ -1,4 +1,4 @@
-import fire from '../fire';
+import { fire } from '../../components/unifire';
 
 // Adapted from here: http://codepen.io/yzubizarreta/pen/ojJBQp
 var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or touchstart events.
@@ -10,14 +10,14 @@ var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or
     startTime = 0,// Time on swipeStart
     elapsedTime = 0;// Elapsed time between swipeStart and swipeEnd
 
-function swipeStart(e) {
+function start(e) {
   e = e ? e : window.event;
   e = ('changedTouches' in e) ? e.changedTouches[0] : e;
   touchStartCoords = { x: e.pageX, y: e.pageY };
   startTime = Date.now();
 }
 
-function swipeEnd(e) {
+function end(e) {
   let el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
   e = e ? e : window.event;
@@ -39,11 +39,7 @@ function swipeEnd(e) {
   }
 }
 
-function listen(el, s, fn) {
-  var evts = s.split(' ');
-  for (var i = 0, iLen = evts.length; i < iLen; i++) {
-    el.addEventListener(evts[i], fn, false);
-  }
+export default function(el) {
+  el.addEventListener('touchstart', start);
+  el.addEventListener('touchend', end);
 }
-
-export default { swipeStart, swipeEnd, listen };
