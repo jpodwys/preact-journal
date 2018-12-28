@@ -31,22 +31,26 @@ describe('unifire', () => {
       expect(provider.state.b).to.equal('b');
     });
 
-    it('should listen for the UNIFIRE event on the document and execute the appropriate actions', (done) => {
+    it('should listen for the UNIFIRE event on the document and execute the appropriate actions with the appropriate arguments', (done) => {
       const action1 = sinon.spy();
       const action2 = sinon.spy();
       const action3 = sinon.spy();
-      new Provider({
+      const provider = new Provider({
         state: {},
         actions: { action1, action2 },
         children: []
       });
+      const payload = {};
+      const e = {};
 
-      fire('action1')();
-      fire('action2')();
+      fire('action1', payload)();
+      fire('action2', payload)(e);
 
       setTimeout(() => {
         expect(action1.calledOnce).to.be.true;
+        expect(action1.calledWithExactly(provider, payload, undefined)).to.be.true;
         expect(action2.calledOnce).to.be.true;
+        expect(action2.calledWithExactly(provider, payload, e)).to.be.true;
         expect(action3.calledOnce).to.be.false;
         done();
       });
