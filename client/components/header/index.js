@@ -16,6 +16,11 @@ export default class Header extends Component {
 		}})();
 	}
 
+	cancelAndBlur = (e) => {
+		e.preventDefault();
+		this.base.querySelector('#filterTextInput').blur();
+	}
+
 	copy = () => {
 		let date = document.getElementById('entryDate').innerText;
 		let text = document.getElementById('entryText').innerText;
@@ -43,7 +48,7 @@ export default class Header extends Component {
 
 					<div class="nav-set flex-grow">
 						{view === '/entries' && showFilterInput &&
-							<form class="search-form full-height right" onsubmit={e => e.preventDefault()}>
+							<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
 						    <input
 						    	id="filterTextInput"
 						    	autocomplete="off"
