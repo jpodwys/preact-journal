@@ -19,7 +19,7 @@ export default class Entries extends Component {
    * Only render if viewEntries has changed
    * or if scroll position has not changed.
    * The scroll position condition is
-   * necessary becasue app.js wraps pushState
+   * necessary becasue Router wraps pushState
    * so that it scrolls each pushState to the
    * top of the screen. However, I don't want
    * that to happen when navigating to /entries.

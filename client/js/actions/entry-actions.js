@@ -43,7 +43,7 @@ function getEntries (el){
 function getAllEntries (el){
   Entry.getAll()
     .then(response => getAllEntriesSuccess(el, response))
-    .catch(err => getAllEntriesError(el, err));
+    .catch(/* Do nothing */);
 };
 
 function getAllEntriesSuccess (el, response){
@@ -51,10 +51,6 @@ function getAllEntriesSuccess (el, response){
     timestamp: response.timestamp,
     entries: [].concat(el.state.entries, response.entries)
   });
-};
-
-function getAllEntriesError (el, err){
-  console.log('getAllEntriesError', err)
 };
 
 // Send updates to the server
@@ -78,7 +74,7 @@ function syncClientEntries (el){
 function syncEntries (el){
   Entry.sync(el.state.timestamp)
     .then(response => syncEntriesSuccess(el, response))
-    .catch(err => syncEntriesFailure(el, err));
+    .catch(/* Do nothing */);
   syncClientEntries(el);
 };
 
@@ -114,10 +110,6 @@ function persistSyncPatch (el, timestamp){
       setEntry(el, {id: el.state.entryId});
     }
   });
-};
-
-function syncEntriesFailure (el, err){
-  console.log('syncEntriesFailure', err)
 };
 
 function createEntry (el, { entry, clientSync }){
@@ -171,7 +163,7 @@ function createEntry (el, { entry, clientSync }){
 
   Entry.create({ date: entry.date, text: entry.text })
     .then(response => createEntrySuccess(el, entry.id, response))
-    .catch(err => createEntryFailure(el, entry.id, err));
+    .catch(() => createEntryFailure(el, entry.id));
 };
 
 function createEntrySuccess (el, oldId, response){
@@ -211,7 +203,7 @@ function createEntrySuccess (el, oldId, response){
   });
 };
 
-function createEntryFailure (el, oldId, err){
+function createEntryFailure (el, oldId){
   /**
    * Only update state.entry if the entry we just
    * modified is still active.
@@ -224,7 +216,6 @@ function createEntryFailure (el, oldId, err){
     entry: Object.assign({}, el.state.entry),
     entries: [].concat(el.state.entries)
   });
-  console.log('createEntryFailure', err);
 };
 
 function updateEntry (el, { entry, property, entryId }){
@@ -237,6 +228,7 @@ function updateEntry (el, { entry, property, entryId }){
    * Don't need this right now since the only values users can
    * edit are strings. Will need this if I add favorites or
    * other user-editable non-string values.
+   * It's currently being done in the entry component.
    * if(typeof current === 'string') current = current.trim();
    */
   var next = entry[property];
@@ -251,7 +243,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   Entry.update(entryId, entry)
     .then(() => updateEntrySuccess(el, entryId))
-    .catch(err => updateEntryFailure(el, err));
+    .catch(/* Do nothing */);
 };
 
 function updateEntrySuccess (el, id){
@@ -271,10 +263,6 @@ function updateEntrySuccess (el, id){
     entry: entry,
     entries: entries
   });
-};
-
-function updateEntryFailure (el, err){
-  console.log('updateEntryFailure', err);
 };
 
 function putEntry (el, { entry }){
@@ -302,7 +290,7 @@ function deleteEntry (el, { id }){
 
   Entry.del(id)
     .then(() => deleteEntrySuccess(el, id))
-    .catch(err => deleteEntryFailure(el, err));
+    .catch(/* Do nothing */);
 };
 
 function deleteEntrySuccess (el, id){
@@ -310,10 +298,6 @@ function deleteEntrySuccess (el, id){
   el.set({
     entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
-};
-
-function deleteEntryFailure (el, err){
-  console.log('deleteEntryFailure', err);
 };
 
 function setEntry (el, { id }){
@@ -355,10 +339,7 @@ function newEntry (el){
 };
 
 function filterByText (el, text, e){
-  if(text === undefined && (!e || !e.target)) return;
-  let query = text === undefined ? e.target.value : text;
-  if(el.state.filterText === query) return;
-  let filterText = query || '';
+  const filterText = text === undefined ? e.target.value : text;
   el.set({ filterText });
 };
 
@@ -370,8 +351,8 @@ function blurTextFilter (el){
 
 function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
-  var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
-  let entry = el.state.viewEntries[entryIndex + count];
+  const entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
+  const entry = el.state.viewEntries[entryIndex + count];
   if(entry) route('/entry/' + entry.id);
 };
 

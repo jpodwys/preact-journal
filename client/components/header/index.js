@@ -16,18 +16,13 @@ export default class Header extends Component {
 		}})();
 	}
 
-	cancelAndBlur = (e) => {
-		e.preventDefault();
-		this.base.querySelector('#filterTextInput').blur();
-	}
-
 	copy = () => {
 		let date = document.getElementById('entryDate').innerText;
 		let text = document.getElementById('entryText').innerText;
 		copyText(date + ' ' + text);
 	}
 
-	render({view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark}) {
+	render({ view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark }) {
 		if(!loggedIn) return null;
 		let vw = window.innerWidth;
 		let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
@@ -48,7 +43,7 @@ export default class Header extends Component {
 
 					<div class="nav-set flex-grow">
 						{view === '/entries' && showFilterInput &&
-							<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
+							<form class="search-form full-height right" onsubmit={e => e.preventDefault()}>
 						    <input
 						    	id="filterTextInput"
 						    	autocomplete="off"

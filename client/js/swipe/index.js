@@ -18,7 +18,7 @@ function start(e) {
 }
 
 function end(e) {
-  let el = document.activeElement;
+  const el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
   e = e ? e : window.event;
   e = ('changedTouches' in e) ? e.changedTouches[0] : e;
