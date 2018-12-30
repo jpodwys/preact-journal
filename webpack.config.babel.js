@@ -38,7 +38,12 @@ module.exports = {
     ]
   },
   plugins: [
-    new UglifyJSPlugin()
+    new UglifyJSPlugin({
+      uglifyOptions: {
+        keep_fargs: false,
+        passes: 3
+      }
+    })
   ],
   output: {
     filename: 'bundle.js',
