@@ -40,7 +40,6 @@ module.exports = {
   plugins: [
     new UglifyJSPlugin({
       uglifyOptions: {
-        drop_console: true,
         keep_fargs: false,
         passes: 3
       }
