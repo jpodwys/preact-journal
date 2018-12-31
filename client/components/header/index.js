@@ -8,10 +8,14 @@ const supportedIcons = ['star-filled', 'star-empty', 'clear'];
 
 export default class Header extends Component {
 	handleBlur = (e) => {
-		const target = e.relatedTarget;
+		const target = e.relatedTarget || e.explicitOriginalTarget;
+		let id;
 		let icon;
-		if(target) icon = target.getAttribute('icon');
-		if(~supportedIcons.indexOf(icon) && this.base.contains(target)) return;
+		if(target){
+			id = target.id;
+			icon = target.getAttribute('icon');
+		}
+		if(id === 'filterTextInput' || ~supportedIcons.indexOf(icon) && this.base.contains(target)) return;
 		fire('blurTextFilter')();
 	}
 
@@ -68,7 +72,10 @@ export default class Header extends Component {
 						{view === '/entries' && showFilterInput &&
 							<form class="search-form grow" onsubmit={this.cancelAndBlur}>
 								<span class="nav-set">
-									<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
+									<Icon
+										icon={filterIcon}
+										onblur={this.handleBlur}
+										onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
 								</span>
 						    <input
 						    	id="filterTextInput"
@@ -88,14 +95,14 @@ export default class Header extends Component {
 					  {view === '/entries' && !showFilterInput && !filter &&
 					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
 						}
+						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
+						}
 						{view === '/entry' && entry && !entry.newEntry &&
 							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 						}
-					  {(view === '/entry' || view === '/new') &&
-					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
-						}
-						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
+						{(view === '/entry' || view === '/new') &&
+							<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}
 					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 					</div>

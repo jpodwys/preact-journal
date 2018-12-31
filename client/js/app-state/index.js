@@ -13,12 +13,13 @@ const compute = (obj, prop, value) => {
     }
 
     // showFilterInput
-    case 'filter': // Fallthrough
-    case 'filterText': //Fallthrough
-    case 'showFilterInput': {
-      if(prop === 'showFilterInput' && !value)
-      obj.showFilterInput = (!!obj.filter || !!obj.filterText);
-    }
+    // case 'view': // Fallthrough
+    // case 'filter': // Fallthrough
+    // case 'filterText': //Fallthrough
+    // case 'showFilterInput': {
+    //   if(prop === 'showFilterInput' && value === true) return;
+    //   obj.showFilterInput = (!!obj.filter || !!obj.filterText);
+    // }
   }
 };
 
