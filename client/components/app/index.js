@@ -19,6 +19,7 @@ export default (props) => {
         loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}
+        filter={props.filter}
         filterText={props.filterText}
         showFilterInput={props.showFilterInput}
         dark={props.dark}/>

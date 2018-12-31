@@ -10,7 +10,7 @@ module.exports = function(Entry, sequelize){
         deleted: { $ne: 1 }
       },
       attributes: [
-        'id', 'date', 'text',
+        'id', 'date', 'text', 'favorited',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       order: [
@@ -29,7 +29,7 @@ module.exports = function(Entry, sequelize){
         deviceId: { $ne: deviceId }
       },
       attributes: [
-        'id', 'date', 'text', 'deleted',
+        'id', 'date', 'text', 'deleted', 'favorited',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       order: [
@@ -42,9 +42,9 @@ module.exports = function(Entry, sequelize){
 
   self.getEntryById = function(id){
     return Entry.findOne({
-      where: {id: id},
+      where: { id: id },
       attributes: [
-        'id', 'ownerId', 'text',
+        'id', 'ownerId', 'text', 'favorited',
         [sequelize.fn('date_format', sequelize.col('date'), '%Y-%m-%d'), 'date'],
       ],
       raw: true
@@ -57,6 +57,7 @@ module.exports = function(Entry, sequelize){
         ownerId: ownerId,
         date: data.date,
         text: data.text,
+        favorited: 0,
         updatedAt: date.getUtcZeroTimestamp(),
         deviceId: deviceId
       }).then(function (entry){
@@ -81,11 +82,12 @@ module.exports = function(Entry, sequelize){
       text: '',
       deleted: 1,
       updatedAt: date.getUtcZeroTimestamp(),
+      favorited: 0,
       deviceId: deviceId
     };
 
     return Entry.update(data, {
-      where: {id: entryId}
+      where: { id: entryId }
     });
   }
 

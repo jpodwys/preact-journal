@@ -46,6 +46,16 @@ svg {
   width: 24px;
 }
 
+button[data-is="svg"] {
+  background: none;
+	color: inherit;
+  border: none;
+  padding: 0;
+	font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
 .hidden {
   visibility: hidden;
 }
@@ -207,9 +217,8 @@ svg {
   right: -12.5px;
 }
 
-.entry-preview--icons svg {
-  padding-top: 10px;
-  padding-bottom: 5px;
+.entry-preview--icons button[data-is="svg"] {
+  padding: 10px 12.5px 5px;
 }
 
 .entry-preview .entry-link {
@@ -243,7 +252,7 @@ header .nav-set h3 {
   padding: 14px 15px;
 }
 
-header .nav-set > *:not(h1) {
+header .nav-set > *:not(h1):not(form) {
   padding: 12.5px;
 }
 
@@ -251,14 +260,21 @@ header .nav-set > *:not(h1) {
   flex: 1 2;
 }
 
+.nav-search {
+  flex-shrink: 1000;
+}
+
 .search-form {
   margin: 0;
+  padding: 0;
   max-width: 300px;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .search-form input {
   padding: 8px;
-  width: 100%;
+  width: 75%;
   background: transparent;
   border: none;
   outline: 0;

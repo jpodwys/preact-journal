@@ -3,12 +3,21 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const compute = (obj, prop) => {
+const compute = (obj, prop, value) => {
   switch(prop) {
+    // viewEntries
+    case 'filter': // Fallthrough
     case 'entries': // Fallthrough
     case 'filterText': {
-      obj.viewEntries = applyFilters(obj.filterText, obj.entries);
-      return;
+      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.entries);
+    }
+
+    // showFilterInput
+    case 'filter': // Fallthrough
+    case 'filterText': //Fallthrough
+    case 'showFilterInput': {
+      if(prop === 'showFilterInput' && !value)
+      obj.showFilterInput = (!!obj.filter || !!obj.filterText);
     }
   }
 };
@@ -29,7 +38,7 @@ const observe = (obj, prop, value) => {
 const handler = {
   set: function(obj, prop, value) {
     obj[prop] = value;
-    compute(obj, prop);
+    compute(obj, prop, value);
     observe(obj, prop, value);
     return true;
   }
@@ -44,6 +53,7 @@ export default function getInitialState () {
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
+    filter: '',
     filterText: '',
     entryIndex: -1,
     entry: undefined,

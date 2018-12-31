@@ -227,6 +227,14 @@ function createEntryFailure (el, oldId, err){
   console.log('createEntryFailure', err);
 };
 
+function toggleFavorite (el, { id, favorited }){
+  updateEntry(el, {
+    entry: { favorited },
+    property: 'favorited',
+    entryId: id
+  });
+};
+
 function updateEntry (el, { entry, property, entryId }){
   if(!entry || !property || typeof entryId !== 'number') return;
   var entryIndex = findObjectIndexById(entryId, el.state.entries);
@@ -375,6 +383,13 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id);
 };
 
+function clearFilters (el) {
+  el.set({
+    filter: '',
+    filterText: ''
+  });
+};
+
 function removeSlideInProp (el) {
   const entries = el.state.entries.map(entry => {
     delete entry.slideIn;
@@ -395,5 +410,7 @@ export default {
   filterByText,
   blurTextFilter,
   shiftEntry,
+  toggleFavorite,
+  clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50)
 };

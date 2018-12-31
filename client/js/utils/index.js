@@ -42,8 +42,14 @@ function filterHiddenEntries (entries) {
   });
 };
 
-function applyFilters (query, list) {
+function filterByFavorited (entries) {
+  if(!entries) return entries;
+  return entries.filter(entry => !!entry.favorited);
+};
+
+function applyFilters (query, filter, list) {
   list = filterHiddenEntries(list);
+  if(filter === 'favorites') list = filterByFavorited(list);
   return filterObjectsByText(query, list);
 };
 

@@ -4,10 +4,24 @@ import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
+const supportedIcons = ['star-filled', 'star-empty', 'clear'];
+
 export default class Header extends Component {
-	clearFilterText = () => {
-		this.base.querySelector('#filterTextInput').focus();
-		fire('filterByText', '')();
+	handleBlur = (e) => {
+		const target = e.relatedTarget;
+		let icon;
+		if(target) icon = target.getAttribute('icon');
+		if(~supportedIcons.indexOf(icon) && this.base.contains(target)) return;
+		fire('blurTextFilter')();
+	}
+
+	clearFilters = (filter, filterText) => {
+		if(filter || filterText){
+			this.base.querySelector('#filterTextInput').focus();
+			fire('clearFilters')();
+		} else {
+			fire('linkstate', { key: 'showFilterInput', val: false })();
+		}
 	}
 
 	showFilterText = () => {
@@ -22,19 +36,22 @@ export default class Header extends Component {
 	}
 
 	copy = () => {
-		let date = document.getElementById('entryDate').innerText;
-		let text = document.getElementById('entryText').innerText;
+		const date = document.getElementById('entryDate').innerText;
+		const text = document.getElementById('entryText').innerText;
 		copyText(date + ' ' + text);
 	}
 
-	render({ view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark }) {
+	render({ view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput, dark }) {
 		if(!loggedIn) return null;
-		let vw = window.innerWidth;
-		let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+		const vw = window.innerWidth;
+		const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
+		const filterTo = filter === '' ? 'favorites' : '';
+		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
 		return (
 			<header class="elevated">
 				<div class="inner-header">
-					<div class="nav-set">
+					<div class="nav-set flex-grow">
 						{view === '/entries' && (vw > 400 || !showFilterInput) &&
 							<h3 class="fade-down">{entryCount} Entries</h3>
 						}
@@ -46,28 +63,33 @@ export default class Header extends Component {
 						}
 					</div>
 
-					<div class="nav-set flex-grow">
+					<div class="nav-set nav-search">
 						{view === '/entries' && showFilterInput &&
-							<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
+							<form class="search-form grow" onsubmit={this.cancelAndBlur}>
+								<span class="nav-set">
+									<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
+								</span>
 						    <input
 						    	id="filterTextInput"
 						    	autocomplete="off"
 						    	value={filterText}
 						    	placeholder="Search entries"
 						    	oninput={debounce(fire('filterByText'), 100)}
-						    	onblur={fire('blurTextFilter')}
-						    	class="grow"/>
+						    	onblur={this.handleBlur}/>
 						  </form>
 						}
 					</div>
 
 					<div class="nav-set">
-						{view === '/entries' && showFilterInput &&
-							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="fade-up"/>
+						{view === '/entries' && (showFilterInput || filter === 'favorites') &&
+							<Icon icon="clear" key="header-clear" onclick={() => this.clearFilters(filter, filterText)} class="fade-up"/>
 					  }
-					  {view === '/entries' && !showFilterInput &&
+					  {view === '/entries' && !showFilterInput && !filter &&
 					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
-					  }
+						}
+						{view === '/entry' && entry && !entry.newEntry &&
+							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
+						}
 					  {(view === '/entry' || view === '/new') &&
 					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}

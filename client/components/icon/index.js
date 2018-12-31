@@ -37,11 +37,24 @@ function getSVG(icon) {
               <path d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4-4.6-4.6z"/>
               <path d="M0 0h24v24H0z" fill="none"/>
             </g>
+    case 'star-empty':
+      return <g>
+            <path d="M22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.5 14l-1.7 7 6.2-3.7 6.2 3.7-1.6-7L22 9.2zm-10 6.2l-3.8 2.3 1-4.3L6 10.5l4.4-.4 1.7-4 1.7 4 4.4.4-3.3 2.9 1 4.3-3.8-2.3z"/>
+            <path d="M0 0h24v24H0z" fill="none"/>
+          </g>
+    case 'star-filled':
+      return <g>
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M12 17.3l6.2 3.7-1.7-7L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.5 14l-1.7 7z"/>
+            <path d="M0 0h24v24H0z" fill="none"/>
+          </g>
   }
 }
 
 export default (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" {...props}>
-    { getSVG(props.icon) }
-  </svg>
+  <button data-is="svg" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg">
+      { getSVG(props.icon) }
+    </svg>
+  </button>
 );
