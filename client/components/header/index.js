@@ -45,6 +45,7 @@ export default class Header extends Component {
 		if(!loggedIn) return null;
 		const vw = window.innerWidth;
 		const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+		const entryCountDisplay = (vw < 425 && showFilterInput) ? entryCount : `${entryCount} Entries`;
 		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 		const filterTo = filter === '' ? 'favorites' : '';
 		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
@@ -52,8 +53,8 @@ export default class Header extends Component {
 			<header class="elevated">
 				<div class="inner-header">
 					<div class="nav-set flex-grow">
-						{view === '/entries' && (vw > 400 || !showFilterInput) &&
-							<h3 class="fade-down">{entryCount} Entries</h3>
+						{view === '/entries' && (vw > 350 || !showFilterInput) &&
+							<h3 class="fade-down">{entryCountDisplay}</h3>
 						}
 
 						{(view === '/entry' || view === '/new') &&
