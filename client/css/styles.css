@@ -269,6 +269,7 @@ header .nav-set > *:not(h1):not(form) {
 
 .search-form input {
   padding: 8px;
+  margin: 0;
   width: 90%;
   background: transparent;
   border: none;
