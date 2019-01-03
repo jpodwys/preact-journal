@@ -75,7 +75,7 @@ export default class Header extends Component {
 						{(view === '/entry' || view === '/new') &&
 							<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}
-						{view === '/entry' && entry && !entry.newEntry &&
+						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 						}
 						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
