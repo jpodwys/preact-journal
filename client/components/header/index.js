@@ -35,7 +35,7 @@ export default class Header extends Component {
 		// 	favoriteDirection = entry.favorited ? 'up' : 'down';
 		// }
 		// const favoriteDirection = entry && prevView !== '/entry' && entry.favorited ? 'up' : 'down';
-		const formDirection = prevView === '/entry' && filter || filterText ? 'down' : 'up';
+		const formDirection = prevView === '/entry' && showFilterInput ? 'down' : 'up';
 
 		return (
 			<header class="elevated">
