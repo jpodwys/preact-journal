@@ -16,6 +16,7 @@ export default (props) => {
     <div class={`app ${dark} ${toast}`}>
       <Header
         view={props.view}
+        prevView={props.prevView}
         loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}

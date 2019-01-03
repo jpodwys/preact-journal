@@ -3,44 +3,52 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const compute = (obj, prop, value) => {
+const compute = (obj, prop, next, prev) => {
   switch(prop) {
     // viewEntries
     case 'filter': // Fallthrough
     case 'entries': // Fallthrough
     case 'filterText': {
       obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.entries);
+      return;
     }
 
+    // prevView
+    // filter
+    // filterText
     // showFilterInput
-    // case 'view': // Fallthrough
-    // case 'filter': // Fallthrough
-    // case 'filterText': //Fallthrough
-    // case 'showFilterInput': {
-    //   if(prop === 'showFilterInput' && value === true) return;
-    //   obj.showFilterInput = (!!obj.filter || !!obj.filterText);
-    // }
+    case 'view': {
+      obj.prevView = prev;
+      if(prev === '/entries' && next === '/entries' || !obj.filter && !obj.filterText){
+        return fire('clearFilters', true)();
+        // obj.filter = '';
+        // obj.filterText = '';
+        // obj.showFilterInput = false;
+      }
+    }
   }
 };
 
-const observe = (obj, prop, value) => {
+const observe = (obj, prop, next, prev) => {
   switch(prop) {
     case 'entries': {
-      obj.entries = sortObjectsByDate(value);
+      obj.entries = sortObjectsByDate(next);
       set('entries', obj.entries);
       return;
     }
-    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
-    case 'dark':        localStorage.setItem('dark', !!value);      return;
-    case 'loggedIn':    if(value) setTimeout(fire('getEntries'));   return;
+    case 'timestamp':   localStorage.setItem('timestamp', next);   return;
+    case 'dark':        localStorage.setItem('dark', !!next);      return;
+    case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
   }
 };
 
 const handler = {
-  set: function(obj, prop, value) {
-    obj[prop] = value;
-    compute(obj, prop, value);
-    observe(obj, prop, value);
+  set: function(obj, prop, next) {
+    const prev = obj[prop];
+    obj[prop] = next;
+    // obj.prevView = obj.view;
+    compute(obj, prop, next, prev);
+    observe(obj, prop, next, prev);
     return true;
   }
 };
@@ -62,6 +70,7 @@ export default function getInitialState () {
     // toastConfig: undefined,
     showFilterInput: false,
     view: getViewFromPathname(location.pathname),
+    prevView: '',
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
   };

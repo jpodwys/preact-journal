@@ -52,9 +52,7 @@ function getSVG(icon) {
 }
 
 export default (props) => (
-  <button data-is="svg" {...props}>
-    <svg xmlns="http://www.w3.org/2000/svg">
-      { getSVG(props.icon) }
-    </svg>
-  </button>
+  <svg xmlns="http://www.w3.org/2000/svg" {...props}>
+    { getSVG(props.icon) }
+  </svg>
 );

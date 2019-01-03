@@ -383,10 +383,11 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id);
 };
 
-function clearFilters (el) {
+function clearFilters (el, hideInput) {
   el.set({
     filter: '',
-    filterText: ''
+    filterText: '',
+    showFilterInput: hideInput === true ? false : el.state.showFilterInput
   });
 };
 
