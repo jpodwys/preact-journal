@@ -72,14 +72,14 @@ export default class Header extends Component {
 					  {view === '/entries' && !showFilterInput && !filter &&
 					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
 						}
-						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
+						{(view === '/entry' || view === '/new') &&
+							<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}
 						{view === '/entry' && entry && !entry.newEntry &&
 							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 						}
-						{(view === '/entry' || view === '/new') &&
-							<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
+						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
 						}
 					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
 					</div>
