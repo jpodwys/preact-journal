@@ -30,8 +30,12 @@ export default class Header extends Component {
 		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 		const filterTo = filter === '' ? 'favorites' : '';
 		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-		// debugger
-		const formDirection = prevView === '/entry' && showFilterInput ? 'down' : 'up';
+		// let favoriteDirection;
+		// if(entry && prevView !== '/entry'){
+		// 	favoriteDirection = entry.favorited ? 'up' : 'down';
+		// }
+		// const favoriteDirection = entry && prevView !== '/entry' && entry.favorited ? 'up' : 'down';
+		const formDirection = prevView === '/entry' && filter || filterText ? 'down' : 'up';
 
 		return (
 			<header class="elevated">

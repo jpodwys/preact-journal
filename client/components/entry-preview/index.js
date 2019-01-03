@@ -13,6 +13,7 @@ export default class EntryPreview extends Component {
   }
 
   render({ entry }) {
+    const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
     const fadeRight = entry.slideIn ? 'fade-right' : '';
     if(fadeRight) setTimeout(fire('removeSlideInProp'), 450);
 
@@ -35,8 +36,9 @@ export default class EntryPreview extends Component {
         </a>
 
         <span class="nav-set right dark-fill entry-preview--icons">
-          <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
           <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/>
+          <Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
+          <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
         </span>
       </div>
     );
