@@ -1,49 +1,59 @@
-import { h, Component } from 'preact';
+import { h } from 'preact';
 import Dialog from '../dialog';
 import { fire } from '../unifire';
 
-export default class DialogWrapper extends Component {
-  handleToggleDarkMode = () => {
-    fire('linkstate', {key: 'dark', val: !this.props.dark})();
-    fire('linkstate', {key: 'dialogMode'})();
-  }
+const menu = (dark) => (
+  <ul>
+    <li onclick={fire('linkstate', {key: 'dark', val: !dark})}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={() => setTimeout(fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }), 100)}>Logout</li>
+  </ul>
+);
 
-  handleDeleteEntry = () => {
-    fire('deleteEntry', { id: this.props.entry.id })();
-    fire('linkstate', {key: 'dialogMode'})();
-  }
+const modal = (message, confirmText, onConfirm) => (
+  <div>
+    <div class="modal-message">{message}</div>
+    <div>
+      <button class="mdl-button">Cancel</button>
+      <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
+    </div>
+  </div>
+);
 
-  render({ dialogMode, dark, entry }) {
-    if(!dialogMode) return;
-
-    const menu = (
-      <ul>
-        <li onclick={this.handleToggleDarkMode}>{dark ? 'Light' : 'Dark'}</li>
-        <li onclick={fire('logout')}>Logout</li>
-      </ul>
-    );
-
-    const modal = (
-      <div>
-        <div class="modal-message">Delete this entry?</div>
-        <div>
-          <button class="mdl-button" onclick={fire('linkstate', {key: 'dialogMode'})}>Cancel</button>
-          <button class="mdl-button" onclick={this.handleDeleteEntry}>Delete</button>
-        </div>
-      </div>
-    );
-
-    let markup;
-    if(dialogMode === 'menu'){
-      markup = menu;
-    } else if (dialogMode === 'modal'){
-      markup = modal;
+const modalOptions = (modalType, entry) => {
+  if(modalType === 'delete'){
+    return {
+      message: 'Delete this entry?',
+      confirmText: 'Delete',
+      onConfirm: fire('deleteEntry', { id: entry.id })
     }
-
-    return (
-      <Dialog dialogMode={dialogMode}>
-        { markup }
-      </Dialog>
-    );
   }
+  if(modalType === 'logout'){
+    return {
+      message: 'Logout?',
+      confirmText: 'Logout',
+      onConfirm: fire('logout')
+    }
+  }
+};
+
+export default ({ dialogMode, dark, entry }) => {
+  if(!dialogMode) return;
+
+  let markup;
+  if(dialogMode === 'menu'){
+    markup = menu(dark);
+  } else {
+    const modalType = dialogMode.split(':')[1];
+    if(modalType === 'delete' && !entry) return;
+    const { message, confirmText, onConfirm } = modalOptions(modalType, entry);
+    markup = modal(message, confirmText, onConfirm);
+  }
+
+  dialogMode = dialogMode.split(':')[0];
+
+  return (
+    <Dialog dialogMode={dialogMode}>
+      { markup }
+    </Dialog>
+  );
 };
