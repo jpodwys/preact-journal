@@ -359,7 +359,7 @@ header .nav-set > *:not(h1):not(form) {
 } */
 
 .modal-dialog {
-  font-size: 20px;
+  font-size: 18px;
   display: inline-block;
   position: relative;
   background-color: #fff;
@@ -369,13 +369,13 @@ header .nav-set > *:not(h1):not(form) {
 
 .modal-dialog ul {
   list-style: none;
-  padding: 0;
+  padding: 5px;
   margin: 0;
   cursor: pointer;
 }
 
 .modal-dialog li {
-  padding: 10px 15px;
+  padding: 12.5px 15px;
 }
 
 .modal-dialog p {
