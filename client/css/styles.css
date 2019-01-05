@@ -2,6 +2,7 @@
 
 :root {
   --theme-blue: #4285F4;
+  --theme-dark: #424242;
   --theme-white: #fff;
   --theme-dark-text: #ccc;
 }
@@ -18,7 +19,7 @@
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  color: #424242;
+  color: var(--theme-dark);
   font-size: 16px;
 }
 
@@ -36,7 +37,7 @@ input {
 }
 
 a, a:visited {
-  color: #424242;
+  color: var(--theme-dark);
   text-decoration: none;
 }
 
@@ -109,18 +110,15 @@ svg {
 }
 
 .mdl-button {
-  background: transparent;
+  background: 0 0;
   border: none;
-  color: var(--theme-white);
+  color: var(--theme-dark);
   position: relative;
-  height: 50px;
-  padding: 0 16px;
+  padding: 16px;
   font-size: 14px;
-  font-weight: 500;
-  text-transform: uppercase;
-  outline: none;
+  outline: 0;
   cursor: pointer;
-  line-height: 36px;
+  line-height: 10px;
 }
 
 /* Login */
@@ -341,6 +339,70 @@ header .nav-set > *:not(h1):not(form) {
   }
 }
 
+/* Dialog */
+
+.modal-overlay {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.modal-overlay.modal-modal {
+  background-color: #00000080;
+}
+
+/* .modal-overlay.modal-menu {
+
+} */
+
+.modal-dialog {
+  display: inline-block;
+  position: relative;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.75);
+}
+
+.modal-dialog ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.modal-dialog li {
+  padding: 10px 15px;
+}
+
+.modal-dialog p {
+  margin: 5px;
+}
+
+.modal-dialog.modal-modal {
+  min-width: 150px;
+  left: calc(50% - 100px);
+  top: calc(50% - 75px);
+  text-align: center;
+}
+
+.modal-dialog.modal-modal > div {
+  padding: 10px;
+}
+
+.modal-dialog.modal-modal .modal-message {
+  padding: 8px 10px;
+}
+
+.modal-dialog.modal-menu {
+  width: 150px;
+  float: right;
+  top: 10px;
+  right: 10px;
+}
+
 /* Toast */
 
 toast {
@@ -349,7 +411,7 @@ toast {
   position: fixed;
   text-align: center;
   height: 50px;
-  background-color: #424242;
+  background-color: var(--theme-dark);
   bottom: -50px;
   transition: bottom linear .1s;
   z-index: 2;
@@ -376,15 +438,27 @@ toast.show {
 }
 
 .app.dark header {
-  background-color: #424242;
+  background-color: var(--theme-dark);
 }
 
 .app.dark .search-form {
   background-color: #000;
 }
 
+.app.dark .modal-dialog {
+  background-color: var(--theme-dark);
+}
+
+/* .app.dark .modal-dialog button {
+  color: var(--theme-white);
+} */
+
 .app.dark .dark-fill svg {
   fill: #c5c5c5;
+}
+
+.app.dark .mdl-button {
+  color: var(--theme-white);
 }
 
 .app.dark .entry-preview .entry-link {
@@ -412,6 +486,15 @@ toast.show {
 }
 
 /* Transitions */
+
+@keyframes fade-in {
+  from {
+    opacity: .25;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 @keyframes fade-up {
   from {
@@ -453,6 +536,10 @@ toast.show {
   to {
     transform: scale(1);
   }
+}
+
+.fade-in {
+  animation: fade-in ease .2s forwards;
 }
 
 .fade-up {

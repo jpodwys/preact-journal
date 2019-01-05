@@ -8,22 +8,23 @@ const compute = (obj, prop, next, prev) => {
     // viewEntries
     case 'filter': // Fallthrough
     case 'entries': // Fallthrough
-    case 'filterText': {
-      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.entries);
+    case 'filterText': // Fallthrough
+    case 'showFilterInput': {
+      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.showFilterInput, obj.entries);
       return;
     }
 
-    // prevView
+    // entry
     // filter
     // filterText
+    // dialogMode
     // showFilterInput
     case 'view': {
+      obj.entry = undefined;
+      obj.dialogMode = '';
       obj.prevView = prev;
       if(prev === '/entries' && next === '/entries' || !obj.filter && !obj.filterText){
         return fire('clearFilters', true)();
-        // obj.filter = '';
-        // obj.filterText = '';
-        // obj.showFilterInput = false;
       }
     }
   }
@@ -68,6 +69,7 @@ export default function getInitialState () {
     entry: undefined,
     // Included for documentation purporses
     // toastConfig: undefined,
+    // dialogMode: '',
     showFilterInput: false,
     view: getViewFromPathname(location.pathname),
     prevView: '',

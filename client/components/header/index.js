@@ -4,8 +4,6 @@ import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
-const supportedIcons = ['star-filled', 'star-empty', 'clear'];
-
 export default class Header extends Component {
 	showFilterText = () => {
 		fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
@@ -30,11 +28,6 @@ export default class Header extends Component {
 		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 		const filterTo = filter === '' ? 'favorites' : '';
 		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-		// let favoriteDirection;
-		// if(entry && prevView !== '/entry'){
-		// 	favoriteDirection = entry.favorited ? 'up' : 'down';
-		// }
-		// const favoriteDirection = entry && prevView !== '/entry' && entry.favorited ? 'up' : 'down';
 		const formDirection = prevView === '/entry' && showFilterInput ? 'down' : 'up';
 
 		return (
@@ -79,9 +72,9 @@ export default class Header extends Component {
 							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 						}
 						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'dialogMode', val: 'modal'})} class="fade-up"/>
 						}
-					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
+					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
 					</div>
 
 					{view === '/entries' &&

@@ -5,6 +5,7 @@ import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
+import DialogWrapper from '../dialog-wrapper';
 import Toast from '../toast';
 import { fire } from '../unifire';
 
@@ -14,6 +15,10 @@ export default (props) => {
 
   return (
     <div class={`app ${dark} ${toast}`}>
+      <DialogWrapper
+        dark={dark}
+        entry={props.entry}
+        dialogMode={props.dialogMode}/>
       <Header
         view={props.view}
         prevView={props.prevView}
@@ -28,6 +33,7 @@ export default (props) => {
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>
           <Entries path="/entries"
+            showFilterInput={props.showFilterInput}
             scrollPosition={props.scrollPosition}
             viewEntries={props.viewEntries}/>
           <Entry path="/entry/:id"

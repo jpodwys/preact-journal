@@ -10,7 +10,7 @@ export default class Entries extends Component {
       fire('linkstate', { key: 'scrollPosition', val: document.body.scrollTop })();
     }, 50);
   }
-  
+
   componentWillUnmount() {
     document.body.onscroll = null;
   }
@@ -30,9 +30,10 @@ export default class Entries extends Component {
       || op.scrollPosition === np.scrollPosition;
   }
 
-  render({ viewEntries, scrollPosition }) {
-    document.body.scrollTop = scrollPosition;
+  render({ showFilterInput, viewEntries, scrollPosition }) {
     viewEntries = viewEntries || [];
+    if(showFilterInput && !viewEntries.length) return;
+    document.body.scrollTop = scrollPosition;
     if(!viewEntries.length){
       return (
         <h2 class="center-text fade-up">It's empty in here!</h2>
