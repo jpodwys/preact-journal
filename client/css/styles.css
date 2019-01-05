@@ -115,7 +115,7 @@ svg {
   color: var(--theme-dark);
   position: relative;
   padding: 16px;
-  font-size: 14px;
+  font-size: 16px;
   outline: 0;
   cursor: pointer;
   line-height: 10px;
@@ -290,7 +290,7 @@ header .nav-set > *:not(h1):not(form) {
 
 @media (min-width: 1049px) {
   .button--fab.add-entry {
-    right: calc((100vw - 1000px) / 2)
+    right: calc((100vw - 1000px) / 2);
   }
 }
 
@@ -359,6 +359,7 @@ header .nav-set > *:not(h1):not(form) {
 } */
 
 .modal-dialog {
+  font-size: 20px;
   display: inline-block;
   position: relative;
   background-color: #fff;
@@ -382,7 +383,7 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .modal-dialog.modal-modal {
-  min-width: 150px;
+  width: 200px;
   left: calc(50% - 100px);
   top: calc(50% - 75px);
   text-align: center;
@@ -397,10 +398,16 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .modal-dialog.modal-menu {
+  position: fixed;
   width: 150px;
-  float: right;
   top: 10px;
   right: 10px;
+}
+
+@media (min-width: 1019px) {
+  .modal-dialog.modal-menu {
+    right: calc((100vw - 1000px) / 2);
+  }
 }
 
 /* Toast */
