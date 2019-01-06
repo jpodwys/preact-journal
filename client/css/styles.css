@@ -23,6 +23,10 @@ body {
   font-size: 16px;
 }
 
+body.dialog {
+  overflow: hidden;
+}
+
 main {
   margin: 0 auto;
   max-width: 800px;
@@ -439,56 +443,56 @@ toast.show {
 
 /* Dark theme */
 
-.app.dark {
+body.dark {
   background-color: #000;
   color: var(--theme-white);
 }
 
-.app.dark header {
+body.dark header {
   background-color: var(--theme-dark);
 }
 
-.app.dark .search-form {
+body.dark .search-form {
   background-color: #000;
 }
 
-.app.dark .modal-dialog {
+body.dark .modal-dialog {
   background-color: var(--theme-dark);
 }
 
-/* .app.dark .modal-dialog button {
+/* body.dark .modal-dialog button {
   color: var(--theme-white);
 } */
 
-.app.dark .dark-fill svg {
+body.dark .dark-fill svg {
   fill: #c5c5c5;
 }
 
-.app.dark .mdl-button {
+body.dark .mdl-button {
   color: var(--theme-white);
 }
 
-.app.dark .entry-preview .entry-link {
+body.dark .entry-preview .entry-link {
   color: #f3f3f3;
 }
 
-.app.dark .entry-date {
+body.dark .entry-date {
   color: #e0e0e0;
 }
 
-.app.dark .entry-text {
+body.dark .entry-text {
   color: var(--theme-dark-text);
 }
 
-.app.dark .list-item .second-row {
+body.dark .list-item .second-row {
   color: var(--theme-dark-text);
 }
 
-.app.dark .button--fab.add-entry {
+body.dark .button--fab.add-entry {
   background-color: #2d50afe0;
 }
 
-.app.dark .elevated {
+body.dark .elevated {
   box-shadow: none;
 }
 

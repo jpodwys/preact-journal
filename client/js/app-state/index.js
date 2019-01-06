@@ -38,8 +38,18 @@ const observe = (obj, prop, next, prev) => {
       return;
     }
     case 'timestamp':   localStorage.setItem('timestamp', next);   return;
-    case 'dark':        localStorage.setItem('dark', !!next);      return;
+    case 'dark':        {
+      localStorage.setItem('dark', !!next);
+      const func = next ? 'add' : 'remove';
+      document.body.classList[func]('dark');
+      return;
+    }
     case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
+    case 'dialogMode':  {
+      const func = !!next ? 'add' : 'remove';
+      document.body.classList[func]('dialog');
+      return;
+    }
   }
 };
 
