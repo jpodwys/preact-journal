@@ -10,6 +10,7 @@ import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
+  const dark = props.dark ? 'dark' : '';
   const toast = props.toastConfig ? 'toast' : '';
 
   return (

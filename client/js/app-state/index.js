@@ -91,5 +91,9 @@ export default function getInitialState () {
     fire('boot', { entries })();
   }).catch();
 
+  // Now that I'm setting a class to body, I
+  // have to ensure it gets set on load.
+  observe(null, 'dark', state.dark);
+
   return new Proxy(state, handler);
 };
