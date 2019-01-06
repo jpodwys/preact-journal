@@ -2,10 +2,17 @@ import { h } from 'preact';
 import Dialog from '../dialog';
 import { fire } from '../unifire';
 
+const onClick = e => {
+  e.stopPropagation();
+  fire('linkstate', { key: 'dialogMode', cb: function(){
+    fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })();
+  }})();
+};
+
 const menu = (dark) => (
   <ul>
     <li onclick={fire('linkstate', {key: 'dark', val: !dark})}>{dark ? 'Light' : 'Dark'}</li>
-    <li onclick={() => setTimeout(fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }), 100)}>Logout</li>
+    <li onclick={onClick}>Logout</li>
   </ul>
 );
 
