@@ -10,13 +10,12 @@ import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
-  const dark = props.dark ? 'dark' : '';
   const toast = props.toastConfig ? 'toast' : '';
 
   return (
     <div class={`app ${toast}`}>
       <DialogWrapper
-        dark={dark}
+        dark={props.dark}
         entry={props.entry}
         dialogMode={props.dialogMode}/>
       <Header
