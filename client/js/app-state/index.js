@@ -45,11 +45,11 @@ const observe = (obj, prop, next, prev) => {
       return;
     }
     case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
-    case 'dialogMode':  {
-      const func = !!next ? 'add' : 'remove';
-      document.body.classList[func]('dialog');
-      return;
-    }
+    // case 'dialogMode':  {
+    //   const func = !!next ? 'add' : 'remove';
+    //   document.body.classList[func]('dialog');
+    //   return;
+    // }
   }
 };
 

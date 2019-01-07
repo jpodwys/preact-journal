@@ -23,9 +23,9 @@ body {
   font-size: 16px;
 }
 
-body.dialog {
+/* body.dialog {
   overflow: hidden;
-}
+} */
 
 main {
   margin: 0 auto;
