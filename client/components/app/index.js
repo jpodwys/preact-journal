@@ -20,14 +20,12 @@ export default (props) => {
         dialogMode={props.dialogMode}/>
       <Header
         view={props.view}
-        prevView={props.prevView}
         loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}
         filter={props.filter}
         filterText={props.filterText}
-        showFilterInput={props.showFilterInput}
-        dark={props.dark}/>
+        showFilterInput={props.showFilterInput}/>
       <main>
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>
