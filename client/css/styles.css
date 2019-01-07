@@ -258,21 +258,29 @@ header .nav-set > *:not(h1):not(form) {
 
 .search-form {
   background-color: #676767;
-  margin: 5.5px;
+  margin: 5.5px 0;
   padding: 0;
   display: flex;
   justify-content: flex-start;
   border-radius: 10px;
 }
 
-.search-form .nav-set svg {
+.search-form .nav-set > svg {
   padding: 7.5px;
 }
 
+.search-form .nav-set > .search-entry-count {
+  padding: 10px;
+  width: 35px;
+  text-align: right;
+  text-align: center;
+}
+
 .search-form input {
+  flex: 10;
   padding: 8px;
   margin: 0;
-  width: 90%;
+  width: 60%;
   background: transparent;
   border: none;
   outline: 0;

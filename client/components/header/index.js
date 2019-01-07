@@ -54,8 +54,11 @@ export default class Header extends Component {
 						    	id="filterTextInput"
 						    	autocomplete="off"
 						    	value={filterText}
-						    	placeholder="Search entries"
+						    	placeholder="Search"
 						    	oninput={debounce(fire('filterByText'), 100)}/>
+								<span class="nav-set">
+									<span class="search-entry-count">{viewEntries.length}</span>
+								</span>
 						  </form>
 						}
 					</div>
