@@ -13,13 +13,13 @@ function boot (el, { entries }){
      * If the user is trying to view a specific entry,
      * I need to rerun the route handler once the
      * entries have been loaded from indexedDB.
-     * 
+     *
      * There may be a better way to manage this.
      * Perhaps I can make entry a computed property
      * that depends on view and entries. But that
      * would be wasteful since I only need to check
      * this on boot.
-     * 
+     *
      * I'll think about it, but for now I'm going to
      * leave this here.
      */
@@ -152,18 +152,18 @@ function createEntry (el, { entry, clientSync }){
    * In the event that the original POST failed for
    * whatever reason, results in the behavior you
    * would expect.
-   * 
+   *
    * My original thought was to allow the client
    * to generate the ID that ends up getting used in
    * the database as the entry's id. I settled on
    * this plan to avoid entry id collisions.
-   * 
+   *
    * I would like to revisit this at some point. It
    * makes sense that if an entry has the newEntry,
    * needsSync, and postPending flags all set to true,
    * then the front end would call an endpoint to
    * upsert than POST.
-   * 
+   *
    * For now, however, this is why clientSync
    * overrides postPending.
    */
@@ -189,7 +189,7 @@ function createEntrySuccess (el, oldId, response){
   /**
    * Because needsSync is a boolean, removing it here
    * can introduce a problem.
-   * 
+   *
    * For example, if I type one character and pause,
    * thereby triggering a POST, that will add the
    * needsSync and postPending flags to the entry. As
@@ -198,7 +198,7 @@ function createEntrySuccess (el, oldId, response){
    * needsSync flag to the entry) will be ignored when
    * the POST returns and triggers a removal of the
    * entry's needsSync flag.
-   * 
+   *
    * A potential solution could be to make needsSync
    * an integer so I can increment it when it needs
    * both a POST and a PATCH.
@@ -296,7 +296,7 @@ function deleteEntry (el, { id }){
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
   if(entryIndex === -1) return;
-  
+
   el.state.entries[entryIndex].needsSync = true;
   el.state.entries[entryIndex].deleted = true;
   el.state.entries[entryIndex].text = '';

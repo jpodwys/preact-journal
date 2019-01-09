@@ -26,7 +26,7 @@ export default class EntryPreview extends Component {
                 class="entry-link">
                 {entry.date}
               </span>
-        
+
             </div>
 
             <div class="second-row">
@@ -38,7 +38,6 @@ export default class EntryPreview extends Component {
         <span class="nav-set right dark-fill entry-preview--icons">
           <Icon icon="copy" key={entry.id + 'copy'} onclick={this.copy}/>
           <Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
-          {/* <Icon icon="delete" key="delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})}/> */}
         </span>
       </div>
     );

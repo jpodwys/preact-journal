@@ -47,7 +47,8 @@ function filterByFavorited (entries) {
   return entries.filter(entry => !!entry.favorited);
 };
 
-function applyFilters (query, filter, list) {
+function applyFilters (query, filter, showFilterInput, list) {
+  if(showFilterInput && !query && !filter) return [];
   list = filterHiddenEntries(list);
   if(filter === 'favorites') list = filterByFavorited(list);
   return filterObjectsByText(query, list);
