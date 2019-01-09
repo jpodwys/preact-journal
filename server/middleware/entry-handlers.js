@@ -1,8 +1,15 @@
 var date = require('../utils/date');
 
+const removeFalseyFavorited = entry => {
+  if(entry.favorited === 0){
+    delete entry.favorited;
+  }
+  return entry;
+};
+
 exports.getAllEntriesByOwnerId = function(req, res, entries){
   res.send({
-    entries: entries,
+    entries: entries.map(removeFalseyFavorited),
     timestamp: date.getUtcZeroTimestamp()
   });
 }
