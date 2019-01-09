@@ -22,13 +22,12 @@ export default class Header extends Component {
 		copyText(date + ' ' + text);
 	}
 
-	render({ view, prevView, loggedIn, viewEntries, entry, filter, filterText, showFilterInput, dark }) {
+	render({ view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput }) {
 		if(!loggedIn) return null;
 		const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
 		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 		const filterTo = filter === '' ? 'favorites' : '';
 		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-		const formDirection = prevView === '/entry' && showFilterInput ? 'down' : 'up';
 
 		return (
 			<header class="elevated">
@@ -47,7 +46,7 @@ export default class Header extends Component {
 
 					<div class="nav-set flex-grow nav-search">
 						{view === '/entries' && showFilterInput &&
-							<form class={`search-form fade-${formDirection}`} onsubmit={this.cancelAndBlur}>
+							<form class="search-form fade-up" onsubmit={this.cancelAndBlur}>
 								<span class="nav-set">
 									<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
 								</span>
@@ -55,14 +54,17 @@ export default class Header extends Component {
 						    	id="filterTextInput"
 						    	autocomplete="off"
 						    	value={filterText}
-						    	placeholder="Search entries"
+						    	placeholder="Search"
 						    	oninput={debounce(fire('filterByText'), 100)}/>
+								<span class="nav-set">
+									<span class="search-entry-count">{viewEntries.length}</span>
+								</span>
 						  </form>
 						}
 					</div>
 
 					<div class="nav-set">
-					  {view === '/entries' && !showFilterInput && !filter &&
+					  {view === '/entries' && !showFilterInput && !filter && !filterText &&
 					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
 						}
 						{(view === '/entry' || view === '/new') &&

@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval';
 import getInitialState from './index';
-  
+
 describe('appState', () => {
   let state;
 
@@ -9,12 +9,13 @@ describe('appState', () => {
   };
 
   beforeEach(() => {
+    localStorage.clear();
     state = getInitialState();
   });
 
-  afterEach(() => {
-    localStorage.clear();
-  });
+  // afterEach(() => {
+  //   localStorage.clear();
+  // });
 
   it('should return correct defaults', () => {
     localStorage.setItem('bogus', 'hi');
@@ -54,15 +55,16 @@ describe('appState', () => {
     //   document.removeEventListener('boot', cb);
     //   done();
     // });
-    
+
     deleteCookie('logged_in');
   });
 
   it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', (done) => {
+    // I have to manually clear localStorage here to avoid a race condition...
+    localStorage.clear();
     expect(localStorage.getItem('dark')).to.be.null;
     expect(localStorage.getItem('timestamp')).to.be.null;
     get('entries').then(entries => {
-      // This is a race condition since I call done below. Should I change it?
       expect(entries).to.be.undefined;
 
       state.dark = true;

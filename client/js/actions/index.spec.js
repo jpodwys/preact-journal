@@ -2,7 +2,7 @@ import fetchMock from 'fetch-mock';
 import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
-  
+
 describe('actions', () => {
   const NAME = 'UNIFIRE';
   let el;
@@ -45,7 +45,7 @@ describe('actions', () => {
       it('should set view when appropriate', () => {
         Global.handleRouteChange(el, null, '/entries');
         expect(el.set.called).to.be.false;
-    
+
         Global.handleRouteChange(el, null, '/');
         expect(el.set.args[0][0].view).to.equal('/');
       });
@@ -213,7 +213,7 @@ describe('actions', () => {
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.calledOnce).to.be.true;
-          expect(el.set.args[0][0].showFilterInput).to.be.undefined;
+          expect(el.set.args[0][0].showFilterInput).to.be.false;
           done();
         });
       });
@@ -246,11 +246,11 @@ describe('actions', () => {
       });
 
       // it('should call get entries in a callback', () => {
-        
+
       // });
 
       // it('should run handleRouteChange when state.view === "/entry"', () => {
-        
+
       // });
 
     });
@@ -295,7 +295,7 @@ describe('actions', () => {
             timestamp: 1234
           }
         });
-        
+
         el.state.entries = [];
         el.state.loggedIn = true;
         Entry.getEntries(el);
@@ -309,7 +309,7 @@ describe('actions', () => {
 
       it('should handle an error when fetching entries and timestamp when timestamp is undefined', (done) => {
         fetchMock.get('/api/entries', 500);
-        
+
         delete el.state.entries;
         el.state.loggedIn = true;
         Entry.getEntries(el);
@@ -327,7 +327,7 @@ describe('actions', () => {
             timestamp: 4321
           }
         });
-        
+
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         el.state.entries = [ { id: 0 }, { id: 1 } ];
@@ -351,7 +351,7 @@ describe('actions', () => {
             timestamp: 4321
           }
         });
-        
+
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         localStorage.setItem('timestamp', 1234);
@@ -365,7 +365,7 @@ describe('actions', () => {
 
       it('should handle an error when syncing entries', (done) => {
         fetchMock.get('/api/entries/sync/1234', 500);
-        
+
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         Entry.getEntries(el);
@@ -389,7 +389,7 @@ describe('actions', () => {
         });
         fetchMock.patch('/api/entry/1', 204);
         fetchMock.delete('/api/entry/2', 204);
-        
+
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         el.state.entries = [
@@ -418,7 +418,7 @@ describe('actions', () => {
           }
         });
         fetchMock.patch('/api/entry/0', 500);
-        
+
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         el.state.entries = [ { id: 0, date: '2017-01-01', text: 'what', needsSync: true } ];
@@ -617,7 +617,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entry.needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].date).to.equal(updateObj.entry.date);
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
-        
+
         setTimeout(() => {
           const secondCallArgs = el.set.args[1];
           expect(secondCallArgs[0].entry.date).to.equal(updateObj.entry.date);
@@ -642,7 +642,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entry.needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].text).to.equal(updateObj.entry.text);
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
-        
+
         setTimeout(() => {
           const secondCallArgs = el.set.args[1];
           expect(secondCallArgs[0].entry.text).to.equal(updateObj.entry.text);
@@ -667,7 +667,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entry.needsSync).to.be.true;
         expect(firstCallArgs[0].entries[0].text).to.equal(updateObj.entry.text);
         expect(firstCallArgs[0].entries[0].needsSync).to.be.true;
-        
+
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
           expect(console.log.calledWith('updateEntryFailure')).to.be.true;
@@ -705,7 +705,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
         expect(firstCallArgs[0].entries[0].text).to.equal('');
         expect(typeof firstCallArgs[1]).to.equal('function');
-        
+
         setTimeout(() => {
           const secondCallArgs = el.set.args[1];
           expect(secondCallArgs[0].entries.length).to.equal(0);
@@ -723,7 +723,7 @@ describe('actions', () => {
         expect(firstCallArgs[0].entries[0].deleted).to.be.true;
         expect(firstCallArgs[0].entries[0].text).to.equal('');
         expect(typeof firstCallArgs[1]).to.equal('function');
-        
+
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
           expect(console.log.calledWith('deleteEntryFailure')).to.be.true;
@@ -831,7 +831,7 @@ describe('actions', () => {
     // describe('shiftEntry', () => {
 
     //   it('should route to the next or prior entry when appropriate', () => {
-        
+
     //   });
 
     // });

@@ -10,25 +10,22 @@ import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
-  const dark = props.dark ? 'dark' : '';
   const toast = props.toastConfig ? 'toast' : '';
 
   return (
-    <div class={`app ${dark} ${toast}`}>
+    <div class={`app ${toast}`}>
       <DialogWrapper
-        dark={dark}
+        dark={props.dark}
         entry={props.entry}
         dialogMode={props.dialogMode}/>
       <Header
         view={props.view}
-        prevView={props.prevView}
         loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}
         filter={props.filter}
         filterText={props.filterText}
-        showFilterInput={props.showFilterInput}
-        dark={props.dark}/>
+        showFilterInput={props.showFilterInput}/>
       <main>
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>

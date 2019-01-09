@@ -23,6 +23,10 @@ body {
   font-size: 16px;
 }
 
+/* body.dialog {
+  overflow: hidden;
+} */
+
 main {
   margin: 0 auto;
   max-width: 800px;
@@ -254,21 +258,29 @@ header .nav-set > *:not(h1):not(form) {
 
 .search-form {
   background-color: #676767;
-  margin: 5.5px;
+  margin: 5.5px 0;
   padding: 0;
   display: flex;
   justify-content: flex-start;
   border-radius: 10px;
 }
 
-.search-form .nav-set svg {
+.search-form .nav-set > svg {
   padding: 7.5px;
 }
 
+.search-form .nav-set > .search-entry-count {
+  padding: 10px;
+  width: 35px;
+  text-align: right;
+  text-align: center;
+}
+
 .search-form input {
+  flex: 10;
   padding: 8px;
   margin: 0;
-  width: 90%;
+  width: 60%;
   background: transparent;
   border: none;
   outline: 0;
@@ -439,56 +451,56 @@ toast.show {
 
 /* Dark theme */
 
-.app.dark {
+body.dark {
   background-color: #000;
   color: var(--theme-white);
 }
 
-.app.dark header {
+body.dark header {
   background-color: var(--theme-dark);
 }
 
-.app.dark .search-form {
+body.dark .search-form {
   background-color: #000;
 }
 
-.app.dark .modal-dialog {
+body.dark .modal-dialog {
   background-color: var(--theme-dark);
 }
 
-/* .app.dark .modal-dialog button {
+/* body.dark .modal-dialog button {
   color: var(--theme-white);
 } */
 
-.app.dark .dark-fill svg {
+body.dark .dark-fill svg {
   fill: #c5c5c5;
 }
 
-.app.dark .mdl-button {
+body.dark .mdl-button {
   color: var(--theme-white);
 }
 
-.app.dark .entry-preview .entry-link {
+body.dark .entry-preview .entry-link {
   color: #f3f3f3;
 }
 
-.app.dark .entry-date {
+body.dark .entry-date {
   color: #e0e0e0;
 }
 
-.app.dark .entry-text {
+body.dark .entry-text {
   color: var(--theme-dark-text);
 }
 
-.app.dark .list-item .second-row {
+body.dark .list-item .second-row {
   color: var(--theme-dark-text);
 }
 
-.app.dark .button--fab.add-entry {
+body.dark .button--fab.add-entry {
   background-color: #2d50afe0;
 }
 
-.app.dark .elevated {
+body.dark .elevated {
   box-shadow: none;
 }
 

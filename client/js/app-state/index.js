@@ -20,9 +20,8 @@ const compute = (obj, prop, next, prev) => {
     // dialogMode
     // showFilterInput
     case 'view': {
-      obj.entry = undefined;
+      // obj.entry = undefined;
       obj.dialogMode = '';
-      obj.prevView = prev;
       if(prev === '/entries' && next === '/entries' || !obj.filter && !obj.filterText){
         return fire('clearFilters', true)();
       }
@@ -38,7 +37,12 @@ const observe = (obj, prop, next, prev) => {
       return;
     }
     case 'timestamp':   localStorage.setItem('timestamp', next);   return;
-    case 'dark':        localStorage.setItem('dark', !!next);      return;
+    case 'dark':        {
+      localStorage.setItem('dark', !!next);
+      const func = next ? 'add' : 'remove';
+      document.body.classList[func]('dark');
+      return;
+    }
     case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
   }
 };
@@ -47,7 +51,6 @@ const handler = {
   set: function(obj, prop, next) {
     const prev = obj[prop];
     obj[prop] = next;
-    // obj.prevView = obj.view;
     compute(obj, prop, next, prev);
     observe(obj, prop, next, prev);
     return true;
@@ -72,7 +75,6 @@ export default function getInitialState () {
     // dialogMode: '',
     showFilterInput: false,
     view: getViewFromPathname(location.pathname),
-    prevView: '',
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
   };
@@ -80,6 +82,10 @@ export default function getInitialState () {
   get('entries').then((entries = []) => {
     fire('boot', { entries })();
   }).catch();
+
+  // Now that I'm setting a class to body, I
+  // have to ensure it gets set on load.
+  observe(null, 'dark', state.dark);
 
   return new Proxy(state, handler);
 };
