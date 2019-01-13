@@ -400,8 +400,8 @@ header .nav-set > *:not(h1):not(form) {
 .modal-dialog.modal-menu {
   position: fixed;
   width: 150px;
-  top: 2px;
-  right: 2px;
+  top: 5px;
+  right: 5px;
 }
 
 @media (min-width: 1019px) {
