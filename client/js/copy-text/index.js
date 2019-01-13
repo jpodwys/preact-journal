@@ -27,6 +27,6 @@ export default function copyText(text) {
   textarea.value = text;
   select(textarea);
   let successful = document.execCommand('copy');
-  if(successful) fire('linkstate', {key: 'toastConfig', val: {type: 'text copied'}})();
+  if(successful) fire('setToast')();
   hideKeyboard(textarea);
 }
