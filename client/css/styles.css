@@ -495,7 +495,7 @@ body.dark .elevated {
     opacity: .25;
   }
   to {
-    opacity: .99;
+    opacity: 1;
   }
 }
 
@@ -505,7 +505,7 @@ body.dark .elevated {
     transform: translateY(25px);
   }
   to {
-    opacity: .99;
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -516,7 +516,7 @@ body.dark .elevated {
     transform: translateY(-25px);
   }
   to {
-    opacity: .99;
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -527,7 +527,7 @@ body.dark .elevated {
     transform: translateX(-250px);
   }
   to {
-    opacity: .99;
+    opacity: 1;
     transform: translateX(0);
   }
 }
