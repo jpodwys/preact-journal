@@ -23,10 +23,6 @@ body {
   font-size: 16px;
 }
 
-/* body.dialog {
-  overflow: hidden;
-} */
-
 main {
   margin: 0 auto;
   max-width: 800px;
@@ -96,10 +92,6 @@ svg {
 .right {
   float: right;
 }
-
-/* .left {
-  float: left;
-} */
 
 .center-text {
   text-align: center;
@@ -366,10 +358,6 @@ header .nav-set > *:not(h1):not(form) {
   background-color: #00000080;
 }
 
-/* .modal-overlay.modal-menu {
-
-} */
-
 .modal-dialog {
   font-size: 18px;
   display: inline-block;
@@ -412,8 +400,8 @@ header .nav-set > *:not(h1):not(form) {
 .modal-dialog.modal-menu {
   position: fixed;
   width: 150px;
-  top: 10px;
-  right: 10px;
+  top: 5px;
+  right: 5px;
 }
 
 @media (min-width: 1019px) {
@@ -467,10 +455,6 @@ body.dark .search-form {
 body.dark .modal-dialog {
   background-color: var(--theme-dark);
 }
-
-/* body.dark .modal-dialog button {
-  color: var(--theme-white);
-} */
 
 body.dark .dark-fill svg {
   fill: #c5c5c5;

@@ -24,16 +24,18 @@ describe('appState', () => {
     expect(localStorage.getItem('bogus')).to.be.null;
     expect(typeof state).to.equal('object');
     expect(state.scrollPosition).to.equal(0);
-    // expect(state.view).to.equal('/');
-    // expect(state.showFilterInput).to.be.false;
+    expect(state.view).to.equal('/');
+    expect(state.showFilterInput).to.be.false;
     expect(state.filterText).to.equal('');
     expect(state.loggedIn).to.be.false;
     expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
+    expect(state.toast).to.be.undefined;
+    expect(state.dialogMode).to.be.undefined;
     expect(state.entryIndex).to.equal(-1);
     expect(state.entries.length).to.equal(0);
     expect(state.viewEntries.length).to.equal(0);
-    expect(state.toastConfig).to.be.undefined;
+    expect(state.toast).to.be.undefined;
     expect(state.dark).to.be.false;
 
     // const cb = sinon.spy();

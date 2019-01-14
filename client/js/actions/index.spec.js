@@ -67,24 +67,26 @@ describe('actions', () => {
       //   expect(el.set.args[0][0].view).to.equal('/');
       // });
 
-      it('should reset toastConfig if it is set', (done) => {
-        const cb = sinon.spy();
-        const handler = (e) => {
-          if(e.detail[0] === 'linkstate'){
-            cb(e.detail[1]);
-          }
-        };
-        document.addEventListener(NAME, handler);
-        el.state.toastConfig = {};
-        Global.handleRouteChange(el, null, '/');
-        setTimeout(() => {
-          const detail = cb.args[0][0];
-          expect(detail.key).to.equal('toastConfig');
-          expect(detail.val).to.be.undefined;
-          document.removeEventListener(NAME, handler);
-          done();
-        });
-      });
+      /* This test may become useful in the future if I change how toast works, but it's not useful with my latest changes. */
+
+      // it('should reset toastConfig if it is set', (done) => {
+      //   const cb = sinon.spy();
+      //   const handler = (e) => {
+      //     if(e.detail[0] === 'linkstate'){
+      //       cb(e.detail[1]);
+      //     }
+      //   };
+      //   document.addEventListener(NAME, handler);
+      //   el.state.toastConfig = {};
+      //   Global.handleRouteChange(el, null, '/');
+      //   setTimeout(() => {
+      //     const detail = cb.args[0][0];
+      //     expect(detail.key).to.equal('toastConfig');
+      //     expect(detail.val).to.be.undefined;
+      //     document.removeEventListener(NAME, handler);
+      //     done();
+      //   });
+      // });
 
       it('should remove first entry from entries when appropriate when going to /entries', () => {
         el.state.loggedIn = true;

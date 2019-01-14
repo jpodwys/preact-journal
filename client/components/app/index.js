@@ -10,7 +10,7 @@ import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
-  const toast = props.toastConfig ? 'toast' : '';
+  const toast = props.toast ? 'toast' : '';
 
   return (
     <div class={`app ${toast}`}>
@@ -39,7 +39,7 @@ export default (props) => {
             viewEntries={props.viewEntries}
             entryIndex={props.entryIndex}/>
         </Router>
-        <Toast config={props.toastConfig}/>
+        <Toast toast={props.toast}/>
       </main>
     </div>
   );

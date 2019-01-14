@@ -71,7 +71,7 @@ export default function getInitialState () {
     entryIndex: -1,
     entry: undefined,
     // Included for documentation purporses
-    // toastConfig: undefined,
+    // toast: '',
     // dialogMode: '',
     showFilterInput: false,
     view: getViewFromPathname(location.pathname),
