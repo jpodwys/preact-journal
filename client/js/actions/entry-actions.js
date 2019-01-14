@@ -241,12 +241,6 @@ function updateEntry (el, { entry, property, entryId }){
   if(entryIndex === -1) return;
   var activeEntry = el.state.entries[entryIndex];
   var current = activeEntry[property];
-  /**
-   * Don't need this right now since the only values users can
-   * edit are strings. Will need this if I add favorites or
-   * other user-editable non-string values.
-   * if(typeof current === 'string') current = current.trim();
-   */
   var next = entry[property];
   if(current === next) return;
 
