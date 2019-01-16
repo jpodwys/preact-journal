@@ -1,6 +1,5 @@
 require('dotenv').load();
 var express = require('express'),
-  compress = require('compression'),
   bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),
   app = express(),
@@ -9,12 +8,13 @@ var express = require('express'),
   jwtMW = require('express-jwt'),
   AES = require('./server/utils/aes'),
   cron = require('./server/cron'),
+  shrinkRay = require('shrink-ray-current');
   PORT = process.env.PORT || 3000;
 
 app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
-app.use(compress({threshold: '1.4kb'}));
+app.use(shrinkRay({threshold: '1.4kb'}));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
