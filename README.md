@@ -4,9 +4,9 @@
 
 [![Build Status](https://travis-ci.org/jpodwys/preact-journal.svg?branch=master)](https://travis-ci.org/jpodwys/preact-journal)
 
-## 15k?
+## 14k?
 
-The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 15k. Add a service worker download for under 500 bytes and you're ready to work offline. The other donwloads are the favicon, manifest, and whichever home screen icon your device downloads.
+The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 13.43k (compressed using brotli). Add a service worker download for under 500 bytes and you're ready to work offline. The other donwloads are the favicon, manifest, and whichever home screen icon your device downloads. I don't include these items in the 14k total, but they do indeed get downloaded.
 
 ## Features
 
@@ -17,6 +17,22 @@ The HTML, CSS, and JS necessary to run Journalize in its entirety while online w
 * **Search/Filter**. Search by plain text, entry date, and/or favorites.
 
 ## Architecture
+
+#### Stack
+
+* **Preact**: Front end components
+* **Node/Express**: API/DB calls/file server (I'd like to move from Express to [Polka](https://github.com/lukeed/polka) at some point)
+* **MySQL**: DB
+* **IndexedDB**: Client-side data storage (I'm using the excellent [idb-keyval](https://github.com/jakearchibald/idb-keyval)
+
+#### What NPM Packages Do I Include in My Bundle?
+
+* [preact](https://github.com/developit/preact)
+* [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport)
+* [idb-keyval](https://github.com/jakearchibald/idb-keyval)npmj
+* [select](https://github.com/zenorocha/select)
+
+That's it!
 
 #### Sinlge File
 
