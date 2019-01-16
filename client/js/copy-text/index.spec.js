@@ -1,12 +1,12 @@
 import copyText from './index';
-  
+
 describe('copyText', () => {
 
-  it('should fire linkstate', (done) => {
+  it('should fire setToast', (done) => {
     const NAME = 'UNIFIRE';
     const cb = sinon.spy();
     const handler = (e) => {
-      if(e.detail[0] === 'linkstate'){
+      if(e.detail[0] === 'setToast'){
         cb(e.detail);
       }
     };
@@ -16,9 +16,7 @@ describe('copyText', () => {
     setTimeout(() => {
       expect(cb.called).to.be.true;
       const args = cb.args[0][0];
-      expect(args[0]).to.equal('linkstate');
-      expect(args[1].key).to.equal('toastConfig');
-      expect(args[1].val.type).to.equal('text copied');
+      expect(args[0]).to.equal('setToast');
       document.addEventListener(NAME, handler);
       done();
     });
@@ -31,5 +29,5 @@ describe('copyText', () => {
       expect(navigator.share.args[0][0].text).to.equal('bogus');
     });
   });
-  
+
 });

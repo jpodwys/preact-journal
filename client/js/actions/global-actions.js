@@ -2,10 +2,21 @@ import { fire } from '../../components/unifire';
 import { removeObjectByIndex, getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
 
-function linkstate (el, { key, val, cb }){
+let timeout;
+
+function linkstate (el, { key, val, cb }) {
   let obj = {};
   obj[key] = val;
   el.set(obj, cb);
+};
+
+// Copied to clipboard confirmation is currently the only toast message.
+function setToast (el) {
+  if(timeout) clearTimeout(timeout);
+  el.set({ toast: 'Entry copied to clipboard!' });
+  timeout = setTimeout(() => {
+    el.set({ toast: '' });
+  }, 2000)
 };
 
 function handleRouteChange (el, e, url) {
@@ -14,14 +25,13 @@ function handleRouteChange (el, e, url) {
   if(view !== '/' && !el.state.loggedIn) return route('/', true);
   el.set({ view });
   handleRoute(el, view, url);
-  if(el.state.toastConfig) fire('linkstate', { key: 'toastConfig' })();
 };
 
 function handleRoute (el, view, url) {
   switch(view) {
     case '/':         handleLoginView(el);    break;
     case '/entries':  handleEntriesView(el);  break;
-    case '/entry':    // Fallthrough 
+    case '/entry':    // Fallthrough
     case '/new':      handleEntryView(url);   break;
     default:          route('/');             break;
   }
@@ -54,5 +64,6 @@ function handleEntryView (url) {
 
 export default {
   linkstate,
+  setToast,
   handleRouteChange
 };

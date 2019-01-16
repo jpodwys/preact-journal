@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval';
 import getInitialState from './index';
-  
+
 describe('appState', () => {
   let state;
 
@@ -9,12 +9,13 @@ describe('appState', () => {
   };
 
   beforeEach(() => {
+    localStorage.clear();
     state = getInitialState();
   });
 
-  afterEach(() => {
-    localStorage.clear();
-  });
+  // afterEach(() => {
+  //   localStorage.clear();
+  // });
 
   it('should return correct defaults', () => {
     localStorage.setItem('bogus', 'hi');
@@ -23,16 +24,18 @@ describe('appState', () => {
     expect(localStorage.getItem('bogus')).to.be.null;
     expect(typeof state).to.equal('object');
     expect(state.scrollPosition).to.equal(0);
-    // expect(state.view).to.equal('/');
-    // expect(state.showFilterInput).to.be.false;
+    expect(state.view).to.equal('/');
+    expect(state.showFilterInput).to.be.false;
     expect(state.filterText).to.equal('');
     expect(state.loggedIn).to.be.false;
     expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
+    expect(state.toast).to.be.undefined;
+    expect(state.dialogMode).to.be.undefined;
     expect(state.entryIndex).to.equal(-1);
     expect(state.entries.length).to.equal(0);
     expect(state.viewEntries.length).to.equal(0);
-    expect(state.toastConfig).to.be.undefined;
+    expect(state.toast).to.be.undefined;
     expect(state.dark).to.be.false;
 
     // const cb = sinon.spy();
@@ -54,15 +57,16 @@ describe('appState', () => {
     //   document.removeEventListener('boot', cb);
     //   done();
     // });
-    
+
     deleteCookie('logged_in');
   });
 
   it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', (done) => {
+    // I have to manually clear localStorage here to avoid a race condition...
+    localStorage.clear();
     expect(localStorage.getItem('dark')).to.be.null;
     expect(localStorage.getItem('timestamp')).to.be.null;
     get('entries').then(entries => {
-      // This is a race condition since I call done below. Should I change it?
       expect(entries).to.be.undefined;
 
       state.dark = true;

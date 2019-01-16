@@ -5,14 +5,9 @@ import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
 export default class Header extends Component {
-	clearFilterText = () => {
-		this.base.querySelector('#filterTextInput').focus();
-		fire('filterByText', '')();
-	}
-
 	showFilterText = () => {
 		fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
-			this.base.querySelector('#filterTextInput').focus();
+			setTimeout(() => this.base.querySelector('#filterTextInput').focus(), 200);
 		}})();
 	}
 
@@ -22,59 +17,66 @@ export default class Header extends Component {
 	}
 
 	copy = () => {
-		let date = document.getElementById('entryDate').innerText;
-		let text = document.getElementById('entryText').innerText;
+		const date = document.getElementById('entryDate').innerText;
+		const text = document.getElementById('entryText').innerText;
 		copyText(date + ' ' + text);
 	}
 
-	render({ view, loggedIn, viewEntries, entry, filterText, showFilterInput, dark }) {
+	render({ view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput }) {
 		if(!loggedIn) return null;
-		let vw = window.innerWidth;
-		let entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+		const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+		const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
+		const filterTo = filter === '' ? 'favorites' : '';
+		const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
+
 		return (
 			<header class="elevated">
 				<div class="inner-header">
 					<div class="nav-set">
-						{view === '/entries' && (vw > 400 || !showFilterInput) &&
-							<h3 class="fade-down">{entryCount} Entries</h3>
+						{view === '/entries' && !showFilterInput &&
+							<h3 class="fade-down">{`${entryCount} Entries`}</h3>
 						}
 
-						{(view === '/entry' || view === '/new') &&
+						{(view === '/entry' || view === '/new' || (view === '/entries' && showFilterInput)) &&
 							<a href="/entries">
 								<Icon icon="back" key="header-back" class="fade-up"/>
 							</a>
 						}
 					</div>
 
-					<div class="nav-set flex-grow">
+					<div class="nav-set flex-grow nav-search">
 						{view === '/entries' && showFilterInput &&
-							<form class="search-form full-height right" onsubmit={this.cancelAndBlur}>
+							<form class="search-form fade-up" onsubmit={this.cancelAndBlur}>
+								<span class="nav-set">
+									<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
+								</span>
 						    <input
 						    	id="filterTextInput"
 						    	autocomplete="off"
 						    	value={filterText}
-						    	placeholder="Search entries"
-						    	oninput={debounce(fire('filterByText'), 100)}
-						    	onblur={fire('blurTextFilter')}
-						    	class="grow"/>
+						    	placeholder="Search"
+						    	oninput={debounce(fire('filterByText'), 100)}/>
+								<span class="nav-set">
+									<span class="search-entry-count">{viewEntries.length}</span>
+								</span>
 						  </form>
 						}
 					</div>
 
 					<div class="nav-set">
-						{view === '/entries' && showFilterInput &&
-							<Icon icon="clear" key="header-clear" onclick={this.clearFilterText} class="fade-up"/>
-					  }
-					  {view === '/entries' && !showFilterInput &&
+					  {view === '/entries' && !showFilterInput && !filter && !filterText &&
 					  	<Icon icon="search" key="header-search" onclick={this.showFilterText} class="fade-down"/>
-					  }
-					  {(view === '/entry' || view === '/new') &&
-					  	<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
+						}
+						{(view === '/entry' || view === '/new') &&
+							<Icon icon="copy" key="header-copy" onclick={this.copy} class="fade-up"/>
 						}
 						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'confirm delete', data: entry.id}})} class="fade-up"/>
+							<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 						}
-					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'toastConfig', val: {type: 'menu', data: dark}})}/>
+						{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+							<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'dialogMode', val: 'modal:delete'})} class="fade-up"/>
+						}
+					  <Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
 					</div>
 
 					{view === '/entries' &&

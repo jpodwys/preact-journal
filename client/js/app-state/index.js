@@ -3,34 +3,56 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const compute = (obj, prop) => {
+const compute = (obj, prop, next, prev) => {
   switch(prop) {
+    // viewEntries
+    case 'filter': // Fallthrough
     case 'entries': // Fallthrough
-    case 'filterText': {
-      obj.viewEntries = applyFilters(obj.filterText, obj.entries);
+    case 'filterText': // Fallthrough
+    case 'showFilterInput': {
+      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.showFilterInput, obj.entries);
       return;
+    }
+
+    // entry
+    // filter
+    // filterText
+    // dialogMode
+    // showFilterInput
+    case 'view': {
+      // obj.entry = undefined;
+      obj.dialogMode = '';
+      if(prev === '/entries' && next === '/entries' || !obj.filter && !obj.filterText){
+        return fire('clearFilters', true)();
+      }
     }
   }
 };
 
-const observe = (obj, prop, value) => {
+const observe = (obj, prop, next, prev) => {
   switch(prop) {
     case 'entries': {
-      obj.entries = sortObjectsByDate(value);
+      obj.entries = sortObjectsByDate(next);
       set('entries', obj.entries);
       return;
     }
-    case 'timestamp':   localStorage.setItem('timestamp', value);   return;
-    case 'dark':        localStorage.setItem('dark', !!value);      return;
-    case 'loggedIn':    if(value) setTimeout(fire('getEntries'));   return;
+    case 'timestamp':   localStorage.setItem('timestamp', next);   return;
+    case 'dark':        {
+      localStorage.setItem('dark', !!next);
+      const func = next ? 'add' : 'remove';
+      document.body.classList[func]('dark');
+      return;
+    }
+    case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
   }
 };
 
 const handler = {
-  set: function(obj, prop, value) {
-    obj[prop] = value;
-    compute(obj, prop);
-    observe(obj, prop, value);
+  set: function(obj, prop, next) {
+    const prev = obj[prop];
+    obj[prop] = next;
+    compute(obj, prop, next, prev);
+    observe(obj, prop, next, prev);
     return true;
   }
 };
@@ -44,12 +66,14 @@ export default function getInitialState () {
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
+    filter: '',
     filterText: '',
     entryIndex: -1,
     entry: undefined,
     // Included for documentation purporses
-    // toastConfig: undefined,
-    // showFilterInput: false,
+    // toast: '',
+    // dialogMode: '',
+    showFilterInput: false,
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined
@@ -58,6 +82,10 @@ export default function getInitialState () {
   get('entries').then((entries = []) => {
     fire('boot', { entries })();
   }).catch();
+
+  // Now that I'm setting a class to body, I
+  // have to ensure it gets set on load.
+  observe(null, 'dark', state.dark);
 
   return new Proxy(state, handler);
 };

@@ -5,27 +5,32 @@ import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
 import Entry from '../entry';
+import DialogWrapper from '../dialog-wrapper';
 import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
-  const dark = props.dark ? 'dark' : '';
-  const toast = props.toastConfig ? 'toast' : '';
+  const toast = props.toast ? 'toast' : '';
 
   return (
-    <div class={`app ${dark} ${toast}`}>
+    <div class={`app ${toast}`}>
+      <DialogWrapper
+        dark={props.dark}
+        entry={props.entry}
+        dialogMode={props.dialogMode}/>
       <Header
         view={props.view}
         loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}
+        filter={props.filter}
         filterText={props.filterText}
-        showFilterInput={props.showFilterInput}
-        dark={props.dark}/>
+        showFilterInput={props.showFilterInput}/>
       <main>
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>
           <Entries path="/entries"
+            showFilterInput={props.showFilterInput}
             scrollPosition={props.scrollPosition}
             viewEntries={props.viewEntries}/>
           <Entry path="/entry/:id"
@@ -34,7 +39,7 @@ export default (props) => {
             viewEntries={props.viewEntries}
             entryIndex={props.entryIndex}/>
         </Router>
-        <Toast config={props.toastConfig}/>
+        <Toast toast={props.toast}/>
       </main>
     </div>
   );
