@@ -23,7 +23,6 @@
     "babel-preset-stage-0": "^6.24.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "1.14.2",
-    "compression": "1.6.0",
     "cookie-parser": "1.4.1",
     "del": "^3.0.0",
     "dotenv": "1.2.0",
@@ -47,6 +46,7 @@
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",
     "sequelize": "3.19.3",
+    "shrink-ray-current": "^3.0.2",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.6.0"
   },
