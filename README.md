@@ -51,9 +51,19 @@ All state mutations are triggered from one of two places:
 1. the state object (more on that in the **Derived State** section)
 2. Actions
 
+Actions accept three arguments:
+
+1. `el` which can be destructured as `{ state, set }`. Actions can provide a delta and a callback to `set`.
+2. `detail` which is provided by the caller of the action.
+3. `e` which is a DOM event when user interaction directly triggers calling an action.
+
+These arguments make more sense after reading the **Eventing for Actions** section.
+
 #### Eventing for Actions
 
-The only way to execute actions outside of other actions is to fire events. This ensures components recieve props, return markup, and fire events, all of which is very testable. Firing events allows me to avoid passing actions as props.
+The only way to execute actions outside of other actions is to fire events. This ensures components recieve props, return markup, and fire events, all of which are simple to test. Firing events allows me to avoid passing actions as props.
+
+To help facilitate this, I've created `unifire`, which exports a higher-order component called `Provider` and an event firing utility method called `fire`. `Provider` accepts `state` and `actions`. It then creates a document-level event listener for the `UNIFIRE` event. The `fire` method accepts two arguments (`name` and optionally `detail`) and returns a function that optionally accepts a DOM event object. `fire` ultimately emits the `UNIFIRE` event with the name of the action to be executed, they detail object to provide to it, and the DOM event that triggered it.
 
 You may wonder why I'm ok with passing state as props but not actions. In this app, passing state as props results in almost no prop drilling. Passing actions as props would result in quite a bit of prop drilling. It would also make the app's markup far too verbose.
 
