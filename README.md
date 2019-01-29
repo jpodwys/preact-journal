@@ -11,35 +11,57 @@ The HTML, CSS, and JS necessary to run Journalize in its entirety while online w
 ## Features
 
 * **Offline Capable**. You can CRUD entries to your heart's content while offline. The next time you boot Journalize while online, the changes you made while offline will sync to the server. Similarly, changes you made on other devices while online will sync back to your devices that didn't have a connection at the time. You cannot login, create an account, or logout while offline.
-* **Favorites**. This blurb seems redundant.
-* **Dark Mode**. This one too.
-* **Share/Copy**. Clicking the copy icon in browsers that support the `navigator.share` API ([currently only mobile Chrome](https://caniuse.com/#search=share%20api)), will bring up the operating system's native share UI. In all other browsers, it will copy the entry to the clipboard.
-* **Search/Filter**. Search by plain text, entry date, and/or favorites.
+* **Favorites**.
+* **Dark Mode**.
+* **Share/Copy**. Clicking the copy icon in [browsers that support the `navigator.share` API](https://caniuse.com/#search=share%20api), will bring up the operating system's native share UI. In all other browsers, it will copy the entry to the clipboard.
+* **Search/Filter**. Search by plain text or entry date and/or favorites.
 
-## Architecture
-
-#### Stack
+## Stack
 
 * **Preact**: Front end components
-* **Node/Express**: API/DB calls/file server (I'd like to move from Express to [Polka](https://github.com/lukeed/polka) at some point)
+* **Node/Express**: API/DB calls/file server. I'd like to move the file server to a CDN and the API from Express to [Polka](https://github.com/lukeed/polka) and at some point.
 * **MySQL**: DB
 * **IndexedDB**: Client-side data storage (I'm using the excellent [idb-keyval](https://github.com/jakearchibald/idb-keyval)
 
-#### What NPM Packages Do I Include in My Bundle?
+## What NPM Packages Do I Include in My Bundle?
 
 * [preact](https://github.com/developit/preact)
 * [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport)
 * [idb-keyval](https://github.com/jakearchibald/idb-keyval)npmj
 * [select](https://github.com/zenorocha/select)
 
-That's it!
+That's it! Everything else is app code I wrote myself.
 
-#### Sinlge File
+## Sinlge File
 
 I package the entire site's HTML, CSS, and JS into a single file to optimize the download size.
 
-#### State Management
+## State Management
 
-This project is small enough that passing props to each component layer isn't an inconvenience and actually makes my component code very readable. If there's any prop drilling (passing props through layers that don't need them), then it's extremely limited. As such, and because I'm trying hard to keep my download size small, it seemed unnecessary to go with a robust, off-the-shelf state management solution.
+This app is tiny and will stay that way. As such, a complex state management solution is not necessary. However, there are a few design principles by which I abide.
 
-My comfort with passing state as props does not, however, translate to being comfortable passing actions as props. For some reason, that just felt wrong to me in this context. 
+#### State as Props
+
+In such a small app, passing state as props to each application layer works extremely well. In fact, for an app this small, passing state as props makes the app's markup extremely readable.
+
+#### Mutations in Actions
+
+All state mutations are triggered from one of two places:
+
+1. the state object (more on that in the **Derived State** section)
+2. Actions
+
+#### Eventing for Actions
+
+The only way to execute actions outside of other actions is to fire events. This ensures components recieve props, return markup, and fire events, all of which is very testable. Firing events allows me to avoid passing actions as props.
+
+You may wonder why I'm ok with passing state as props but not actions. In this app, passing state as props results in almost no prop drilling. Passing actions as props would result in quite a bit of prop drilling. It would also make the app's markup far too verbose.
+
+#### Derived State
+
+A [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) object sits at the heart of my state management approach. When I need to define a computed property or observer, I do so within the Proxy. As such, incoming state deltas triggered by actions can in turn result in side effects.
+
+Consider two examples:
+
+1. Which entries populate the entries list (called `viewEntries`) depends on the value of four other state variables: `entries`, `filter`, `filterText`, and `showFilterInput`. Therefore, when an action updates any of these four variables, the Proxy recomputes `viewEntries` before the next render.
+2. Proxies are also great for persistence. For example, any time the user changes their dark mode preference, the Proxy catches that change and writes the preference to localStorage so it's available the next time the user launches the app.
