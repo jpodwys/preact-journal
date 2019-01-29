@@ -48,8 +48,8 @@ In such a small app, passing state as props to each application layer works extr
 
 All state mutations are triggered from one of two places:
 
-1. the state object (more on that in the **Derived State** section)
-2. Actions
+1. Actions
+2. The state object (more on that in the **Derived State** section)
 
 Actions accept three arguments:
 
