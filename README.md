@@ -27,7 +27,7 @@ The HTML, CSS, and JS necessary to run Journalize in its entirety while online w
 
 * [preact](https://github.com/developit/preact)
 * [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport)
-* [idb-keyval](https://github.com/jakearchibald/idb-keyval)npmj
+* [idb-keyval](https://github.com/jakearchibald/idb-keyval)
 * [select](https://github.com/zenorocha/select)
 
 That's it! Everything else is app code I wrote myself.
