@@ -80,7 +80,7 @@ Journalize obviously mimics much of Google's [material design](https://material.
 
 #### Network Optimism
 
-Journalize has no loading spinners or progress bars. I've gone through quite a bit of effort to make Journalize's network layer resilient to spotty connections. As such, your changes *will* sync the server at some point. Until then, it's saved locally on your device. Therefore, there's no need to inform the user that they're waiting because, in reality, they're not.
+Journalize has no loading spinners or progress bars. I've gone through quite a bit of effort to make Journalize's network layer resilient to spotty connections. As such, your changes *will* sync the server at some point. Until then, they're saved locally on your device. Therefore, there's no need to inform the user that they're waiting because, in reality, they're not.
 
 #### Route Transitions
 
