@@ -8,6 +8,15 @@
 
 The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 13.43k (compressed using brotli). Add a service worker download for under 500 bytes and you're ready to work offline. The other donwloads are the favicon, manifest, and whichever home screen icon your device downloads. I don't include these items in the 14k total, but they do indeed get downloaded.
 
+#### What NPM Packages are Included in that 14k?
+
+* [preact](https://github.com/developit/preact) ([3.5k](https://bundlephobia.com/result?p=preact@8.4.2))
+* [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport) ([1k](https://bundlephobia.com/result?p=preact-scroll-viewport@0.2.0))
+* [idb-keyval](https://github.com/jakearchibald/idb-keyval) ([597b](https://bundlephobia.com/result?p=idb-keyval@3.1.0))
+* [select](https://github.com/zenorocha/select) ([364b](https://bundlephobia.com/result?p=select@1.1.2))
+
+That's it! Everything else is app code I wrote myself.
+
 ## Features
 
 * **Offline Capable**. You can CRUD entries to your heart's content while offline. The next time you boot Journalize while online, the changes you made while offline will sync to the server. Similarly, changes you made on other devices while online will sync back to your devices that didn't have a connection at the time. You cannot login, create an account, or logout while offline.
@@ -22,15 +31,6 @@ The HTML, CSS, and JS necessary to run Journalize in its entirety while online w
 * **Node/Express**: API/DB calls/file server. I'd like to move the file server to a CDN and the API from Express to [Polka](https://github.com/lukeed/polka) at some point.
 * **MySQL**: DB
 * **IndexedDB**: Client-side data storage (I'm using the excellent [idb-keyval](https://github.com/jakearchibald/idb-keyval)
-
-## What NPM Packages Do I Include in My Bundle?
-
-* [preact](https://github.com/developit/preact) ([3.5k](https://bundlephobia.com/result?p=preact@8.4.2))
-* [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport) ([1k](https://bundlephobia.com/result?p=preact-scroll-viewport@0.2.0))
-* [idb-keyval](https://github.com/jakearchibald/idb-keyval) ([597b](https://bundlephobia.com/result?p=idb-keyval@3.1.0))
-* [select](https://github.com/zenorocha/select) ([364b](https://bundlephobia.com/result?p=select@1.1.2))
-
-That's it! Everything else is app code I wrote myself.
 
 ## Sinlge File
 
