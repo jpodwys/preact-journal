@@ -19,16 +19,16 @@ The HTML, CSS, and JS necessary to run Journalize in its entirety while online w
 ## Stack
 
 * **Preact**: Front end components
-* **Node/Express**: API/DB calls/file server. I'd like to move the file server to a CDN and the API from Express to [Polka](https://github.com/lukeed/polka) and at some point.
+* **Node/Express**: API/DB calls/file server. I'd like to move the file server to a CDN and the API from Express to [Polka](https://github.com/lukeed/polka) at some point.
 * **MySQL**: DB
 * **IndexedDB**: Client-side data storage (I'm using the excellent [idb-keyval](https://github.com/jakearchibald/idb-keyval)
 
 ## What NPM Packages Do I Include in My Bundle?
 
-* [preact](https://github.com/developit/preact)
-* [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport)
-* [idb-keyval](https://github.com/jakearchibald/idb-keyval)
-* [select](https://github.com/zenorocha/select)
+* [preact](https://github.com/developit/preact) ([3.5k](https://bundlephobia.com/result?p=preact@8.4.2))
+* [preact-scroll-viewport](https://github.com/developit/preact-scroll-viewport) ([1k](https://bundlephobia.com/result?p=preact-scroll-viewport@0.2.0))
+* [idb-keyval](https://github.com/jakearchibald/idb-keyval) ([597b](https://bundlephobia.com/result?p=idb-keyval@3.1.0))
+* [select](https://github.com/zenorocha/select) ([364b](https://bundlephobia.com/result?p=select@1.1.2))
 
 That's it! Everything else is app code I wrote myself.
 
