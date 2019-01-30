@@ -8,6 +8,8 @@
 
 The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 13.43k (compressed using brotli). Add a service worker download for under 500 bytes and you're ready to work offline. The other donwloads are the favicon, manifest, and whichever home screen icon your device downloads. I don't include these items in the 14k total, but they do indeed get downloaded.
 
+To helpt get the bundle as small as it is, I combine the HTML, CSS, and JS into a single HTML file.
+
 #### What NPM Packages are Included in that 14k?
 
 * [preact](https://github.com/developit/preact) ([3.5k](https://bundlephobia.com/result?p=preact@8.4.2))
@@ -31,10 +33,6 @@ That's it! Everything else is app code I wrote myself.
 * **Node/Express**: API/DB calls/file server. I'd like to move the file server to a CDN and the API from Express to [Polka](https://github.com/lukeed/polka) at some point.
 * **MySQL**: DB
 * **IndexedDB**: Client-side data storage (I'm using the excellent [idb-keyval](https://github.com/jakearchibald/idb-keyval)
-
-## Sinlge File
-
-I package the entire site's HTML, CSS, and JS into a single file to optimize the download size.
 
 ## State Management
 
