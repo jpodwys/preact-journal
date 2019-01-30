@@ -6,7 +6,7 @@
 
 ## 14k?
 
-The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 13.43k (compressed using brotli). Add a service worker download for under 500 bytes and you're ready to work offline. The other donwloads are the favicon, manifest, and whichever home screen icon your device downloads. I don't include these items in the 14k total, but they do indeed get downloaded.
+The HTML, CSS, and JS necessary to run Journalize in its entirety while online weighs 13.43k (compressed using brotli). Add a service worker download for under 500 bytes and you're ready to work offline. The other downloads are the favicon, manifest, and whichever home screen icon your device downloads. I don't include these items in the 14k total, but they do indeed get downloaded.
 
 To helpt get the bundle as small as it is, I combine the HTML, CSS, and JS into a single HTML file.
 
@@ -21,11 +21,11 @@ That's it! Everything else is app code I wrote myself.
 
 ## Features
 
-* **Offline Capable**. You can CRUD entries to your heart's content while offline. The next time you boot Journalize while online, the changes you made while offline will sync to the server. Similarly, changes you made on other devices while online will sync back to your devices that didn't have a connection at the time. You cannot login, create an account, or logout while offline.
-* **Favorites**.
-* **Dark Mode**.
-* **Share/Copy**. Clicking the copy icon in [browsers that support the `navigator.share` API](https://caniuse.com/#search=share%20api), will bring up the operating system's native share UI. In all other browsers, it will copy the entry to the clipboard.
-* **Search/Filter**. Search by plain text or entry date and/or favorites.
+* **Offline Capable**: You can CRUD entries to your heart's content while offline. The next time you boot Journalize while online, the changes you made while offline will sync to the server. Similarly, changes you made on other devices while online will sync back to your devices that didn't have a connection at the time. You cannot login, create an account, or logout while offline.
+* **Favorites**
+* **Dark Mode**
+* **Share/Copy**: Clicking the copy icon in [browsers that support the `navigator.share` API](https://caniuse.com/#search=share%20api), will bring up the operating system's native share UI. In all other browsers, it will copy the entry to the clipboard.
+* **Search/Filter**: Search by plain text or entry date and/or favorites.
 
 ## Stack
 
@@ -73,3 +73,21 @@ Consider two examples:
 
 1. Which entries populate the entries list (called `viewEntries`) depends on the value of four other state variables: `entries`, `filter`, `filterText`, and `showFilterInput`. Therefore, when an action updates any of these four variables, the Proxy recomputes `viewEntries` before the next render.
 2. Proxies are also great for persistence. For example, any time the user changes their dark mode preference, the Proxy catches that change and writes the preference to localStorage so it's available the next time the user launches the app.
+
+## UX Principles
+
+Journalize obviously mimics much of Google's [material design](https://material.io/). However, there are a couple of additional principles to which I adhere.
+
+#### Network Optimism
+
+Journalize has no loading spinners or progress bars. I've gone through quite a bit of effort to make Journalize's network layer resilient to spotty connections. As such, your changes *will* sync the server at some point. Until then, it's saved locally on your device. Therefore, there's no need to inform the user that they're waiting because, in reality, they're not.
+
+#### Route Transitions
+
+Journalize is simple--it only has three views.
+
+1. Login
+2. Entry list
+3. Entry view
+
+Once you're past the login page, there are only two other pages to switch between. With that in mind, I've implemented a simple up/down transition between pages. The entry list fades down and the entry view fades up. I've also applied this to route-specific header icons. It's not fancy. My implementation exclusively uses CSS `animation`s via class names and therefore can only fade in, not out like [react-transition-group](https://github.com/reactjs/react-transition-group) can do. However, it's minimal in both UX and code which makes me happy.
