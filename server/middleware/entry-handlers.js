@@ -23,7 +23,7 @@ exports.getUpdatesSinceTimestamp = function(req, res, entries){
     };
   });
   res.send({
-    entries: entries,
+    entries: entries.map(removeFalseyFavorited),
     timestamp: date.getUtcZeroTimestamp()
   });
 }
