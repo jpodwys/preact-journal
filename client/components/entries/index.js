@@ -3,6 +3,7 @@ import ScrollViewport from 'preact-scroll-viewport';
 import EntryPreview from '../entry-preview';
 import { fire } from '../unifire';
 import debounce from '../../js/debounce';
+import context from '../../js/context';
 
 export default class Entries extends Component {
   componentDidMount() {
@@ -29,7 +30,7 @@ export default class Entries extends Component {
     }
     document.body.scrollTop = scrollPosition;
     return (
-      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
+      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20} onContextMenu={context}>
         {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );

@@ -18,7 +18,7 @@ export default class EntryPreview extends Component {
     if(fadeRight) setTimeout(fire('removeSlideInProp'), 450);
 
     return (
-      <div class={`entry-preview ${fadeRight}`}>
+      <div class={`entry-preview ${fadeRight}`} data-id={entry.id}>
         <a href={"/entry/" + entry.id}>
           <div class="list-item">
             <div class="first-row">

@@ -27,7 +27,7 @@ export class Provider extends Component {
   // The Proxy handles computed properties and local persistence.
   constructor(props) {
     super(props);
-    STATE = this.props.state;
+    window.state = STATE = this.props.state;
     this.child = props.children[0];
     listen(this, this.props.actions);
     this.setState(STATE);

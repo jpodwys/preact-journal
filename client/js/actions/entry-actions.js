@@ -333,6 +333,7 @@ function setEntry (el, { id }){
   var entry = el.state[collection][entryIndex];
 
   el.set({
+    view: '/entry',
     entry: entry,
     entryIndex: entryIndex
   });
