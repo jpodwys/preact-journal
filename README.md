@@ -76,7 +76,7 @@ Consider two examples:
 
 ## UX Principles
 
-Journalize obviously mimics much of Google's [material design](https://material.io/). However, there are a couple of additional principles to which I adhere.
+Journalize obviously mimics some of Google's [material design](https://material.io/). Specifically, I modeled the header, new entry button, and dialog boxes after material design. And all of the icons are [material design icons](https://material.io/tools/icons/?style=baseline) that I've run through [SVGOMG](https://jakearchibald.github.io/svgomg/) to save on download size. However, there are a couple of additional principles to which I adhere.
 
 #### Network Optimism
 
