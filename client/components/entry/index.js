@@ -7,7 +7,7 @@ import debounce from '../../js/debounce';
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      let entryText = document.getElementById('#entryText');
+      let entryText = document.getElementById('entryText');
       if(entryText) entryText.focus();
     }
   }
@@ -24,7 +24,7 @@ export default class Entry extends Component {
     var entry = this.props.entry;
     if(entry.newEntry){
       entry.date = document.getElementById('entryDate').innerText;
-      entry.text = document.getElementById('#entryText').innerText;
+      entry.text = document.getElementById('entryText').innerText;
       fire('createEntry', { entry })();
     } else {
       this.update(e);
