@@ -1,3 +1,4 @@
+var op = require('sequelize').Op;
 var date = require('../utils/date');
 
 module.exports = function(Entry, sequelize){
@@ -7,7 +8,7 @@ module.exports = function(Entry, sequelize){
     return Entry.findAndCountAll({
       where: {
         ownerId: userId,
-        deleted: { $ne: 1 }
+        deleted: { [op.ne]: 1 }
       },
       attributes: [
         'id', 'date', 'text', 'favorited',
@@ -25,8 +26,8 @@ module.exports = function(Entry, sequelize){
     return Entry.findAll({
       where: {
         ownerId: ownerId,
-        updatedAt: { $gt: timestamp },
-        deviceId: { $ne: deviceId }
+        updatedAt: { [op.gt]: timestamp },
+        deviceId: { [op.ne]: deviceId }
       },
       attributes: [
         'id', 'date', 'text', 'deleted', 'favorited',
