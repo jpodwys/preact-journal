@@ -3,7 +3,7 @@ module.exports = function(User, sequelize){
 
   self.getUserById = function(id){
     return User.findOne({
-      where: {id: id},
+      where: { id: id },
       attributes: ['id', 'username', 'password']
     });
   }
@@ -30,13 +30,13 @@ module.exports = function(User, sequelize){
     //   username: data.username,
     //   password: data.password
     // }, {
-    //   where: {id: data.id}
+    //   where: { id: data.id }
     // });
   }
 
   self.deleteUser = function(id){
     // return User.destroy({
-    //   where: {id: id}
+    //   where: { id: id }
     // });
   }
 
