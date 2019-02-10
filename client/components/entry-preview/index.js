@@ -3,10 +3,6 @@ import Icon from '../icon';
 import { fire } from '../unifire';
 import copyText from '../../js/copy-text';
 
-const copy = ({ date, text }) => copyText(date + ' ' + text);
-
-const getText = ({ previewText, text }) => previewText || text;
-
 export default ({ entry }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
   const fadeRight = entry.slideIn ? 'fade-right' : '';
@@ -25,13 +21,13 @@ export default ({ entry }) => {
           </div>
 
           <div class="second-row">
-            {getText(entry)}
+            {entry.previewText || entry.text}
           </div>
         </div>
       </a>
 
       <span class="nav-set right dark-fill entry-preview--icons">
-        <Icon icon="copy" key={entry.id + 'copy'} onclick={() => copy(entry)}/>
+        <Icon icon="copy" key={entry.id + 'copy'} onclick={() => copyText(entry.date + ' ' + entry.text)}/>
         <Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>

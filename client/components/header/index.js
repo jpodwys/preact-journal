@@ -15,8 +15,6 @@ const cancelAndBlur = (e) => {
 	document.getElementById('filterTextInput').blur();
 }
 
-const copy = ({ date, text }) => copyText(date + ' ' + text);
-
 export default ({ view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput }) => {
 	if(!loggedIn) return null;
 	const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
@@ -63,7 +61,7 @@ export default ({ view, loggedIn, viewEntries, entry, filter, filterText, showFi
 						<Icon icon="search" key="header-search" onclick={showFilterText} class="fade-down"/>
 					}
 					{(view === '/entry' || view === '/new') &&
-						<Icon icon="copy" key="header-copy" onclick={() => copy(entry)} class="fade-up"/>
+						<Icon icon="copy" key="header-copy" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 						<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
