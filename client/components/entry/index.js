@@ -7,7 +7,7 @@ import debounce from '../../js/debounce';
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      let entryText = this.base.querySelector('#entryText');
+      let entryText = document.getElementById('entryText');
       if(entryText) entryText.focus();
     }
   }
@@ -22,17 +22,14 @@ export default class Entry extends Component {
 
   slowUpsert = e => {
     var entry = this.props.entry;
-
     if(entry.newEntry){
-      entry.date = this.base.querySelector('#entryDate').innerText;
-      entry.text = this.base.querySelector('#entryText').innerText;
-
+      entry.date = document.getElementById('entryDate').innerText;
+      entry.text = document.getElementById('entryText').innerText;
       fire('createEntry', { entry })();
     } else {
       this.update(e);
     }
   }
-
   upsert = debounce(this.slowUpsert, 500);
 
   update = e => {
@@ -41,14 +38,12 @@ export default class Entry extends Component {
       case 'entryDate':  property = 'date'; break;
       case 'entryText':  property = 'text'; break;
     }
-
     var obj = {
       entry: {},
       property: property,
       entryId: this.props.entry.id
     }
     obj.entry[property] = e.target.innerText.trim();
-
     fire('updateEntry', obj)();
   }
 
@@ -57,7 +52,6 @@ export default class Entry extends Component {
     return (
       <div class="entry fade-up">
         <div class="entry-header nav-set dark-fill">
-
           {view !== '/new' &&
             <Icon
               icon="left"
@@ -65,7 +59,6 @@ export default class Entry extends Component {
               onclick={fire('shiftEntry', -1)}
               class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
           }
-
           <div class="entry-date-wrapper">
             <h1
               id="entryDate"
@@ -75,7 +68,6 @@ export default class Entry extends Component {
               {entry.date}
             </h1>
           </div>
-
           {view !== '/new' &&
             <Icon
               icon="left"
@@ -84,7 +76,6 @@ export default class Entry extends Component {
               class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
           }
         </div>
-
         <div
           id="entryText"
           contenteditable
