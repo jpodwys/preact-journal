@@ -542,21 +542,21 @@ body.dark .elevated {
 }
 
 .fade-in {
-  animation: fade-in ease .2s forwards;
+  animation: fade-in ease .2s;
 }
 
 .fade-up {
-  animation: fade-up ease .2s forwards;
+  animation: fade-up ease .2s;
 }
 
 .fade-down {
-  animation: fade-down ease .2s forwards;
+  animation: fade-down ease .2s;
 }
 
 .fade-right {
-  animation: fade-right ease .35s forwards;
+  animation: fade-right ease .35s;
 }
 
 .grow {
-  animation: grow ease .2s forwards;
+  animation: grow ease .2s;
 }
