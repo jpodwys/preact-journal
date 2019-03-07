@@ -2,7 +2,7 @@ import { h } from 'preact';
 import Dialog from '../dialog';
 import { fire } from '../unifire';
 
-const onLogout = e => {
+const onLogout = () => {
   fire('linkstate', {
     key: 'dialogMode',
     cb: fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })
