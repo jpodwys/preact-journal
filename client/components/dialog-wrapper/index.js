@@ -4,9 +4,8 @@ import { fire } from '../unifire';
 
 const onLogout = e => {
   e.stopPropagation();
-  fire('linkstate', { key: 'dialogMode', cb: function(){
-    fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })();
-  }})();
+  const cb = fire('linkstate', { key: 'dialogMode', val: 'modal:logout' });
+  fire('linkstate', { key: 'dialogMode', cb })();
 };
 
 const menu = (dark) => (
