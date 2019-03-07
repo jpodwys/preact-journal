@@ -19,7 +19,7 @@ const modal = (message, confirmText, onConfirm) => (
   <div>
     <div class="modal-message">{message}</div>
     <div>
-      <button class="mdl-button">Cancel</button>
+      <button class="mdl-button" onclick={fire('linkstate', { key: 'dialogMode' })}>Cancel</button>
       <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
     </div>
   </div>
