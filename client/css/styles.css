@@ -258,7 +258,7 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .search-form .nav-set > svg {
-  padding: 7.5px;
+  padding: 7.5px 10px;
 }
 
 .search-form .nav-set > .search-entry-count {
@@ -270,7 +270,7 @@ header .nav-set > *:not(h1):not(form) {
 
 .search-form input {
   flex: 10;
-  padding: 8px;
+  padding: 8px 8px 8px 0;
   margin: 0;
   width: 60%;
   background: transparent;
