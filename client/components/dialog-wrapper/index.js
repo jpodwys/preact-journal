@@ -3,9 +3,10 @@ import Dialog from '../dialog';
 import { fire } from '../unifire';
 
 const onLogout = e => {
-  e.stopPropagation();
-  const cb = fire('linkstate', { key: 'dialogMode', val: 'modal:logout' });
-  fire('linkstate', { key: 'dialogMode', cb })();
+  fire('linkstate', {
+    key: 'dialogMode',
+    cb: fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })
+  })();
 };
 
 const menu = (dark) => (
