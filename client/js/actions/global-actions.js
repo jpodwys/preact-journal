@@ -10,6 +10,13 @@ function linkstate (el, { key, val, cb }) {
   el.set(obj, cb);
 };
 
+function toggleDarkMode (el) {
+  el.set({
+    dark: !el.state.dark,
+    dialogMode: ''
+  });
+};
+
 // Copied to clipboard confirmation is currently the only toast message.
 function setToast (el) {
   if(timeout) clearTimeout(timeout);
@@ -64,6 +71,7 @@ function handleEntryView (url) {
 
 export default {
   linkstate,
+  toggleDarkMode,
   setToast,
   handleRouteChange
 };

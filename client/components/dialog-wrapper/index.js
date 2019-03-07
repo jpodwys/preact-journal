@@ -10,7 +10,7 @@ const onLogout = e => {
 
 const menu = (dark) => (
   <ul>
-    <li onclick={fire('linkstate', {key: 'dark', val: !dark})}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
     <li onclick={onLogout}>Logout</li>
   </ul>
 );

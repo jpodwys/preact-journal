@@ -297,7 +297,8 @@ function deleteEntry (el, { id }){
 
   el.set({
     entry: undefined,
-    entries: [].concat(el.state.entries)
+    entries: [].concat(el.state.entries),
+    dialogMode: ''
   }, () => {
     if(el.state.view !== '/entries') route('/entries', true);
   });
