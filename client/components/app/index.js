@@ -14,10 +14,6 @@ export default (props) => {
 
   return (
     <div class={`app ${toast}`}>
-      <DialogWrapper
-        dark={props.dark}
-        entry={props.entry}
-        dialogMode={props.dialogMode}/>
       <Header
         view={props.view}
         loggedIn={props.loggedIn}
@@ -39,8 +35,12 @@ export default (props) => {
             viewEntries={props.viewEntries}
             entryIndex={props.entryIndex}/>
         </Router>
-        <Toast toast={props.toast}/>
       </main>
+      <DialogWrapper
+        dark={props.dark}
+        entry={props.entry}
+        dialogMode={props.dialogMode}/>
+      <Toast toast={props.toast}/>
     </div>
   );
 };

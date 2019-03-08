@@ -2,16 +2,16 @@ import { h } from 'preact';
 import Dialog from '../dialog';
 import { fire } from '../unifire';
 
-const onLogout = e => {
-  e.stopPropagation();
-  fire('linkstate', { key: 'dialogMode', cb: function(){
-    fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })();
-  }})();
+const onLogout = () => {
+  fire('linkstate', {
+    key: 'dialogMode',
+    cb: fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })
+  })();
 };
 
 const menu = (dark) => (
   <ul>
-    <li onclick={fire('linkstate', {key: 'dark', val: !dark})}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
     <li onclick={onLogout}>Logout</li>
   </ul>
 );
@@ -20,7 +20,7 @@ const modal = (message, confirmText, onConfirm) => (
   <div>
     <div class="modal-message">{message}</div>
     <div>
-      <button class="mdl-button">Cancel</button>
+      <button class="mdl-button" onclick={fire('linkstate', { key: 'dialogMode' })}>Cancel</button>
       <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
     </div>
   </div>
