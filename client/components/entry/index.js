@@ -30,6 +30,7 @@ export default class Entry extends Component {
       this.update(e);
     }
   }
+
   upsert = debounce(this.slowUpsert, 500);
 
   update = e => {

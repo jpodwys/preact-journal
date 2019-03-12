@@ -15,9 +15,9 @@ const cancelAndBlur = (e) => {
 	document.getElementById('filterTextInput').blur();
 }
 
-export default ({ view, loggedIn, viewEntries, entry, filter, filterText, showFilterInput }) => {
-	if(!loggedIn) return null;
-	const entryCount = Array.isArray(viewEntries) ? viewEntries.length : 0;
+export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText, showFilterInput }) => {
+	if(!loggedIn) return;
+	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
@@ -50,7 +50,7 @@ export default ({ view, loggedIn, viewEntries, entry, filter, filterText, showFi
 								placeholder="Search"
 								oninput={debounce(fire('filterByText'), 100)}/>
 							<span class="nav-set">
-								<span class="search-entry-count">{viewEntries.length}</span>
+								<span class="search-entry-count">{entryCount}</span>
 							</span>
 						</form>
 					}

@@ -19,13 +19,10 @@ export default class Entries extends Component {
     return this.props.viewEntries !== np.viewEntries;
   }
 
-  render({ showFilterInput, viewEntries, scrollPosition }) {
-    viewEntries = viewEntries || [];
+  render({ showFilterInput, viewEntries = [], scrollPosition }) {
     if(showFilterInput && !viewEntries.length) return;
     if(!viewEntries.length){
-      return (
-        <h2 class="center-text fade-up">It's empty in here!</h2>
-      );
+      return <h2 class="center-text fade-up">It's empty in here!</h2>;
     }
     document.body.scrollTop = scrollPosition;
     return (
