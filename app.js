@@ -1,3 +1,6 @@
+try {
+  require('dotenv').load();
+} catch (e) {}
 var express = require('express'),
   bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),

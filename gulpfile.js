@@ -1,3 +1,6 @@
+try {
+  require('dotenv').load();
+} catch (e) {}
 var gulp = require('gulp');
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
@@ -81,8 +84,8 @@ function build() {
   )();
 }
 
-gulp.task('build', build);
+// gulp.task('build', build);
 
-gulp.task('serve', serve);
+// gulp.task('serve', serve);
 
 gulp.task('default', build/*, watch*/);
