@@ -1,4 +1,3 @@
-require('dotenv').load();
 var gulp = require('gulp');
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
@@ -29,7 +28,7 @@ function sw() {
       presets: ['env']
     }))
     .pipe(uglify())
-    .pipe(gulp.dest('./dist'));   
+    .pipe(gulp.dest('./dist'));
 }
 
 function version() {
