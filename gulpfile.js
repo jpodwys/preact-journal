@@ -81,8 +81,8 @@ function build() {
   )();
 }
 
-// gulp.task('build', build);
+gulp.task('build', build);
 
-// gulp.task('serve', serve);
+gulp.task('serve', serve);
 
 gulp.task('default', build/*, watch*/);
