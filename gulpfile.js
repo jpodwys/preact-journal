@@ -15,7 +15,7 @@ function serve(cb) {
   cb();
 }
 
-function scripts(cb) {
+function scripts() {
   return gulp.src('client/js/index.js')
     .pipe(webpack(require('./webpack.config.babel.js')))
     .pipe(rename('bundle.js'))

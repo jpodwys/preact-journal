@@ -41,7 +41,7 @@
     "idb-keyval": "^3.1.0",
     "jsonwebtoken": "^8.0.0",
     "mysql2": "^1.6.5",
-    "nodemon": "1.8.1",
+    "nodemon": "^1.18.10",
     "preact": "^8.3.1",
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",
@@ -51,8 +51,8 @@
     "webpack": "^3.6.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.39",
-    "@babel/preset-env": "^7.0.0-beta.39",
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "chai": "^4.1.2",
     "css-loader": "^0.28.9",
     "fetch-mock": "^7.0.0-alpha.6",
@@ -67,7 +67,7 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-phantomjs-launcher": "^1.0.4",
     "karma-sinon": "^1.0.5",
-    "karma-webpack": "^3.0.4",
+    "karma-webpack": "^3.0.5",
     "mocha": "^5.2.0",
     "node-fetch": "^2.2.0",
     "path": "^0.12.7",
