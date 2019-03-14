@@ -1,6 +1,4 @@
-try {
-  require('dotenv').load();
-} catch (e) {}
+require('dotenv').load();
 var gulp = require('gulp');
 var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
