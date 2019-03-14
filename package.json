@@ -10,7 +10,7 @@
   "scripts": {
     "start": "gulp",
     "build": "gulp build",
-    "serve": "node app.js",
+    "serve": "gulp serve",
     "test": "karma start test/karma.conf.js --single-run"
   },
   "dependencies": {
@@ -41,7 +41,6 @@
     "idb-keyval": "^3.1.0",
     "jsonwebtoken": "^8.0.0",
     "mysql2": "^1.6.5",
-    "nodemon": "^1.18.10",
     "preact": "^8.3.1",
     "preact-scroll-viewport": "^0.2.0",
     "select": "^1.1.2",

@@ -72,18 +72,17 @@ function inline() {
     .pipe(gulp.dest('./dist'));
 }
 
-function build() {
+function build(cb) {
   return gulp.series(
     clean,
     gulp.parallel(scripts, sw, version, manifest, images),
-    serve,
     styles,
     inline
-  )();
+  )(cb);
 }
 
 gulp.task('build', build);
 
 gulp.task('serve', serve);
 
-gulp.task('default', build/*, watch*/);
+gulp.task('default', build, serve);
