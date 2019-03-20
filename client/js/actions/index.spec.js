@@ -151,24 +151,20 @@ describe('actions', () => {
 
     describe('login', () => {
 
-      it('should clear localStorage, login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
+      it('should login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 204 }));
-        localStorage.setItem('bogus', 'value');
         User.login(el, USER);
         setTimeout(() => {
-          expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.args[0][0].loggedIn).to.be.true;
           expect(typeof el.set.args[0][1]).to.equal('function');
           done();
         });
       });
 
-      it('should clear localStorage and log an error', (done) => {
+      it('should log an error', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 400 }));
-        localStorage.setItem('bogus', 'value');
         User.login(el, USER);
         setTimeout(() => {
-          expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.called).to.be.false;
           expect(console.log.calledWith('loginFailure')).to.be.true;
           done();
@@ -179,24 +175,20 @@ describe('actions', () => {
 
     describe('create', () => {
 
-      it('should clear localStorage, create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
+      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
         fetchMock.post('/api/user', Promise.resolve({ status: 204 }));
-        localStorage.setItem('bogus', 'value');
         User.createAccount(el, USER);
         setTimeout(() => {
-          expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.args[0][0].loggedIn).to.be.true;
           expect(typeof el.set.args[0][1]).to.equal('function');
           done();
         });
       });
 
-      it('should clear localStorage and log an error', (done) => {
+      it('should log an error', (done) => {
         fetchMock.post('/api/user', Promise.resolve({ status: 400 }));
-        localStorage.setItem('bogus', 'value');
         User.createAccount(el, USER);
         setTimeout(() => {
-          expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.called).to.be.false;
           expect(console.log.calledWith('createAccountFailure')).to.be.true;
           done();

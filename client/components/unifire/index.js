@@ -30,7 +30,7 @@ export class Provider extends Component {
     STATE = this.props.state;
     this.child = props.children[0];
     listen(this, this.props.actions);
-    this.setState(STATE);
+    this.state = STATE;
   }
 
   set(delta, cb) {
