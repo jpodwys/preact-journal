@@ -165,6 +165,7 @@ svg {
 
 .entry-date {
   margin: 0;
+  cursor: text;
 }
 
 .next-entry {

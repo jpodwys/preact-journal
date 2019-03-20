@@ -69,7 +69,7 @@ function syncClientEntries (el){
       else if(entry.deleted)  func = deleteEntry;
       else                    func = putEntry;
 
-      func(el, {id: entry.id, entry: entry, clientSync: true});
+      func(el, { id: entry.id, entry: entry, clientSync: true });
     }
   });
 };

@@ -4,18 +4,16 @@ import getInitialState from '../app-state';
 import { route } from '../../components/router';
 
 function login (el, user){
-  clearData();
   User.login(user)
     .then(() => loginSuccess(el))
     .catch(err => loginFailure(el, err));
 };
 
 function loginSuccess (el){
-  el.set({
-    loggedIn: true,
-  }, () => {
-    route('/entries', true);
-  });
+  el.set(
+    { loggedIn: true },
+    () => route('/entries', true)
+  );
 };
 
 function loginFailure (el, err){
@@ -23,7 +21,6 @@ function loginFailure (el, err){
 };
 
 function createAccount (el, user){
-  clearData();
   User.create(user)
     .then(() => loginSuccess(el))
     .catch(err => createAccountFailure(el, err));
