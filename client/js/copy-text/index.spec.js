@@ -3,6 +3,7 @@ import copyText from './index';
 describe('copyText', () => {
 
   it('should fire setToast', (done) => {
+    if (navigator.share) return done();
     const NAME = 'UNIFIRE';
     const cb = sinon.spy();
     const handler = (e) => {

@@ -41,11 +41,11 @@ describe('utils', () => {
     });
 
     it('should sort object by descending date', () => {
-      const list = [ { date: '1' }, { date: '0' }, { date: '2' } ];
+      const list = [ { date: '2010' }, { date: '2000' }, { date: '2020' } ];
       const sorted = sortObjectsByDate(list);
-      expect(sorted[0].date).to.equal('2');
-      expect(sorted[1].date).to.equal('1');
-      expect(sorted[2].date).to.equal('0');
+      expect(sorted[0].date).to.equal('2020');
+      expect(sorted[1].date).to.equal('2010');
+      expect(sorted[2].date).to.equal('2000');
     });
   });
 

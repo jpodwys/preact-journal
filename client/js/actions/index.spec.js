@@ -298,7 +298,7 @@ describe('actions', () => {
           expect(arg.entries[0].id).to.equal(0);
           expect(arg.timestamp).to.equal(1234);
           done();
-        });
+        }, 200);
       });
 
       it('should handle an error when fetching entries and timestamp when timestamp is undefined', (done) => {
@@ -334,7 +334,7 @@ describe('actions', () => {
           expect(arg.entries[1].date).to.equal('2018-01-01');
           expect(arg.timestamp).to.equal(4321);
           done();
-        });
+        }, 200);
       });
 
       it('should set timestamp to localStorage without calling el.set when the sync response contains no entries', (done) => {
@@ -354,7 +354,7 @@ describe('actions', () => {
           expect(el.set.called).to.be.false;
           expect(localStorage.getItem('timestamp')).to.equal('4321');
           done();
-        });
+        }, 200);
       });
 
       it('should handle an error when syncing entries', (done) => {
@@ -400,7 +400,7 @@ describe('actions', () => {
           expect(entries[0].needsSync).to.be.undefined;
           expect(entries[1].needsSync).to.be.undefined;
           done();
-        });
+        }, 100);
       });
 
       it('should handle a failure to update an entry from client to server', (done) => {
@@ -487,7 +487,7 @@ describe('actions', () => {
           expect(secondCallArg.entries[0].newEntry).to.be.undefined;
           expect(secondCallArg.entries[0].needsSync).to.be.undefined;
           done();
-        });
+        }, 100);
       });
 
       it('should call set twice (with the correct params, of course) and set postPending to true if clientSync is true even when postPending is true', (done) => {
@@ -513,32 +513,7 @@ describe('actions', () => {
           expect(secondCallArg.entries[0].newEntry).to.be.undefined;
           expect(secondCallArg.entries[0].needsSync).to.be.undefined;
           done();
-        });
-      });
-
-      it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
-        fetchMock.post('/api/entry', {
-          status: 200,
-          body: { id: 1 }
-        });
-        Entry.createEntry(el, { entry: entry });
-
-        const firstCallArg = el.set.args[0][0];
-        expect(firstCallArg.entry).to.equal(entry);
-        expect(firstCallArg.entries[0].postPending).to.be.true;
-
-        setTimeout(() => {
-          const secondCallArg = el.set.args[1][0];
-          expect(secondCallArg.entry.id).to.equal(1);
-          expect(secondCallArg.entry.postPending).to.be.undefined;
-          expect(secondCallArg.entry.newEntry).to.be.undefined;
-          expect(secondCallArg.entry.needsSync).to.be.undefined;
-          expect(secondCallArg.entries[0].id).to.equal(1);
-          expect(secondCallArg.entries[0].postPending).to.be.undefined;
-          expect(secondCallArg.entries[0].newEntry).to.be.undefined;
-          expect(secondCallArg.entries[0].needsSync).to.be.undefined;
-          done();
-        });
+        }, 100);
       });
 
       it('should handle a network call failure correctly', (done) => {
