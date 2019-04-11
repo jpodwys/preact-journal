@@ -42,6 +42,31 @@ describe('actions', () => {
 
     describe('handleRouteChange', () => {
 
+      /* Can't currently test whether route was called. Unfortunately falling back to wrapping the history API. */
+
+      // let pushStateCall;
+      let replaceStateCall;
+
+      const { pushState, replaceState } = history;
+      // history.pushState = (a, b, url) => {
+      //   pushState.call(history, a, b, url);
+      //   pushStateCall = url;
+      // };
+      history.replaceState = (a, b, url) => {
+        replaceState.call(history, a, b, url);
+        replaceStateCall = url;
+      };
+
+      afterEach(() => {
+        // pushStateCall = undefined;
+        replaceStateCall = undefined;
+      });
+
+      after(() => {
+        // history.pushState = pushState;
+        history.replaceState = replaceState;
+      });
+
       it('should set view when appropriate', () => {
         Global.handleRouteChange(el, null, '/entries');
         expect(el.set.called).to.be.false;
@@ -50,22 +75,31 @@ describe('actions', () => {
         expect(el.set.args[0][0].view).to.equal('/');
       });
 
-      /* Can't currently test whether route was called. I'll look more into this later. */
+      it('should route back to / when passed an unkown path', (done) => {
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, null, '/bogus');
+        setTimeout(() => {
+          expect(replaceStateCall).to.equal('/');
+          done();
+        });
+      });
 
-      // it('should route back to / when passed an unkown path', () => {
-      //   Global.handleRouteChange(el, null, '/bogus');
-      //   expect(el.set.args[0][0].view).to.equal('/');
-      // });
+      it('should route back to / while logged out', (done) => {
+        Global.handleRouteChange(el, null, '/entries');
+        setTimeout(() => {
+          expect(replaceStateCall).to.equal('/');
+          done();
+        });
+      });
 
-      // it('should route back to / while logged out', () => {
-      //   Global.handleRouteChange(el, null, '/entries');
-      //   expect(el.set.args[0][0].view).to.equal('/');
-      // });
-
-      // it('should route to /entries when visiting / while logged in', () => {
-      //   Global.handleRouteChange(el, null, '/entries');
-      //   expect(el.set.args[0][0].view).to.equal('/');
-      // });
+      it('should route to /entries when visiting / while logged in', (done) => {
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, null, '/');
+        setTimeout(() => {
+          expect(replaceStateCall).to.equal('/entries');
+          done();
+        });
+      });
 
       /* This test may become useful in the future if I change how toast works, but it's not useful with my latest changes. */
 
@@ -151,7 +185,7 @@ describe('actions', () => {
 
     describe('login', () => {
 
-      it('should login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
+      it('should login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 204 }));
         User.login(el, USER);
         setTimeout(() => {
@@ -175,7 +209,7 @@ describe('actions', () => {
 
     describe('create', () => {
 
-      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope', (done) => {
+      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
         fetchMock.post('/api/user', Promise.resolve({ status: 204 }));
         User.createAccount(el, USER);
         setTimeout(() => {

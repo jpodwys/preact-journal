@@ -40,7 +40,7 @@ function handleRoute (el, view, url) {
     case '/entries':  handleEntriesView(el);  break;
     case '/entry':    // Fallthrough
     case '/new':      handleEntryView(url);   break;
-    default:          route('/');             break;
+    default:          route('/', true);             break;
   }
 };
 
