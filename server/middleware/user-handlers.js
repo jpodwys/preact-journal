@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken'),
   date = require('../utils/date');
 
 var loginOrCreate = function(req, res, user) {
-  var expiration = (new Date((new Date()).getTime() + (60 * 60 * 1000 * 24 * 30))); // One month
+  var expiration = date.getOneMonth();
   user.deviceId = date.getLastFiveFromTimestamp();
   jwt.sign(user, process.env.JWT_KEY, { expiresIn: '30d' }, function(err, token){
     // Something went wrong when signing the token
@@ -22,7 +22,7 @@ var loginOrCreate = function(req, res, user) {
       secure: (process.env.NODE_ENV === 'production'),
       expires: expiration
     });
-  
+
     res.sendStatus(204);
   });
 };

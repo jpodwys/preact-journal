@@ -12,6 +12,11 @@ const getLastFiveFromTimestamp = function(){
   return getUtcZeroTimestamp().toString().substr(-5);
 }
 
+const getOneMonth = function(){
+  return (new Date((new Date()).getTime() + (60 * 60 * 1000 * 24 * 30)));
+}
+
 exports.getUtcZeroTimestamp = getUtcZeroTimestamp;
 exports.getUtcZeroFromThirtyOneDaysAgo = getUtcZeroFromThirtyOneDaysAgo;
 exports.getLastFiveFromTimestamp =getLastFiveFromTimestamp;
+exports.getOneMonth = getOneMonth;

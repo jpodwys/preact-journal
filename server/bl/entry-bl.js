@@ -3,7 +3,7 @@ module.exports = function(Entry){
   const fourOhFour = { status: 400, message: 'Timestamp is required.' };
   const fiveHundred = { status: 500, message: 'There was an error.' };
 
-  self.getAllEntriesByOwnerId = function({body, query, user}){
+  self.getAllEntriesByOwnerId = function({user}){
     return new Promise(function (resolve, reject){
       Entry.getAllEntriesByOwnerId(user.id).then(function (entries){
         if(entries && entries.rows) return resolve(entries.rows);
@@ -14,7 +14,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.getUpdatesSinceTimestamp = function({body, query, params, user}){
+  self.getUpdatesSinceTimestamp = function({params, user}){
     return new Promise(function (resolve, reject){
       if(!params.timestamp) return reject(fourOhFour);
       const timestamp = parseInt(params.timestamp, 10);
@@ -27,7 +27,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.getEntryById = function({body, query, params, user}){
+  self.getEntryById = function({params, user}){
     return new Promise(function (resolve, reject){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
@@ -41,7 +41,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.createEntry = function({body, query, user}){
+  self.createEntry = function({body, user}){
     return new Promise(function (resolve, reject){
       Entry.createEntry(body, user.id, user.deviceId).then(function (entry){
         return resolve(entry.id);
@@ -51,7 +51,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.updateEntry = function({body, query, params, user}){
+  self.updateEntry = function({body, params, user}){
     return new Promise(function (resolve, reject){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
@@ -67,7 +67,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.deleteEntry = function({body, query, params, user}){
+  self.deleteEntry = function({params, user}){
     return new Promise(function (resolve, reject){
       var entryId = parseInt(params.id, 10);
       Entry.getEntryById(entryId).then(function (entry){
@@ -83,7 +83,7 @@ module.exports = function(Entry){
     });
   }
 
-  self.getEntryCount = function({body, query, user}){
+  self.getEntryCount = function(){
     return new Promise(function (resolve, reject){
       Entry.getEntryCount().then(function (total){
         return resolve(total);

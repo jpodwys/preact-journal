@@ -3,7 +3,7 @@ var bcrypt = require('bcryptjs');
 module.exports = function(User){
   var self = this;
 
-  self.attemptLogin = function({body, query, user}){
+  self.attemptLogin = function({body}){
     return new Promise(function (resolve, reject){
       User.getUserByUsername(body.username).then(function (user){
         if(!user) return reject({status: 400, message: 'Invalid username/password combination'});
@@ -23,7 +23,7 @@ module.exports = function(User){
 
   }
 
-  self.createAccount = function({body, query, user}){
+  self.createAccount = function({body}){
     var user = body;
     return new Promise(function (resolve, reject){
       if(!body.username || !body.password) reject({status: 400, message: 'Username and password are both required'});
@@ -67,7 +67,7 @@ module.exports = function(User){
     // });
   }
 
-  self.getUserCount = function({body, query, user}){
+  self.getUserCount = function(){
     return new Promise(function (resolve, reject){
       User.getUserCount().then(function (total){
         return resolve(total);
