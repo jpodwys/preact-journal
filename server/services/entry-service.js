@@ -4,7 +4,7 @@ var date = require('../utils/date');
 module.exports = function(Entry, sequelize){
   var self = this;
 
-  self.getAllEntriesByOwnerId = function(userId, limit, offset){
+  self.getAllEntriesByOwnerId = function(userId){
     return Entry.findAndCountAll({
       where: {
         ownerId: userId,
@@ -94,7 +94,10 @@ module.exports = function(Entry, sequelize){
 
   self.removeAllDeletedEntries = function(){
     return Entry.destroy({
-      where: { deleted: 1 }
+      where: {
+        deleted: 1,
+        updatedAt: { [op.lt]: date.getUtcZeroFromThirtyOneDaysAgo() }
+      }
     });
   }
 

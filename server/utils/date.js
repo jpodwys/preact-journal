@@ -1,5 +1,11 @@
+const thirtyOneDaysInSeconds = 31 * 24 * 60 * 60;
+
 const getUtcZeroTimestamp = function(){
   return Math.trunc(Date.now() / 1000 - new Date().getTimezoneOffset() * 60);
+}
+
+const getUtcZeroFromThirtyOneDaysAgo = function(){
+  return getUtcZeroTimestamp - thirtyOneDaysInSeconds;
 }
 
 const getLastFiveFromTimestamp = function(){
@@ -7,4 +13,5 @@ const getLastFiveFromTimestamp = function(){
 }
 
 exports.getUtcZeroTimestamp = getUtcZeroTimestamp;
+exports.getUtcZeroFromThirtyOneDaysAgo = getUtcZeroFromThirtyOneDaysAgo;
 exports.getLastFiveFromTimestamp =getLastFiveFromTimestamp;
