@@ -24,8 +24,9 @@ body {
 }
 
 main {
+  display: flex;
   margin: 0 auto;
-  max-width: 800px;
+  max-width: 2000px;
   padding: 60px 15px 0;
   min-height: calc(100vh - 60px);
 }
@@ -160,10 +161,15 @@ svg {
 /* Entry List */
 
 .entry-list {
+  flex: 2;
   padding-bottom: 75px;
 }
 
 /* Entry */
+
+.entry {
+  flex: 4;
+}
 
 .entry-date-wrapper {
   display: inline-block;
@@ -192,6 +198,7 @@ svg {
 }
 
 .entry-text {
+  margin: 0 100px;
   white-space: pre-wrap;
   min-height: calc(100vh - 200px);
 }

@@ -23,12 +23,14 @@ export default (props) => {
         filterText={props.filterText}
         showFilterInput={props.showFilterInput}/>
       <main>
+        <Entries
+          view={props.view}
+          loggedIn={props.loggedIn}
+          showFilterInput={props.showFilterInput}
+          scrollPosition={props.scrollPosition}
+          viewEntries={props.viewEntries}/>
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>
-          <Entries path="/entries"
-            showFilterInput={props.showFilterInput}
-            scrollPosition={props.scrollPosition}
-            viewEntries={props.viewEntries}/>
           <Entry path="/entry/:id"
             view={props.view}
             entry={props.entry}
