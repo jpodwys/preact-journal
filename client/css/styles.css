@@ -26,8 +26,8 @@ body {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 60px 15px 75px;
-  min-height: calc(100vh - 135px);
+  padding: 60px 15px 0;
+  min-height: calc(100vh - 60px);
 }
 
 input {
@@ -155,6 +155,12 @@ svg {
   color: var(--theme-white);
   box-shadow: none;
   border: none;
+}
+
+/* Entry List */
+
+.entry-list {
+  padding-bottom: 75px;
 }
 
 /* Entry */
