@@ -29,7 +29,7 @@ module.exports = function(User){
       if(!body.username || !body.password) reject({status: 400, message: 'Username and password are both required'});
       // if(!) username and password should both be several characters minimum
       User.getUserByUsername(body.username).then(function (user){
-        if(user) return reject({status: 400, message: 'Username ' + body.username + ' is taken. Please try another.'});
+        if(user) return reject({status: 409, message: 'Username ' + body.username + ' is taken. Please try another.'});
         bcrypt.genSalt(10, function (err, salt){
           bcrypt.hash(body.password, salt, function (err, hash){
             var userData = {username: body.username, password: hash};

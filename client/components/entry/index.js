@@ -48,42 +48,123 @@ export default class Entry extends Component {
     fire('updateEntry', obj)();
   }
 
+  shiftEntry = () => {
+    document.getElementById('entry-wrapper').scrollTo({
+      left: 400,
+      behavior: 'smooth'
+    })
+  }
+
   render({ view, entry, viewEntries, entryIndex }) {
     if(!entry) return <FourOhFour/>
     return (
-      <div class="entry fade-up">
-        <div class="entry-header nav-set dark-fill">
-          {view !== '/new' &&
-            <Icon
-              icon="left"
-              key={entry.id + '-left'}
-              onclick={fire('shiftEntry', -1)}
-              class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
-          }
-          <div class="entry-date-wrapper">
-            <h1
-              id="entryDate"
-              contenteditable
-              onInput={this.upsert}
-              class="entry-date center-text">
-              {entry.date}
-            </h1>
+      <div id="entry-wrapper" class="entry-wrapper">
+        <div class="entry fade-up">
+          <div class="entry-header nav-set dark-fill">
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-left'}
+                onclick={this.shiftEntry}
+                class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
+            }
+            <div class="entry-date-wrapper">
+              <h1
+                id="entryDate"
+                contenteditable
+                onInput={this.upsert}
+                class="entry-date center-text">
+                {entry.date}
+              </h1>
+            </div>
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-right'}
+                onclick={this.shiftEntry}
+                class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
+            }
           </div>
-          {view !== '/new' &&
-            <Icon
-              icon="left"
-              key={entry.id + '-right'}
-              onclick={fire('shiftEntry', 1)}
-              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
-          }
+          <div
+            id="entryText"
+            contenteditable
+            class="entry-text"
+            onInput={this.upsert}
+            key={'entry-' + entry.id}>
+            {entry.text}
+          </div>
         </div>
-        <div
-          id="entryText"
-          contenteditable
-          class="entry-text"
-          onInput={this.upsert}
-          key={'entry-' + entry.id}>
-          {entry.text}
+
+        <div class="entry fade-up">
+          <div class="entry-header nav-set dark-fill">
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-left'}
+                onclick={this.shiftEntry}
+                class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
+            }
+            <div class="entry-date-wrapper">
+              <h1
+                id="entryDate"
+                contenteditable
+                onInput={this.upsert}
+                class="entry-date center-text">
+                {entry.date}
+              </h1>
+            </div>
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-right'}
+                onclick={this.shiftEntry}
+                class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
+            }
+          </div>
+          <div
+            id="entryText"
+            contenteditable
+            class="entry-text"
+            onInput={this.upsert}
+            key={'entry-' + entry.id}>
+            {entry.text}
+          </div>
+        </div>
+
+        <div class="entry fade-up">
+          <div class="entry-header nav-set dark-fill">
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-left'}
+                onclick={this.shiftEntry}
+                class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
+            }
+            <div class="entry-date-wrapper">
+              <h1
+                id="entryDate"
+                contenteditable
+                onInput={this.upsert}
+                class="entry-date center-text">
+                {entry.date}
+              </h1>
+            </div>
+            {view !== '/new' &&
+              <Icon
+                icon="left"
+                key={entry.id + '-right'}
+                onclick={this.shiftEntry}
+                class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
+            }
+          </div>
+          <div
+            id="entryText"
+            contenteditable
+            class="entry-text"
+            onInput={this.upsert}
+            key={'entry-' + entry.id}>
+            {entry.text}
+          </div>
         </div>
       </div>
     );
