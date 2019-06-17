@@ -7,7 +7,7 @@ module.exports = function(){
     }, 900000); // Every 15 minutes
   }
 
-  // Remove all entries mark as deleted over 31 days ago
+  // Remove all entries marked as deleted over 31 days ago
   var Sequelize = require('sequelize'),
     db = require('./db')(Sequelize),
     entryModel = require('./models/entry-model')(db, Sequelize),
