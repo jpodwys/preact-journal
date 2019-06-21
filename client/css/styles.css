@@ -165,6 +165,10 @@ svg {
 
 /* Entry */
 
+.entry {
+  padding-bottom: 75px;
+}
+
 .entry-date-wrapper {
   display: inline-block;
 }
