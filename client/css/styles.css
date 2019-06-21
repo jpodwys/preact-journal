@@ -26,8 +26,8 @@ body {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 60px 15px 0;
-  min-height: calc(100vh - 60px);
+  padding: 60px 15px 75px;
+  min-height: calc(100vh - 135px);
 }
 
 input {
@@ -159,15 +159,7 @@ svg {
 
 /* Entry List */
 
-.entry-list {
-  padding-bottom: 75px;
-}
-
 /* Entry */
-
-.entry {
-  padding-bottom: 75px;
-}
 
 .entry-date-wrapper {
   display: inline-block;
