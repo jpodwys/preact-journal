@@ -46,10 +46,10 @@ function getAllEntries (el){
     .catch(err => getAllEntriesError(el, err));
 };
 
-function getAllEntriesSuccess (el, response){
+function getAllEntriesSuccess (el, { timestamp, entries }){
   el.set({
-    timestamp: response.timestamp,
-    entries: [].concat(el.state.entries, response.entries)
+    timestamp,
+    entries: [].concat(el.state.entries, entries)
   });
 };
 
@@ -82,14 +82,14 @@ function syncEntries (el){
   syncClientEntries(el);
 };
 
-function syncEntriesSuccess (el, response){
-  if(response.entries.length === 0){
-    localStorage.setItem('timestamp', response.timestamp);
+function syncEntriesSuccess (el, { entries, timestamp }){
+  if(entries.length === 0){
+    localStorage.setItem('timestamp', timestamp);
     return;
   }
 
-  applySyncPatch(el, response.entries);
-  persistSyncPatch(el, response.timestamp);
+  applySyncPatch(el, entries);
+  persistSyncPatch(el, timestamp);
 };
 
 function applySyncPatch (el, entries){
@@ -107,8 +107,8 @@ function applySyncPatch (el, entries){
 
 function persistSyncPatch (el, timestamp){
   el.set({
-    entries: [].concat(el.state.entries),
-    timestamp: timestamp
+    timestamp,
+    entries: [].concat(el.state.entries)
   }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
@@ -139,7 +139,7 @@ function createEntry (el, { entry, clientSync }){
   el.state.entries[entryIndex] = entry;
 
   el.set({
-    entry: entry,
+    entry,
     entries: [].concat(el.state.entries)
   });
 
@@ -170,20 +170,20 @@ function createEntry (el, { entry, clientSync }){
   if(!clientSync && postPending) return;
 
   Entry.create({ date: entry.date, text: entry.text })
-    .then(response => createEntrySuccess(el, entry.id, response))
+    .then(response => createEntrySuccess(el, entry.id, response.id))
     .catch(err => createEntryFailure(el, entry.id, err));
 };
 
-function createEntrySuccess (el, oldId, response){
+function createEntrySuccess (el, oldId, id){
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
   /**
    * Only update state.entry if the entry we just
    * modified is still active.
    */
-  if(isActiveEntryId(el, oldId)) el.state.entry.id = response.id;
+  if(isActiveEntryId(el, oldId)) el.state.entry.id = id;
 
-  el.state.entries[entryIndex].id = response.id;
+  el.state.entries[entryIndex].id = id;
   delete el.state.entries[entryIndex].postPending;
   delete el.state.entries[entryIndex].newEntry;
   /**
@@ -269,10 +269,7 @@ function updateEntrySuccess (el, id){
     ? Object.assign({}, entries[entryIndex])
     : el.state.entry;
 
-  el.set({
-    entry: entry,
-    entries: entries
-  });
+  el.set({ entry, entries });
 };
 
 function updateEntryFailure (el, err){
@@ -333,10 +330,7 @@ function setEntry (el, { id }){
   var entryIndex = findObjectIndexById(parseInt(id), el.state[collection]);
   var entry = el.state[collection][entryIndex];
 
-  el.set({
-    entry: entry,
-    entryIndex: entryIndex
-  });
+  el.set({ entry, entryIndex });
 };
 
 function newEntry (el){
@@ -350,10 +344,10 @@ function newEntry (el){
   };
 
   el.set({
-    entry: entry,
+    entry,
     entries: [entry].concat(el.state.entries)
   }, function(){
-    setEntry(el, {id: entry.id});
+    setEntry(el, { id: entry.id });
   });
 };
 
