@@ -22,7 +22,7 @@ var loginOrCreate = function(req, res, user) {
       secure: (process.env.NODE_ENV === 'production'),
       expires: expiration
     });
-  
+
     res.sendStatus(204);
   });
 };
