@@ -96,7 +96,7 @@ module.exports = function(Entry, sequelize){
     return Entry.destroy({
       where: {
         deleted: 1,
-        updatedAt: { [op.lt]: date.getUtcZeroFromThirtyOneDaysAgo() }
+        updatedAt: { [op.lt]: date.getTimestampFromThirtyOneDaysAgo() }
       }
     });
   }
