@@ -3,7 +3,7 @@ import { fire } from '../../components/unifire';
 // Adapted from here: http://codepen.io/yzubizarreta/pen/ojJBQp
 var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or touchstart events.
     touchEndCoords = { x: -1, y: -1 },// X and Y coordinates on mouseup or touchend events.
-    direction = 'undefined',// Swipe direction
+    direction,// Swipe direction
     minDistanceXAxis = 30,// Min distance on mousemove or touchmove on the X axis
     maxDistanceYAxis = 20,// Max distance on mousemove or touchmove on the Y axis
     maxAllowedTime = 1000,// Max allowed time between swipeStart and swipeEnd
@@ -26,14 +26,11 @@ function end(e) {
   elapsedTime = Date.now() - startTime;
   if (elapsedTime <= maxAllowedTime){
     if (Math.abs(touchEndCoords.x) >= minDistanceXAxis && Math.abs(touchEndCoords.y) < maxDistanceYAxis){
-      direction = (touchEndCoords.x < 0) ? 'left' : 'right';
-      switch(direction){
-        case 'left':
-          fire('shiftEntry', 1)();
-          break;
-        case 'right':
-          fire('shiftEntry', -1)();
-          break;
+      direction = touchEndCoords.x < 0 ? 'left' : 'right';
+      if (direction === 'left') {
+        fire('shiftEntry', 1)();
+      } else if (direction === 'right') {
+        fire('shiftEntry', -1)();
       }
     }
   }

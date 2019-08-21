@@ -59,7 +59,7 @@ module.exports = function(Entry, sequelize){
         date: data.date,
         text: data.text,
         favorited: 0,
-        updatedAt: date.getUtcZeroTimestamp(),
+        updatedAt: Date.now(),
         deviceId: deviceId
       }).then(function (entry){
         return resolve(entry);
@@ -70,7 +70,7 @@ module.exports = function(Entry, sequelize){
   }
 
   self.updateEntry = function(entryId, data, deviceId){
-    data.updatedAt = date.getUtcZeroTimestamp();
+    data.updatedAt = Date.now();
     data.deviceId = deviceId;
 
     return Entry.update(data, {
@@ -82,7 +82,7 @@ module.exports = function(Entry, sequelize){
     var data = {
       text: '',
       deleted: 1,
-      updatedAt: date.getUtcZeroTimestamp(),
+      updatedAt: Date.now(),
       favorited: 0,
       deviceId: deviceId
     };
@@ -96,7 +96,7 @@ module.exports = function(Entry, sequelize){
     return Entry.destroy({
       where: {
         deleted: 1,
-        updatedAt: { [op.gt]: date.getUtcZeroFromThirtyOneDaysAgo() }
+        updatedAt: { [op.lt]: date.getUtcZeroFromThirtyOneDaysAgo() }
       }
     });
   }
