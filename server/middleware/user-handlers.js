@@ -3,7 +3,7 @@ var jwt = require('jsonwebtoken'),
   date = require('../utils/date');
 
 var loginOrCreate = function(req, res, user) {
-  var expiration = date.getTimestampOneMonthFromNow();
+  var expiration = date.getHumanReadableOneMonthFromNow();
   user.deviceId = date.getLastFiveFromTimestamp();
   jwt.sign(user, process.env.JWT_KEY, { expiresIn: '30d' }, function(err, token){
     // Something went wrong when signing the token

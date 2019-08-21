@@ -9,10 +9,10 @@ const getLastFiveFromTimestamp = function(){
   return Date.now().toString().substr(-5);
 }
 
-const getTimestampOneMonthFromNow = function(){
-  return Date.getTime() + oneMonth;
+const getHumanReadableOneMonthFromNow = function(){
+  return (new Date((new Date()).getTime() + oneMonth));
 }
 
 exports.getTimestampFromThirtyOneDaysAgo = getTimestampFromThirtyOneDaysAgo;
 exports.getLastFiveFromTimestamp = getLastFiveFromTimestamp;
-exports.getTimestampOneMonthFromNow = getTimestampOneMonthFromNow;
+exports.getHumanReadableOneMonthFromNow = getHumanReadableOneMonthFromNow;
