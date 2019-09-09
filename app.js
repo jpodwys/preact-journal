@@ -15,15 +15,15 @@ app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
 app.use(shrinkRay({threshold: '1.4kb'}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,
   getToken: function(req){
-    if(req.cookies && req.cookies.auth_token){
+    if(req.cookies && req.cookies.auth_token)
       return AES.decrypt(req.cookies.auth_token);
-    }
     return null;
   }
 }));
