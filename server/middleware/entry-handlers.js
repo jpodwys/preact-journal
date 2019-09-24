@@ -10,7 +10,7 @@ const removeFalseyFavorited = entry => {
 exports.getAllEntriesByOwnerId = function(req, res, entries){
   res.send({
     entries: entries.map(removeFalseyFavorited),
-    timestamp: Date.now()
+    timestamp: date.getUtcZeroTimestamp()
   });
 }
 
@@ -24,7 +24,7 @@ exports.getUpdatesSinceTimestamp = function(req, res, entries){
   });
   res.send({
     entries: entries.map(removeFalseyFavorited),
-    timestamp: Date.now()
+    timestamp: date.getUtcZeroTimestamp()
   });
 }
 
