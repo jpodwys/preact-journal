@@ -6,24 +6,26 @@ import { fire } from '../../components/unifire';
 const compute = (obj, prop, next, prev) => {
   switch(prop) {
     // viewEntries
+    case 'view': // Fallthrough
     case 'filter': // Fallthrough
     case 'entries': // Fallthrough
-    case 'filterText': // Fallthrough
-    case 'showFilterInput': {
-      obj.viewEntries = applyFilters(obj.filterText, obj.filter, obj.showFilterInput, obj.entries);
-      return;
+    case 'filterText': {
+      if(obj.view === '/entries'){
+        obj.viewEntries = obj.entries;
+      } else if(obj.view === '/search'){
+        obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
+      }
     }
 
     // entry
     // filter
     // filterText
     // dialogMode
-    // showFilterInput
     case 'view': {
       // obj.entry = undefined;
       obj.dialogMode = '';
-      if(prev === '/entries' && next === '/entries' || !obj.filter && !obj.filterText){
-        return fire('clearFilters', true)();
+      if(prev === '/search' && next === '/entries'){
+        fire('clearFilters', true)();
       }
     }
   }
@@ -73,7 +75,6 @@ export default function getInitialState () {
     // Included for documentation purporses
     // toast: '',
     // dialogMode: '',
-    showFilterInput: false,
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined

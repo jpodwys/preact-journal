@@ -4,18 +4,17 @@ import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
-const showFilterText = () => {
-	fire('linkstate', {key: 'showFilterInput', val: true, cb: function(){
-		setTimeout(() => document.getElementById('filterTextInput').focus(), 200);
-	}})();
-}
-
 const cancelAndBlur = (e) => {
 	e.preventDefault();
 	document.getElementById('filterTextInput').blur();
 }
 
-export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText, showFilterInput }) => {
+const getBackHref = (view, filter, filterText) => {
+	if(view === '/search') return '/entries';
+	return filter || filterText ? '/search' : '/entries';
+};
+
+export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText }) => {
 	if(!loggedIn) return;
 	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
@@ -26,19 +25,19 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText, s
 		<header class="elevated">
 			<div class="inner-header">
 				<div class="nav-set">
-					{view === '/entries' && !showFilterInput &&
+					{view === '/entries' &&
 						<h3 class="fade-down">{`${entryCount} Entries`}</h3>
 					}
 
-					{(view === '/entry' || view === '/new' || (view === '/entries' && showFilterInput)) &&
-						<a href="/entries">
+					{(view === '/search' || view === '/entry' || view === '/new') &&
+						<a href={getBackHref(view, filter, filterText)}>
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
 					}
 				</div>
 
 				<div class="nav-set flex-grow nav-search">
-					{view === '/entries' && showFilterInput &&
+					{view === '/search' &&
 						<form class="search-form fade-up" onsubmit={cancelAndBlur}>
 							<span class="nav-set">
 								<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
@@ -57,8 +56,10 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText, s
 				</div>
 
 				<div class="nav-set">
-					{view === '/entries' && !showFilterInput && !filter && !filterText &&
-						<Icon icon="search" key="header-search" onclick={showFilterText} class="fade-down"/>
+					{view === '/entries' &&
+						<a href="/search">
+							<Icon icon="search" key="header-search" class="fade-down"/>
+						</a>
 					}
 					{(view === '/entry' || view === '/new') &&
 						<Icon icon="copy" key="header-copy" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>

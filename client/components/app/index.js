@@ -4,6 +4,7 @@ import Router from '../router';
 import Header from '../header';
 import Login from '../login';
 import Entries from '../entries';
+import Search from '../search';
 import Entry from '../entry';
 import DialogWrapper from '../dialog-wrapper';
 import Toast from '../toast';
@@ -20,13 +21,16 @@ export default (props) => {
         viewEntries={props.viewEntries}
         entry={props.entry}
         filter={props.filter}
-        filterText={props.filterText}
-        showFilterInput={props.showFilterInput}/>
+        filterText={props.filterText}/>
       <main>
         <Router onChange={fire('handleRouteChange')}>
           <Login path="/"/>
           <Entries path="/entries"
-            showFilterInput={props.showFilterInput}
+            scrollPosition={props.scrollPosition}
+            viewEntries={props.viewEntries}/>
+          <Search path="/search"
+            filter={props.filter}
+            filterText={props.filterText}
             scrollPosition={props.scrollPosition}
             viewEntries={props.viewEntries}/>
           <Entry path="/entry/:id"

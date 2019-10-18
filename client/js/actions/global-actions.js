@@ -37,10 +37,11 @@ function handleRouteChange (el, e, url) {
 function handleRoute (el, view, url) {
   switch(view) {
     case '/':         handleLoginView(el);    break;
-    case '/entries':  handleEntriesView(el);  break;
+    case '/entries':  // Fallthrough
+    case '/search':   handleEntriesView(el);  break;
     case '/entry':    // Fallthrough
     case '/new':      handleEntryView(url);   break;
-    default:          route('/', true);             break;
+    default:          route('/', true);       break;
   }
 };
 

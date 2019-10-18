@@ -841,19 +841,19 @@ describe('actions', () => {
 
     });
 
-    describe('blurTextFilter', () => {
+    // describe('blurTextFilter', () => {
 
-      it('should set showFilterInput to false when there is no filter text', () => {
-        el.state.filterText = 'bogus';
-        Entry.blurTextFilter(el);
-        expect(el.set.called).to.be.false;
+    //   it('should set showFilterInput to false when there is no filter text', () => {
+    //     el.state.filterText = 'bogus';
+    //     Entry.blurTextFilter(el);
+    //     expect(el.set.called).to.be.false;
 
-        el.state.filterText = '';
-        Entry.blurTextFilter(el);
-        expect(el.set.args[0][0].showFilterInput).to.be.false;
-      });
+    //     el.state.filterText = '';
+    //     Entry.blurTextFilter(el);
+    //     expect(el.set.args[0][0].showFilterInput).to.be.false;
+    //   });
 
-    });
+    // });
 
     // Can't really test this ATM due to it simply calling route. I don't think spying on route will work here.
     // describe('shiftEntry', () => {
