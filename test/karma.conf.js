@@ -7,6 +7,12 @@ module.exports = function(config) {
     preprocessors: { './test/index.js': 'webpack' },
     frameworks: [ 'mocha', 'chai', 'sinon' ],
     browsers: [ 'ChromeHeadless' ],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
     webpack: {
       module: {
         rules: [
