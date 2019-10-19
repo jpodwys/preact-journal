@@ -14,6 +14,17 @@ const getBackHref = (view, filter, filterText) => {
 	return filter || filterText ? '/search' : '/entries';
 };
 
+const onBack = (e) => {
+	if(e.metaKey || e.ctrlKey) return;
+	e.preventDefault();
+	history.back();
+};
+
+const focusSearchInput = () => {
+	setTimeout(() => document.getElementById('filterTextInput').focus(), 200);
+};
+
+
 export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText }) => {
 	if(!loggedIn) return;
 	const entryCount = viewEntries.length;
@@ -30,7 +41,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					}
 
 					{(view === '/search' || view === '/entry' || view === '/new') &&
-						<a href={getBackHref(view, filter, filterText)}>
+						<a href={getBackHref(view, filter, filterText)} onclick={onBack}>
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
 					}
@@ -58,7 +69,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 				<div class="nav-set">
 					{view === '/entries' &&
 						<a href="/search">
-							<Icon icon="search" key="header-search" class="fade-down"/>
+							<Icon icon="search" onclick={focusSearchInput} key="header-search" class="fade-down"/>
 						</a>
 					}
 					{(view === '/entry' || view === '/new') &&

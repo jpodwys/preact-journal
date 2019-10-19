@@ -5,8 +5,6 @@ import ZeroState from '../zero-state';
 import { fire } from '../unifire';
 
 export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
-  setTimeout(() => document.getElementById('filterTextInput').focus(), 200);
-
   if(!viewEntries.length){
     if(!filter && !filterText){
       return (
@@ -15,7 +13,7 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
             <Icon icon="star-filled"/>
             <span>Favorites</span>
           </li>
-          <li onclick={fire('linkstate', { key: 'filterText', val: new Date().toISOString().slice(5, 10) })}>
+          <li onclick={fire('linkstate', { key: 'filterText', val: new Date().toISOString().slice(5, 10) + '-' })}>
             <Icon icon="calendar"/>
             <span>On this day</span>
           </li>

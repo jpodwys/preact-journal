@@ -46,7 +46,7 @@ function filterByFavorited (entries) {
 };
 
 function applyFilters (view, query, filter, list) {
-  if(view === '/search', !query && !filter) return [];
+  if(view === '/search' && !query && !filter) return [];
   list = filterHiddenEntries(list);
   if(filter === 'favorites') list = filterByFavorited(list);
   return filterObjectsByText(query, list);

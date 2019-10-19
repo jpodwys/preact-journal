@@ -12,7 +12,7 @@ const compute = (obj, prop, next, prev) => {
     case 'filterText': {
       if(obj.view === '/entries'){
         obj.viewEntries = obj.entries;
-      } else if(obj.view === '/search'){
+      } else {
         obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
       }
     }
