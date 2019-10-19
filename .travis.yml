@@ -17,7 +17,7 @@ before_script:
 
 # Make chrome browser available for testing
 before_install:
-  - export CHROME_BIN=chromium-browser
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 services:
   - xvfb
