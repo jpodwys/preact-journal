@@ -48,6 +48,11 @@ function getSVG(icon) {
             <path d="M12 17.3l6.2 3.7-1.7-7L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.5 14l-1.7 7z"/>
             <path d="M0 0h24v24H0z" fill="none"/>
           </g>
+    case 'calendar':
+      return <g>
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v14c0 1.1.9 2 2 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+          </g>
   }
 }
 

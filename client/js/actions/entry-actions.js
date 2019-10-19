@@ -359,24 +359,17 @@ function filterByText (el, text, e){
   el.set({ filterText });
 };
 
-function blurTextFilter (el){
-  if(!el.state.filter && !el.state.filterText){
-    el.set({ showFilterInput: false });
-  }
-};
-
 function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
-  if(entry) route('/entry/' + entry.id);
+  if(entry) route('/entry/' + entry.id, true);
 };
 
 function clearFilters (el, hideInput) {
   el.set({
     filter: '',
-    filterText: '',
-    showFilterInput: hideInput === true ? false : el.state.showFilterInput
+    filterText: ''
   });
 };
 
@@ -398,7 +391,6 @@ export default {
   setEntry,
   newEntry,
   filterByText,
-  blurTextFilter,
   shiftEntry,
   toggleFavorite,
   clearFilters,

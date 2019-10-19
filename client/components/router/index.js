@@ -68,10 +68,10 @@ class Router extends Component {
   }
 
   matchUrlWithWildCards(path, url) {
-    let paths = path.split('/');
-    let urls = url.split('/');
+    const paths = path.split('/');
+    const urls = url.split('/');
 
-    if(paths.length !== urls.length) return false;
+    if(paths.length > urls.length) return false;
 
     for(let i = 0; i < urls.length; i++){
       if(paths[i] !== urls[i] && paths[i][0] !== ':'){

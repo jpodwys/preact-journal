@@ -52,12 +52,16 @@ svg {
 }
 
 .nav-set {
+  display: flex;
   height: inherit;
   position: relative;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-set > * {
+  display: flex;
   position: relative;
   display: inline-block;
   margin: 0;
@@ -158,6 +162,25 @@ svg {
 }
 
 /* Entry List */
+
+/* Search Suggestions */
+
+.search-suggestions {
+  list-style: none;
+  font-size: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.search-suggestions > li {
+  padding: 15px 0;
+  cursor: pointer;
+}
+
+.search-suggestions > li svg {
+  margin: 0 12.5px;
+  vertical-align: middle;
+}
 
 /* Entry */
 
