@@ -9,7 +9,7 @@ describe('actions', () => {
 
   function getElStub() {
     return {
-      state: { entries: [], showFilterInput: false },
+      state: { entries: [] },
       set: sinon.spy(),
       reset () {
         this.state = { entries: [] };
@@ -236,12 +236,10 @@ describe('actions', () => {
       it('should clear localStorage, reset state, and route back to / (the login page)', (done) => {
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
         localStorage.setItem('bogus', 'value');
-        el.state.showFilterInput = true;
         User.logout(el);
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.be.null;
           expect(el.set.calledOnce).to.be.true;
-          expect(el.set.args[0][0].showFilterInput).to.be.false;
           done();
         });
       });
@@ -840,20 +838,6 @@ describe('actions', () => {
       });
 
     });
-
-    // describe('blurTextFilter', () => {
-
-    //   it('should set showFilterInput to false when there is no filter text', () => {
-    //     el.state.filterText = 'bogus';
-    //     Entry.blurTextFilter(el);
-    //     expect(el.set.called).to.be.false;
-
-    //     el.state.filterText = '';
-    //     Entry.blurTextFilter(el);
-    //     expect(el.set.args[0][0].showFilterInput).to.be.false;
-    //   });
-
-    // });
 
     // Can't really test this ATM due to it simply calling route. I don't think spying on route will work here.
     // describe('shiftEntry', () => {

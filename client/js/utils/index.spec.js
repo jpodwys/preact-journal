@@ -112,7 +112,6 @@ describe('utils', () => {
   describe('applyFilters', () => {
     const query = 'query';
     let filter = 'favorites';
-    // let showFilterInput = false;
     const list = [
       { deleted: '1', text: query },
       { date: '0', text: '', favorited: true },
@@ -120,27 +119,27 @@ describe('utils', () => {
       { date: query, text: '1' }
     ];
 
-    it('should return an empty list when query and filter are falsey and showFilterInput is true', () => {
-      const filtered = applyFilters('', '', true, list);
+    it('should return an empty list when on the /search view and query and filter are falsey', () => {
+      const filtered = applyFilters('/search', '', '', list);
       expect(filtered.length).to.equal(0);
     });
 
     it('should return entries containing query (excluding deleted)', () => {
-      const filtered = applyFilters(query, '', false, list);
+      const filtered = applyFilters('/search', query, '', list);
       expect(filtered.length).to.equal(2);
       expect(filtered[0].text).to.equal(query);
       expect(filtered[1].date).to.equal(query);
     });
 
     it('should return favorited entries (excluding deleted)', () => {
-      const filtered = applyFilters('', filter, false, list);
+      const filtered = applyFilters('/search', '', filter, list);
       expect(filtered.length).to.equal(2);
       expect(filtered[0].text).to.equal('');
       expect(filtered[1].text).to.equal(query);
     });
 
     it('should return favorited entries containing query (excluding deleted)', () => {
-      const filtered = applyFilters(query, filter, false, list);
+      const filtered = applyFilters('/search', query, filter, list);
       expect(filtered.length).to.equal(1);
       expect(filtered[0].text).to.equal(query);
     });
