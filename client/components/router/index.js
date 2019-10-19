@@ -74,7 +74,6 @@ class Router extends Component {
     if(paths.length > urls.length) return false;
 
     for(let i = 0; i < urls.length; i++){
-      // if(urls.length - 1 < i && path[path.length - 1] === '?') return true;
       if(paths[i] !== urls[i] && paths[i][0] !== ':'){
         return false;
       }
