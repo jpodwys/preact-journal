@@ -5,6 +5,7 @@
   --theme-dark: #424242;
   --theme-white: #fff;
   --theme-dark-text: #ccc;
+  --theme-dark-blue: #2d50afe0;
 }
 
 /* Global */
@@ -522,7 +523,7 @@ body.dark .list-item .second-row {
 }
 
 body.dark .button--fab.add-entry {
-  background-color: #2d50afe0;
+  background-color: var(--theme-dark-blue);
 }
 
 body.dark .elevated {
@@ -530,7 +531,7 @@ body.dark .elevated {
 }
 
 body.dark .highlight {
-  background-color: #2d50afe0;
+  background-color: var(--theme-dark-blue);
 }
 
 /* Transitions */
