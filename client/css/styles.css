@@ -231,8 +231,10 @@ svg {
   display: none;
 }
 
-.entry-preview:hover .entry-preview--icons .hide-icon {
-  display: block;
+@media (hover: hover) {
+  .entry-preview:hover .entry-preview--icons .hide-icon {
+    display: block;
+  }
 }
 
 .entry-preview--icons svg {
