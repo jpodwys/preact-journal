@@ -703,6 +703,18 @@ describe('actions', () => {
 
     });
 
+    describe('showConfirmDeleteEntryModal', () => {
+
+      it('should set entry and dialogMode', () => {
+        const entry = {};
+        Entry.showConfirmDeleteEntryModal(el, { entry });
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry).to.equal(entry);
+        expect(firstCallArgs[0].dialogMode).to.equal('modal:delete');
+      });
+
+    });
+
     describe('deleteEntry', () => {
 
       beforeEach(() => {

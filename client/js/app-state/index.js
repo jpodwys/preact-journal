@@ -10,13 +10,7 @@ const compute = (obj, prop, next, prev) => {
     case 'filter': // Fallthrough
     case 'entries': // Fallthrough
     case 'filterText': {
-      if(obj.view !== '/'){
-        if(obj.view === '/entries'){
-          obj.viewEntries = obj.entries;
-        } else {
-          obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
-        }
-      }
+      obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
     }
 
     // entry

@@ -26,9 +26,19 @@ export default ({ entry }) => {
         </div>
       </a>
 
-      <span class="nav-set right dark-fill entry-preview--icons">
-        <Icon icon="copy" key={entry.id + 'copy'} onclick={() => copyText(entry.date + ' ' + entry.text)}/>
-        <Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
+      <span class="nav-set dark-fill entry-preview--icons">
+        <Icon icon="delete"
+          class="hide-icon"
+          key={entry.id + 'delete'}
+          onclick={fire('showConfirmDeleteEntryModal', { entry })}/>
+        <Icon icon="share"
+          class="hide-icon"
+          key={entry.id + 'sharre'}
+          onclick={() => copyText(entry.date + ' ' + entry.text)}/>
+        <Icon icon={favoriteIcon}
+          class={entry.favorited ? '' : 'hide-icon'}
+          key={entry.id + 'favorite'}
+          onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>
   );

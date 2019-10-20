@@ -227,6 +227,14 @@ svg {
   right: -12.5px;
 }
 
+.entry-preview--icons .hide-icon {
+  opacity: 0;
+}
+
+.entry-preview:hover .entry-preview--icons .hide-icon {
+  opacity: 1
+}
+
 .entry-preview--icons svg {
   padding: 10px 12.5px 5px;
 }

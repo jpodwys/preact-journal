@@ -72,14 +72,14 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 							<Icon icon="search" onclick={focusSearchInput} key="header-search" class="fade-down"/>
 						</a>
 					}
+					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+						<Icon icon="delete" key="header-delete" onclick={fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
+					}
 					{(view === '/entry' || view === '/new') &&
-						<Icon icon="copy" key="header-copy" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
+						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 						<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
-					}
-					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon="delete" key="header-delete" onclick={fire('linkstate', {key: 'dialogMode', val: 'modal:delete'})} class="fade-up"/>
 					}
 					<Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
 				</div>

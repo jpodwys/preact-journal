@@ -282,6 +282,13 @@ function putEntry (el, { entry }){
     .catch(err => updateEntryFailure(el, err));
 };
 
+function showConfirmDeleteEntryModal (el, { entry }){
+  el.set({
+    entry,
+    dialogMode: 'modal:delete'
+  });
+};
+
 function deleteEntry (el, { id }){
   if(typeof id !== 'number') return;
 
@@ -387,6 +394,7 @@ export default {
   getEntries,
   createEntry,
   updateEntry,
+  showConfirmDeleteEntryModal,
   deleteEntry,
   setEntry,
   newEntry,
