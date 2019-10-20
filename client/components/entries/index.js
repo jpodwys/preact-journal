@@ -26,7 +26,7 @@ export default class Entries extends Component {
     }
     document.body.scrollTop = scrollPosition;
     return (
-      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
+      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20} onContextMenu={(e) => e.preventDefault()}>
         {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
       </ScrollViewport>
     );

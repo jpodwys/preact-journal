@@ -228,11 +228,11 @@ svg {
 }
 
 .entry-preview--icons .hide-icon {
-  opacity: 0;
+  display: none;
 }
 
 .entry-preview:hover .entry-preview--icons .hide-icon {
-  opacity: 1
+  display: block;
 }
 
 .entry-preview--icons svg {
