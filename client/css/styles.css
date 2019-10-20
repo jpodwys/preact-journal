@@ -245,6 +245,10 @@ svg {
   color: var(--theme-blue);
 }
 
+.highlight {
+  background-color: #ff0;
+}
+
 /* Header */
 
 header {
@@ -523,6 +527,10 @@ body.dark .button--fab.add-entry {
 
 body.dark .elevated {
   box-shadow: none;
+}
+
+body.dark .highlight {
+  background-color: #2d50afe0;
 }
 
 /* Transitions */
