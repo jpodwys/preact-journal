@@ -15,8 +15,9 @@ const getBackHref = (view, filter, filterText) => {
 };
 
 const onBack = (e) => {
-	if(e.metaKey || e.ctrlKey) return;
+	if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
 	e.preventDefault();
+	e.stopPropagation();
 	history.back();
 };
 
