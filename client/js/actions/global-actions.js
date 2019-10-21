@@ -26,8 +26,7 @@ function setToast (el) {
   }, 2000)
 };
 
-function handleRouteChange (el, e, url) {
-  url = url || e.url;
+function handleRouteChange (el, url) {
   let view = getViewFromPathname(url);
   if(view !== '/' && !el.state.loggedIn) return route('/', true);
   if(view !== el.state.view) el.set({ view });
@@ -63,9 +62,9 @@ function handleEntriesView (el) {
 function handleEntryView (url) {
   const id = url.substr(url.lastIndexOf('/') + 1);
   if(id === 'new'){
-    fire('newEntry')();
+    fire('newEntry');
   } else {
-    fire('setEntry', { id })();
+    fire('setEntry', { id });
   }
 };
 

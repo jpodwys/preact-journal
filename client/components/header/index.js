@@ -52,14 +52,14 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{view === '/search' &&
 						<form class="search-form fade-up" onsubmit={cancelAndBlur}>
 							<span class="nav-set">
-								<Icon icon={filterIcon} onclick={fire('linkstate', { key: 'filter', val: filterTo })}/>
+								<Icon icon={filterIcon} onclick={() => fire('linkstate', { key: 'filter', val: filterTo })}/>
 							</span>
 							<input
 								id="filterTextInput"
 								autocomplete="off"
 								value={filterText}
 								placeholder="Search"
-								oninput={debounce(fire('filterByText'), 100)}/>
+								oninput={debounce((e) => fire('filterByText', e.target.value), 100)}/>
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
@@ -74,15 +74,15 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 						</a>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon="delete" key="header-delete" onclick={fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
+						<Icon icon="delete" key="header-delete" onclick={() => fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
 					}
 					{(view === '/entry' || view === '/new') &&
 						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon={favoriteIcon} onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
+						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 					}
-					<Icon icon="menu" key="header-menu" onclick={fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
+					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
 				</div>
 
 				{view === '/entries' &&

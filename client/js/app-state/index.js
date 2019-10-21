@@ -21,7 +21,7 @@ const observe = (obj, prop, next, prev) => {
       // obj.entry = undefined;
       obj.dialogMode = '';
       if(prev === '/search' && next === '/entries'){
-        fire('clearFilters', true)();
+        fire('clearFilters');
       }
       return;
     }
@@ -72,7 +72,7 @@ export default function getInitialState () {
   };
 
   get('entries').then((entries = []) => {
-    fire('boot', { entries })();
+    fire('boot', { entries });
   }).catch();
 
   // Now that I'm setting a class to body, I

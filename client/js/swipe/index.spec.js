@@ -1,10 +1,10 @@
 import swipe from './index';
-  
+import { Provider } from '../../components/unifire';
+
 describe('swipe', () => {
-  const NAME = 'UNIFIRE';
   const ID = 'bogus-id';
-  let cb;
-  let handler;
+  let provider;
+  let shiftEntry;
 
   function appendAndFocus(type, attr) {
     const el = document.createElement(type);
@@ -31,25 +31,23 @@ describe('swipe', () => {
   });
 
   beforeEach(() => {
-    cb = sinon.spy();
-    handler = (e) => {
-      if(e.detail[0] === 'shiftEntry'){
-        cb(e.detail[1]);
-      }
-    }
-    document.addEventListener(NAME, handler);
+    shiftEntry = sinon.spy();
+    provider = new Provider({
+      state: { loggedIn: true },
+      actions: { shiftEntry },
+      children: []
+    });
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener(NAME, handler);
   });
 
   it('should do nothing when the swipe\'s x distance is below 30px', (done) => {
     emit('touchstart', 0, 0);
     emit('touchend', 29, 0);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -58,7 +56,7 @@ describe('swipe', () => {
     emit('touchstart', 0, 0);
     emit('touchend', 30, 21);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -68,7 +66,7 @@ describe('swipe', () => {
     emit('touchstart', 0, 0);
     emit('touchend', 30, 21);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -78,7 +76,7 @@ describe('swipe', () => {
     emit('touchstart', 0, 0);
     emit('touchend', 30, 21);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -88,7 +86,7 @@ describe('swipe', () => {
     emit('touchstart', 0, 0);
     emit('touchend', 30, 21);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -98,7 +96,7 @@ describe('swipe', () => {
     setTimeout(() => {
       emit('touchend', 30, 0);
       setTimeout(() => {
-        expect(cb.called).to.be.false;
+        expect(shiftEntry.called).to.be.false;
         done();
       });
     }, 1010); // This test occasionally fails with exactly 1000ms as the timeout
@@ -109,7 +107,7 @@ describe('swipe', () => {
     setTimeout(() => {
       emit('touchend', 30, 19);
       setTimeout(() => {
-        expect(cb.calledWithExactly(-1)).to.be.true;
+        expect(shiftEntry.calledWithExactly(provider, -1, undefined)).to.be.true;
         done();
       });
     }, 100);
@@ -120,7 +118,7 @@ describe('swipe', () => {
     setTimeout(() => {
       emit('touchend', 0, 19);
       setTimeout(() => {
-        expect(cb.calledWithExactly(1)).to.be.true;
+        expect(shiftEntry.calledWithExactly(provider, 1, undefined)).to.be.true;
         done();
       });
     }, 100);

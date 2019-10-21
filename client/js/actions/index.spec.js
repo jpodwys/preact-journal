@@ -2,9 +2,9 @@ import fetchMock from 'fetch-mock';
 import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
+import { Provider, fire } from '../../components/unifire';
 
 describe('actions', () => {
-  const NAME = 'UNIFIRE';
   let el;
 
   function getElStub() {
@@ -36,6 +36,7 @@ describe('actions', () => {
         const delta = { key: 'bogus', val: 'value', cb: cb };
         Global.linkstate(el, delta);
         expect(el.set.args[0][0][delta.key]).to.equal(delta.val);
+
       });
 
     });
@@ -68,37 +69,28 @@ describe('actions', () => {
       });
 
       it('should set view when appropriate', () => {
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         expect(el.set.called).to.be.false;
 
-        Global.handleRouteChange(el, null, '/');
+        Global.handleRouteChange(el, '/');
         expect(el.set.args[0][0].view).to.equal('/');
       });
 
-      it('should route back to / when passed an unkown path', (done) => {
+      it('should route back to / when passed an unkown path', () => {
         el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/bogus');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/');
-          done();
-        });
+        Global.handleRouteChange(el, '/bogus');
+        expect(replaceStateCall).to.equal('/');
       });
 
-      it('should route back to / while logged out', (done) => {
-        Global.handleRouteChange(el, null, '/entries');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/');
-          done();
-        });
+      it('should route back to / while logged out', () => {
+        Global.handleRouteChange(el, '/entries');
+        expect(replaceStateCall).to.equal('/');
       });
 
-      it('should route to /entries when visiting / while logged in', (done) => {
+      it('should route to /entries when visiting / while logged in', () => {
         el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/entries');
-          done();
-        });
+        Global.handleRouteChange(el, '/');
+        expect(replaceStateCall).to.equal('/entries');
       });
 
       /* This test may become useful in the future if I change how toast works, but it's not useful with my latest changes. */
@@ -112,7 +104,7 @@ describe('actions', () => {
       //   };
       //   document.addEventListener(NAME, handler);
       //   el.state.toastConfig = {};
-      //   Global.handleRouteChange(el, null, '/');
+      //   Global.handleRouteChange(el, '/');
       //   setTimeout(() => {
       //     const detail = cb.args[0][0];
       //     expect(detail.key).to.equal('toastConfig');
@@ -126,54 +118,45 @@ describe('actions', () => {
         el.state.loggedIn = true;
 
         el.state.entries = undefined;
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called once at this point
         expect(el.set.calledTwice).to.be.false;
 
         el.state.entries = [ { text: 'hi' } ];
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called twice at this point
         expect(el.set.calledThrice).to.be.false;
 
         el.state.entries = [ { newEntry: true, text: '' } ];
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called thrice at this point
         const args = el.set.args[3][0];
         expect(args.entries.length).to.equal(0);
       });
 
-      it('should fire newEntry on /new', (done) => {
-        const cb = sinon.spy();
-        document.addEventListener(NAME, cb);
-
-        el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/entry/new');
-
-        setTimeout(() => {
-          expect(cb.called).to.be.true
-          document.removeEventListener(NAME, cb);
-          done();
+      it('should fire newEntry on /new', () => {
+        const newEntry = sinon.spy();
+        const provider = new Provider({
+          state: { loggedIn: true },
+          actions: Object.assign({}, Global, { newEntry }),
+          children: []
         });
+
+        fire('handleRouteChange', '/entry/new');
+        expect(newEntry.calledWithExactly(provider, undefined, undefined)).to.be.true;
       });
 
-      it('should fire setEntry on /entry/:id', (done) => {
-        const cb = sinon.spy();
-        const handler = (e) => {
-          if(e.detail[0] === 'setEntry'){
-            cb(e.detail[1]);
-          }
-        };
-        document.addEventListener(NAME, handler);
-
-        el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/entry/10');
-
-        setTimeout(() => {
-          const args = cb.args[0][0];
-          expect(args.id).to.equal('10');
-          document.removeEventListener(NAME, handler);
-          done();
+      it('should fire setEntry on /entry/:id', () => {
+        const setEntry = sinon.spy();
+        const provider = new Provider({
+          state: { loggedIn: true },
+          actions: Object.assign({}, Global, { setEntry }),
+          children: []
         });
+
+        fire('handleRouteChange', '/entry/10');
+        expect(setEntry.args[0][0]).to.equal(provider);
+        expect(setEntry.args[0][1].id).to.equal('10');
       });
 
     });
@@ -831,23 +814,14 @@ describe('actions', () => {
       it('should set filterText when appropriate', () => {
         el.state.filterText = 'bogus';
 
-        Entry.filterByText(el);
-        expect(el.set.called).to.be.false;
-
-        Entry.filterByText(el, undefined, {});
-        expect(el.set.called).to.be.false;
-
         Entry.filterByText(el, 'bogus');
         expect(el.set.called).to.be.false;
 
-        Entry.filterByText(el, undefined, { target: { value: 'bogus' } });
-        expect(el.set.called).to.be.false;
+        Entry.filterByText(el);
+        expect(el.set.args[0][0].filterText).to.equal('');
 
         Entry.filterByText(el, 'one');
-        expect(el.set.args[0][0].filterText).to.equal('one');
-
-        Entry.filterByText(el, undefined, { target: { value: 'two' } });
-        expect(el.set.args[1][0].filterText).to.equal('two');
+        expect(el.set.args[1][0].filterText).to.equal('one');
       });
 
     });

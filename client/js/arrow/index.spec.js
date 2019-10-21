@@ -1,14 +1,14 @@
 import arrow from './index';
+import { Provider } from '../../components/unifire';
 
 describe('arrow', () => {
-  const NAME = 'UNIFIRE';
   const LEFT = 37;
   const RIGHT = 39;
   const ENTER = 13;
   const SPACE = 19;
   const ID = 'bogus-id';
-  let handler;
-  let cb;
+  let provider;
+  let shiftEntry;
 
   function appendAndFocus(type, attr) {
     const el = document.createElement(type);
@@ -33,25 +33,23 @@ describe('arrow', () => {
   });
 
   beforeEach(() => {
-    cb = sinon.spy();
-    handler = (e) => {
-      if(e.detail[0] === 'shiftEntry'){
-        cb(e.detail[1]);
-      }
-    }
-    document.addEventListener(NAME, handler);
+    shiftEntry = sinon.spy();
+    provider = new Provider({
+      state: { loggedIn: true },
+      actions: { shiftEntry },
+      children: []
+    });
   });
 
   afterEach(() => {
     removeEl();
-    document.removeEventListener(NAME, handler);
   });
 
   it('should do nothing when the key pressed is not left or right', (done) => {
     emit(ENTER);
     emit(SPACE);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -61,7 +59,7 @@ describe('arrow', () => {
     emit(LEFT);
     emit(RIGHT);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -71,7 +69,7 @@ describe('arrow', () => {
     emit(LEFT);
     emit(RIGHT);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -81,7 +79,7 @@ describe('arrow', () => {
     emit(LEFT);
     emit(RIGHT);
     setTimeout(() => {
-      expect(cb.called).to.be.false;
+      expect(shiftEntry.called).to.be.false;
       done();
     });
   });
@@ -90,8 +88,7 @@ describe('arrow', () => {
     appendAndFocus('div');
     emit(LEFT);
     setTimeout(() => {
-      expect(cb.called).to.be.true;
-      expect(cb.calledWithExactly(-1)).to.be.true;
+      expect(shiftEntry.calledWithExactly(provider, -1, undefined)).to.be.true;
       done();
     });
   });
@@ -100,10 +97,9 @@ describe('arrow', () => {
     appendAndFocus('div');
     emit(RIGHT);
     setTimeout(() => {
-      expect(cb.called).to.be.true;
-      expect(cb.calledWithExactly(1)).to.be.true;
+      expect(shiftEntry.calledWithExactly(provider, 1, undefined)).to.be.true;
       done();
     });
   });
-    
+
 });

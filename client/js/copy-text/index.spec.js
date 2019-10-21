@@ -1,33 +1,30 @@
 import copyText from './index';
+import { Provider } from '../../components/unifire';
 
 describe('copyText', () => {
+  let setToast;
+  let provider;
 
-  it('should fire setToast', (done) => {
-    const NAME = 'UNIFIRE';
-    const cb = sinon.spy();
-    const handler = (e) => {
-      if(e.detail[0] === 'setToast'){
-        cb(e.detail);
-      }
-    };
-    document.execCommand = () => true;
-    document.addEventListener(NAME, handler);
-    copyText('bogus');
-    setTimeout(() => {
-      expect(cb.called).to.be.true;
-      const args = cb.args[0][0];
-      expect(args[0]).to.equal('setToast');
-      document.addEventListener(NAME, handler);
-      done();
+  beforeEach(() => {
+    setToast = sinon.spy();
+    provider = new Provider({
+      state: { loggedIn: true },
+      actions: { setToast },
+      children: []
     });
   });
 
-  it('should use the share API when available', () => {
-    navigator.share = sinon.spy();
+  it('should fire setToast', () => {
+    document.execCommand = () => true;
     copyText('bogus');
-    setTimeout(() => {
-      expect(navigator.share.args[0][0].text).to.equal('bogus');
-    });
+    expect(setToast.calledWithExactly(provider, undefined, undefined)).to.be.true;
+  });
+
+  it('should use the share API when available', () => {
+    navigator.share = sinon.stub().returns(true);
+    copyText('bogus');
+    expect(navigator.share.args[0][0].text).to.equal('bogus');
+    expect(setToast.called).to.be.false;
   });
 
 });

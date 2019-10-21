@@ -14,7 +14,7 @@ function loginSuccess (el){
   el.set(
     { loggedIn: true },
     () => {
-      fire('getEntries')();
+      fire('getEntries');
       route('/entries', true);
     }
   );

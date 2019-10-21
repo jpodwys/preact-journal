@@ -23,7 +23,7 @@ export default (props) => {
         filter={props.filter}
         filterText={props.filterText}/>
       <main>
-        <Router onChange={fire('handleRouteChange')}>
+        <Router onChange={(url) => fire('handleRouteChange', url)}>
           <Login path="/"/>
           <Entries path="/entries"
             scrollPosition={props.scrollPosition}
