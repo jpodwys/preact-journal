@@ -2,6 +2,7 @@ import { clearData } from '../utils';
 import User from '../services/user-service';
 import getInitialState from '../app-state';
 import { route } from '../../components/router';
+import { fire } from '../../components/unifire';
 
 function login (el, user){
   User.login(user)
@@ -12,7 +13,10 @@ function login (el, user){
 function loginSuccess (el){
   el.set(
     { loggedIn: true },
-    () => route('/entries', true)
+    () => {
+      fire('getEntries')();
+      route('/entries', true);
+    }
   );
 };
 

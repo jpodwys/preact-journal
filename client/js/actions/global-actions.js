@@ -30,7 +30,7 @@ function handleRouteChange (el, e, url) {
   url = url || e.url;
   let view = getViewFromPathname(url);
   if(view !== '/' && !el.state.loggedIn) return route('/', true);
-  el.set({ view });
+  if(view !== el.state.view) el.set({ view });
   handleRoute(el, view, url);
 };
 
