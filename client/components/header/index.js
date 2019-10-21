@@ -59,7 +59,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 								autocomplete="off"
 								value={filterText}
 								placeholder="Search"
-								oninput={debounce((e) => fire('filterByText', null, e), 100)}/>
+								oninput={debounce((e) => fire('filterByText', e.target.value), 100)}/>
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
@@ -85,7 +85,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
 				</div>
 
-				{['/entries', '/search'].includes(view) &&
+				{view === '/entries' &&
 					<div class="button button--fab add-entry elevated grow">
 						<a href="/entry/new">
 							<Icon icon="clear" key="header-add"/>

@@ -24,7 +24,7 @@ function boot (el, { entries }){
      * leave this here.
      */
     if(el.state.view === '/entry'){
-      fire('handleRouteChange', { url: location.pathname });
+      fire('handleRouteChange', location.pathname);
     }
   });
 };
@@ -358,12 +358,9 @@ function newEntry (el){
   });
 };
 
-function filterByText (el, text, e){
-  if(text === undefined && (!e || !e.target)) return;
-  let query = !text ? e.target.value : text;
+function filterByText (el, query = ''){
   if(el.state.filterText === query) return;
-  let filterText = query || '';
-  el.set({ filterText });
+  el.set({ filterText: query });
 };
 
 function shiftEntry (el, count){

@@ -69,27 +69,27 @@ describe('actions', () => {
       });
 
       it('should set view when appropriate', () => {
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         expect(el.set.called).to.be.false;
 
-        Global.handleRouteChange(el, null, '/');
+        Global.handleRouteChange(el, '/');
         expect(el.set.args[0][0].view).to.equal('/');
       });
 
       it('should route back to / when passed an unkown path', () => {
         el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/bogus');
+        Global.handleRouteChange(el, '/bogus');
         expect(replaceStateCall).to.equal('/');
       });
 
       it('should route back to / while logged out', () => {
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         expect(replaceStateCall).to.equal('/');
       });
 
       it('should route to /entries when visiting / while logged in', () => {
         el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/');
+        Global.handleRouteChange(el, '/');
         expect(replaceStateCall).to.equal('/entries');
       });
 
@@ -104,7 +104,7 @@ describe('actions', () => {
       //   };
       //   document.addEventListener(NAME, handler);
       //   el.state.toastConfig = {};
-      //   Global.handleRouteChange(el, null, '/');
+      //   Global.handleRouteChange(el, '/');
       //   setTimeout(() => {
       //     const detail = cb.args[0][0];
       //     expect(detail.key).to.equal('toastConfig');
@@ -118,17 +118,17 @@ describe('actions', () => {
         el.state.loggedIn = true;
 
         el.state.entries = undefined;
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called once at this point
         expect(el.set.calledTwice).to.be.false;
 
         el.state.entries = [ { text: 'hi' } ];
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called twice at this point
         expect(el.set.calledThrice).to.be.false;
 
         el.state.entries = [ { newEntry: true, text: '' } ];
-        Global.handleRouteChange(el, null, '/entries');
+        Global.handleRouteChange(el, '/entries');
         // set was already called thrice at this point
         const args = el.set.args[3][0];
         expect(args.entries.length).to.equal(0);
@@ -142,7 +142,7 @@ describe('actions', () => {
           children: []
         });
 
-        fire('handleRouteChange', null, '/entry/new');
+        fire('handleRouteChange', '/entry/new');
         expect(newEntry.calledWithExactly(provider, undefined, undefined)).to.be.true;
       });
 
@@ -154,7 +154,7 @@ describe('actions', () => {
           children: []
         });
 
-        fire('handleRouteChange', null, '/entry/10');
+        fire('handleRouteChange', '/entry/10');
         expect(setEntry.args[0][0]).to.equal(provider);
         expect(setEntry.args[0][1].id).to.equal('10');
       });
@@ -814,23 +814,14 @@ describe('actions', () => {
       it('should set filterText when appropriate', () => {
         el.state.filterText = 'bogus';
 
-        Entry.filterByText(el);
-        expect(el.set.called).to.be.false;
-
-        Entry.filterByText(el, undefined, {});
-        expect(el.set.called).to.be.false;
-
         Entry.filterByText(el, 'bogus');
         expect(el.set.called).to.be.false;
 
-        Entry.filterByText(el, undefined, { target: { value: 'bogus' } });
-        expect(el.set.called).to.be.false;
+        Entry.filterByText(el);
+        expect(el.set.args[0][0].filterText).to.equal('');
 
         Entry.filterByText(el, 'one');
-        expect(el.set.args[0][0].filterText).to.equal('one');
-
-        Entry.filterByText(el, undefined, { target: { value: 'two' } });
-        expect(el.set.args[1][0].filterText).to.equal('two');
+        expect(el.set.args[1][0].filterText).to.equal('one');
       });
 
     });
