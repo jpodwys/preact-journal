@@ -191,6 +191,7 @@ describe('actions', () => {
         setTimeout(() => {
           expect(el.set.args[0][0].loggedIn).to.be.true;
           expect(typeof el.set.args[0][1]).to.equal('function');
+          // Need to expect that the getEntries action was called
           done();
         });
       });
