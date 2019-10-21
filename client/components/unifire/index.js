@@ -4,9 +4,9 @@ let EL;
 let STATE;
 let ACTIONS;
 
-export function fire (name, payload) {
+export function fire (name, payload, e) {
   // if(!ACTIONS[name]) return;
-  return (e) => ACTIONS[name](EL, payload, e);
+  ACTIONS[name](EL, payload, e);
 };
 
 export class Provider extends Component {
@@ -22,6 +22,7 @@ export class Provider extends Component {
   }
 
   set(delta, cb) {
+    // This assignment triggers the state object's proxy trap
     Object.assign(STATE, delta);
     this.setState(STATE, cb);
   }

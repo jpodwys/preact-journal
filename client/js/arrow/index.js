@@ -8,7 +8,7 @@ function cb(e){
   let el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
   let i = e.keyCode === LEFT ? -1 : 1;
-  fire('shiftEntry', i)();
+  fire('shiftEntry', i);
 }
 
 export default function(el) {

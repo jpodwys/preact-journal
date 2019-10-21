@@ -28,9 +28,9 @@ function end(e) {
     if (Math.abs(touchEndCoords.x) >= minDistanceXAxis && Math.abs(touchEndCoords.y) < maxDistanceYAxis){
       direction = touchEndCoords.x < 0 ? 'left' : 'right';
       if (direction === 'left') {
-        fire('shiftEntry', 1)();
+        fire('shiftEntry', 1);
       } else if (direction === 'right') {
-        fire('shiftEntry', -1)();
+        fire('shiftEntry', -1);
       }
     }
   }

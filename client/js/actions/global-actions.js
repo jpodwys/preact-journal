@@ -63,9 +63,9 @@ function handleEntriesView (el) {
 function handleEntryView (url) {
   const id = url.substr(url.lastIndexOf('/') + 1);
   if(id === 'new'){
-    fire('newEntry')();
+    fire('newEntry');
   } else {
-    fire('setEntry', { id })();
+    fire('setEntry', { id });
   }
 };
 

@@ -2,9 +2,9 @@ import fetchMock from 'fetch-mock';
 import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
+import { Provider, fire } from '../../components/unifire';
 
 describe('actions', () => {
-  const NAME = 'UNIFIRE';
   let el;
 
   function getElStub() {
@@ -36,6 +36,7 @@ describe('actions', () => {
         const delta = { key: 'bogus', val: 'value', cb: cb };
         Global.linkstate(el, delta);
         expect(el.set.args[0][0][delta.key]).to.equal(delta.val);
+
       });
 
     });
@@ -75,30 +76,21 @@ describe('actions', () => {
         expect(el.set.args[0][0].view).to.equal('/');
       });
 
-      it('should route back to / when passed an unkown path', (done) => {
+      it('should route back to / when passed an unkown path', () => {
         el.state.loggedIn = true;
         Global.handleRouteChange(el, null, '/bogus');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/');
-          done();
-        });
+        expect(replaceStateCall).to.equal('/');
       });
 
-      it('should route back to / while logged out', (done) => {
+      it('should route back to / while logged out', () => {
         Global.handleRouteChange(el, null, '/entries');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/');
-          done();
-        });
+        expect(replaceStateCall).to.equal('/');
       });
 
-      it('should route to /entries when visiting / while logged in', (done) => {
+      it('should route to /entries when visiting / while logged in', () => {
         el.state.loggedIn = true;
         Global.handleRouteChange(el, null, '/');
-        setTimeout(() => {
-          expect(replaceStateCall).to.equal('/entries');
-          done();
-        });
+        expect(replaceStateCall).to.equal('/entries');
       });
 
       /* This test may become useful in the future if I change how toast works, but it's not useful with my latest changes. */
@@ -142,38 +134,29 @@ describe('actions', () => {
         expect(args.entries.length).to.equal(0);
       });
 
-      it('should fire newEntry on /new', (done) => {
-        const cb = sinon.spy();
-        document.addEventListener(NAME, cb);
-
-        el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/entry/new');
-
-        setTimeout(() => {
-          expect(cb.called).to.be.true
-          document.removeEventListener(NAME, cb);
-          done();
+      it('should fire newEntry on /new', () => {
+        const newEntry = sinon.spy();
+        const provider = new Provider({
+          state: { loggedIn: true },
+          actions: Object.assign({}, Global, { newEntry }),
+          children: []
         });
+
+        fire('handleRouteChange', null, '/entry/new');
+        expect(newEntry.calledWithExactly(provider, undefined, undefined)).to.be.true;
       });
 
-      it('should fire setEntry on /entry/:id', (done) => {
-        const cb = sinon.spy();
-        const handler = (e) => {
-          if(e.detail[0] === 'setEntry'){
-            cb(e.detail[1]);
-          }
-        };
-        document.addEventListener(NAME, handler);
-
-        el.state.loggedIn = true;
-        Global.handleRouteChange(el, null, '/entry/10');
-
-        setTimeout(() => {
-          const args = cb.args[0][0];
-          expect(args.id).to.equal('10');
-          document.removeEventListener(NAME, handler);
-          done();
+      it('should fire setEntry on /entry/:id', () => {
+        const setEntry = sinon.spy();
+        const provider = new Provider({
+          state: { loggedIn: true },
+          actions: Object.assign({}, Global, { setEntry }),
+          children: []
         });
+
+        fire('handleRouteChange', null, '/entry/10');
+        expect(setEntry.args[0][0]).to.equal(provider);
+        expect(setEntry.args[0][1].id).to.equal('10');
       });
 
     });

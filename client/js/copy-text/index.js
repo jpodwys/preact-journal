@@ -18,7 +18,7 @@ function hideKeyboard (el) {
 
 function tryShareApi (text) {
   return navigator.share
-    ? navigator.share({text: text})
+    ? navigator.share({ text })
     : false;
 }
 
@@ -27,6 +27,6 @@ export default function copyText(text) {
   textarea.value = text;
   select(textarea);
   let successful = document.execCommand('copy');
-  if(successful) fire('setToast')();
+  if(successful) fire('setToast');
   hideKeyboard(textarea);
 }
