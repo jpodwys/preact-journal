@@ -3,7 +3,7 @@ import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
-const compute = (obj, prop, next, prev) => {
+const compute = (obj, prop) => {
   switch(prop) {
     // viewEntries
     case 'view': // Fallthrough
@@ -12,36 +12,31 @@ const compute = (obj, prop, next, prev) => {
     case 'filterText': {
       obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
     }
-
-    // entry
-    // filter
-    // filterText
-    // dialogMode
-    case 'view': {
-      // obj.entry = undefined;
-      obj.dialogMode = '';
-      if(prev === '/search' && next === '/entries'){
-        fire('clearFilters', true)();
-      }
-    }
   }
 };
 
 const observe = (obj, prop, next, prev) => {
   switch(prop) {
+    case 'view': {
+      // obj.entry = undefined;
+      obj.dialogMode = '';
+      if(prev === '/search' && next !== '/search'){
+        fire('clearFilters', true)();
+      }
+      return;
+    }
     case 'entries': {
       obj.entries = sortObjectsByDate(next);
       set('entries', obj.entries);
       return;
     }
-    case 'timestamp':   localStorage.setItem('timestamp', next);   return;
     case 'dark':        {
       localStorage.setItem('dark', !!next);
       const func = next ? 'add' : 'remove';
       document.body.classList[func]('dark');
       return;
     }
-    case 'loggedIn':    if(next) setTimeout(fire('getEntries'));   return;
+    case 'timestamp':   localStorage.setItem('timestamp', next);   return;
   }
 };
 
@@ -49,7 +44,7 @@ const handler = {
   set: function(obj, prop, next) {
     const prev = obj[prop];
     obj[prop] = next;
-    compute(obj, prop, next, prev);
+    compute(obj, prop);
     observe(obj, prop, next, prev);
     return true;
   }
