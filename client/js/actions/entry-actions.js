@@ -370,7 +370,7 @@ function shiftEntry (el, count){
   if(entry) route('/entry/' + entry.id, true);
 };
 
-function clearFilters (el, hideInput) {
+function clearFilters (el) {
   el.set({
     filter: '',
     filterText: ''

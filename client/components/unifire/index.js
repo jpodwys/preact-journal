@@ -5,7 +5,6 @@ let STATE;
 let ACTIONS;
 
 export function fire (name, payload, e) {
-  // if(!ACTIONS[name]) return;
   ACTIONS[name](EL, payload, e);
 };
 
@@ -22,7 +21,10 @@ export class Provider extends Component {
   }
 
   set(delta, cb) {
-    // This assignment triggers the state object's proxy trap
+    console.log('set', delta);
+    // This assignment triggers the state object's proxy trap.
+    // Synchronous side effects triggered by the proxy object
+    // yield reactive updates to STATE before this.setState runs.
     Object.assign(STATE, delta);
     this.setState(STATE, cb);
   }

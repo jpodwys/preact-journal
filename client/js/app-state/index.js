@@ -21,7 +21,7 @@ const observe = (obj, prop, next, prev) => {
       // obj.entry = undefined;
       obj.dialogMode = '';
       if(prev === '/search' && next === '/entries'){
-        fire('clearFilters', true);
+        fire('clearFilters');
       }
       return;
     }
