@@ -20,7 +20,7 @@ const observe = (obj, prop, next, prev) => {
     case 'view': {
       // obj.entry = undefined;
       obj.dialogMode = '';
-      if(prev === '/search' && next !== '/search'){
+      if(prev === '/search' && next === '/entries'){
         fire('clearFilters', true)();
       }
       return;
