@@ -25,7 +25,7 @@ export default class Entry extends Component {
     if(entry.newEntry){
       entry.date = document.getElementById('entryDate').innerText;
       entry.text = document.getElementById('entryText').innerText;
-      fire('createEntry', { entry })();
+      fire('createEntry', { entry });
     } else {
       this.update(e);
     }
@@ -45,7 +45,7 @@ export default class Entry extends Component {
       entryId: this.props.entry.id
     }
     obj.entry[property] = e.target.innerText.trim();
-    fire('updateEntry', obj)();
+    fire('updateEntry', obj);
   }
 
   render({ view, entry, viewEntries, entryIndex }) {
@@ -57,7 +57,7 @@ export default class Entry extends Component {
             <Icon
               icon="left"
               key={entry.id + '-left'}
-              onclick={fire('shiftEntry', -1)}
+              onclick={() => fire('shiftEntry', -1)}
               class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
           }
           <div class="entry-date-wrapper">
@@ -73,7 +73,7 @@ export default class Entry extends Component {
             <Icon
               icon="left"
               key={entry.id + '-right'}
-              onclick={fire('shiftEntry', 1)}
+              onclick={() => fire('shiftEntry', 1)}
               class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
           }
         </div>

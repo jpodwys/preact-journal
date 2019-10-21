@@ -8,12 +8,12 @@ const getUser = prefix => ({
 
 const join = e => {
   e.preventDefault();
-  fire('createAccount', getUser('c'))();
+  fire('createAccount', getUser('c'));
 }
 
 const login = e => {
   e.preventDefault();
-  fire('login', getUser('l'))();
+  fire('login', getUser('l'));
 }
 
 export default () => {

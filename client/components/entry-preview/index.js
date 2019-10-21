@@ -28,7 +28,7 @@ const getEntryText = (entry, filterText) => {
 export default ({ entry, filterText }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
   const fadeRight = entry.slideIn ? 'fade-right' : '';
-  if(fadeRight) setTimeout(fire('removeSlideInProp'), 450);
+  if(fadeRight) setTimeout(() => fire('removeSlideInProp'), 450);
 
   return (
     <div class={`entry-preview ${fadeRight}`}>
@@ -50,7 +50,7 @@ export default ({ entry, filterText }) => {
         <Icon icon="delete"
           class="hide-icon"
           key={entry.id + 'delete'}
-          onclick={fire('showConfirmDeleteEntryModal', { entry })}/>
+          onclick={() => fire('showConfirmDeleteEntryModal', { entry })}/>
         <Icon icon="share"
           class="hide-icon"
           key={entry.id + 'sharre'}
@@ -58,7 +58,7 @@ export default ({ entry, filterText }) => {
         <Icon icon={favoriteIcon}
           class={entry.favorited ? '' : 'hide-icon'}
           key={entry.id + 'favorite'}
-          onclick={fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
+          onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>
   );

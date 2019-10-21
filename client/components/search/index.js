@@ -9,11 +9,11 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
     if(!filter && !filterText){
       return (
         <ul class="search-suggestions fade-up dark-fill entry-text">
-          <li onclick={fire('linkstate', { key: 'filter', val: 'favorites' })}>
+          <li onclick={() => fire('linkstate', { key: 'filter', val: 'favorites' })}>
             <Icon icon="star-filled"/>
             <span>Favorites</span>
           </li>
-          <li onclick={fire('linkstate', { key: 'filterText', val: new Date().toISOString().slice(4, 10) })}>
+          <li onclick={() => fire('linkstate', { key: 'filterText', val: new Date().toISOString().slice(4, 10) })}>
             <Icon icon="calendar"/>
             <span>On this day</span>
           </li>

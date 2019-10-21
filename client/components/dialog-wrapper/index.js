@@ -5,13 +5,13 @@ import { fire } from '../unifire';
 const onLogout = () => {
   fire('linkstate', {
     key: 'dialogMode',
-    cb: fire('linkstate', { key: 'dialogMode', val: 'modal:logout' })
-  })();
+    cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }))
+  });
 };
 
 const menu = (dark) => (
   <ul>
-    <li onclick={fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={() => fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
     <li onclick={onLogout}>Logout</li>
   </ul>
 );
@@ -20,7 +20,7 @@ const modal = (message, confirmText, onConfirm) => (
   <div>
     <div class="modal-message">{message}</div>
     <div>
-      <button class="mdl-button" onclick={fire('linkstate', { key: 'dialogMode' })}>Cancel</button>
+      <button class="mdl-button" onclick={() => fire('linkstate', { key: 'dialogMode' })}>Cancel</button>
       <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
     </div>
   </div>
@@ -31,14 +31,14 @@ const modalOptions = (modalType, entry) => {
     return {
       message: 'Delete this entry?',
       confirmText: 'Delete',
-      onConfirm: fire('deleteEntry', { id: entry.id })
+      onConfirm: () => fire('deleteEntry', { id: entry.id })
     }
   }
   if(modalType === 'logout'){
     return {
       message: 'Logout?',
       confirmText: 'Logout',
-      onConfirm: fire('logout')
+      onConfirm: () => fire('logout')
     }
   }
 };

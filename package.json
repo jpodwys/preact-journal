@@ -11,6 +11,7 @@
     "start": "gulp",
     "build": "gulp build",
     "serve": "gulp serve",
+    "go": "npm run build && npm run serve",
     "test": "karma start test/karma.conf.js --single-run"
   },
   "dependencies": {
