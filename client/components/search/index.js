@@ -29,6 +29,7 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
   return (
     <Entries
       scrollPosition={scrollPosition}
-      viewEntries={viewEntries}/>
+      viewEntries={viewEntries}
+      filterText={filterText}/>
   );
 };

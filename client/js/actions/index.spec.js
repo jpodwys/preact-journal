@@ -191,6 +191,7 @@ describe('actions', () => {
         setTimeout(() => {
           expect(el.set.args[0][0].loggedIn).to.be.true;
           expect(typeof el.set.args[0][1]).to.equal('function');
+          // Need to expect that the getEntries action was called
           done();
         });
       });
@@ -699,6 +700,18 @@ describe('actions', () => {
           expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
+      });
+
+    });
+
+    describe('showConfirmDeleteEntryModal', () => {
+
+      it('should set entry and dialogMode', () => {
+        const entry = {};
+        Entry.showConfirmDeleteEntryModal(el, { entry });
+        const firstCallArgs = el.set.args[0];
+        expect(firstCallArgs[0].entry).to.equal(entry);
+        expect(firstCallArgs[0].dialogMode).to.equal('modal:delete');
       });
 
     });

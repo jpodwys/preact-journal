@@ -20,14 +20,14 @@ export default class Entries extends Component {
     return this.props.viewEntries !== np.viewEntries;
   }
 
-  render({ viewEntries = [], scrollPosition }) {
+  render({ viewEntries = [], scrollPosition, filterText }) {
     if(!viewEntries.length){
       return <ZeroState/>
     }
     document.body.scrollTop = scrollPosition;
     return (
       <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
-        {viewEntries.map(entry => <EntryPreview entry={entry}/>)}
+        {viewEntries.map(entry => <EntryPreview entry={entry} filterText={filterText}/>)}
       </ScrollViewport>
     );
   }

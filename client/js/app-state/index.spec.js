@@ -87,13 +87,11 @@ describe('appState', () => {
   });
 
   it('should compute and set viewEntries whenever entries or filterText change', () => {
-    state.view = '/entries';
     expect(state.viewEntries.length).to.equal(0);
 
     state.entries = [ { date: '2018-01-01', text: 'hi' } ];
     expect(state.viewEntries[0].text).to.equal('hi');
 
-    state.view = '/search';
     state.filterText = 'yo';
     expect(state.viewEntries.length).to.equal(0);
   });

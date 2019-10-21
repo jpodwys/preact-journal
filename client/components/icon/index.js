@@ -17,10 +17,10 @@ function getSVG(icon) {
               <path d="M15.5 14h-.8l-.3-.3c1-1.1 1.6-2.6 1.6-4.2a6.5 6.5 0 1 0-2.3 5l.3.2v.8l5 5 1.5-1.5-5-5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/>
               <path d="M0 0h24v24H0z" fill="none"/>
             </g>
-    case 'copy':
+    case 'share':
       return <g>
               <path d="M0 0h24v24H0z" fill="none"/>
-              <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/>
+              <path d="M18 16a3 3 0 00-2 .8l-7-4.1V12v-.7l7-4.1A3 3 0 0021 5a3 3 0 10-6 .7L8 9.8A3 3 0 003 12a3 3 0 005 2.2l7.2 4.2-.1.6a3 3 0 102.9-3z"/>
             </g>
     case 'delete':
       return <g>

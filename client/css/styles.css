@@ -5,6 +5,7 @@
   --theme-dark: #424242;
   --theme-white: #fff;
   --theme-dark-text: #ccc;
+  --theme-dark-blue: #2d50afe0;
 }
 
 /* Global */
@@ -227,12 +228,26 @@ svg {
   right: -12.5px;
 }
 
+.entry-preview--icons .hide-icon {
+  display: none;
+}
+
+@media (hover: hover) {
+  .entry-preview:hover .entry-preview--icons .hide-icon {
+    display: block;
+  }
+}
+
 .entry-preview--icons svg {
   padding: 10px 12.5px 5px;
 }
 
 .entry-preview .entry-link {
   color: var(--theme-blue);
+}
+
+.highlight {
+  background-color: #ff0;
 }
 
 /* Header */
@@ -508,11 +523,15 @@ body.dark .list-item .second-row {
 }
 
 body.dark .button--fab.add-entry {
-  background-color: #2d50afe0;
+  background-color: var(--theme-dark-blue);
 }
 
 body.dark .elevated {
   box-shadow: none;
+}
+
+body.dark .highlight {
+  background-color: var(--theme-dark-blue);
 }
 
 /* Transitions */
