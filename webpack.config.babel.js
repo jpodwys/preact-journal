@@ -37,14 +37,14 @@ module.exports = {
       }
     ]
   },
-  // plugins: [
-  //   new UglifyJSPlugin({
-  //     uglifyOptions: {
-  //       keep_fargs: false,
-  //       passes: 3
-  //     }
-  //   })
-  // ],
+  plugins: [
+    new UglifyJSPlugin({
+      uglifyOptions: {
+        keep_fargs: false,
+        passes: 3
+      }
+    })
+  ],
   output: {
     filename: 'bundle.js',
     path: dist

@@ -21,7 +21,6 @@ export class Provider extends Component {
   }
 
   set(delta, cb) {
-    console.log('set', delta);
     // This assignment triggers the state object's proxy trap.
     // Synchronous side effects triggered by the proxy object
     // yield reactive updates to STATE before this.setState runs.
