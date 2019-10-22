@@ -286,7 +286,8 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .nav-search {
-  flex-shrink: 1000;
+  justify-content: flex-end;
+  padding: 10px;
 }
 
 .search-form {
