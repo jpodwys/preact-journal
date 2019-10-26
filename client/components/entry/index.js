@@ -33,8 +33,16 @@ const update = (e, entry) => {
   fire('updateEntry', obj);
 }
 
+const shouldUpdate = (prev, next) => {
+  var oe = prev.entry;
+  var ne = next.entry;
+  if(!oe || !ne) return true;
+  if(oe.id !== ne.id) return true;
+  return false;
+}
+
 const Entry = () => {
-  const [ _, { view, entry, viewEntries, entryIndex  } ] = useUnifire('view', 'entry', 'viewEntries', 'entryIndex');
+  const [{ view, entry, viewEntries, entryIndex  }] = useUnifire([ 'view', 'entry', 'viewEntries', 'entryIndex' ], shouldUpdate);
 
   useEffect(() => {
     if(view === '/new'){

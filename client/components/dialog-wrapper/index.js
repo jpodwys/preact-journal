@@ -44,7 +44,7 @@ const modalOptions = (modalType, entry) => {
 };
 
 export default () => {
-  const [ _, { dialogMode, dark, entry } ] = useUnifire('dialogMode', 'dark', 'entry');
+  const [{ dialogMode, dark, entry }] = useUnifire([ 'dialogMode', 'dark', 'entry' ]);
   if(!dialogMode) return;
 
   let markup;

@@ -27,7 +27,7 @@ const focusSearchInput = () => {
 
 
 export default () => {
-	const [ _, { view, loggedIn, viewEntries = [], entry, filter, filterText } ] = useUnifire('view', 'loggedIn', 'viewEntries', 'entry', 'filter', 'filterText');
+	const [{ view, loggedIn, viewEntries = [], entry, filter, filterText }] = useUnifire(['view', 'loggedIn', 'viewEntries', 'entry', 'filter', 'filterText']);
 	if(!loggedIn) return;
 	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';

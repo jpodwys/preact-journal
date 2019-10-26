@@ -3,6 +3,7 @@ import { removeObjectByIndex } from '../../js/utils';
 
 let EL;
 let STATE;
+let BEFORE;
 let ACTIONS;
 const SUBSCRIBERS = [];
 
@@ -13,12 +14,15 @@ export function fire (name, payload, e) {
 const useIsomorphicLayoutEffect =
   typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
-export function useUnifire (...keys) {
+export function useUnifire (keys, checkIfShouldUpdate) {
   const [ blank, setState ] = useState({});
 
   useIsomorphicLayoutEffect(() => {
-    const cb = changed => {
-      const changeInKeys = keys.some(key => changed.includes(key));
+    const cb = (changedKeys, before, after) => {
+      if(checkIfShouldUpdate){
+        if(!checkIfShouldUpdate(before, after)) return;
+      }
+      const changeInKeys = keys.some(key => changedKeys.includes(key));
       if (changeInKeys) setState({});
     }
     SUBSCRIBERS.push(cb);
@@ -32,7 +36,7 @@ export function useUnifire (...keys) {
   return useMemo(() => {
     const data = {};
     keys.forEach(key => data[key] = STATE[key]);
-    return [ fire, data ];
+    return [ data, fire ];
   }, [ blank ])
 };
 
@@ -50,17 +54,17 @@ export class Provider {
     // This assignment triggers the state object's proxy trap.
     // Synchronous side effects triggered by the proxy object
     // yield reactive updates to STATE before this.setState runs.
-    const before = Object.assign({}, STATE);
+    BEFORE = Object.assign({}, STATE);
     Object.assign(STATE, delta);
     // this.setState(STATE, cb);
     if(cb) cb();
 
-    const changed = [];
-    Object.keys(before).forEach(key => {
-      if(before[key] !== STATE[key]){
-        changed.push(key);
+    const changedKeys = [];
+    Object.keys(BEFORE).forEach(key => {
+      if(BEFORE[key] !== STATE[key]){
+        changedKeys.push(key);
       }
     });
-    SUBSCRIBERS.forEach(sub => sub(changed));
+    SUBSCRIBERS.forEach(sub => sub(changedKeys, BEFORE, STATE));
   }
 }

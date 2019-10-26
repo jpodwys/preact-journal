@@ -8,7 +8,7 @@ import { fire, useUnifire } from '../unifire';
 import debounce from '../../js/debounce';
 
 const Entries = () => {
-  const [ _, { viewEntries = [], scrollPosition, filterText  } ] = useUnifire('viewEntries', 'scrollPosition', 'filterText');
+  const [{ viewEntries = [], scrollPosition, filterText  }] = useUnifire(['viewEntries', 'scrollPosition', 'filterText']);
 
   useEffect(() => {
     document.body.onscroll = debounce(() => {

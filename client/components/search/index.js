@@ -5,7 +5,7 @@ import ZeroState from '../zero-state';
 import { fire, useUnifire } from '../unifire';
 
 export default () => {
-  const [ _, { filter, filterText, viewEntries = [], scrollPosition } ] = useUnifire('filter', 'filterText', 'viewEntries', 'scrollPosition');
+  const [{ filter, filterText }] = useUnifire([ 'filter', 'filterText' ]);
 
   if(!viewEntries.length){
     if(!filter && !filterText){
@@ -29,9 +29,6 @@ export default () => {
   }
 
   return (
-    <Entries
-      scrollPosition={scrollPosition}
-      viewEntries={viewEntries}
-      filterText={filterText}/>
+    <Entries/>
   );
 };
