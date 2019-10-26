@@ -57,7 +57,6 @@ export class Provider {
     BEFORE = Object.assign({}, STATE);
     Object.assign(STATE, delta);
     // this.setState(STATE, cb);
-    if(cb) cb();
 
     const changedKeys = [];
     Object.keys(BEFORE).forEach(key => {
@@ -66,5 +65,7 @@ export class Provider {
       }
     });
     SUBSCRIBERS.forEach(sub => sub(changedKeys, BEFORE, STATE));
+
+    if(cb) cb();
   }
 }
