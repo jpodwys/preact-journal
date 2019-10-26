@@ -1,4 +1,3 @@
-import { h, Component, cloneElement, toChildArray } from 'preact';
 import { useLayoutEffect, useEffect, useState, useMemo } from 'preact/hooks';
 import { removeObjectByIndex } from '../../js/utils';
 
@@ -23,6 +22,7 @@ export function useUnifire (...keys) {
       if (changeInKeys) setState({});
     }
     SUBSCRIBERS.push(cb);
+
     return () => {
       const index = SUBSCRIBERS.indexOf(cb);
       if(index > -1) removeObjectByIndex(index, SUBSCRIBERS);
@@ -36,15 +36,13 @@ export function useUnifire (...keys) {
   }, [ blank ])
 };
 
-export class Provider extends Component {
+export class Provider {
   // Provider expects props.state to be a Proxy object.
   // The Proxy handles computed properties and local persistence.
-  constructor(props) {
-    super(props);
+  constructor({ state, actions }) {
     EL = this;
-    STATE = this.props.state;
-    ACTIONS = this.props.actions;
-    this.child = toChildArray(props.children)[0];
+    STATE = state;
+    ACTIONS = actions;
     this.state = STATE;
   }
 
@@ -64,10 +62,5 @@ export class Provider extends Component {
       }
     });
     SUBSCRIBERS.forEach(sub => sub(changed));
-    console.log('Subscriber count', SUBSCRIBERS.length);
-  }
-
-  render() {
-    return cloneElement(this.child, STATE);
   }
 }

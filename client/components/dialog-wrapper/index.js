@@ -45,7 +45,6 @@ const modalOptions = (modalType, entry) => {
 
 export default () => {
   const [ _, { dialogMode, dark, entry } ] = useUnifire('dialogMode', 'dark', 'entry');
-  console.log('Render:dialog-wrapper');
   if(!dialogMode) return;
 
   let markup;
