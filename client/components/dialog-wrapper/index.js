@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import Dialog from '../dialog';
-import { fire } from '../unifire';
+import { fire, useUnifire } from '../unifire';
 
 const onLogout = () => {
   fire('linkstate', {
@@ -43,7 +43,9 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default ({ dialogMode, dark, entry }) => {
+export default () => {
+  const [ _, { dialogMode, dark, entry } ] = useUnifire('dialogMode', 'dark', 'entry');
+  console.log('Render:dialog-wrapper');
   if(!dialogMode) return;
 
   let markup;
@@ -56,10 +58,10 @@ export default ({ dialogMode, dark, entry }) => {
     markup = modal(message, confirmText, onConfirm);
   }
 
-  dialogMode = dialogMode.split(':')[0];
+  const mode = dialogMode.split(':')[0];
 
   return (
-    <Dialog dialogMode={dialogMode}>
+    <Dialog dialogMode={mode}>
       { markup }
     </Dialog>
   );

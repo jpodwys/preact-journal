@@ -8,7 +8,7 @@ import arrow from '../js/arrow';
 
 render(
   <Provider state={getInitialState()} actions={actions}>
-    <App />
+    <App/>
   </Provider>,
   document.body
 );

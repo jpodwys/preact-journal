@@ -2,9 +2,11 @@ import { h } from 'preact';
 import Entries from '../entries';
 import Icon from '../icon';
 import ZeroState from '../zero-state';
-import { fire } from '../unifire';
+import { fire, useUnifire } from '../unifire';
 
-export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
+export default () => {
+  const [ _, { filter, filterText, viewEntries = [], scrollPosition } ] = useUnifire('filter', 'filterText', 'viewEntries', 'scrollPosition');
+
   if(!viewEntries.length){
     if(!filter && !filterText){
       return (

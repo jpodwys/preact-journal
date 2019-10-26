@@ -1,6 +1,6 @@
 import { h } from 'preact';
 import Icon from '../icon';
-import { fire } from '../../components/unifire';
+import { fire, useUnifire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
@@ -26,7 +26,8 @@ const focusSearchInput = () => {
 };
 
 
-export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText }) => {
+export default () => {
+	const [ _, { view, loggedIn, viewEntries = [], entry, filter, filterText } ] = useUnifire('view', 'loggedIn', 'viewEntries', 'entry', 'filter', 'filterText');
 	if(!loggedIn) return;
 	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';

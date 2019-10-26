@@ -1,4 +1,4 @@
-import { h, Component } from 'preact';
+import { h, Component, toChildArray } from 'preact';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -84,13 +84,13 @@ class Router extends Component {
 
   matchPath(url, children) {
     return children.filter(child => {
-      let path = child.attributes.path;
+      let path = child.props.path;
       return path === url || this.matchUrlWithWildCards(path, url);
     });
   }
 
   render({ children }, { url }) {
-    return this.matchPath(url, children)[0];
+    return this.matchPath(url, toChildArray(children))[0];
   }
 }
 

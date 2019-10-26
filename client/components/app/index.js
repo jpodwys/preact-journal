@@ -15,37 +15,17 @@ export default (props) => {
 
   return (
     <div class={`app ${toast}`}>
-      <Header
-        view={props.view}
-        loggedIn={props.loggedIn}
-        viewEntries={props.viewEntries}
-        entry={props.entry}
-        filter={props.filter}
-        filterText={props.filterText}/>
+      <Header/>
       <main>
         <Router onChange={(url) => fire('handleRouteChange', url)}>
           <Login path="/"/>
-          <Entries path="/entries"
-            scrollPosition={props.scrollPosition}
-            viewEntries={props.viewEntries}
-            filterText={props.filterText}/>
-          <Search path="/search"
-            filter={props.filter}
-            filterText={props.filterText}
-            scrollPosition={props.scrollPosition}
-            viewEntries={props.viewEntries}/>
-          <Entry path="/entry/:id"
-            view={props.view}
-            entry={props.entry}
-            viewEntries={props.viewEntries}
-            entryIndex={props.entryIndex}/>
+          <Entries path="/entries"/>
+          <Search path="/search"/>
+          <Entry path="/entry/:id"/>
         </Router>
       </main>
-      <DialogWrapper
-        dark={props.dark}
-        entry={props.entry}
-        dialogMode={props.dialogMode}/>
-      <Toast toast={props.toast}/>
+      <DialogWrapper/>
+      <Toast/>
     </div>
   );
 };
