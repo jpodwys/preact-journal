@@ -63,9 +63,8 @@ export default function getInitialState () {
     filterText: '',
     entryIndex: -1,
     entry: undefined,
-    // Included for documentation purporses
-    // toast: '',
-    // dialogMode: '',
+    toast: '',
+    dialogMode: '',
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: localStorage.getItem('timestamp') || undefined

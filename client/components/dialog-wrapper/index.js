@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { memo } from 'preact/compat';
 import Dialog from '../dialog';
 import { fire, useUnifire } from '../unifire';
 
@@ -43,8 +44,11 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default () => {
-  const [{ dialogMode, dark, entry }] = useUnifire([ 'dialogMode', 'dark', 'entry' ]);
+const shouldUpdate = (prev, next) => prev.dialogMode !== next.dialogMode;
+
+const DialogWrapper = () => {
+  console.log('Render:dialog-wrapper');
+  const [{ dialogMode, dark, entry }] = useUnifire([ 'dialogMode', 'dark', 'entry' ], shouldUpdate);
   if(!dialogMode) return;
 
   let markup;
@@ -65,3 +69,5 @@ export default () => {
     </Dialog>
   );
 };
+
+export default memo(DialogWrapper);
