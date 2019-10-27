@@ -8,13 +8,14 @@ import Search from '../search';
 import Entry from '../entry';
 import DialogWrapper from '../dialog-wrapper';
 import Toast from '../toast';
-import { fire } from '../unifire';
+import { fire, useUnifire } from '../unifire';
 
-export default (props) => {
-  const toast = props.toast ? 'toast' : '';
+export default () => {
+  const [{ toast }] = useUnifire([ 'toast' ]);
+  const toastClass = toast ? 'toast' : '';
 
   return (
-    <div class={`app ${toast}`}>
+    <div class={`app ${toastClass}`}>
       <Header/>
       <main>
         <Router onChange={(url) => fire('handleRouteChange', url)}>

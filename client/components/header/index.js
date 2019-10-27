@@ -1,4 +1,5 @@
 import { h } from 'preact';
+import { memo } from 'preact/compat';
 import Icon from '../icon';
 import { fire, useUnifire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
@@ -26,8 +27,10 @@ const focusSearchInput = () => {
 };
 
 
-export default () => {
-	const [{ view, loggedIn, viewEntries = [], entry, filter, filterText }] = useUnifire(['view', 'loggedIn', 'viewEntries', 'entry', 'filter', 'filterText']);
+const Header = () => {
+	const [{ view, loggedIn, viewEntries = [], entry, filter, filterText }]
+		= useUnifire(['view', 'loggedIn', 'viewEntries', 'entry', 'filter', 'filterText']);
+
 	if(!loggedIn) return;
 	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
@@ -97,3 +100,5 @@ export default () => {
 		</header>
 	);
 }
+
+export default memo(Header);

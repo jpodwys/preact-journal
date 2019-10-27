@@ -1,10 +1,11 @@
 import { h } from 'preact';
+import { memo } from 'preact/compat';
 import Entries from '../entries';
 import Icon from '../icon';
 import ZeroState from '../zero-state';
 import { fire, useUnifire } from '../unifire';
 
-export default () => {
+const Search = () => {
   const [{ filter, filterText }] = useUnifire([ 'filter', 'filterText' ]);
 
   if(!viewEntries.length){
@@ -32,3 +33,5 @@ export default () => {
     <Entries/>
   );
 };
+
+export default memo(Search);
