@@ -47,7 +47,6 @@ const modalOptions = (modalType, entry) => {
 const shouldUpdate = (prev, next) => prev.dialogMode !== next.dialogMode;
 
 const DialogWrapper = () => {
-  console.log('Render:dialog-wrapper');
   const [{ dialogMode, dark, entry }] = useUnifire([ 'dialogMode', 'dark', 'entry' ], shouldUpdate);
   if(!dialogMode) return;
 
