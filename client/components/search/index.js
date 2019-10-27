@@ -6,7 +6,7 @@ import ZeroState from '../zero-state';
 import { fire, useUnifire } from '../unifire';
 
 const Search = () => {
-  const [{ filter, filterText }] = useUnifire([ 'filter', 'filterText' ]);
+  const [{ filter, filterText, viewEntries }] = useUnifire([ 'filter', 'filterText', 'viewEntries' ]);
 
   if(!viewEntries.length){
     if(!filter && !filterText){
