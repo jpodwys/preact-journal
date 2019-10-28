@@ -41,7 +41,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 						<h3 class="fade-down">{`${entryCount} Entries`}</h3>
 					}
 
-					{(view === '/search' || view === '/entry' || view === '/new') &&
+					{view !== '/entries' &&
 						<a href={getBackHref(view, filter, filterText)} onclick={onBack}>
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
@@ -51,9 +51,6 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 				<div class="nav-set flex-grow nav-search">
 					{view === '/search' &&
 						<form class="search-form fade-up" onsubmit={cancelAndBlur}>
-							<span class="nav-set">
-								<Icon icon={filterIcon} onclick={() => fire('linkstate', { key: 'filter', val: filterTo })}/>
-							</span>
 							<input
 								id="filterTextInput"
 								autocomplete="off"
@@ -63,6 +60,12 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
+							<span class="nav-set">
+								<Icon icon={filterIcon} onclick={() => fire('linkstate', { key: 'filter', val: filterTo })}/>
+							</span>
+							{/* <span class="nav-set">
+								<Icon icon="clear" onclick={() => fire('clearFilters')}/>
+							</span> */}
 						</form>
 					}
 				</div>
@@ -80,9 +83,14 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
-						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
+						<Icon icon={favoriteIcon} key="header-favorite" onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 					}
-					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
+					{view === '/search' &&
+						<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')}/>
+					}
+					{view !== '/search' &&
+						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', { key: 'dialogMode', val: 'menu' })}/>
+					}
 				</div>
 
 				{view === '/entries' &&

@@ -290,7 +290,7 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .search-form {
-  background-color: #676767;
+  /* background-color: #676767; */
   margin: 5.5px 0;
   padding: 0;
   display: flex;
@@ -491,7 +491,7 @@ body.dark header {
 }
 
 body.dark .search-form {
-  background-color: #000;
+  /* background-color: #000; */
 }
 
 body.dark .modal-dialog {
