@@ -89,8 +89,11 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{view === '/search' &&
 						<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
 					}
-					{view !== '/search' &&
-						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class={menuFadeClass}/>
+					{view !== '/search' && !filter && !filterText &&
+						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-down"/>
+					}
+					{view === '/entry' && (filter || filterText) &&
+						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-up"/>
 					}
 				</div>
 
