@@ -32,6 +32,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
+	const menuFadeClass = view === '/entry' ? 'fade-up' : 'fade-down';
 
 	return (
 		<header class="elevated">
@@ -82,7 +83,15 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 					}
-					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})}/>
+				</div>
+
+				<div class="nav-set">
+					{view === '/search' &&
+						<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
+					}
+					{view !== '/search' &&
+						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class={menuFadeClass}/>
+					}
 				</div>
 
 				{view === '/entries' &&
