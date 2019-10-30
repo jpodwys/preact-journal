@@ -32,7 +32,6 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-	const menuFadeClass = view === '/entry' ? 'fade-up' : 'fade-down';
 
 	return (
 		<header class="elevated">
