@@ -37,6 +37,10 @@ input {
   border: 1px grey;
 }
 
+input[type="file"] {
+  display: none;
+}
+
 a, a:visited {
   color: var(--theme-dark);
   text-decoration: none;
@@ -209,6 +213,15 @@ svg {
 
 .entry-header > *:last-child {
   padding-right: 0;
+}
+
+.entry-image {
+  width: 100%;
+  max-width: 500px;
+}
+
+.entry-image[src=""] {
+  display: none;
 }
 
 .entry-text {

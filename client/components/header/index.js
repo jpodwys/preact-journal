@@ -76,6 +76,9 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
 						<Icon icon="delete" key="header-delete" onclick={() => fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
 					}
+					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+						<Icon icon="image" key="header-image" onclick={() => fire('showFileSelector', { entry })} class="fade-up"/>
+					}
 					{(view === '/entry' || view === '/new') &&
 						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}

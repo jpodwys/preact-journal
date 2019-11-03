@@ -53,6 +53,11 @@ function getSVG(icon) {
             <path d="M0 0h24v24H0z" fill="none"/>
             <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v14c0 1.1.9 2 2 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
           </g>
+    case 'image':
+      return <g>
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14c0 1.1.9 2 2 2h14a2 2 0 002-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/>
+          </g>
   }
 }
 

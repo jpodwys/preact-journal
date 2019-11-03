@@ -4,6 +4,10 @@ import { fire } from '../unifire';
 import FourOhFour from '../four-oh-four';
 import debounce from '../../js/debounce';
 
+const getImgSrc = (entry) => {
+  return entry.imagePreview || entry.imageUrl;
+};
+
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
@@ -16,7 +20,11 @@ export default class Entry extends Component {
     var oe = this.props.entry;
     var ne = nextProps.entry;
     if(!oe || !ne) return true;
-    if(oe.id !== ne.id) return true;
+    if(oe.id !== ne.id
+      || oe.imagePreview !== ne.imagePreview
+      || oe.imageUrl !== ne.imageUrl){
+      return true;
+    }
     return false;
   }
 
@@ -77,6 +85,9 @@ export default class Entry extends Component {
               class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
           }
         </div>
+        <div class="center-text">
+          <img src={getImgSrc(entry)} class="entry-image"/>
+        </div>
         <div
           id="entryText"
           contenteditable
@@ -85,6 +96,7 @@ export default class Entry extends Component {
           key={'entry-' + entry.id}>
           {entry.text}
         </div>
+        <input id="file-input" type="file" onchange={(e) => fire('uploadImage', { entry, file: e.target.files[0] })}/>
       </div>
     );
   }
