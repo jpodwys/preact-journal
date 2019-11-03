@@ -11,7 +11,7 @@ const getImgSrc = (entry) => {
 export default class Entry extends Component {
   componentDidUpdate() {
     if(this.props.view === '/new'){
-      let entryText = document.getElementById('entryText');
+      const entryText = document.getElementById('entryText');
       if(entryText) entryText.focus();
     }
   }
@@ -85,9 +85,11 @@ export default class Entry extends Component {
               class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
           }
         </div>
-        <div class="center-text">
-          <img src={getImgSrc(entry)} class="entry-image"/>
-        </div>
+        {!!getImgSrc(entry) &&
+          <div class="center-text">
+            <img src={getImgSrc(entry)} class="entry-image"/>
+          </div>
+        }
         <div
           id="entryText"
           contenteditable
@@ -96,7 +98,7 @@ export default class Entry extends Component {
           key={'entry-' + entry.id}>
           {entry.text}
         </div>
-        <input id="file-input" type="file" onchange={(e) => fire('uploadImage', { entry, file: e.target.files[0] })}/>
+        <input id="file-input" type="file" onchange={(e) => fire('uploadImage', { entryId: entry.id, file: e.target.files[0] })}/>
       </div>
     );
   }

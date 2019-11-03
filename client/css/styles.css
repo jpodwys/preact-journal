@@ -216,12 +216,8 @@ svg {
 }
 
 .entry-image {
-  width: 100%;
   max-width: 500px;
-}
-
-.entry-image[src=""] {
-  display: none;
+  max-height: 250px;
 }
 
 .entry-text {

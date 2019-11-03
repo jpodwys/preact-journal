@@ -7,27 +7,29 @@ function showFileSelector (){
   FILE_INPUT().click();
 }
 
-function uploadImage (el, { entry, file }){
-  if(!entry || !file) return;
-  const entryIndex = findObjectIndexById(entry.id, el.state.entries);
+function uploadImage (el, { entryId, file }){
+  if(!entryId || !file) return;
+  const entryIndex = findObjectIndexById(entryId, el.state.entries);
   if(entryIndex === -1) return;
+  const entry = el.state.entries[entryIndex];
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    entry.imagePreview = e.target.result;
     el.set({
-      entry: Object.assign({}, entry),
+      entry: Object.assign({}, entry, { imagePreview: e.target.result }),
       entries: [].concat(el.state.entries)
     });
   }
   reader.readAsDataURL(file);
 
   // Media.uploadImage(file)
-  //   .then((url) => imploadImageSuccess(el, entry, url))
+  //   .then((url) => imploadImageSuccess(el, entryId, url))
   //   .catch(err => imploadImageFailure(el, err));
 }
 
-function imploadImageSuccess (el, entry, url){
+function imploadImageSuccess (el, entryId, url){
+  const entryIndex = findObjectIndexById(entryId, el.state.entries);
+  const entry = el.state.entries[entryIndex];
   delete entry.imagePreview;
   entry.imageUrl = url;
   const entries = [].concat(el.state.entries);
