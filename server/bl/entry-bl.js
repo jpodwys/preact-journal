@@ -1,6 +1,7 @@
 module.exports = function(Entry){
   var self = this;
-  const fourOhFour = { status: 400, message: 'Timestamp is required.' };
+  const fourHundred = { status: 400, message: 'Timestamp is required.' };
+  const fourOhFour = { status: 404, message: 'Entry not found.' };
   const fiveHundred = { status: 500, message: 'There was an error.' };
 
   self.getAllEntriesByOwnerId = function({body, query, user}){
@@ -16,7 +17,7 @@ module.exports = function(Entry){
 
   self.getUpdatesSinceTimestamp = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      if(!params.timestamp) return reject(fourOhFour);
+      if(!params.timestamp) return reject(fourHundred);
       const timestamp = parseInt(params.timestamp, 10);
       Entry.getUpdatesSinceTimestamp(user.id, timestamp, user.deviceId).then(function (entries){
         if(!entries) return reject(fiveHundred);

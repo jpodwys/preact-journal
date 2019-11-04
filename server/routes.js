@@ -2,6 +2,7 @@ var Sequelize = require('sequelize'),
   db = require('./db')(Sequelize),
   user = require('./middleware/userMW')(db, Sequelize),
   entry = require('./middleware/entryMW')(db, Sequelize),
+  media = require('./middleware/mediaMW')(db, Sequelize),
   version = require('../dist/version.json').version;
 
 module.exports = app => {
@@ -21,6 +22,7 @@ module.exports = app => {
   app.post('/api/entry', app.restrict, entry.createEntry);
   app.patch('/api/entry/:id', app.restrict, entry.updateEntry);
   app.delete('/api/entry/:id', app.restrict, entry.deleteEntry);
+  app.post('/api/entry/:entryId/image', app.restrict, media.handleUpload)
 
   /* Convenience routes for development and metrics */
   app.get('/baseline', (req, res) => res.sendStatus(200));

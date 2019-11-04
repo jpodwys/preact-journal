@@ -1,6 +1,6 @@
 import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
-import Image from './image-actions';
+import Media from './media-actions';
 
-export default Object.assign(Global, User, Entry, Image);
+export default Object.assign(Global, User, Entry, Media);

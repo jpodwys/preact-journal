@@ -1,5 +1,3 @@
-var handlers = require('./user-handlers');
-
 module.exports = function(sequelize, Sequelize) {
   var userModel = require('../models/user-model')(sequelize, Sequelize),
     userService = new (require('../services/user-service'))(userModel, sequelize),

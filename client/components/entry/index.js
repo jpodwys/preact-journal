@@ -98,7 +98,7 @@ export default class Entry extends Component {
           key={'entry-' + entry.id}>
           {entry.text}
         </div>
-        <input id="file-input" type="file" onchange={(e) => fire('uploadImage', { entryId: entry.id, file: e.target.files[0] })}/>
+        <input id="file-input" type="file" onchange={(e) => fire('uploadFile', { entryId: entry.id, file: e.target.files[0] })}/>
       </div>
     );
   }

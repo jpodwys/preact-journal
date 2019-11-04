@@ -1,10 +1,10 @@
 import xhr from '../xhr';
 
-function uploadImage (image){
-  return xhr('/api/image', {
+function uploadFile (file){
+  return xhr('/api/media', {
     method: 'POST',
-    body: image
+    body: file
   });
 }
 
-export default { uploadImage };
+export default { uploadFile };

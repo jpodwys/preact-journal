@@ -7,7 +7,7 @@ function showFileSelector (){
   FILE_INPUT().click();
 }
 
-function uploadImage (el, { entryId, file }){
+function uploadFile (el, { entryId, file }){
   if(!entryId || !file) return;
   const entryIndex = findObjectIndexById(entryId, el.state.entries);
   if(entryIndex === -1) return;
@@ -22,12 +22,12 @@ function uploadImage (el, { entryId, file }){
   }
   reader.readAsDataURL(file);
 
-  // Media.uploadImage(file)
+  // Media.uploadFile(file)
   //   .then((url) => imploadImageSuccess(el, entryId, url))
   //   .catch(err => imploadImageFailure(el, err));
 }
 
-function imploadImageSuccess (el, entryId, url){
+function imploadFileSuccess (el, entryId, url){
   const entryIndex = findObjectIndexById(entryId, el.state.entries);
   const entry = el.state.entries[entryIndex];
   delete entry.imagePreview;
@@ -45,8 +45,8 @@ function imploadImageSuccess (el, entryId, url){
   el.set({ entry: activeEntry, entries });
 };
 
-function imploadImageFailure (el, err){
+function imploadFileFailure (el, err){
   console.log('imploadImageFailure', err);
 };
 
-export default { showFileSelector, uploadImage };
+export default { showFileSelector, uploadFile };

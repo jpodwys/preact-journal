@@ -1,5 +1,3 @@
-var handlers = require('./entry-handlers');
-
 module.exports = function(sequelize, Sequelize){
   var entryModel = require('../models/entry-model')(sequelize, Sequelize),
     entryService = new (require('../services/entry-service'))(entryModel, sequelize),
