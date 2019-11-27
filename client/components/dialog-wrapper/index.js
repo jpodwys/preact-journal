@@ -12,6 +12,7 @@ const onLogout = () => {
 const menu = (dark) => (
   <ul>
     <li onclick={() => fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={() => fire('exportEntries')}>Export</li>
     <li onclick={onLogout}>Logout</li>
   </ul>
 );
