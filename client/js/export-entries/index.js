@@ -8,6 +8,7 @@ anchor.setAttribute('style', 'position:absolute;height:1px;width:1px;left:-100px
 const CARRIAGE_RETURN = '\r\n';
 
 export default function exportEntries(entries) {
+  if (!entries.length) return;
   let text = '';
   entries.forEach(entry => {
     text += entry.date
@@ -22,5 +23,6 @@ export default function exportEntries(entries) {
   const url = window.URL.createObjectURL(data);
   anchor.setAttribute('href', url);
   anchor.click();
+  window.URL.revokeObjectURL(url);
   fire('linkstate', { key: 'dialogMode' });
 }
