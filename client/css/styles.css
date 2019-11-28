@@ -278,7 +278,7 @@ header .nav-set h3 {
 }
 
 header .nav-set > *:not(h1):not(form) {
-  padding: 12.5px;
+  padding: 12.5px 8px;
 }
 
 .flex-grow {

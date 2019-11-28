@@ -364,6 +364,14 @@ function filterByText (el, query = ''){
   el.set({ filterText: query });
 };
 
+function toggleSort (el){
+  const sort = el.state.sort;
+  el.set({
+    sort: sort === 'desc' ? 'asc' : 'desc',
+    dialogMode: ''
+  });
+};
+
 function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
@@ -405,5 +413,6 @@ export default {
   toggleFavorite,
   clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50),
-  exportEntries
+  exportEntries,
+  toggleSort
 };

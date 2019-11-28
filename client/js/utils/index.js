@@ -11,10 +11,14 @@ function removeObjectByIndex (index, list) {
   return list;
 };
 
-function sortObjectsByDate (list) {
-  if(!list) return;
-  return list.sort(function(a, b){
-    return new Date(b.date) - new Date(a.date);
+function sortObjectsByDate (list, sort = 'desc') {
+  if(!list);
+  return list.sort((a, b) => {
+    const aDate = new Date(a.date);
+    const bDate = new Date(b.date);
+    return sort === 'desc'
+      ? bDate - aDate
+      : aDate  -bDate;
   });
 };
 
@@ -45,10 +49,11 @@ function filterByFavorited (entries) {
   return entries.filter(entry => !!entry.favorited);
 };
 
-function applyFilters (view, query, filter, list) {
+function applyFilters (view, query, filter, sort, list) {
   if(view === '/search' && !query && !filter) return [];
   list = filterHiddenEntries(list);
   if(filter === 'favorites') list = filterByFavorited(list);
+  list = sortObjectsByDate(list, sort) || [];
   return filterObjectsByText(query, list);
 };
 

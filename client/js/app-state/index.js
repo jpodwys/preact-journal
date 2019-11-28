@@ -7,10 +7,11 @@ const compute = (obj, prop) => {
   switch(prop) {
     // viewEntries
     case 'view': // Fallthrough
+    case 'sort': // Fallthrough
     case 'filter': // Fallthrough
     case 'entries': // Fallthrough
     case 'filterText': {
-      obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.entries);
+      obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.sort, obj.entries);
     }
   }
 };
@@ -59,6 +60,7 @@ export default function getInitialState () {
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
+    sort: 'desc',
     filter: '',
     filterText: '',
     entryIndex: -1,

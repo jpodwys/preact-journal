@@ -9,9 +9,10 @@ const onLogout = () => {
   });
 };
 
-const menu = (dark) => (
+const menu = (dark, sort) => (
   <ul>
     <li onclick={() => fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
+    <li onclick={() => fire('toggleSort')}>{sort === 'desc' ? 'Ascending' : 'Descending'}</li>
     <li onclick={() => fire('exportEntries')}>Export</li>
     <li onclick={onLogout}>Logout</li>
   </ul>
@@ -44,12 +45,12 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default ({ dialogMode, dark, entry }) => {
+export default ({ dialogMode, dark, entry, sort }) => {
   if(!dialogMode) return;
 
   let markup;
   if(dialogMode === 'menu'){
-    markup = menu(dark);
+    markup = menu(dark, sort);
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'delete' && !entry) return;
