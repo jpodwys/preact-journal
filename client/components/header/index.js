@@ -63,6 +63,9 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
+							<span class="nav-set">
+								<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
+							</span>
 						</form>
 					}
 				</div>
@@ -85,9 +88,6 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 				</div>
 
 				<div class="nav-set">
-					{view === '/search' &&
-						<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
-					}
 					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-down"/>
 				</div>
 

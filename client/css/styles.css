@@ -278,7 +278,7 @@ header .nav-set h3 {
 }
 
 header .nav-set > *:not(h1):not(form) {
-  padding: 12.5px 8px;
+  padding: 12.5px 10px;
 }
 
 .flex-grow {
@@ -300,18 +300,16 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .search-form .nav-set > svg {
-  padding: 7.5px 10px;
+  padding: 7.5px 8px;
 }
 
 .search-form .nav-set > .search-entry-count {
   padding: 10px;
-  width: 35px;
-  text-align: center;
 }
 
 .search-form input {
   flex: 10;
-  padding: 8px 8px 8px 0;
+  padding: 8px 0;
   margin: 0;
   width: 60%;
   background: transparent;
