@@ -64,7 +64,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
 							<span class="nav-set">
-								<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
+								<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')}/>
 							</span>
 						</form>
 					}
