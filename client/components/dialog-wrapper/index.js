@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import Dialog from '../dialog';
+import Icon from '../icon';
 import { fire } from '../unifire';
 
 const onLogout = () => {
@@ -10,11 +11,23 @@ const onLogout = () => {
 };
 
 const menu = (dark, sort) => (
-  <ul>
-    <li onclick={() => fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
-    <li onclick={() => fire('toggleSort')}>{sort === 'desc' ? 'Ascending' : 'Descending'}</li>
-    <li onclick={() => fire('exportEntries')}>Export</li>
-    <li onclick={onLogout}>Logout</li>
+  <ul class="search-suggestions dark-fill">
+    <li onclick={() => fire('toggleDarkMode')}>
+      <Icon icon={dark ? 'sun' : 'moon'}/>
+      <span>{dark ? 'Light' : 'Dark'}</span>
+    </li>
+    <li onclick={() => fire('toggleSort')}>
+      <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
+      <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
+    </li>
+    <li onclick={() => fire('exportEntries')}>
+      <Icon icon="download"/>
+      <span>Export</span>
+    </li>
+    <li onclick={onLogout}>
+      <Icon icon="logout"/>
+      <span>Logout</span>
+    </li>
   </ul>
 );
 

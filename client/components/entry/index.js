@@ -74,7 +74,7 @@ export default class Entry extends Component {
               icon="left"
               key={entry.id + '-right'}
               onclick={() => fire('shiftEntry', 1)}
-              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill next-entry' : 'hidden'}/>
+              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill rotate180' : 'hidden'}/>
           }
         </div>
         <div
