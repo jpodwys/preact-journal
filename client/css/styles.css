@@ -498,18 +498,15 @@ body.dark .modal-dialog {
 }
 
 body.dark .dark-fill svg {
-  fill: var(--theme-white);
+  fill: var(--theme-dark-text);
 }
 
 body.dark .mdl-button {
   color: var(--theme-white);
 }
 
-body.dark .entry-preview .entry-link,
-body.dark .entry-date,
-body.dark .entry-text,
-body.dark .list-item .second-row {
-  color: var(--theme-dark-text);
+body.dark *, svg {
+  color: var(--theme-dark-text) !important;
 }
 
 body.dark .button--fab.add-entry {
