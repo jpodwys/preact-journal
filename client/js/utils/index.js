@@ -1,7 +1,7 @@
 import { clear } from 'idb-keyval';
 
 function findObjectIndexById (id, list) {
-  return list.map(function(obj){
+  return list.map((obj) => {
     return obj.id;
   }).indexOf(id);
 };
@@ -12,13 +12,13 @@ function removeObjectByIndex (index, list) {
 };
 
 function sortObjectsByDate (list, sort = 'desc') {
-  if(!list);
+  if(!list) return [];
   return list.sort((a, b) => {
     const aDate = new Date(a.date);
     const bDate = new Date(b.date);
     return sort === 'desc'
       ? bDate - aDate
-      : aDate  -bDate;
+      : aDate - bDate;
   });
 };
 
@@ -53,7 +53,7 @@ function applyFilters (view, query, filter, sort, list) {
   if(view === '/search' && !query && !filter) return [];
   list = filterHiddenEntries(list);
   if(filter === 'favorites') list = filterByFavorited(list);
-  list = sortObjectsByDate(list, sort) || [];
+  list = sortObjectsByDate(list, sort);
   return filterObjectsByText(query, list);
 };
 
