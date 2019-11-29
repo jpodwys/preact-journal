@@ -2,7 +2,7 @@
 
 :root {
   --theme-blue: #4285F4;
-  --theme-dark: #2d2d2d;
+  --theme-dark: #2b2b2b;
   --theme-white: #fff;
   --theme-text: #424242;
   --theme-dark-text: #e4e4e4;
@@ -411,7 +411,7 @@ header .nav-set > *:not(h1):not(form) {
   position: fixed;
   background-color: #fff;
   border-radius: 5px;
-  box-shadow: 0px 5px 20px 0px rgba(0,0,0,0.75);
+  box-shadow: 0 5px 20px 0 rgba(0,0,0,.35);
   z-index: 3;
 }
 
