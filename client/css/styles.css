@@ -380,8 +380,11 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .menu > li > * {
-  margin: 0 10px;
   vertical-align: middle;
+}
+
+.menu > li > svg {
+  margin: 0 10px;
 }
 
 .modal-overlay {
@@ -432,7 +435,7 @@ header .nav-set > *:not(h1):not(form) {
 
 .modal-dialog.modal-menu {
   position: fixed;
-  width: 170px;
+  width: 160px;
   top: 5px;
   right: 5px;
 }
