@@ -8,7 +8,7 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
   if(!viewEntries.length){
     if(!filter && !filterText){
       return (
-        <ul class="search-suggestions fade-up dark-fill entry-text">
+        <ul class="menu fade-up dark-fill entry-text">
           <li onclick={() => fire('linkstate', { key: 'filter', val: 'favorites' })}>
             <Icon icon="star-filled"/>
             <span>Favorites</span>

@@ -11,7 +11,7 @@ const onLogout = () => {
 };
 
 const menu = (dark, sort) => (
-  <ul class="search-suggestions dark-fill">
+  <ul class="menu dark-fill">
     <li onclick={() => fire('toggleDarkMode')}>
       <Icon icon={dark ? 'sun' : 'moon'}/>
       <span>{dark ? 'Light' : 'Dark'}</span>
