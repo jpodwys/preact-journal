@@ -2,9 +2,10 @@
 
 :root {
   --theme-blue: #4285F4;
-  --theme-dark: #424242;
+  --theme-dark: #2d2d2d;
   --theme-white: #fff;
-  --theme-dark-text: #ccc;
+  --theme-text: #424242;
+  --theme-dark-text: #e4e4e4;
   --theme-dark-blue: #2d50afe0;
 }
 
@@ -20,7 +21,7 @@
 body {
   margin: 0;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  color: var(--theme-dark);
+  color: var(--theme-text);
   font-size: 16px;
 }
 
@@ -38,7 +39,7 @@ input {
 }
 
 a, a:visited {
-  color: var(--theme-dark);
+  color: var(--theme-text);
   text-decoration: none;
 }
 
@@ -113,7 +114,7 @@ svg {
 .mdl-button {
   background: 0 0;
   border: none;
-  color: var(--theme-dark);
+  color: var(--theme-text);
   position: relative;
   padding: 16px;
   font-size: 16px;
@@ -401,7 +402,7 @@ header .nav-set > *:not(h1):not(form) {
 }
 
 .modal-overlay.modal-modal {
-  background-color: #00000080;
+  background-color: #000000a6;
 }
 
 .modal-dialog {
@@ -480,8 +481,8 @@ toast.show {
 /* Dark theme */
 
 body.dark {
-  background-color: #000;
-  color: var(--theme-white);
+  background-color: var(--theme-dark);
+  color: var(--theme-dark-text);
 }
 
 body.dark header {
@@ -497,25 +498,16 @@ body.dark .modal-dialog {
 }
 
 body.dark .dark-fill svg {
-  fill: #c5c5c5;
+  fill: var(--theme-white);
 }
 
 body.dark .mdl-button {
   color: var(--theme-white);
 }
 
-body.dark .entry-preview .entry-link {
-  color: #f3f3f3;
-}
-
-body.dark .entry-date {
-  color: #e0e0e0;
-}
-
-body.dark .entry-text {
-  color: var(--theme-dark-text);
-}
-
+body.dark .entry-preview .entry-link,
+body.dark .entry-date,
+body.dark .entry-text,
 body.dark .list-item .second-row {
   color: var(--theme-dark-text);
 }
