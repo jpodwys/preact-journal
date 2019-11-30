@@ -1,13 +1,11 @@
 import { fire } from '../../components/unifire';
 
 const anchor = document.createElement('a');
-anchor.tabindex = '-1';
 anchor.download = 'journalize.txt';
-anchor.style = 'position:absolute;height:1px;width:1px;left:-100px;';
 
 const CARRIAGE_RETURN = '\r\n';
 
-export default function exportEntries(entries) {
+export default function exportEntries(entries, e) {
   if (!entries.length) return;
   let text = '';
   entries.forEach(entry => {
@@ -21,7 +19,7 @@ export default function exportEntries(entries) {
   });
   const data = new Blob([ text ], { type: 'text/plain' });
   const url = window.URL.createObjectURL(data);
-  anchor.setAttribute('href', url);
+  anchor.href = url;
   anchor.click();
   window.URL.revokeObjectURL(url);
   fire('linkstate', { key: 'dialogMode' });
