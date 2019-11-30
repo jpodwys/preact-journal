@@ -396,7 +396,27 @@ function removeSlideInProp (el) {
 };
 
 function exportEntries (el, e) {
-  exportAllEntries(el.state.viewEntries, e);
+  // exportAllEntries(el.state.viewEntries, e);
+  const anchor = document.createElement('a');
+  anchor.download = 'journalize.txt';
+  const CARRIAGE_RETURN = '\r\n';
+  if (!el.state.entries.length) return;
+  let text = '';
+  el.state.entries.forEach(entry => {
+    text += entry.date
+      + CARRIAGE_RETURN
+      + CARRIAGE_RETURN
+      + entry.text
+      + CARRIAGE_RETURN
+      + CARRIAGE_RETURN
+      + CARRIAGE_RETURN;
+  });
+  const data = new Blob([ text ], { type: 'text/plain' });
+  const url = window.URL.createObjectURL(data);
+  anchor.href = url;
+  anchor.click();
+  window.URL.revokeObjectURL(url);
+  el.set({ dialogMode: '' });
 };
 
 export default {
