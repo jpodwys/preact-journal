@@ -31,8 +31,8 @@ app.get('/favicon.ico', function(req, res, next){
   res.sendFile('favicon.ico', {root: './dist', maxAge: '30d'});
   next();
 });
-app.get('/icon-192x192.png', function(req, res, next){
-  res.sendFile('icon-192x192.png', {root: './dist', maxAge: '30d'});
+app.get('/icon-192.png', function(req, res, next){
+  res.sendFile('icon-192.png', {root: './dist', maxAge: '30d'});
   next();
 });
 app.get('/icon-144.png', function(req, res, next){
