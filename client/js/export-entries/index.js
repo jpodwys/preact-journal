@@ -4,7 +4,6 @@ const anchor = document.createElement('a');
 anchor.tabindex = '-1';
 anchor.download = 'journalize.txt';
 anchor.style = 'position:absolute;height:1px;width:1px;left:-100px;';
-document.appendChild(anchor);
 
 const CARRIAGE_RETURN = '\r\n';
 
