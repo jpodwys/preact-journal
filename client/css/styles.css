@@ -269,9 +269,9 @@ header > .inner-header {
   margin: 0 auto;
 }
 
-header .nav-set h3 {
+header .nav-set .h3 {
   padding: 14px 15px;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 header .nav-set > *:not(h1):not(form) {

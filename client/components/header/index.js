@@ -38,7 +38,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 			<div class="inner-header">
 				<div class="nav-set">
 					{view === '/entries' &&
-						<h3 class="fade-down">{`${entryCount} Entries`}</h3>
+						<span class="h3 fade-down">{`${entryCount} Entries`}</span>
 					}
 
 					{(view === '/search' || view === '/entry' || view === '/new') &&
