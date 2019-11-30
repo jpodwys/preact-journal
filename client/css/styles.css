@@ -3,7 +3,7 @@
 :root {
   --theme-blue: #4285F4;
   --theme-dark: #2b2b2b;
-  --theme-white: #fff;
+  --theme-white: #f5f5f5;
   --theme-text: #424242;
   --theme-dark-text: #e4e4e4;
   --theme-dark-blue: #2d50afe0;
@@ -23,6 +23,7 @@ body {
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
   color: var(--theme-text);
   font-size: 16px;
+  background-color: var(--theme-white);
 }
 
 main {
@@ -57,7 +58,6 @@ svg {
   display: flex;
   height: inherit;
   position: relative;
-  overflow: hidden;
   align-items: center;
   justify-content: center;
 }
