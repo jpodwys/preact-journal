@@ -34,7 +34,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
 
 	return (
-		<header class="elevated">
+		<header class="dark-fill">
 			<div class="inner-header">
 				<div class="nav-set">
 					{view === '/entries' &&
