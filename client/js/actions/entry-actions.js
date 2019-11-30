@@ -395,8 +395,8 @@ function removeSlideInProp (el) {
   el.set({ entries });
 };
 
-function exportEntries (el) {
-  exportAllEntries(el.state.viewEntries);
+function exportEntries (el, e) {
+  exportAllEntries(el.state.viewEntries, e);
 };
 
 export default {
