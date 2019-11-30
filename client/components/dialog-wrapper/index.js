@@ -20,7 +20,7 @@ const menu = (dark, sort) => (
       <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
       <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
     </li>
-    <li onclick={(e) => fire('exportEntries', e)}>
+    <li onclick={() => fire('exportEntries')}>
       <Icon icon="download"/>
       <span>Export</span>
     </li>

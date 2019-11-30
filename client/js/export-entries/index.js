@@ -4,7 +4,7 @@ const anchor = document.createElement('a');
 anchor.download = 'journalize.txt';
 const CARRIAGE_RETURN = '\r\n';
 
-export default function exportEntries(entries, e) {
+export default function exportEntries(entries) {
   if (!entries.length) return;
   let text = '';
   entries.forEach(entry => {
