@@ -16,7 +16,7 @@ export default function exportEntries(entries) {
       + CARRIAGE_RETURN
       + CARRIAGE_RETURN;
   });
-  const data = new Blob([ text ], { type: 'text/plain' });
+  const data = new Blob([ text ], { type: 'text/plain;charset=utf-8' });
   const url = window.URL.createObjectURL(data);
   anchor.href = url;
   anchor.click();
