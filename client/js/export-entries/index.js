@@ -18,7 +18,7 @@ export default function exportEntries(entries) {
   });
   const data = new Blob([ text ], { type: 'text/plain;charset=utf-8' });
   anchor.href = window.URL.createObjectURL(data);
-  setTimeout(function () { URL.revokeObjectURL(anchor.href) }, 10);
-  setTimeout(function () { anchor.click() });
+  setTimeout(() => URL.revokeObjectURL(anchor.href), 4E4); // 40s
+  setTimeout(() => anchor.click());
   fire('linkstate', { key: 'dialogMode' });
 }
