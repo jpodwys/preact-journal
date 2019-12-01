@@ -17,9 +17,8 @@ export default function exportEntries(entries) {
       + CARRIAGE_RETURN;
   });
   const data = new Blob([ text ], { type: 'text/plain;charset=utf-8' });
-  const url = window.URL.createObjectURL(data);
-  anchor.href = url;
-  anchor.click();
-  window.URL.revokeObjectURL(url);
+  anchor.href = window.URL.createObjectURL(data);
+  setTimeout(function () { URL.revokeObjectURL(anchor.href) }, 10);
+  setTimeout(function () { anchor.click() });
   fire('linkstate', { key: 'dialogMode' });
 }
