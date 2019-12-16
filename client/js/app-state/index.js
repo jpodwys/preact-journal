@@ -37,7 +37,6 @@ const observe = (obj, prop, next, prev) => {
       document.body.classList[func]('dark');
       return;
     }
-    case 'timestamp':   localStorage.setItem('timestamp', next);   return;
   }
 };
 
@@ -52,11 +51,7 @@ const handler = {
 };
 
 export default function getInitialState () {
-  let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) clearData();
-
   let state = {
-    loggedIn,
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
@@ -69,8 +64,7 @@ export default function getInitialState () {
     // toast: '',
     // dialogMode: '',
     view: getViewFromPathname(location.pathname),
-    dark: localStorage.getItem('dark') === 'true',
-    timestamp: localStorage.getItem('timestamp') || undefined
+    dark: localStorage.getItem('dark') === 'true'
   };
 
   get('entries').then((entries = []) => {

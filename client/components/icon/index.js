@@ -53,10 +53,6 @@ function getSVG(icon) {
             <path d="M0 0h24v24H0z" fill="none"/>
             <path d="M19 3h-1V1h-2v2H8V1H6v2H5a2 2 0 00-2 2v14c0 1.1.9 2 2 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
           </g>
-    case 'logout':
-      return <g>
-            <path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 012 2v2h-2V4H5v16h9v-2h2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h9z"/>
-          </g>
     case 'download':
       return <g>
             <path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7 7-7z"/>

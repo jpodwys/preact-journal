@@ -28,24 +28,18 @@ function setToast (el) {
 
 function handleRouteChange (el, url) {
   let view = getViewFromPathname(url);
-  if(view !== '/' && !el.state.loggedIn) return route('/', true);
   if(view !== el.state.view) el.set({ view });
   handleRoute(el, view, url);
 };
 
 function handleRoute (el, view, url) {
   switch(view) {
-    case '/':         handleLoginView(el);    break;
     case '/entries':  // Fallthrough
     case '/search':   handleEntriesView(el);  break;
     case '/entry':    // Fallthrough
     case '/new':      handleEntryView(url);   break;
-    default:          route('/', true);       break;
+    default:          route('/entries', true);       break;
   }
-};
-
-function handleLoginView (el) {
-  if(el.state.loggedIn) route('/entries', true);
 };
 
 function handleEntriesView (el) {

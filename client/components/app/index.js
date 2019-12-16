@@ -2,7 +2,6 @@ import { h } from 'preact';
 
 import Router from '../router';
 import Header from '../header';
-import Login from '../login';
 import Entries from '../entries';
 import Search from '../search';
 import Entry from '../entry';
@@ -17,14 +16,12 @@ export default (props) => {
     <div class={`app ${toast}`}>
       <Header
         view={props.view}
-        loggedIn={props.loggedIn}
         viewEntries={props.viewEntries}
         entry={props.entry}
         filter={props.filter}
         filterText={props.filterText}/>
       <main>
         <Router onChange={(url) => fire('handleRouteChange', url)}>
-          <Login path="/"/>
           <Entries path="/entries"
             scrollPosition={props.scrollPosition}
             viewEntries={props.viewEntries}

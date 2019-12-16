@@ -3,13 +3,6 @@ import Dialog from '../dialog';
 import Icon from '../icon';
 import { fire } from '../unifire';
 
-const onLogout = () => {
-  fire('linkstate', {
-    key: 'dialogMode',
-    cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }))
-  });
-};
-
 const menu = (dark, sort) => (
   <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
     <li onclick={() => fire('toggleDarkMode')}>
@@ -23,10 +16,6 @@ const menu = (dark, sort) => (
     <li onclick={() => fire('exportEntries')}>
       <Icon icon="download"/>
       <span>Export</span>
-    </li>
-    <li onclick={onLogout}>
-      <Icon icon="logout"/>
-      <span>Logout</span>
     </li>
   </ul>
 );
@@ -47,13 +36,6 @@ const modalOptions = (modalType, entry) => {
       message: 'Delete this entry?',
       confirmText: 'Delete',
       onConfirm: () => fire('deleteEntry', { id: entry.id })
-    }
-  }
-  if(modalType === 'logout'){
-    return {
-      message: 'Logout?',
-      confirmText: 'Logout',
-      onConfirm: () => fire('logout')
     }
   }
 };
