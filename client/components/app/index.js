@@ -43,6 +43,7 @@ export default (props) => {
       </main>
       <DialogWrapper
         dark={props.dark}
+        sort={props.sort}
         entry={props.entry}
         dialogMode={props.dialogMode}/>
       <Toast toast={props.toast}/>

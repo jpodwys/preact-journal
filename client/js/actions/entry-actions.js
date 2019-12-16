@@ -1,5 +1,6 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
+import exportAllEntries from '../../js/export-entries';
 import debounce from '../debounce';
 import { route } from '../../components/router';
 import { fire } from '../../components/unifire';
@@ -363,6 +364,14 @@ function filterByText (el, query = ''){
   el.set({ filterText: query });
 };
 
+function toggleSort (el){
+  const sort = el.state.sort;
+  el.set({
+    sort: sort === 'desc' ? 'asc' : 'desc',
+    dialogMode: ''
+  });
+};
+
 function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
@@ -386,6 +395,10 @@ function removeSlideInProp (el) {
   el.set({ entries });
 };
 
+function exportEntries (el) {
+  exportAllEntries(el.state.viewEntries);
+};
+
 export default {
   boot,
   getEntries,
@@ -399,5 +412,7 @@ export default {
   shiftEntry,
   toggleFavorite,
   clearFilters,
-  removeSlideInProp: debounce(removeSlideInProp, 50)
+  removeSlideInProp: debounce(removeSlideInProp, 50),
+  exportEntries,
+  toggleSort
 };

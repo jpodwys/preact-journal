@@ -1,11 +1,11 @@
 {
   "name": "Journalize",
   "short_name": "Journalize",
-  "theme_color": "#0061bb",
+  "theme_color": "#2b2b2b",
   "display": "standalone",
   "start_url": "/",
   "orientation": "portrait",
-  "background_color": "#fff",
+  "background_color": "#2b2b2b",
   "description": "Private journal entries.",
   "icons": [
     {

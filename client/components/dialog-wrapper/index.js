@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import Dialog from '../dialog';
+import Icon from '../icon';
 import { fire } from '../unifire';
 
 const onLogout = () => {
@@ -9,10 +10,24 @@ const onLogout = () => {
   });
 };
 
-const menu = (dark) => (
-  <ul>
-    <li onclick={() => fire('toggleDarkMode')}>{dark ? 'Light' : 'Dark'}</li>
-    <li onclick={onLogout}>Logout</li>
+const menu = (dark, sort) => (
+  <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
+    <li onclick={() => fire('toggleDarkMode')}>
+      <Icon icon={dark ? 'sun' : 'moon'}/>
+      <span>{dark ? 'Light' : 'Dark'}</span>
+    </li>
+    <li onclick={() => fire('toggleSort')}>
+      <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
+      <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
+    </li>
+    <li onclick={() => fire('exportEntries')}>
+      <Icon icon="download"/>
+      <span>Export</span>
+    </li>
+    <li onclick={onLogout}>
+      <Icon icon="logout"/>
+      <span>Logout</span>
+    </li>
   </ul>
 );
 
@@ -43,12 +58,12 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default ({ dialogMode, dark, entry }) => {
+export default ({ dialogMode, dark, entry, sort }) => {
   if(!dialogMode) return;
 
   let markup;
   if(dialogMode === 'menu'){
-    markup = menu(dark);
+    markup = menu(dark, sort);
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'delete' && !entry) return;

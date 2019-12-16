@@ -34,11 +34,11 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
 
 	return (
-		<header class="elevated">
+		<header class="dark-fill">
 			<div class="inner-header">
 				<div class="nav-set">
 					{view === '/entries' &&
-						<h3 class="fade-down">{`${entryCount} Entries`}</h3>
+						<span class="h3 fade-down">{`${entryCount} Entries`}</span>
 					}
 
 					{(view === '/search' || view === '/entry' || view === '/new') &&
@@ -63,6 +63,9 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
+							<span class="nav-set">
+								<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')}/>
+							</span>
 						</form>
 					}
 				</div>
@@ -85,21 +88,13 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 				</div>
 
 				<div class="nav-set">
-					{view === '/search' &&
-						<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} class="fade-up"/>
-					}
-					{view !== '/search' && !filter && !filterText &&
-						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-down"/>
-					}
-					{view === '/entry' && (filter || filterText) &&
-						<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-up"/>
-					}
+					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-down"/>
 				</div>
 
 				{view === '/entries' &&
 					<div class="button button--fab add-entry elevated grow">
 						<a href="/entry/new">
-							<Icon icon="clear" key="header-add"/>
+							<Icon icon="clear" key="header-add" class="rotate45"/>
 						</a>
 					</div>
 				}
