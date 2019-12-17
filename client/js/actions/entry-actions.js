@@ -40,6 +40,7 @@ function createEntry (el, { entry, clientSync }){
   if(entryIndex === -1) return;
 
   el.state.entries[entryIndex] = entry;
+  delete el.state.entries[entryIndex].newEntry;
   el.set({
     entry,
     entries: [].concat(el.state.entries)
@@ -87,7 +88,7 @@ function deleteEntry (el, { id }){
     dialogMode: '',
     entry: undefined,
     entries: removeObjectByIndex(entryIndex, el.state.entries)
-  });
+  }, () => route('/entries'));
 };
 
 function setEntry (el, { id }){
