@@ -199,12 +199,8 @@ svg {
   padding: 20px 0;
 }
 
-.entry-header > *:first-child {
+.entry-header > *:first-child, .entry-header > *:last-child {
   padding-left: 0;
-}
-
-.entry-header > *:last-child {
-  padding-right: 0;
 }
 
 .entry-text {
