@@ -45,6 +45,7 @@ export default (props) => {
         dark={props.dark}
         sort={props.sort}
         entry={props.entry}
+        view={props.view}
         dialogMode={props.dialogMode}/>
       <Toast toast={props.toast}/>
     </div>

@@ -10,20 +10,24 @@ const onLogout = () => {
   });
 };
 
-const menu = (dark, sort) => (
+const menu = (dark, view, sort) => (
   <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
     <li onclick={() => fire('toggleDarkMode')}>
       <Icon icon={dark ? 'sun' : 'moon'}/>
       <span>{dark ? 'Light' : 'Dark'}</span>
     </li>
-    <li onclick={() => fire('toggleSort')}>
-      <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
-      <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
-    </li>
-    <li onclick={() => fire('exportEntries')}>
-      <Icon icon="download"/>
-      <span>Export</span>
-    </li>
+    {view !== '/entry' && view !== '/new' &&
+      <li onclick={() => fire('toggleSort')}>
+        <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
+        <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
+      </li>
+    }
+    {view !== '/entry' && view !== '/new' &&
+      <li onclick={() => fire('exportEntries')}>
+        <Icon icon="download"/>
+        <span>Export</span>
+      </li>
+    }
     <li onclick={onLogout}>
       <Icon icon="logout"/>
       <span>Logout</span>
@@ -58,12 +62,12 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default ({ dialogMode, dark, entry, sort }) => {
+export default ({ dialogMode, dark, entry, view, sort }) => {
   if(!dialogMode) return;
 
   let markup;
   if(dialogMode === 'menu'){
-    markup = menu(dark, sort);
+    markup = menu(dark, view, sort);
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'delete' && !entry) return;
