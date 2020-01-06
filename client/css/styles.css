@@ -498,7 +498,7 @@ body.dark .search-form {
 
 body.dark .modal-dialog {
   background-color: var(--theme-dark);
-  filter: brightness(120%);
+  filter: brightness(150%);
 }
 
 body.dark .dark-fill svg {
