@@ -1,7 +1,7 @@
 const jwtMW = require('express-jwt'),
   AES = require('../utils/aes');
 
-export default jwtMW({
+module.exports = jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,
   getToken: (req) => {
