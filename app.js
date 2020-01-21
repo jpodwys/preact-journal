@@ -5,29 +5,22 @@ var express = require('express'),
   app = express(),
   strictTransportSecurity = require('./server/middleware/strict-transport-security'),
   forceSsl = require('force-ssl-heroku'),
-  jwtMW = require('express-jwt'),
-  AES = require('./server/utils/aes'),
+  jwtPrser = require('./server/middleware/jwt-parser'),
   cron = require('./server/cron'),
   shrinkRay = require('shrink-ray-current');
   PORT = process.env.PORT || 3000;
 
+
+
 app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
-app.use(shrinkRay({threshold: '1.4kb'}));
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(shrinkRay({ threshold: '1.4kb' }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(jwtMW({
-  secret: process.env.JWT_KEY,
-  credentialsRequired: false,
-  getToken: function(req){
-    if(req.cookies && req.cookies.auth_token)
-      return AES.decrypt(req.cookies.auth_token);
-    return null;
-  }
-}));
-app.use(express.static('dist', {maxAge: '0h'}));
+app.use(jwtPrser);
+app.use(express.static('dist', { maxAge: '0h' }));
 require('./server/middleware/app-middleware')(app);
 require('./server/routes')(app);
 

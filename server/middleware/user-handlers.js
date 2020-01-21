@@ -22,7 +22,7 @@ var loginOrCreate = function(req, res, user) {
       secure: (process.env.NODE_ENV === 'production'),
       expires: expiration
     });
-  
+
     res.sendStatus(204);
   });
 };
@@ -34,6 +34,7 @@ exports.createAccount = loginOrCreate;
 exports.logout = function(req, res) {
   res.clearCookie('auth_token');
   res.clearCookie('logged_in');
+  res.sendStatus(204);
 }
 
 exports.getUserCount = function(req, res, total) {

@@ -1,17 +1,14 @@
 var Sequelize = require('sequelize'),
   db = require('./db')(Sequelize),
   user = require('./middleware/userMW')(db, Sequelize),
+  userHandlers = require('./middleware/user-handlers'),
   entry = require('./middleware/entryMW')(db, Sequelize),
   version = require('../dist/version.json').version;
 
 module.exports = app => {
   /* REST endpoints */
   app.post('/api/user/login', user.attemptLogin);
-  app.post('/api/user/logout', app.restrict, (req, res) => {
-    res.clearCookie('auth_token');
-    res.clearCookie('logged_in');
-    res.sendStatus(204);
-  });
+  app.post('/api/user/logout', app.restrict, userHandlers.logout);
   app.post('/api/user', user.createAccount);
   // app.patch('/user/:id');
   // app.delete('/user/:id')
@@ -28,10 +25,10 @@ module.exports = app => {
   app.get('/entry-count', entry.getEntryCount);
 
   /* App version so ServiceWorker knows whether to refresh assets */
-  app.get('/version', (req, res) => res.send({ version: version }));
+  app.get('/version', (req, res) => res.send({ version }));
 
   /* Catch-all view route */
   app.get('/*', (req, res) => {
-    res.sendFile('index.html', {root: './dist', maxAge: '30d'});
+    res.sendFile('index.html', { root: './dist', maxAge: '30d' });
   });
 }
