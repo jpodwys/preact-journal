@@ -1,4 +1,5 @@
 import { get, set } from 'idb-keyval';
+import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
