@@ -1,5 +1,5 @@
 import { h, Component } from 'preact';
-import ScrollViewport from 'preact-scroll-viewport';
+import ScrollViewport from '../virtual-scroll';
 import EntryPreview from '../entry-preview';
 import ZeroState from '../zero-state';
 import { fire } from '../unifire';
@@ -25,9 +25,19 @@ export default class Entries extends Component {
       return <ZeroState/>
     }
     document.body.scrollTop = scrollPosition;
+
+    const renderer = (items) => {
+      return items.map(entry => <EntryPreview entry={entry} filterText={filterText}/>)
+    };
+
     return (
-      <ScrollViewport class="entry-list fade-down" rowHeight={83} overscan={20}>
-        {viewEntries.map(entry => <EntryPreview entry={entry} filterText={filterText}/>)}
+      <ScrollViewport
+        class="entry-list"
+        items={viewEntries}
+        renderer={renderer}
+        rowHeight={83}
+        overscan={20}
+        internalClass="fade-down">
       </ScrollViewport>
     );
   }
