@@ -46,7 +46,7 @@
     "node-zopfli-es": "^1.0.3",
     "preact": "^8.3.1",
     "select": "^1.1.2",
-    "sequelize": "^6.2.4",
+    "sequelize": "^5.22.3",
     "shrink-ray-current": "^4.0.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.6.0"
