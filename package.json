@@ -75,7 +75,7 @@
     "sinon": "^6.2.0"
   },
   "engines": {
-    "node": "8.x"
+    "node": "16.x"
   },
   "author": "jpodwys",
   "license": "MIT",
