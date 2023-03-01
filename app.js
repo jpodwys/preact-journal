@@ -10,8 +10,6 @@ var express = require('express'),
   shrinkRay = require('shrink-ray-current');
   PORT = process.env.PORT || 3000;
 
-
-
 app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
