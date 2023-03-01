@@ -28,7 +28,7 @@
     "cookie-parser": "1.4.1",
     "del": "^3.0.0",
     "dotenv": "1.2.0",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "express-jwt": "^5.3.3",
     "force-ssl-heroku": "1.0.2",
     "gulp": "^4.0.0",
