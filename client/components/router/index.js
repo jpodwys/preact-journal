@@ -5,7 +5,7 @@ import { h, Component } from 'preact';
 const { pushState } = history;
 history.pushState = (a, b, url) => {
   pushState.call(history, a, b, url);
-  scrollTo(0, 0);
+  // scrollTo(0, 0);
 };
 
 let ROUTER;
@@ -36,6 +36,10 @@ const clickListener = function(e) {
 };
 
 const popstateListener = function(e) {
+  // if(ROUTER) ROUTER.setState({ url: location.pathname });
+  // if(ONCHANGE) ONCHANGE(location.pathname);
+  // return;
+
   let date;
   let text;
   const url = ROUTER.state.url;
@@ -45,6 +49,10 @@ const popstateListener = function(e) {
       if(ROUTER) ROUTER.setState({ url: location.pathname });
       if(ONCHANGE) ONCHANGE(location.pathname);
       setTimeout(() => {
+        // if (url === '/entries' || url === '/search') {
+        //   console.log('ROUTER.props.scrollPosition', ROUTER.props.scrollPosition);
+        //   document.body.scrollTop = ROUTER.props.scrollPosition;
+        // }
         date = document.querySelector(`a[href="${url}"] .first-row`);
         text = document.querySelector(`a[href="${url}"] .second-row`);
         if (date && text) {

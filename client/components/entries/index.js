@@ -7,9 +7,12 @@ import debounce from '../../js/debounce';
 
 export default class Entries extends Component {
   componentDidMount() {
-    document.body.onscroll = debounce(() => {
-      fire('linkstate', { key: 'scrollPosition', val: document.body.scrollTop });
-    }, 50);
+    setTimeout(() => {
+      document.body.onscroll = debounce(() => {
+        console.log('scrolling', document.body.scrollTop);
+        // fire('linkstate', { key: 'scrollPosition', val: document.body.scrollTop });
+      }, 50);
+    }, 250);
   }
 
   componentWillUnmount() {
@@ -24,7 +27,8 @@ export default class Entries extends Component {
     if(!viewEntries.length){
       return <ZeroState/>
     }
-    document.body.scrollTop = scrollPosition;
+    console.log(scrollPosition);
+    // document.body.scrollTop = scrollPosition;
 
     const renderer = (items) => {
       return items.map(entry => <EntryPreview entry={entry} filterText={filterText}/>)
