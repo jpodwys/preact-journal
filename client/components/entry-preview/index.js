@@ -36,7 +36,7 @@ export default ({ entry, filterText }) => {
         <div class="list-item">
           <div class="first-row">
             <span
-              class="entry-link">
+              class="entry-preview--date">
               {entry.date}
             </span>
 

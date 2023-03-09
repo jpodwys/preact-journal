@@ -376,7 +376,7 @@ function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
-  if(entry) route('/entry/' + entry.id, true);
+  if(entry) route('/entry/' + entry.id, true, count === 1 ? false : true);
 };
 
 function clearFilters (el) {

@@ -36,15 +36,57 @@ const clickListener = function(e) {
 };
 
 const popstateListener = function(e) {
-  if(ONCHANGE) ONCHANGE(location.pathname);
-  if(ROUTER) ROUTER.setState({ url: location.pathname });
+  let date;
+  let text;
+  const url = ROUTER.state.url;
+  document.documentElement.classList.add('back');
+  const transition = document.startViewTransition(() => {
+    return new Promise((resolve) => {
+      if(ROUTER) ROUTER.setState({ url: location.pathname });
+      if(ONCHANGE) ONCHANGE(location.pathname);
+      setTimeout(() => {
+        date = document.querySelector(`a[href="${url}"] .first-row`);
+        text = document.querySelector(`a[href="${url}"] .second-row`);
+        if (date && text) {
+          date.style.viewTransitionName = 'entryDate';
+          text.style.viewTransitionName = 'entryText';
+        }
+        resolve();
+      }, 100);
+    });
+  });
+  transition.finished.finally(() => {
+    if (date && text) {
+      date.style.viewTransitionName = '';
+      text.style.viewTransitionName = '';
+    }
+    document.documentElement.classList.remove('back');
+  });
 };
 
-const route = function(url, replace){
-  if(ONCHANGE) ONCHANGE(url);
-  if(ROUTER) ROUTER.setState({ url: url });
-  let func = replace ? 'replace' : 'push';
-  history[func + 'State'](null, null, url);
+const route = function(url, replace, isBack){
+  if (isBack) {
+    document.documentElement.classList.add('back');
+  }
+  const date = document.querySelector(`a[href="${url}"] .first-row`);
+  const text = document.querySelector(`a[href="${url}"] .second-row`);
+  if (date && text) {
+    date.style.viewTransitionName = 'entryDate';
+    text.style.viewTransitionName = 'entryText';
+  }
+  const transition = document.startViewTransition(() => {
+    if(ROUTER) ROUTER.setState({ url: url });
+    if(ONCHANGE) ONCHANGE(url);
+    let func = replace ? 'replace' : 'push';
+    history[func + 'State'](null, null, url);
+  });
+  transition.finished.finally(() => {
+    if (date && text) {
+      date.style.viewTransitionName = '';
+      text.style.viewTransitionName = '';
+    }
+    document.documentElement.classList.remove('back');
+  });
 };
 
 class Router extends Component {
