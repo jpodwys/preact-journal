@@ -594,7 +594,7 @@ body.dark toast {
   }
 }
 
-.no-view-transitions .fade-in {
+.fade-in {
   animation: fade-in ease .2s;
 }
 
@@ -606,11 +606,11 @@ body.dark toast {
   animation: fade-down ease .2s;
 }
 
-.no-view-transitions .fade-right {
+.fade-right {
   animation: fade-right ease .35s;
 }
 
-.no-view-transitions .grow {
+.grow {
   animation: grow ease .2s;
 }
 
