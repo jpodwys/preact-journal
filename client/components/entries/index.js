@@ -9,7 +9,6 @@ export default class Entries extends Component {
   componentDidMount() {
     setTimeout(() => {
       document.body.onscroll = debounce(() => {
-        console.log('scrolling', document.body.scrollTop);
         // fire('linkstate', { key: 'scrollPosition', val: document.body.scrollTop });
       }, 50);
     }, 250);
@@ -27,7 +26,6 @@ export default class Entries extends Component {
     if(!viewEntries.length){
       return <ZeroState/>
     }
-    console.log(scrollPosition);
     // document.body.scrollTop = scrollPosition;
 
     const renderer = (items) => {

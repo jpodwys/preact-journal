@@ -6,6 +6,11 @@ import actions from '../js/actions';
 import swipe from '../js/swipe';
 import arrow from '../js/arrow';
 
+window.hasViewTransitions = 'startViewTransition' in document;
+document.documentElement.classList.add(
+  hasViewTransitions ? 'has-view-transitions' : 'no-view-transitions'
+);
+
 render(
   <Provider state={getInitialState()} actions={actions}>
     <App />

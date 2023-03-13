@@ -3,22 +3,19 @@ import Icon from '../icon';
 import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
+import { route } from '../router';
 
 const cancelAndBlur = (e) => {
 	e.preventDefault();
 	document.getElementById('filterTextInput').blur();
 }
 
-const getBackHref = (view, filter, filterText) => {
-	if(view === '/search') return '/entries';
-	return filter || filterText ? '/search' : '/entries';
-};
-
-const onBack = (e) => {
-	if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
-	e.preventDefault();
-	e.stopPropagation();
-	history.back();
+const onBack = () => {
+	if (history.length > 1) {
+		history.back();
+	} else {
+		route('/entries');
+	}
 };
 
 const focusSearchInput = () => {
@@ -42,7 +39,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					}
 
 					{(view === '/search' || view === '/entry' || view === '/new') &&
-						<a href={getBackHref(view, filter, filterText)} onclick={onBack}>
+						<a onclick={onBack} class="back-button">
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
 					}

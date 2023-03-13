@@ -2,11 +2,11 @@ import { h, Component } from 'preact';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
-const { pushState } = history;
-history.pushState = (a, b, url) => {
-  pushState.call(history, a, b, url);
-  // scrollTo(0, 0);
-};
+// const { pushState } = history;
+// history.pushState = (a, b, url) => {
+//   pushState.call(history, a, b, url);
+//   scrollTo(0, 0);
+// };
 
 let ROUTER;
 let ONCHANGE;
@@ -36,65 +36,69 @@ const clickListener = function(e) {
 };
 
 const popstateListener = function(e) {
-  // if(ROUTER) ROUTER.setState({ url: location.pathname });
-  // if(ONCHANGE) ONCHANGE(location.pathname);
-  // return;
-
-  let date;
-  let text;
-  const url = ROUTER.state.url;
-  document.documentElement.classList.add('back');
-  const transition = document.startViewTransition(() => {
-    return new Promise((resolve) => {
-      if(ROUTER) ROUTER.setState({ url: location.pathname });
-      if(ONCHANGE) ONCHANGE(location.pathname);
-      setTimeout(() => {
-        // if (url === '/entries' || url === '/search') {
-        //   console.log('ROUTER.props.scrollPosition', ROUTER.props.scrollPosition);
-        //   document.body.scrollTop = ROUTER.props.scrollPosition;
-        // }
-        date = document.querySelector(`a[href="${url}"] .first-row`);
-        text = document.querySelector(`a[href="${url}"] .second-row`);
-        if (date && text) {
-          date.style.viewTransitionName = 'entryDate';
-          text.style.viewTransitionName = 'entryText';
-        }
-        resolve();
-      }, 100);
+  if (hasViewTransitions) {
+    let date;
+    let text;
+    const url = ROUTER.state.url;
+    document.documentElement.classList.add('back');
+    const transition = document.startViewTransition(() => {
+      return new Promise((resolve) => {
+        if(ROUTER) ROUTER.setState({ url: location.pathname });
+        if(ONCHANGE) ONCHANGE(location.pathname);
+        setTimeout(() => {
+          date = document.querySelector(`a[href="${url}"] .first-row`);
+          text = document.querySelector(`a[href="${url}"] .second-row`);
+          if (date && text) {
+            date.style.viewTransitionName = 'entryDate';
+            text.style.viewTransitionName = 'entryText';
+          }
+          resolve();
+        }, 100);
+      });
     });
-  });
-  transition.finished.finally(() => {
-    if (date && text) {
-      date.style.viewTransitionName = '';
-      text.style.viewTransitionName = '';
-    }
-    document.documentElement.classList.remove('back');
-  });
+    transition.finished.finally(() => {
+      if (date && text) {
+        date.style.viewTransitionName = '';
+        text.style.viewTransitionName = '';
+      }
+      document.documentElement.classList.remove('back');
+    });
+  } else {
+    if(ROUTER) ROUTER.setState({ url: location.pathname });
+    if(ONCHANGE) ONCHANGE(location.pathname);
+  }
 };
 
 const route = function(url, replace, isBack){
-  if (isBack) {
-    document.documentElement.classList.add('back');
-  }
-  const date = document.querySelector(`a[href="${url}"] .first-row`);
-  const text = document.querySelector(`a[href="${url}"] .second-row`);
-  if (date && text) {
-    date.style.viewTransitionName = 'entryDate';
-    text.style.viewTransitionName = 'entryText';
-  }
-  const transition = document.startViewTransition(() => {
+  if (hasViewTransitions) {
+    if (isBack) {
+      document.documentElement.classList.add('back');
+    }
+    const date = document.querySelector(`a[href="${url}"] .first-row`);
+    const text = document.querySelector(`a[href="${url}"] .second-row`);
+    if (date && text) {
+      date.style.viewTransitionName = 'entryDate';
+      text.style.viewTransitionName = 'entryText';
+    }
+    const transition = document.startViewTransition(() => {
+      if(ROUTER) ROUTER.setState({ url: url });
+      if(ONCHANGE) ONCHANGE(url);
+      let func = replace ? 'replace' : 'push';
+      history[func + 'State'](null, null, url);
+    });
+    transition.finished.finally(() => {
+      if (date && text) {
+        date.style.viewTransitionName = '';
+        text.style.viewTransitionName = '';
+      }
+      document.documentElement.classList.remove('back');
+    });
+  } else {
     if(ROUTER) ROUTER.setState({ url: url });
     if(ONCHANGE) ONCHANGE(url);
     let func = replace ? 'replace' : 'push';
     history[func + 'State'](null, null, url);
-  });
-  transition.finished.finally(() => {
-    if (date && text) {
-      date.style.viewTransitionName = '';
-      text.style.viewTransitionName = '';
-    }
-    document.documentElement.classList.remove('back');
-  });
+  }
 };
 
 class Router extends Component {

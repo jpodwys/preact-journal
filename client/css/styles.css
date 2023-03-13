@@ -29,7 +29,7 @@ body {
 main {
   margin: 0 auto;
   max-width: 800px;
-  padding: 60px 15px 75px;
+  padding: 60px 15px 22px;
   min-height: calc(100vh - 135px);
 }
 
@@ -543,7 +543,7 @@ body.dark toast {
 
 /* Transitions */
 
-/* @keyframes fade-in {
+@keyframes fade-in {
   from {
     opacity: .25;
   }
@@ -592,37 +592,27 @@ body.dark toast {
   to {
     transform: scale(1);
   }
-} */
+}
 
-/* .fade-in {
+.no-view-transitions .fade-in {
   animation: fade-in ease .2s;
 }
 
-.fade-up {
+.no-view-transitions .fade-up {
   animation: fade-up ease .2s;
 }
 
-.fade-down {
+.no-view-transitions .fade-down {
   animation: fade-down ease .2s;
 }
 
-.fade-right {
+.no-view-transitions .fade-right {
   animation: fade-right ease .35s;
 }
 
-.grow {
+.no-view-transitions .grow {
   animation: grow ease .2s;
-} */
-
-
-
-
-
-
-
-
-
-
+}
 
 @keyframes fade-in {
   from { opacity: 0; }
@@ -666,48 +656,57 @@ body.dark toast {
   }
 }
 
-::view-transition-old(root) {
+@keyframes expand {
+  from {
+    height: 39px;
+  }
+  to {
+    height: initial;
+  }
+}
+
+.has-view-transitions::view-transition-old(root) {
   animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
     200ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-left;
 }
 
-::view-transition-new(root) {
+.has-view-transitions::view-transition-new(root) {
   animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
     200ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-right;
 }
 
-.back::view-transition-old(root) {
+.has-view-transitions.back::view-transition-old(root) {
   animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
     200ms cubic-bezier(0.4, 0, 0.2, 1) both slide-to-right;
 }
 
-.back::view-transition-new(root) {
+.has-view-transitions.back::view-transition-new(root) {
   animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in,
     200ms cubic-bezier(0.4, 0, 0.2, 1) both slide-from-left;
 }
 
-::view-transition-old(fab) {
+.has-view-transitions::view-transition-old(fab) {
   animation: 150ms cubic-bezier(0.4, 0, 1, 1) both zoom-out;
 }
 
-::view-transition-new(fab) {
+.has-view-transitions::view-transition-new(fab) {
   animation: 150ms cubic-bezier(0.4, 0, 1, 1) both zoom-in;
 }
 
-::view-transition-old(entryText),
-::view-transition-new(entryText) {
+.has-view-transitions::view-transition-old(entryText),
+.has-view-transitions::view-transition-new(entryText) {
   mix-blend-mode: normal;
 }
 
-::view-transition-image-pair(entryText) {
+.has-view-transitions::view-transition-image-pair(entryText) {
   isolation: none;
 }
 
-::view-transition-old(entryDate),
-::view-transition-new(entryDate) {
+.has-view-transitions::view-transition-old(entryDate),
+.has-view-transitions::view-transition-new(entryDate) {
   mix-blend-mode: normal;
 }
 
-::view-transition-image-pair(entryDate) {
+.has-view-transitions::view-transition-image-pair(entryDate) {
   isolation: none;
 }
