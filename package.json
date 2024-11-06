@@ -15,6 +15,7 @@
     "test": "karma start test/karma.conf.js --single-run"
   },
   "dependencies": {
+    "aws-ssl-profiles": "^1.1.2",
     "babel-core": "^6.26.0",
     "babel-loader": "7.1.1",
     "babel-plugin-transform-react-jsx": "^6.4.0",
