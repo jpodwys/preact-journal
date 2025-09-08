@@ -25,7 +25,7 @@ self.addEventListener('fetch', e => {
 });
 
 async function fromCache(request) {
-  const respone = caches.match(request, {
+  const response = caches.match(request, {
     ignoreSearch: true
   });
   return response || fetch(request);
