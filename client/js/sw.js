@@ -2,7 +2,7 @@ const CACHE = 'preact-journal';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(cache => {
-    cache.addAll(['/', '/manifest.json', '/version', '/favicon.ico', '/icon-1024.png']);
+    cache.addAll(['/', '/manifest.json', '/version', '/favicon.ico']);
   }));
 });
 
@@ -20,7 +20,6 @@ self.addEventListener('fetch', e => {
   }
 
   e.respondWith(fromCache(reqUrl || e.request));
-
   e.waitUntil(update());
 });
 
