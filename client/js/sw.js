@@ -7,13 +7,13 @@ self.addEventListener('install', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if(e.request.method !== 'GET' && !~e.request.url.indexOf('/version')) return;
-  if(~e.request.url.indexOf('/api')) return;
+  const { method, url } = e.request;
+  if(method !== 'GET' && !~url.indexOf('/version')) return;
+  if(~url.indexOf('/api')) return;
 
   // All routes return the same payload. As such, cache only '/'
   // and return its cached value for all view routes.
   let reqUrl;
-  let url = e.request.url
   if(~url.indexOf('/entries') || ~url.indexOf('/search') || ~url.indexOf('/entry/')){
     reqUrl = '/';
   }
@@ -26,7 +26,8 @@ self.addEventListener('fetch', e => {
 
 function fromCache(request) {
   return caches.open(CACHE).then(cache => {
-    return cache.match(request);
+    const result = cache.match(request);
+    return result || fetch(request);
   });
 }
 
@@ -53,6 +54,6 @@ function update() {
               });
             });
       });
-    }).catch(err => console.log(err));
+    }).catch(console.log);
   });
 }
