@@ -47,6 +47,7 @@
     "preact": "^8.3.1",
     "select": "^1.1.2",
     "sequelize": "^6.2.4",
+    "shrink-ray": "https://github.com/jpodwys/shrink-ray#master",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.6.0"
   },
