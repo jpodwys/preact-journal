@@ -24,10 +24,11 @@ self.addEventListener('fetch', e => {
   e.waitUntil(update());
 });
 
-function fromCache(request) {
-  return caches.open(CACHE).then(cache => {
-    return cache.match(request);
+async function fromCache(request) {
+  const respone = caches.match(request, {
+    ignoreSearch: true
   });
+  return response || fetch(request);
 }
 
 function update() {
