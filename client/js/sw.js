@@ -2,7 +2,7 @@ const CACHE = 'preact-journal';
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(cache => {
-    cache.addAll(['/', '/manifest.json', '/version', '/favicon.ico']);
+    cache.addAll(['/', '/manifest.json', '/version', '/favicon.ico', '/icon-1024.png']);
   }));
 });
 
@@ -10,7 +10,6 @@ self.addEventListener('fetch', e => {
   const { method, url } = e.request;
   if(method !== 'GET' && !~url.indexOf('/version')) return;
   if(~url.indexOf('/api')) return;
-  if(~url.indexOf('manifest') || ~url.indexOf('icon')) return;
 
   // All routes return the same payload. As such, cache only '/'
   // and return its cached value for all view routes.
@@ -20,6 +19,8 @@ self.addEventListener('fetch', e => {
   }
 
   e.respondWith(fromCache(reqUrl || e.request));
+
+  if(~url.indexOf('manifest') || ~url.indexOf('icon')) return;
   e.waitUntil(update());
 });
 
