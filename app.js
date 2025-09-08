@@ -12,15 +12,15 @@ var express = require('express'),
   // which gyp and therefore heroku don't support.
   // This means the app's download size is significantly larger.
   // But this is the price I have to pay for now to get this deployable again.
-  shrinkRay = require('shrink-ray');
-  // compression = require('compression'),
+  // shrinkRay = require('shrink-ray');
+  compression = require('compression'),
   PORT = process.env.PORT || 3000;
 
 app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
-app.use(shrinkRay({ threshold: '1.4kb' }));
-// app.use(compression({ threshold: '1.4kb' }));
+// app.use(shrinkRay({ threshold: '1.4kb' }));
+app.use(compression({ threshold: '1.4kb' }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
