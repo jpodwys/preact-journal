@@ -6,12 +6,19 @@
   "start_url": "/",
   "orientation": "portrait",
   "background_color": "#2b2b2b",
-  "description": "Private journal entries",
+  "description": "Private journal entries.",
   "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/icon-1024.png",
       "sizes": "1024x1024",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
