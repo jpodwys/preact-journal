@@ -66,8 +66,7 @@ function inline() {
       minifyCSS: true
     }))
     .pipe(inlinesource({
-      rootpath: __dirname + '/dist',
-      compress: false
+      rootpath: __dirname + '/dist'
     }))
     .pipe(gulp.dest('./dist'));
 }
