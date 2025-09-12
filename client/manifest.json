@@ -9,9 +9,9 @@
   "description": "Private journal entries.",
   "icons": [
     {
-      "src": "/icon-512.png",
+      "src": "/icon-512.webp",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/webp",
       "purpose": "maskable"
     }
   ]
