@@ -19,7 +19,7 @@ const menu = (dark, view, sort) => (
     {view !== '/entry' && view !== '/new' &&
       <li onclick={() => fire('toggleSort')}>
         <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
-        <span>{sort === 'desc' ? 'Ascending' : 'Descending'}</span>
+        <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
       </li>
     }
     {view !== '/entry' && view !== '/new' &&
