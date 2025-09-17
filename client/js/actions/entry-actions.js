@@ -79,7 +79,7 @@ function syncClientEntries (el){
 function syncEntries (el){
   Entry.sync(el.state.timestamp)
     .then(response => syncEntriesSuccess(el, response))
-    .catch(err => syncEntriesFailure(el, err));
+    .catch(console.log);
   syncClientEntries(el);
 };
 
@@ -115,10 +115,6 @@ function persistSyncPatch (el, timestamp){
       setEntry(el, {id: el.state.entryId});
     }
   });
-};
-
-function syncEntriesFailure (el, err){
-  console.log('syncEntriesFailure', err)
 };
 
 function createEntry (el, { entry, clientSync }){
@@ -254,7 +250,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   Entry.update(entryId, entry)
     .then(() => updateEntrySuccess(el, entryId))
-    .catch(err => updateEntryFailure(el, err));
+    .catch(console.log);
 };
 
 function updateEntrySuccess (el, id){
@@ -273,14 +269,10 @@ function updateEntrySuccess (el, id){
   el.set({ entry, entries });
 };
 
-function updateEntryFailure (el, err){
-  console.log('updateEntryFailure', err);
-};
-
 function putEntry (el, { entry }){
   Entry.update(entry.id, entry)
     .then(() => updateEntrySuccess(el, entry.id))
-    .catch(err => updateEntryFailure(el, err));
+    .catch(console.log);
 };
 
 function showConfirmDeleteEntryModal (el, { entry }){
@@ -310,7 +302,7 @@ function deleteEntry (el, { id }){
 
   Entry.del(id)
     .then(() => deleteEntrySuccess(el, id))
-    .catch(err => deleteEntryFailure(el, err));
+    .catch(console.log);
 };
 
 function deleteEntrySuccess (el, id){
@@ -318,10 +310,6 @@ function deleteEntrySuccess (el, id){
   el.set({
     entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
-};
-
-function deleteEntryFailure (el, err){
-  console.log('deleteEntryFailure', err);
 };
 
 function setEntry (el, { id }){
