@@ -7,7 +7,7 @@ import { fire } from '../../components/unifire';
 function login (el, user){
   User.login(user)
     .then(() => loginSuccess(el))
-    .catch(console.log);
+    .catch(err => loginFailure(el, err));
 };
 
 function loginSuccess (el){
@@ -20,22 +20,34 @@ function loginSuccess (el){
   );
 };
 
+function loginFailure (el, err){
+  console.log('loginFailure', err);
+};
+
 function createAccount (el, user){
   User.create(user)
     .then(() => loginSuccess(el))
-    .catch(console.log);
+    .catch(err => createAccountFailure(el, err));
+};
+
+function createAccountFailure (el, err){
+  console.log('createAccountFailure', err);
 };
 
 function logout (el){
   User.logout()
     .then(() => logoutSuccess(el))
-    .catch(console.log);
+    .catch(err => logoutFailure(el, err));
 };
 
 function logoutSuccess (el){
   clearData();
   el.set(getInitialState());
   route('/');
+};
+
+function logoutFailure (el, err){
+  console.log('logoutFailure', err);
 };
 
 export default { login, createAccount, logout };
