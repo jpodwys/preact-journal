@@ -1,4 +1,4 @@
-export default function(url, config = {}) {
+export default (url, config = {}) => {
   config.credentials = 'same-origin';
   config.headers = {
     'Content-Type': 'application/json',

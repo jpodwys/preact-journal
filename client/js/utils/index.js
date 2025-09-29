@@ -1,10 +1,6 @@
 import { clear } from 'idb-keyval';
 
-function findObjectIndexById (id, list) {
-  return list.map((obj) => {
-    return obj.id;
-  }).indexOf(id);
-};
+const findObjectIndexById = (id, list) => list.map(obj => obj.id).indexOf(id);
 
 function removeObjectByIndex (index, list) {
   list.splice(index, 1);
@@ -40,9 +36,7 @@ function filterObjectsByText (query, list) {
   }, []);
 };
 
-function filterHiddenEntries (entries) {
-  return entries.filter(entry => !entry.deleted);
-};
+const filterHiddenEntries = entries => entries.filter(entry => !entry.deleted);
 
 function filterByFavorited (entries) {
   if(!entries) return entries;

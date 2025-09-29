@@ -16,13 +16,11 @@ function hideKeyboard (el) {
   }, 10);
 }
 
-function tryShareApi (text) {
-  return navigator.share
-    ? navigator.share({ text })
-    : false;
-}
+const tryShareApi = text => navigator.share
+  ? navigator.share({ text })
+  : false;
 
-export default function copyText(text) {
+export default text => {
   if(tryShareApi(text)) return;
   textarea.value = text;
   select(textarea);

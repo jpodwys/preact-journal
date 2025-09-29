@@ -11,7 +11,7 @@ history.pushState = (a, b, url) => {
 let ROUTER;
 let ONCHANGE;
 
-const shouldFollowLink = function(node) {
+const shouldFollowLink = node => {
   if(!node || !node.getAttribute) return false;
   let href = node.getAttribute('href'),
     target = node.getAttribute('target');
@@ -19,14 +19,14 @@ const shouldFollowLink = function(node) {
   return href;
 };
 
-const getLinkTarget = function(target){
+const getLinkTarget = target => {
   while(target && target.nodeName !== 'A'){
     target = target.parentNode;
   }
   return target;
 };
 
-const clickListener = function(e) {
+const clickListener = e => {
   if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
   let href = shouldFollowLink(getLinkTarget(e.target));
   if(href){
@@ -35,12 +35,12 @@ const clickListener = function(e) {
   }
 };
 
-const popstateListener = function(e) {
+const popstateListener = e => {
   if(ONCHANGE) ONCHANGE(location.pathname);
   if(ROUTER) ROUTER.setState({ url: location.pathname });
 };
 
-const route = function(url, replace){
+const route = (url, replace) => {
   if(ONCHANGE) ONCHANGE(url);
   if(ROUTER) ROUTER.setState({ url: url });
   let func = replace ? 'replace' : 'push';

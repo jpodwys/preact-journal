@@ -4,7 +4,7 @@ import { fire } from '../../components/unifire';
 import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
-const cancelAndBlur = (e) => {
+const cancelAndBlur = e => {
 	e.preventDefault();
 	document.getElementById('filterTextInput').blur();
 }
@@ -14,7 +14,7 @@ const getBackHref = (view, filter, filterText) => {
 	return filter || filterText ? '/search' : '/entries';
 };
 
-const onBack = (e) => {
+const onBack = e => {
 	if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
 	e.preventDefault();
 	e.stopPropagation();

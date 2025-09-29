@@ -1,24 +1,24 @@
 import xhr from '../xhr';
 
-function create (user) {
-  return xhr('/api/user', {
+const create = user =>
+  xhr('/api/user', {
     method: 'POST',
     body: user
-  });
-};
+  }
+);
 
-function login (user) {
-  return xhr('/api/user/login', {
+const login = user =>
+  xhr('/api/user/login', {
     method: 'POST',
     body: user
-  });
-};
+  }
+);
 
-function logout () {
-  return xhr('/api/user/logout', {
+const logout = () =>
+  xhr('/api/user/logout', {
     method: 'POST'
-  });
-};
+  }
+);
 
 // function update (user) {
 //   return xhr({
