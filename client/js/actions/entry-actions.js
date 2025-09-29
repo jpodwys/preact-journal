@@ -60,9 +60,7 @@ function getAllEntriesError (el, err){
 
 // Send updates to the server
 function syncClientEntries (el){
-  var entries = el.state.entries;
-  if(!entries.length) return;
-  entries.forEach(entry => {
+  el.state.entries.forEach(entry => {
     if(entry.needsSync){
       var func;
 
