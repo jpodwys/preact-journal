@@ -12,11 +12,13 @@ let ROUTER;
 let ONCHANGE;
 
 const shouldFollowLink = node => {
-  if(!node || !node.getAttribute) return false;
-  let href = node.getAttribute('href'),
-    target = node.getAttribute('target');
-  if (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i))) return false;
-  return href;
+  if(node && node.getAttribute) {
+    let href = node.getAttribute('href'),
+      target = node.getAttribute('target');
+    return (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i)))
+      ? false
+      : true;
+  }
 };
 
 const getLinkTarget = target => {
