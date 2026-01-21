@@ -48,7 +48,7 @@
     "sequelize": "^6.2.4",
     "shrink-ray": "https://github.com/jpodwys/shrink-ray#master",
     "uglifyjs-webpack-plugin": "^1.1.8",
-    "webpack": "^3.6.0"
+    "webpack": "^3.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
