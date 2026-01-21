@@ -67,7 +67,7 @@
     "karma-sinon": "^1.0.5",
     "karma-webpack": "^3.0.5",
     "mocha": "^5.2.0",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.7",
     "path": "^0.12.7",
     "preact-compat-enzyme": "^0.2.5",
     "preact-test-utils": "^0.1.3",
