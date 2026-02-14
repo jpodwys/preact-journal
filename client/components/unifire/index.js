@@ -1,8 +1,6 @@
 import { h, Component, cloneElement } from 'preact';
 
-let EL;
-let STATE;
-let ACTIONS;
+let EL, STATE, ACTIONS;
 
 export function fire (name, payload, e) {
   ACTIONS[name](EL, payload, e);
@@ -14,8 +12,7 @@ export class Provider extends Component {
   constructor(props) {
     super(props);
     EL = this;
-    STATE = this.props.state;
-    ACTIONS = this.props.actions;
+    ({ state: STATE, actions: ACTIONS } = this.props);
     this.child = props.children[0];
     this.state = STATE;
   }

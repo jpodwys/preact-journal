@@ -25,7 +25,7 @@ const EVENT_OPTS = {
  */
 export default class ScrollViewport extends Component {
 	resized = () => {
-		let height = window.innerHeight || document.documentElement.offsetHeight;
+		let height = innerHeight;
 		if (height!==this.state.height) {
 			this.setState({ height });
 		}
@@ -64,12 +64,7 @@ export default class ScrollViewport extends Component {
 
 		// compute estimated height based on first item height and number of items:
 		let estimatedHeight = rowHeight * items.length;
-		if (typeof props.style==='string') {
-			props.style += ' height:'+estimatedHeight+'px;';
-		}
-		else {
-			(props.style || (props.style={})).height = estimatedHeight.toExponential() + 'px';
-		}
+		(props.style || (props.style={})).height = estimatedHeight + 'px';
 
 		let start = 0,
 			visibleRowCount = 1;

@@ -7,8 +7,7 @@ export default (url, config = {}) => {
   if(config.body) config.body = JSON.stringify(config.body);
 
   return fetch(url, config).then(res => {
-    if(res.status >= 300) return Promise.reject(res);
-    if(res.status === 204) return Promise.resolve();
-    return Promise.resolve(res.json());
+    if(res.status >= 300) throw res;
+    if(res.status !== 204) return res.json();
   });
 }

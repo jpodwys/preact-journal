@@ -27,8 +27,7 @@ const observe = (obj, prop, next, prev) => {
     }
     case 'dark': {
       localStorage.setItem('dark', !!next);
-      const func = next ? 'add' : 'remove';
-      document.body.classList[func]('dark');
+      document.body.classList.toggle('dark', !!next);
       break;
     }
     case 'timestamp': localStorage.setItem('timestamp', next); break;

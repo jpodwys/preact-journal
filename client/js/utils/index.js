@@ -1,6 +1,6 @@
 import { clear } from 'idb-keyval';
 
-const findObjectIndexById = (id, list) => list.map(obj => obj.id).indexOf(id);
+const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
 function removeObjectByIndex (index, list) {
   list.splice(index, 1);
@@ -9,13 +9,11 @@ function removeObjectByIndex (index, list) {
 
 function sortObjectsByDate (list, sort = 'desc') {
   if(!list) return [];
-  return list.sort((a, b) => {
-    const aDate = new Date(a.date);
-    const bDate = new Date(b.date);
-    return sort === 'desc'
-      ? bDate - aDate
-      : aDate - bDate;
-  });
+  return list.sort((a, b) =>
+    sort === 'desc'
+      ? (a.date < b.date) - (a.date > b.date)
+      : (a.date > b.date) - (a.date < b.date)
+  );
 };
 
 function filterObjectsByText (query, list) {
@@ -40,7 +38,7 @@ const filterHiddenEntries = entries => entries.filter(entry => !entry.deleted);
 
 function filterByFavorited (entries) {
   if(!entries) return entries;
-  return entries.filter(entry => !!entry.favorited);
+  return entries.filter(entry => entry.favorited);
 };
 
 function applyFilters (view, query, filter, sort, list) {

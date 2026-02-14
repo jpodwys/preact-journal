@@ -1,38 +1,24 @@
 import { fire } from '../../components/unifire';
 
 // Adapted from here: http://codepen.io/yzubizarreta/pen/ojJBQp
-var touchStartCoords =  { x: -1, y: -1 }, // X and Y coordinates on mousedown or touchstart events.
-    touchEndCoords = { x: -1, y: -1 },// X and Y coordinates on mouseup or touchend events.
-    direction,// Swipe direction
-    minDistanceXAxis = 30,// Min distance on mousemove or touchmove on the X axis
-    maxDistanceYAxis = 20,// Max distance on mousemove or touchmove on the Y axis
-    maxAllowedTime = 1000,// Max allowed time between swipeStart and swipeEnd
-    startTime = 0,// Time on swipeStart
-    elapsedTime = 0;// Elapsed time between swipeStart and swipeEnd
+var startX, // X coordinate on touchstart
+    startY, // Y coordinate on touchstart
+    startTime; // Time on swipeStart
 
 function start(e) {
-  e = e ? e : window.event;
-  e = ('changedTouches' in e) ? e.changedTouches[0] : e;
-  touchStartCoords = { x: e.pageX, y: e.pageY };
+  e = e.changedTouches ? e.changedTouches[0] : e;
+  startX = e.pageX;
+  startY = e.pageY;
   startTime = Date.now();
 }
 
 function end(e) {
   const el = document.activeElement;
   if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
-  e = e ? e : window.event;
-  e = ('changedTouches' in e) ? e.changedTouches[0] : e;
-  touchEndCoords = { x: e.pageX - touchStartCoords.x, y: e.pageY - touchStartCoords.y };
-  elapsedTime = Date.now() - startTime;
-  if (elapsedTime <= maxAllowedTime){
-    if (Math.abs(touchEndCoords.x) >= minDistanceXAxis && Math.abs(touchEndCoords.y) < maxDistanceYAxis){
-      direction = touchEndCoords.x < 0 ? 'left' : 'right';
-      if (direction === 'left') {
-        fire('shiftEntry', 1);
-      } else if (direction === 'right') {
-        fire('shiftEntry', -1);
-      }
-    }
+  e = e.changedTouches ? e.changedTouches[0] : e;
+  var dx = e.pageX - startX, dy = e.pageY - startY;
+  if (Date.now() - startTime <= 1000 && Math.abs(dx) >= 30 && Math.abs(dy) < 20){
+    fire('shiftEntry', dx < 0 ? 1 : -1);
   }
 }
 

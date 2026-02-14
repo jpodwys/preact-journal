@@ -5,9 +5,7 @@ import { route } from '../../components/router';
 let timeout;
 
 function linkstate (el, { key, val, cb }) {
-  let obj = {};
-  obj[key] = val;
-  el.set(obj, cb);
+  el.set({ [key]: val }, cb);
 };
 
 function toggleDarkMode (el) {
