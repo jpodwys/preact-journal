@@ -1,8 +1,8 @@
 import { fire } from '../../components/unifire';
 
 const textarea = document.createElement('textarea');
-textarea.setAttribute('tabindex', '-1');
-textarea.setAttribute('style', 'position:absolute;height:1px;width:1px;left:-100px;');
+textarea.tabIndex = -1;
+textarea.style.cssText = 'position:absolute;height:1px;width:1px;left:-100px';
 document.body.appendChild(textarea);
 
 function hideKeyboard (el) {
@@ -15,9 +15,7 @@ function hideKeyboard (el) {
   }, 10);
 }
 
-const tryShareApi = text => navigator.share
-  ? navigator.share({ text })
-  : false;
+const tryShareApi = text => navigator.share && navigator.share({ text });
 
 export default text => {
   if(tryShareApi(text)) return;

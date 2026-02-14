@@ -65,7 +65,7 @@ const modalOptions = (modalType, entry) => {
 export default ({ dialogMode, dark, entry, view, sort }) => {
   if(!dialogMode) return;
 
-  let markup;
+  let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
     markup = menu(dark, view, sort);
   } else {
@@ -73,12 +73,11 @@ export default ({ dialogMode, dark, entry, view, sort }) => {
     if(modalType === 'delete' && !entry) return;
     const { message, confirmText, onConfirm } = modalOptions(modalType, entry);
     markup = modal(message, confirmText, onConfirm);
+    mode = 'modal';
   }
 
-  dialogMode = dialogMode.split(':')[0];
-
   return (
-    <Dialog dialogMode={dialogMode}>
+    <Dialog dialogMode={mode}>
       { markup }
     </Dialog>
   );

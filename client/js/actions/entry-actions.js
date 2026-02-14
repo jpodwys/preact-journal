@@ -50,7 +50,7 @@ function getAllEntries (el){
 function getAllEntriesSuccess (el, { timestamp, entries }){
   el.set({
     timestamp,
-    entries: [].concat(el.state.entries, entries)
+    entries: el.state.entries.concat(entries)
   });
 };
 
@@ -107,7 +107,7 @@ function applySyncPatch (el, entries){
 function persistSyncPatch (el, timestamp){
   el.set({
     timestamp,
-    entries: [].concat(el.state.entries)
+    entries: el.state.entries.slice()
   }, () => {
     if(el.state.view === '/entry' && el.state.entryId){
       setEntry(el, {id: el.state.entryId});
@@ -139,7 +139,7 @@ function createEntry (el, { entry, clientSync }){
 
   el.set({
     entry,
-    entries: [].concat(el.state.entries)
+    entries: el.state.entries.slice()
   });
 
   /**
@@ -206,7 +206,7 @@ function createEntrySuccess (el, oldId, id){
 
   el.set({
     entry: Object.assign({}, el.state.entry),
-    entries: [].concat(el.state.entries)
+    entries: el.state.entries.slice()
   });
 };
 
@@ -221,7 +221,7 @@ function createEntryFailure (el, oldId, err){
   delete el.state.entries[entryIndex].postPending;
   el.set({
     entry: Object.assign({}, el.state.entry),
-    entries: [].concat(el.state.entries)
+    entries: el.state.entries.slice()
   });
   console.log('createEntryFailure', err);
 };
@@ -247,7 +247,7 @@ function updateEntry (el, { entry, property, entryId }){
   activeEntry.needsSync = true;
   el.set({
     entry: Object.assign({}, activeEntry),
-    entries: [].concat(el.state.entries)
+    entries: el.state.entries.slice()
   });
 
   Entry.update(entryId, entry)
@@ -256,7 +256,7 @@ function updateEntry (el, { entry, property, entryId }){
 };
 
 function updateEntrySuccess (el, id){
-  const entries = [].concat(el.state.entries);
+  const entries = el.state.entries.slice();
   const entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
 
@@ -300,7 +300,7 @@ function deleteEntry (el, { id }){
 
   el.set({
     entry: undefined,
-    entries: [].concat(el.state.entries),
+    entries: el.state.entries.slice(),
     dialogMode: ''
   }, () => {
     if(el.state.view !== '/entries') route('/entries', true);
@@ -351,7 +351,7 @@ function newEntry (el){
 
   el.set({
     entry,
-    entries: [entry].concat(el.state.entries)
+    entries: [entry, ...el.state.entries]
   }, function(){
     setEntry(el, { id: entry.id });
   });

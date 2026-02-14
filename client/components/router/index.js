@@ -15,9 +15,7 @@ const shouldFollowLink = node => {
   if(node && node.getAttribute) {
     let href = node.getAttribute('href'),
       target = node.getAttribute('target');
-    return (!href || !href.match(/^\//g) || (target && !target.match(/^_?self$/i)))
-      ? false
-      : href;
+    if(href && href[0] === '/' && (!target || /^_?self$/i.test(target))) return href;
   }
 };
 
@@ -44,9 +42,13 @@ const popstateListener = e => {
 
 const route = (url, replace) => {
   if(ONCHANGE) ONCHANGE(url);
-  if(ROUTER) ROUTER.setState({ url: url });
-  let func = replace ? 'replace' : 'push';
-  history[func + 'State'](null, null, url);
+  if(ROUTER) ROUTER.setState({ url });
+  history[replace ? 'replaceState' : 'pushState'](null, null, url);
+};
+
+const matchWild = (path, url) => {
+  let p = path.split('/'), u = url.split('/');
+  return p.length <= u.length && u.every((s, i) => p[i] === s || (p[i] && p[i][0] === ':'));
 };
 
 class Router extends Component {
@@ -70,25 +72,11 @@ class Router extends Component {
   }
 
   matchUrlWithWildCards(path, url) {
-    const paths = path.split('/');
-    const urls = url.split('/');
-
-    if(paths.length > urls.length) return false;
-
-    for(let i = 0; i < urls.length; i++){
-      if(paths[i] !== urls[i] && paths[i][0] !== ':'){
-        return false;
-      }
-    }
-
-    return true;
+    return matchWild(path, url);
   }
 
   matchPath(url, children) {
-    return children.filter(child => {
-      let path = child.attributes.path;
-      return path === url || this.matchUrlWithWildCards(path, url);
-    });
+    return children.filter(c => c.attributes.path === url || matchWild(c.attributes.path, url));
   }
 
   render({ children }, { url }) {

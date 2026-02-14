@@ -32,6 +32,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
+	const isEntry = view === '/entry' || view === '/new';
 
 	return (
 		<header class="dark-fill">
@@ -41,7 +42,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 						<span class="h3 fade-down">{`${entryCount} Entries`}</span>
 					}
 
-					{(view === '/search' || view === '/entry' || view === '/new') &&
+					{(view === '/search' || isEntry) &&
 						<a href={getBackHref(view, filter, filterText)} onclick={onBack}>
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
@@ -76,13 +77,13 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 							<Icon icon="search" onclick={focusSearchInput} key="header-search" class="fade-down"/>
 						</a>
 					}
-					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+					{entry && !entry.newEntry && isEntry &&
 						<Icon icon="delete" key="header-delete" onclick={() => fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
 					}
-					{(view === '/entry' || view === '/new') &&
+					{isEntry &&
 						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
 					}
-					{entry && !entry.newEntry && (view === '/entry' || view === '/new') &&
+					{entry && !entry.newEntry && isEntry &&
 						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>
 					}
 				</div>
