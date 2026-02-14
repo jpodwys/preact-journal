@@ -36,10 +36,9 @@
     "gulp-clean-css": "^3.9.2",
     "gulp-htmlmin": "^4.0.0",
     "gulp-inline-source": "^4.0.0",
-    "gulp-rename": "^1.2.2",
+    "esbuild": "^0.24.2",
     "gulp-replace": "^0.6.1",
     "gulp-uglify": "^3.0.0",
-    "gulp-webpack": "^1.5.0",
     "idb-keyval": "^3.1.0",
     "jsonwebtoken": "^8.0.0",
     "mysql2": "^1.6.5",
@@ -47,7 +46,6 @@
     "select": "^1.1.2",
     "sequelize": "^6.2.4",
     "shrink-ray": "https://github.com/jpodwys/shrink-ray#master",
-    "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.6.0"
   },
   "devDependencies": {

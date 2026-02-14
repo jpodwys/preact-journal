@@ -7,8 +7,7 @@ var minifyES = composer(terser, console);
 var cleanCSS = require('gulp-clean-css');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
-var rename = require('gulp-rename');
-var webpack = require('gulp-webpack');
+var esbuild = require('esbuild');
 var del = require('del');
 var replace = require('gulp-replace');
 
@@ -18,10 +17,17 @@ function serve(cb) {
 }
 
 function scripts() {
-  return gulp.src('client/js/index.js')
-    .pipe(webpack(require('./webpack.config.babel.js')))
-    .pipe(rename('bundle.js'))
-    .pipe(gulp.dest('./dist'));
+  return esbuild.build({
+    entryPoints: ['client/js/index.js'],
+    bundle: true,
+    minify: true,
+    outfile: 'dist/bundle.js',
+    jsx: 'transform',
+    jsxFactory: 'h',
+    jsxFragment: 'Fragment',
+    loader: { '.js': 'jsx' },
+    target: ['chrome80', 'firefox80', 'safari13', 'edge80'],
+  });
 }
 
 function sw() {
