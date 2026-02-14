@@ -13,6 +13,17 @@ module.exports = function(config) {
           {
             test: /\.js$/,
             use: {
+              loader: 'babel-loader',
+              options: {
+                presets: ['env', 'stage-0'],
+                plugins: [['transform-react-jsx', { pragma: 'h' }]]
+              }
+            },
+            exclude: /node_modules/,
+          },
+          {
+            test: /\.js$/,
+            use: {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }
             },

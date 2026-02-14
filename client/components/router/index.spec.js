@@ -38,6 +38,10 @@ describe('Router', () => {
     it('should match when url has more segments with wildcards', () => {
       expect(router.matchUrlWithWildCards('/entry/:id', '/entry/123')).to.be.true;
     });
+
+    it('should not match when url has more segments than path', () => {
+      expect(router.matchUrlWithWildCards('/entry', '/entry/123/edit')).to.be.false;
+    });
   });
 
   describe('matchPath', () => {
@@ -114,16 +118,14 @@ describe('Router', () => {
   describe('shouldComponentUpdate', () => {
     it('should return true when url changes', () => {
       const router = new Router();
-      router.props = { url: '/old', onChange: null };
-      expect(router.shouldComponentUpdate({ onChange: null }, { url: '/new' })).to.be.true;
+      router.state = { url: '/old' };
+      expect(router.shouldComponentUpdate({}, { url: '/new' })).to.be.true;
     });
 
-    it('should return true when onChange changes', () => {
+    it('should return false when url is the same', () => {
       const router = new Router();
-      const fn1 = () => {};
-      const fn2 = () => {};
-      router.props = { url: '/same', onChange: fn1 };
-      expect(router.shouldComponentUpdate({ onChange: fn2 }, { url: '/same' })).to.be.true;
+      router.state = { url: '/same' };
+      expect(router.shouldComponentUpdate({}, { url: '/same' })).to.be.false;
     });
   });
 

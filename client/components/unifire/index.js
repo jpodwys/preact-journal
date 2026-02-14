@@ -1,12 +1,8 @@
 import { h, Component, cloneElement } from 'preact';
 
-let EL;
-let STATE;
-let ACTIONS;
+let EL, STATE, ACTIONS;
 
-export function fire (name, payload, e) {
-  ACTIONS[name](EL, payload, e);
-};
+export const fire = (name, payload, e) => ACTIONS[name](EL, payload, e);
 
 export class Provider extends Component {
   // Provider expects props.state to be a Proxy object.
