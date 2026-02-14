@@ -49,16 +49,5 @@ module.exports = {
     filename: 'bundle.js',
     path: dist
   },
-  resolve: {
-    alias: {
-      "react-dom/server": "preact-render-to-string",
-      "react-dom/test-utils": "preact-test-utils",
-      "react-dom": "preact-compat-enzyme",
-      "react-test-renderer/shallow": "preact-test-utils",
-      "react-test-renderer": "preact-test-utils",
-      "react-addons-test-utils": "preact-test-utils",
-      "react-addons-transition-group": "preact-transition-group",
-      "react": "preact-compat-enzyme"
-    }
-  }
+  resolve: {}
 }
