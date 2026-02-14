@@ -223,16 +223,13 @@ describe('utils', () => {
   });
 
   describe('clearData', () => {
-    it('should clear indexedDB and localStorage', (done) => {
+    it('should clear indexedDB and localStorage', async () => {
       localStorage.setItem('bogus', 'value');
-      set('bogus', 'value').then(() => {
-        clearData();
-        get('bogus').then(value => {
-          expect(value).to.be.undefined;
-          expect(localStorage.getItem('bogus')).to.be.null;
-          done();
-        });
-      });
+      await set('bogus', 'value');
+      clearData();
+      const value = await get('bogus');
+      expect(value).to.be.undefined;
+      expect(localStorage.getItem('bogus')).to.be.null;
     });
   });
 

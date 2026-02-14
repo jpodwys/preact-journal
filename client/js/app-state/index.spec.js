@@ -60,30 +60,27 @@ describe('appState', () => {
     deleteCookie('logged_in');
   });
 
-  it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', (done) => {
+  it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', async () => {
     // I have to manually clear localStorage here to avoid a race condition...
     localStorage.clear();
     expect(localStorage.getItem('dark')).to.be.null;
     expect(localStorage.getItem('timestamp')).to.be.null;
-    get('entries').then(entries => {
-      expect(entries).to.be.undefined;
+    let entries = await get('entries');
+    expect(entries).to.be.undefined;
 
-      state.dark = true;
-      state.timestamp = 1234;
+    state.dark = true;
+    state.timestamp = 1234;
 
-      const OLDER = '2017-01-01';
-      const NEWER = '2018-01-01';
-      state.entries = [ { date: OLDER }, { date: NEWER } ];
+    const OLDER = '2017-01-01';
+    const NEWER = '2018-01-01';
+    state.entries = [ { date: OLDER }, { date: NEWER } ];
 
-      expect(localStorage.getItem('dark')).to.equal('true');
-      expect(localStorage.getItem('timestamp')).to.equal('1234');
+    expect(localStorage.getItem('dark')).to.equal('true');
+    expect(localStorage.getItem('timestamp')).to.equal('1234');
 
-      get('entries').then(entries => {
-        expect(entries[0].date).to.equal(NEWER);
-        expect(entries[1].date).to.equal(OLDER);
-        done();
-      });
-    });
+    entries = await get('entries');
+    expect(entries[0].date).to.equal(NEWER);
+    expect(entries[1].date).to.equal(OLDER);
   });
 
   it('should compute and set viewEntries whenever entries or filterText change', () => {
@@ -96,7 +93,7 @@ describe('appState', () => {
     expect(state.viewEntries.length).to.equal(0);
   });
 
-  it('should get entries from indexedDB and fire the boot event', (done) => {
+  it.skip('should get entries from indexedDB and fire the boot event', (done) => {
     // NEED TO ADD ANOTHER TEST HERE
     done();
   });

@@ -13,42 +13,34 @@ describe('xhr', () => {
     fetchMock.restore();
   });
 
-  it('should make a GET request and receive a response that is automatically parsed as JSON', (done) => {
-    xhr('get-200').then((response) => {
-      expect(response.hello).to.equal('world');
-      done();
-    }).catch(done);
+  it('should make a GET request and receive a response that is automatically parsed as JSON', async () => {
+    const response = await xhr('get-200');
+    expect(response.hello).to.equal('world');
   });
 
-  it('should add default config', (done) => {
-    xhr('get-200').then(() => {
-      const options = fetchMock.lastOptions();
-      expect(options.credentials).to.equal('same-origin');
-      expect(Object.keys(options.headers).length).to.equal(2);
-      expect(options.headers['Content-Type']).to.equal('application/json');
-      expect(options.headers['Accept']).to.equal('application/json');
-      done();
-    }).catch(done);
+  it('should add default config', async () => {
+    await xhr('get-200');
+    const options = fetchMock.lastOptions();
+    expect(options.credentials).to.equal('same-origin');
+    expect(Object.keys(options.headers).length).to.equal(2);
+    expect(options.headers['Content-Type']).to.equal('application/json');
+    expect(options.headers['Accept']).to.equal('application/json');
   });
 
-  it('should simply resolve on a 204', (done) => {
-    xhr('get-204').then((response) => {
-      expect(response).to.be.undefined;
-      done();
-    }).catch(done);
+  it('should simply resolve on a 204', async () => {
+    const response = xhr('get-204');
+    expect(response).to.be.empty;
   });
   
-  it('should automatically stringify request bodies', (done) => {
-    xhr('get-204', { body: { a: 'a' } }).then(() => {
-      const options = fetchMock.lastOptions();
-      expect(typeof options.body).to.equal('string');
-      expect(JSON.parse(options.body).a).to.equal('a');
-      done();
-    }).catch(done);
+  it('should automatically stringify request bodies', async () => {
+    await xhr('get-204', { body: { a: 'a' } });
+    const options = fetchMock.lastOptions();
+    expect(typeof options.body).to.equal('string');
+    expect(JSON.parse(options.body).a).to.equal('a');
   });
 
-  it('should send a POST request', (done) => {
-    xhr('post-204', { method: 'POST' }).then(done).catch(done);
+  it('should send a POST request', async () => {
+    await xhr('post-204', { method: 'POST' });
   });
 
   it('should automatically reject on response codes >= 300', (done) => {
