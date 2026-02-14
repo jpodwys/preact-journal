@@ -1,4 +1,3 @@
-import select from 'select';
 import { fire } from '../../components/unifire';
 
 const textarea = document.createElement('textarea');
@@ -23,7 +22,8 @@ const tryShareApi = text => navigator.share
 export default text => {
   if(tryShareApi(text)) return;
   textarea.value = text;
-  select(textarea);
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
   let successful = document.execCommand('copy');
   if(successful) fire('setToast');
   hideKeyboard(textarea);

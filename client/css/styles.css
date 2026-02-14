@@ -63,7 +63,6 @@ svg {
 }
 
 .nav-set > * {
-  display: flex;
   position: relative;
   display: inline-block;
   margin: 0;

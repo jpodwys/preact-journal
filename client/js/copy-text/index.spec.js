@@ -14,7 +14,8 @@ describe('copyText', () => {
     });
   });
 
-  it('should fire setToast', () => {
+  it('should fire setToast when the share API is not available', () => {
+    navigator.share = undefined;
     document.execCommand = () => true;
     copyText('bogus');
     expect(setToast.calledWithExactly(provider, undefined, undefined)).to.be.true;
