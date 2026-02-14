@@ -1,7 +1,9 @@
 require('dotenv').load();
 var gulp = require('gulp');
-var babel = require('gulp-babel');
 var uglify = require('gulp-uglify');
+var composer = require('gulp-uglify/composer');
+var terser = require('terser');
+var minifyES = composer(terser, console);
 var cleanCSS = require('gulp-clean-css');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
@@ -25,10 +27,7 @@ function scripts() {
 function sw() {
   return gulp.src('client/js/sw.js')
     .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
-    .pipe(babel({
-      presets: ['env']
-    }))
-    .pipe(uglify())
+    .pipe(minifyES())
     .pipe(gulp.dest('./dist'));
 }
 
