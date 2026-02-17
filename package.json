@@ -39,7 +39,7 @@
     "gulp-htmlmin": "^4.0.0",
     "gulp-inline-source": "^4.0.0",
     "gulp-replace": "^0.6.1",
-    "gulp-uglify": "^3.0.0",
+    "gulp-terser": "^2.1.0",
     "idb-keyval": "^3.1.0",
     "jsonwebtoken": "^8.0.0",
     "mysql2": "^1.6.5",

@@ -1,9 +1,6 @@
 require('dotenv').load();
 var gulp = require('gulp');
-var uglify = require('gulp-uglify');
-var composer = require('gulp-uglify/composer');
-var terser = require('terser');
-var minifyES = composer(terser, console);
+var gulpTerser = require('gulp-terser');
 var cleanCSS = require('gulp-clean-css');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
@@ -36,7 +33,7 @@ function scripts() {
 function sw() {
   return gulp.src('client/js/sw.js')
     .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
-    .pipe(minifyES())
+    .pipe(gulpTerser())
     .pipe(gulp.dest('./dist'));
 }
 
@@ -66,6 +63,12 @@ function clean() {
   return del(['./dist']);
 }
 
+function compress() {
+  return gulp.src('dist/bundle.js')
+    .pipe(gulpTerser())
+    .pipe(gulp.dest('./dist'));
+}
+
 function inline() {
   return gulp.src('client/index.html')
     .pipe(htmlmin({
@@ -84,7 +87,7 @@ function build(cb) {
   return gulp.series(
     clean,
     gulp.parallel(scripts, sw, version, manifest, images),
-    styles,
+    gulp.parallel(styles, compress),
     inline
   )(cb);
 }
