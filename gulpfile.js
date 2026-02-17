@@ -8,6 +8,7 @@ var cleanCSS = require('gulp-clean-css');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
 var esbuild = require('esbuild');
+var browserslist = require('browserslist');
 var del = require('del');
 var replace = require('gulp-replace');
 
@@ -26,7 +27,9 @@ function scripts() {
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
     loader: { '.js': 'jsx' },
-    target: ['chrome80', 'firefox80', 'safari13', 'edge80'],
+    target: browserslist('last 2 versions, not dead, not ie > 0')
+      .filter(b => ['chrome', 'firefox', 'safari', 'edge', 'opera'].some(name => b.startsWith(name)))
+      .map(b => b.replace(' ', '')),
   });
 }
 
@@ -71,7 +74,8 @@ function inline() {
       minifyCSS: true
     }))
     .pipe(inlinesource({
-      rootpath: __dirname + '/dist'
+      rootpath: __dirname + '/dist',
+      compress: false
     }))
     .pipe(gulp.dest('./dist'));
 }
