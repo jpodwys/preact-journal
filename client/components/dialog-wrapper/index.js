@@ -1,12 +1,20 @@
 import { h } from 'preact';
 import Dialog from '../dialog';
 import Icon from '../icon';
+import SwitchAccount from '../switch-account';
 import { fire } from '../unifire';
 
 const onLogout = () => {
   fire('linkstate', {
     key: 'dialogMode',
     cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }))
+  });
+};
+
+const onSwitch = () => {
+  fire('linkstate', {
+    key: 'dialogMode',
+    cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:switch' }))
   });
 };
 
@@ -28,6 +36,10 @@ const menu = (dark, view, sort) => (
         <span>Export</span>
       </li>
     }
+    <li onclick={onSwitch}>
+      <Icon icon="people"/>
+      <span>Switch</span>
+    </li>
     <li onclick={onLogout}>
       <Icon icon="logout"/>
       <span>Logout</span>
@@ -62,7 +74,7 @@ const modalOptions = (modalType, entry) => {
   }
 };
 
-export default ({ dialogMode, dark, entry, view, sort }) => {
+export default ({ dialogMode, dark, entry, view, sort, userId }) => {
   if(!dialogMode) return;
 
   let markup, mode = dialogMode;
@@ -70,10 +82,15 @@ export default ({ dialogMode, dark, entry, view, sort }) => {
     markup = menu(dark, view, sort);
   } else {
     const modalType = dialogMode.split(':')[1];
-    if(modalType === 'delete' && !entry) return;
-    const { message, confirmText, onConfirm } = modalOptions(modalType, entry);
-    markup = modal(message, confirmText, onConfirm);
-    mode = 'modal';
+    if(modalType === 'switch') {
+      markup = <SwitchAccount userId={userId}/>;
+      mode = 'modal';
+    } else {
+      if(modalType === 'delete' && !entry) return;
+      const { message, confirmText, onConfirm } = modalOptions(modalType, entry);
+      markup = modal(message, confirmText, onConfirm);
+      mode = 'modal';
+    }
   }
 
   return (

@@ -46,6 +46,7 @@ export default (props) => {
         sort={props.sort}
         entry={props.entry}
         view={props.view}
+        userId={props.userId}
         dialogMode={props.dialogMode}/>
       <Toast toast={props.toast}/>
     </div>
