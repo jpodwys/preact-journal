@@ -534,6 +534,26 @@ body.dark toast {
   filter: brightness(150%);
 }
 
+body.dark .login-form-wrapper input {
+  background-color: #1a1a1a;
+  border-color: #555;
+  box-shadow: none;
+  color: var(--theme-dark-text) !important;
+}
+
+body.dark .login-form-wrapper input[type=submit] {
+  background-color: var(--theme-dark-blue);
+  border: none;
+}
+
+body.dark .login-form-wrapper legend {
+  border-bottom-color: #555;
+}
+
+body.dark .login-cancel {
+  border-color: #888;
+}
+
 /* Transitions */
 
 @keyframes fade-in {
