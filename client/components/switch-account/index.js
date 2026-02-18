@@ -32,7 +32,7 @@ export default ({ userId }) => {
         <ul class="switch-account-list">
           {accounts.map(a => (
             <div key={a.id} onclick={() => onSwitch(a.id)}>
-              <button class="entry-link mdl-button full-width">
+              <button class="mdl-button full-width">
                 {a.username}
               </button>
             </div>
