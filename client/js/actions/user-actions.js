@@ -33,13 +33,26 @@ function loginSuccess (el, { id, username }){
   accounts = setActiveAccount(accounts, id);
   saveAccounts(accounts);
 
-  el.set(
-    { loggedIn: true, userId: String(id), username },
-    () => {
+  fire('resetDataFetched');
+
+  get('entries_' + id).then((entries = []) => {
+    var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
+
+    el.set({
+      loggedIn: true,
+      userId: String(id),
+      username,
+      entries,
+      timestamp,
+      entry: undefined,
+      entryIndex: -1,
+      filter: '',
+      filterText: ''
+    }, () => {
       fire('getEntries');
       route('/entries', true);
-    }
-  );
+    });
+  });
 };
 
 function loginFailure (el, err){

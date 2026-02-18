@@ -168,25 +168,42 @@ describe('actions', () => {
 
     describe('login', () => {
 
-      it('should login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
-        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
-        User.login(el, USER);
-        setTimeout(() => {
-          expect(el.set.args[0][0].loggedIn).to.be.true;
-          expect(el.set.args[0][0].userId).to.equal('1');
-          expect(el.set.args[0][0].username).to.equal('bogus');
-          expect(typeof el.set.args[0][1]).to.equal('function');
-          done();
-        }, 10);
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
+        });
       });
 
-      it('should add the account to localStorage and deactivate other accounts', (done) => {
+      it('should login, reset data, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
+        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.login(el, USER);
+        }).then(() => {
+          var args = el.set.args[0][0];
+          expect(args.loggedIn).to.be.true;
+          expect(args.userId).to.equal('1');
+          expect(args.username).to.equal('bogus');
+          expect(args.entries).to.be.an('array');
+          expect(args.entry).to.be.undefined;
+          expect(args.entryIndex).to.equal(-1);
+          expect(args.filter).to.equal('');
+          expect(args.filterText).to.equal('');
+          expect(typeof el.set.args[0][1]).to.equal('function');
+        });
+      });
+
+      it('should add the account to localStorage and deactivate other accounts', () => {
         localStorage.clear();
         var existing = [{ id: 5, username: 'other', active: true }];
         localStorage.setItem('accounts', JSON.stringify(existing));
         fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
-        User.login(el, USER);
-        setTimeout(() => {
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.login(el, USER);
+        }).then(() => {
           var accounts = JSON.parse(localStorage.getItem('accounts'));
           expect(accounts.length).to.equal(2);
           var newAcct = accounts.find(a => a.id === 1);
@@ -194,8 +211,7 @@ describe('actions', () => {
           expect(newAcct.active).to.be.true;
           expect(newAcct.username).to.equal('bogus');
           expect(oldAcct.active).to.be.false;
-          done();
-        }, 10);
+        });
       });
 
       it('should log an error', (done) => {
@@ -212,16 +228,28 @@ describe('actions', () => {
 
     describe('create', () => {
 
-      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
+        });
+      });
+
+      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
         fetchMock.post('/api/user', { status: 200, body: { id: 2, username: 'bogus' } });
-        User.createAccount(el, USER);
-        setTimeout(() => {
-          expect(el.set.args[0][0].loggedIn).to.be.true;
-          expect(el.set.args[0][0].userId).to.equal('2');
-          expect(el.set.args[0][0].username).to.equal('bogus');
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.createAccount(el, USER);
+        }).then(() => {
+          var args = el.set.args[0][0];
+          expect(args.loggedIn).to.be.true;
+          expect(args.userId).to.equal('2');
+          expect(args.username).to.equal('bogus');
+          expect(args.entries).to.be.an('array');
+          expect(args.entry).to.be.undefined;
           expect(typeof el.set.args[0][1]).to.equal('function');
-          done();
-        }, 10);
+        });
       });
 
       it('should log an error', (done) => {
