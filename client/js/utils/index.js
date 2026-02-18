@@ -1,4 +1,4 @@
-import { clear } from 'idb-keyval';
+import { clear, del } from 'idb-keyval';
 
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
@@ -61,9 +61,14 @@ function isActiveEntryId (el, id) {
   return el.state.entry.id === id;
 };
 
-function clearData () {
-  clear();
-  localStorage.clear();
+function clearData (userId) {
+  if(userId) {
+    del('entries_' + userId);
+    localStorage.removeItem('timestamp_' + userId);
+  } else {
+    clear();
+    localStorage.clear();
+  }
 };
 
 export {

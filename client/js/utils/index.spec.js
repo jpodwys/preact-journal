@@ -231,6 +231,22 @@ describe('utils', () => {
       expect(value).to.be.undefined;
       expect(localStorage.getItem('bogus')).to.be.null;
     });
+
+    it('should only clear the specified user data when userId is provided', async () => {
+      localStorage.setItem('timestamp_42', '1234');
+      localStorage.setItem('timestamp_99', '5678');
+      await set('entries_42', [{ id: 1 }]);
+      await set('entries_99', [{ id: 2 }]);
+
+      clearData('42');
+
+      expect(localStorage.getItem('timestamp_42')).to.be.null;
+      expect(localStorage.getItem('timestamp_99')).to.equal('5678');
+      const cleared = await get('entries_42');
+      const kept = await get('entries_99');
+      expect(cleared).to.be.undefined;
+      expect(kept).to.deep.equal([{ id: 2 }]);
+    });
   });
 
 });

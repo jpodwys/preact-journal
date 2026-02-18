@@ -1,5 +1,4 @@
 import { get, set } from 'idb-keyval';
-import cookie from '../cookie';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
 import { fire } from '../../components/unifire';
 
@@ -22,7 +21,7 @@ const observe = (obj, prop, next, prev) => {
     }
     case 'entries': {
       obj.entries = sortObjectsByDate(next);
-      set('entries', obj.entries);
+      set('entries_' + obj.userId, obj.entries);
       break;
     }
     case 'dark': {
@@ -30,7 +29,7 @@ const observe = (obj, prop, next, prev) => {
       document.body.classList.toggle('dark', !!next);
       break;
     }
-    case 'timestamp': localStorage.setItem('timestamp', next); break;
+    case 'timestamp': localStorage.setItem('timestamp_' + obj.userId, next); break;
   }
 };
 
@@ -44,12 +43,27 @@ const handler = {
   }
 };
 
+function getAccounts () {
+  try {
+    return JSON.parse(localStorage.getItem('accounts')) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
 export default function getInitialState () {
-  let loggedIn = !!cookie.get('logged_in');
-  if(!loggedIn) clearData();
+  let accounts = getAccounts();
+  let active = accounts.find(a => a.active);
+  let loggedIn = !!active;
+  let userId = active ? String(active.id) : '';
+  let username = active ? active.username : '';
+
+  if(!loggedIn && accounts.length === 0) clearData();
 
   let state = {
     loggedIn,
+    userId,
+    username,
     entries: [],
     viewEntries: [],
     scrollPosition: 0,
@@ -58,17 +72,16 @@ export default function getInitialState () {
     filterText: '',
     entryIndex: -1,
     entry: undefined,
-    // Included for documentation purporses
-    // toast: '',
-    // dialogMode: '',
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
-    timestamp: localStorage.getItem('timestamp') || undefined
+    timestamp: userId ? localStorage.getItem('timestamp_' + userId) || undefined : undefined
   };
 
-  get('entries').then((entries = []) => {
-    fire('boot', { entries });
-  }).catch();
+  if(loggedIn) {
+    get('entries_' + userId).then((entries = []) => {
+      fire('boot', { entries });
+    }).catch();
+  }
 
   // Now that I'm setting a class to body, I
   // have to ensure it gets set on load.
