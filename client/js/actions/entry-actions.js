@@ -81,9 +81,13 @@ function syncEntries (el){
   syncClientEntries(el);
 };
 
+function resetDataFetched () {
+  dataFetched = false;
+};
+
 function syncEntriesSuccess (el, { entries, timestamp }){
   if(entries.length === 0){
-    localStorage.setItem('timestamp', timestamp);
+    el.set({ timestamp });
     return;
   }
 
@@ -400,6 +404,7 @@ function exportEntries (el) {
 export default {
   boot,
   getEntries,
+  resetDataFetched,
   createEntry,
   updateEntry,
   showConfirmDeleteEntryModal,
