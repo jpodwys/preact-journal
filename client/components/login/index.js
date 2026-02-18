@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { fire } from '../../components/unifire';
+import { route } from '../../components/router';
 
 const getUser = prefix => ({
   username: document.getElementById(prefix + 'user').value,
@@ -16,7 +17,7 @@ const login = e => {
   fire('login', getUser('l'));
 }
 
-export default () => {
+export default ({ cancelable }) => {
   /**
    * For some reason, the input values are still there when this
    * component unrenders then re-renders. Using dynamic keys fixes
@@ -45,6 +46,11 @@ export default () => {
               <input type="submit" value="Submit"/>
             </fieldset>
           </form>
+          {cancelable &&
+            <button class="login-cancel mdl-button full-width" onclick={() => route('/entries')}>
+              Cancel
+            </button>
+          }
         </div>
     </div>
   );

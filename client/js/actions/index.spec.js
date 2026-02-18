@@ -146,6 +146,18 @@ describe('actions', () => {
         expect(newEntry.calledWithExactly(provider, undefined, undefined)).to.be.true;
       });
 
+      it('should not redirect on /switch while logged in', () => {
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, '/switch');
+        expect(replaceStateCall).to.be.undefined;
+        expect(el.set.args[0][0].view).to.equal('/switch');
+      });
+
+      it('should redirect to / on /switch while logged out', () => {
+        Global.handleRouteChange(el, '/switch');
+        expect(replaceStateCall).to.equal('/');
+      });
+
       it('should fire setEntry on /entry/:id', () => {
         const setEntry = sinon.spy();
         const provider = new Provider({

@@ -195,6 +195,10 @@ describe('utils', () => {
     it('should return / when passed /', () => {
       expect(getViewFromPathname(rootHref)).to.equal('/');
     });
+
+    it('should return /switch when passed /switch', () => {
+      expect(getViewFromPathname('/switch')).to.equal('/switch');
+    });
   });
 
   describe('isActiveEntryId', () => {

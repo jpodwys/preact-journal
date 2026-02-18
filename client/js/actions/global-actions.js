@@ -34,6 +34,7 @@ function handleRouteChange (el, url) {
 function handleRoute (el, view, url) {
   switch(view) {
     case '/':         handleLoginView(el);    break;
+    case '/switch':   break;
     case '/entries':  // Fallthrough
     case '/search':   handleEntriesView(el);  break;
     case '/entry':    // Fallthrough

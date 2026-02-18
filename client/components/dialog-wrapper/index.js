@@ -3,6 +3,7 @@ import Dialog from '../dialog';
 import Icon from '../icon';
 import SwitchAccount from '../switch-account';
 import { fire } from '../unifire';
+import { route } from '../router';
 
 const onLogout = () => {
   fire('linkstate', {
@@ -11,14 +12,28 @@ const onLogout = () => {
   });
 };
 
-const onSwitch = () => {
-  fire('linkstate', {
-    key: 'dialogMode',
-    cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:switch' }))
-  });
+function getOtherAccounts (userId) {
+  try {
+    var accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+    return accounts.filter(a => String(a.id) !== String(userId));
+  } catch(e) {
+    return [];
+  }
+}
+
+const onSwitch = (userId) => {
+  if(getOtherAccounts(userId).length > 0) {
+    fire('linkstate', {
+      key: 'dialogMode',
+      cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:switch' }))
+    });
+  } else {
+    fire('linkstate', { key: 'dialogMode' });
+    route('/switch');
+  }
 };
 
-const menu = (dark, view, sort) => (
+const menu = (dark, view, sort, userId) => (
   <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
     <li onclick={() => fire('toggleDarkMode')}>
       <Icon icon={dark ? 'sun' : 'moon'}/>
@@ -36,7 +51,7 @@ const menu = (dark, view, sort) => (
         <span>Export</span>
       </li>
     }
-    <li onclick={onSwitch}>
+    <li onclick={() => onSwitch(userId)}>
       <Icon icon="people"/>
       <span>Switch</span>
     </li>
@@ -79,7 +94,7 @@ export default ({ dialogMode, dark, entry, view, sort, userId }) => {
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
-    markup = menu(dark, view, sort);
+    markup = menu(dark, view, sort, userId);
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'switch') {
