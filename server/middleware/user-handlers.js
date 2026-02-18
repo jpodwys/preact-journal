@@ -2,28 +2,25 @@ var jwt = require('jsonwebtoken'),
   AES = require('../utils/aes'),
   date = require('../utils/date');
 
+function getCookieOpts () {
+  return {
+    httpOnly: (process.env.NODE_ENV === 'production'),
+    secure: (process.env.NODE_ENV === 'production'),
+    expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 90)) // One month
+  };
+}
+
 var loginOrCreate = function(req, res, user) {
-  var expiration = (new Date((new Date()).getTime() + (60 * 60 * 1000 * 24 * 30))); // One month
   user.deviceId = date.getLastFiveFromTimestamp();
-  jwt.sign(user, process.env.JWT_KEY, { expiresIn: '30d' }, function(err, token){
-    // Something went wrong when signing the token
+  jwt.sign(user, process.env.JWT_KEY, { expiresIn: '90d' }, function(err, token){
     if(err) return res.status(500).send(err);
 
-    // This cookie proves a user is logged in and contains JWT claims
-    res.cookie('auth_token', AES.encrypt(token), {
-      httpOnly: (process.env.NODE_ENV === 'production'),
-      secure: (process.env.NODE_ENV === 'production'),
-      expires: expiration
-    });
-    // This cookie contains no data. It is solely for the client to
-    // determine things about the UI since the auth_token cookie
-    // is not accessible to a browser's JavaScript.
-    res.cookie('logged_in', 'true', {
-      secure: (process.env.NODE_ENV === 'production'),
-      expires: expiration
-    });
+    var encrypted = AES.encrypt(token);
+    var cookieOpts = getCookieOpts();
 
-    res.sendStatus(204);
+    res.cookie('auth_token', encrypted, cookieOpts);
+    res.cookie('auth_token_' + user.id, encrypted, cookieOpts);
+    res.status(200).json({ id: user.id, username: user.username });
   });
 };
 
@@ -32,9 +29,27 @@ exports.attemptLogin = loginOrCreate;
 exports.createAccount = loginOrCreate;
 
 exports.logout = function(req, res) {
+  var userId = req.user && req.user.id;
   res.clearCookie('auth_token');
-  res.clearCookie('logged_in');
+  if(userId) res.clearCookie('auth_token_' + userId);
   res.sendStatus(204);
+}
+
+exports.switchAccount = function(req, res) {
+  var userId = req.body.userId;
+  var cookie = req.cookies['auth_token_' + userId];
+
+  if(!cookie) return res.sendStatus(401);
+
+  try {
+    var token = AES.decrypt(cookie);
+    var decoded = jwt.verify(token, process.env.JWT_KEY);
+
+    res.cookie('auth_token', cookie, getCookieOpts());
+    res.status(200).json({ id: decoded.id, username: decoded.username });
+  } catch(err) {
+    res.sendStatus(401);
+  }
 }
 
 exports.getUserCount = function(req, res, total) {
