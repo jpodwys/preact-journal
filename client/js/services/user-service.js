@@ -1,23 +1,30 @@
-import xhr from '../xhr';
+import api from '../api';
 
 const create = user =>
-  xhr('/api/user', {
+  api('/api/user', {
     method: 'POST',
     body: user
   }
 );
 
 const login = user =>
-  xhr('/api/user/login', {
+  api('/api/user/login', {
     method: 'POST',
     body: user
   }
 );
 
 const logout = () =>
-  xhr('/api/user/logout', {
+  api('/api/user/logout', {
     method: 'POST'
   }
+);
+
+const switchAccount = (userId) =>
+  api('/api/user/switch', {
+    method: 'POST',
+    body: { userId }
+  }, { skipAuth: true }
 );
 
 // function update (user) {
@@ -35,4 +42,4 @@ const logout = () =>
 //   });
 // };
 
-export default { create, login, logout };
+export default { create, login, logout, switchAccount };

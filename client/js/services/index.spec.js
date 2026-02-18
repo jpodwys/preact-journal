@@ -31,7 +31,16 @@ describe('services', () => {
       fetchMock.post('/api/user/logout', 204);
       await User.logout();
     });
-      
+
+    it('should call the switchAccount endpoint with a userId', async () => {
+      fetchMock.post('/api/user/switch', { status: 200, body: { id: 5, username: 'other' } });
+      const response = await User.switchAccount('5');
+      const options = fetchMock.lastOptions();
+      expect(typeof options.body).to.equal('string');
+      expect(JSON.parse(options.body).userId).to.equal('5');
+      expect(response.id).to.equal(5);
+    });
+
   });
 
   describe('entryService', () => {
