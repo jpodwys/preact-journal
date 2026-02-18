@@ -9,7 +9,6 @@ module.exports = app => {
   /* REST endpoints */
   app.post('/api/user/login', user.attemptLogin);
   app.post('/api/user/logout', app.restrict, userHandlers.logout);
-  app.post('/api/user/switch', userHandlers.switchAccount);
   // This endpoint does work, but I don't want it to be accessible any more
   // app.post('/api/user', user.createAccount);
   // app.patch('/user/:id');

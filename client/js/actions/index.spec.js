@@ -316,7 +316,6 @@ describe('actions', () => {
         ];
         localStorage.setItem('accounts', JSON.stringify(accounts));
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
-        fetchMock.post('/api/user/switch', { status: 200, body: { id: 50, username: 'other' } });
         el.state.userId = '99';
         User.logout(el);
         setTimeout(() => {
@@ -347,7 +346,6 @@ describe('actions', () => {
           { id: 2, username: 'other', active: false }
         ];
         localStorage.setItem('accounts', JSON.stringify(accounts));
-        fetchMock.post('/api/user/switch', { status: 200, body: { id: 2, username: 'other' } });
 
         return new Promise(resolve => {
           el.set = sinon.spy(resolve);
@@ -363,22 +361,14 @@ describe('actions', () => {
         });
       });
 
-      it('should mark the account as expired on failure and show a toast', (done) => {
+      it('should do nothing when the account is not found', () => {
         localStorage.clear();
         var accounts = [
-          { id: 1, username: 'current', active: true },
-          { id: 2, username: 'other', active: false }
+          { id: 1, username: 'current', active: true }
         ];
         localStorage.setItem('accounts', JSON.stringify(accounts));
-        fetchMock.post('/api/user/switch', Promise.resolve({ status: 401 }));
-        User.switchAccount(el, '2');
-        setTimeout(() => {
-          var updated = JSON.parse(localStorage.getItem('accounts'));
-          expect(updated.find(a => a.id === 2).expired).to.be.true;
-          expect(updated.find(a => a.id === 2).username).to.equal('other');
-          expect(el.set.args[0][0].toast).to.be.a('string');
-          done();
-        }, 10);
+        User.switchAccount(el, '999');
+        expect(el.set.called).to.be.false;
       });
 
     });
@@ -412,7 +402,6 @@ describe('actions', () => {
           { id: 2, username: 'valid-user', active: false }
         ];
         localStorage.setItem('accounts', JSON.stringify(accounts));
-        fetchMock.post('/api/user/switch', { status: 200, body: { id: 2, username: 'valid-user' } });
         el.state.userId = '1';
         User.handleExpiredSession(el, '1');
         setTimeout(() => {
@@ -493,9 +482,9 @@ describe('actions', () => {
             setTimeout(() => {
               expect(el.set.called).to.be.true;
               done();
-            });
-          });
-        });
+            }, 10);
+          }, 10);
+        }, 10);
       });
 
     });

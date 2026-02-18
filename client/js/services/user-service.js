@@ -20,13 +20,6 @@ const logout = () =>
   }
 );
 
-const switchAccount = (userId) =>
-  api('/api/user/switch', {
-    method: 'POST',
-    body: { userId }
-  }, { skipAuth: true }
-);
-
 // function update (user) {
 //   return xhr({
 //     url: '/api/user/' + data.id,
@@ -42,4 +35,4 @@ const switchAccount = (userId) =>
 //   });
 // };
 
-export default { create, login, logout, switchAccount };
+export default { create, login, logout };

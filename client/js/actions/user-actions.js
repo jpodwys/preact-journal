@@ -86,23 +86,12 @@ function logoutFailure (el, err){
 };
 
 function switchAccount (el, userId) {
-  User.switchAccount(userId)
-    .then(({ data }) => switchAccountSuccess(el, data))
-    .catch(err => switchAccountFailure(el, userId, err));
-};
-
-function switchAccountSuccess (el, { id, username }) {
-  var accounts = setActiveAccount(getAccounts(), id);
+  var accounts = getAccounts();
+  var account = accounts.find(a => String(a.id) === String(userId));
+  if(!account) return;
+  accounts = setActiveAccount(accounts, account.id);
   saveAccounts(accounts);
-  activateAccount(el, { id, username }, { dialogMode: '' });
-};
-
-function switchAccountFailure (el, userId, err) {
-  var accounts = getAccounts().map(a =>
-    String(a.id) === String(userId) ? Object.assign({}, a, { expired: true }) : a
-  );
-  saveAccounts(accounts);
-  el.set({ toast: 'Session expired. Please log in again.' });
+  activateAccount(el, { id: account.id, username: account.username }, { dialogMode: '' });
 };
 
 function handleExpiredSession (el, userId) {
