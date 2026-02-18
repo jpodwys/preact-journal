@@ -13,7 +13,9 @@ function getActiveUserId () {
 
 export default (url, config, { skipAuth } = {}) => {
   var userId = getActiveUserId();
-  return xhr(url, config).catch(err => {
+  return xhr(url, config).then(data => {
+    return { data, userId };
+  }).catch(err => {
     if(!skipAuth && err.status === 401) fire('handleExpiredSession', userId);
     throw err;
   });

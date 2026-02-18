@@ -1,11 +1,19 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex, isActiveEntryId } from '../utils';
+import { findObjectIndexById, removeObjectByIndex, isActiveEntryId, sortObjectsByDate } from '../utils';
+import { get, set } from 'idb-keyval';
 import exportAllEntries from '../../js/export-entries';
 import debounce from '../debounce';
 import { route } from '../../components/router';
 import { fire } from '../../components/unifire';
 
 let dataFetched = false;
+
+function updateIdbEntries (userId, updater) {
+  get('entries_' + userId).then((entries = []) => {
+    var updated = updater(entries);
+    if(updated !== false) set('entries_' + userId, sortObjectsByDate(updated || entries));
+  });
+}
 
 function boot (el, { entries }){
   el.set({ entries }, () => {
@@ -43,11 +51,16 @@ function getEntries (el){
 
 function getAllEntries (el){
   Entry.getAll()
-    .then(response => getAllEntriesSuccess(el, response))
+    .then(({ data, userId }) => getAllEntriesSuccess(el, userId, data))
     .catch(err => getAllEntriesError(el, err));
 };
 
-function getAllEntriesSuccess (el, { timestamp, entries }){
+function getAllEntriesSuccess (el, userId, { timestamp, entries }){
+  if(el.state.userId !== userId) {
+    updateIdbEntries(userId, idbEntries => idbEntries.concat(entries));
+    localStorage.setItem('timestamp_' + userId, timestamp);
+    return;
+  }
   el.set({
     timestamp,
     entries: el.state.entries.concat(entries)
@@ -76,7 +89,7 @@ function syncClientEntries (el){
 // Get updates from the server
 function syncEntries (el){
   Entry.sync(el.state.timestamp)
-    .then(response => syncEntriesSuccess(el, response))
+    .then(({ data, userId }) => syncEntriesSuccess(el, userId, data))
     .catch(err => syncEntriesFailure(el, err));
   syncClientEntries(el);
 };
@@ -85,7 +98,23 @@ function resetDataFetched () {
   dataFetched = false;
 };
 
-function syncEntriesSuccess (el, { entries, timestamp }){
+function syncEntriesSuccess (el, userId, { entries, timestamp }){
+  if(el.state.userId !== userId) {
+    updateIdbEntries(userId, idbEntries => {
+      entries.forEach(entry => {
+        var idx = findObjectIndexById(entry.id, idbEntries);
+        if(idx > -1) {
+          if(entry.deleted) idbEntries.splice(idx, 1);
+          else idbEntries[idx] = entry;
+        } else if(!entry.deleted) {
+          idbEntries.push(entry);
+        }
+      });
+    });
+    localStorage.setItem('timestamp_' + userId, timestamp);
+    return;
+  }
+
   if(entries.length === 0){
     el.set({ timestamp });
     return;
@@ -173,11 +202,24 @@ function createEntry (el, { entry, clientSync }){
   if(!clientSync && postPending) return;
 
   Entry.create({ date: entry.date, text: entry.text })
-    .then(response => createEntrySuccess(el, entry.id, response.id))
+    .then(({ data, userId }) => createEntrySuccess(el, userId, entry.id, data.id))
     .catch(err => createEntryFailure(el, entry.id, err));
 };
 
-function createEntrySuccess (el, oldId, id){
+function createEntrySuccess (el, userId, oldId, id){
+  if(el.state.userId !== userId) {
+    updateIdbEntries(userId, entries => {
+      var idx = findObjectIndexById(oldId, entries);
+      if(idx > -1) {
+        entries[idx].id = id;
+        delete entries[idx].postPending;
+        delete entries[idx].newEntry;
+        delete entries[idx].needsSync;
+      }
+    });
+    return;
+  }
+
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
   /**
@@ -255,11 +297,19 @@ function updateEntry (el, { entry, property, entryId }){
   });
 
   Entry.update(entryId, entry)
-    .then(() => updateEntrySuccess(el, entryId))
+    .then(({ userId }) => updateEntrySuccess(el, userId, entryId))
     .catch(err => updateEntryFailure(el, err));
 };
 
-function updateEntrySuccess (el, id){
+function updateEntrySuccess (el, userId, id){
+  if(el.state.userId !== userId) {
+    updateIdbEntries(userId, entries => {
+      var idx = findObjectIndexById(id, entries);
+      if(idx > -1) delete entries[idx].needsSync;
+    });
+    return;
+  }
+
   const entries = el.state.entries.slice();
   const entryIndex = findObjectIndexById(id, entries);
   delete entries[entryIndex].needsSync;
@@ -281,7 +331,7 @@ function updateEntryFailure (el, err){
 
 function putEntry (el, { entry }){
   Entry.update(entry.id, entry)
-    .then(() => updateEntrySuccess(el, entry.id))
+    .then(({ userId }) => updateEntrySuccess(el, userId, entry.id))
     .catch(err => updateEntryFailure(el, err));
 };
 
@@ -311,11 +361,19 @@ function deleteEntry (el, { id }){
   });
 
   Entry.del(id)
-    .then(() => deleteEntrySuccess(el, id))
+    .then(({ userId }) => deleteEntrySuccess(el, userId, id))
     .catch(err => deleteEntryFailure(el, err));
 };
 
-function deleteEntrySuccess (el, id){
+function deleteEntrySuccess (el, userId, id){
+  if(el.state.userId !== userId) {
+    updateIdbEntries(userId, entries => {
+      var idx = findObjectIndexById(id, entries);
+      if(idx > -1) entries.splice(idx, 1);
+    });
+    return;
+  }
+
   var entryIndex = findObjectIndexById(id, el.state.entries);
   el.set({
     entries: removeObjectByIndex(entryIndex, el.state.entries)

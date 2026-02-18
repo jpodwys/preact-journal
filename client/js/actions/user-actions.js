@@ -23,7 +23,7 @@ function setActiveAccount (accounts, id) {
 
 function login (el, user){
   User.login(user)
-    .then(data => loginSuccess(el, data))
+    .then(({ data }) => loginSuccess(el, data))
     .catch(err => loginFailure(el, err));
 };
 
@@ -61,7 +61,7 @@ function loginFailure (el, err){
 
 function createAccount (el, user){
   User.create(user)
-    .then(data => loginSuccess(el, data))
+    .then(({ data }) => loginSuccess(el, data))
     .catch(err => createAccountFailure(el, err));
 };
 
@@ -97,7 +97,7 @@ function logoutFailure (el, err){
 
 function switchAccount (el, userId) {
   User.switchAccount(userId)
-    .then(data => switchAccountSuccess(el, data))
+    .then(({ data }) => switchAccountSuccess(el, data))
     .catch(err => switchAccountFailure(el, userId, err));
 };
 

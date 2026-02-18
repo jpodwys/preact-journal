@@ -25,9 +25,10 @@ describe('api', () => {
     });
   });
 
-  it('should pass requests through to xhr and return the response', async () => {
+  it('should pass requests through to xhr and return { data, userId }', async () => {
     const response = await api('api-200');
-    expect(response.hello).to.equal('world');
+    expect(response.data.hello).to.equal('world');
+    expect(response.userId).to.be.a('string');
   });
 
   it('should fire handleExpiredSession with the active userId on 401', (done) => {

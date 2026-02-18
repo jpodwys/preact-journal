@@ -38,7 +38,8 @@ describe('services', () => {
       const options = fetchMock.lastOptions();
       expect(typeof options.body).to.equal('string');
       expect(JSON.parse(options.body).userId).to.equal('5');
-      expect(response.id).to.equal(5);
+      expect(response.data.id).to.equal(5);
+      expect(response.userId).to.be.a('string');
     });
 
   });

@@ -439,6 +439,11 @@ describe('actions', () => {
 
   describe('entryActions', () => {
 
+    beforeEach(() => {
+      localStorage.setItem('accounts', JSON.stringify([{ id: 1, username: 'test', active: true }]));
+      el.state.userId = '1';
+    });
+
     describe('boot', () => {
 
       it('should set entries', () => {
@@ -475,6 +480,7 @@ describe('actions', () => {
           el = getElStub();
           el.state.entries = [];
           el.state.loggedIn = true;
+          el.state.userId = '1';
 
           // Second call should be a no-op (dataFetched is true)
           Entry.getEntries(el);
