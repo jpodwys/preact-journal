@@ -1,21 +1,9 @@
 import { get } from 'idb-keyval';
-import { clearData } from '../utils';
+import { clearData, getAccounts, saveAccounts } from '../utils';
 import User from '../services/user-service';
 import getInitialState from '../app-state';
 import { route } from '../../components/router';
 import { fire } from '../../components/unifire';
-
-function getAccounts () {
-  try {
-    return JSON.parse(localStorage.getItem('accounts')) || [];
-  } catch(e) {
-    return [];
-  }
-}
-
-function saveAccounts (accounts) {
-  localStorage.setItem('accounts', JSON.stringify(accounts));
-}
 
 function setActiveAccount (accounts, id) {
   return accounts.map(a => Object.assign({}, a, { active: a.id === id }));
@@ -27,19 +15,13 @@ function login (el, user){
     .catch(err => loginFailure(el, err));
 };
 
-function loginSuccess (el, { id, username }){
-  var accounts = getAccounts().filter(a => a.id !== id);
-  accounts.push({ id, username, active: true });
-  accounts = setActiveAccount(accounts, id);
-  saveAccounts(accounts);
-
+function activateAccount (el, { id, username }, extra) {
   fire('resetDataFetched');
 
   get('entries_' + id).then((entries = []) => {
     var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
 
-    el.set({
-      loggedIn: true,
+    el.set(Object.assign({
       userId: String(id),
       username,
       entries,
@@ -48,11 +30,19 @@ function loginSuccess (el, { id, username }){
       entryIndex: -1,
       filter: '',
       filterText: ''
-    }, () => {
+    }, extra), () => {
       fire('getEntries');
       route('/entries', true);
     });
   });
+}
+
+function loginSuccess (el, { id, username }){
+  var accounts = getAccounts().filter(a => a.id !== id);
+  accounts.push({ id, username, active: true });
+  accounts = setActiveAccount(accounts, id);
+  saveAccounts(accounts);
+  activateAccount(el, { id, username }, { loggedIn: true });
 };
 
 function loginFailure (el, err){
@@ -104,27 +94,7 @@ function switchAccount (el, userId) {
 function switchAccountSuccess (el, { id, username }) {
   var accounts = setActiveAccount(getAccounts(), id);
   saveAccounts(accounts);
-
-  fire('resetDataFetched');
-
-  get('entries_' + id).then((entries = []) => {
-    var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
-
-    el.set({
-      userId: String(id),
-      username,
-      entries,
-      timestamp,
-      entry: undefined,
-      entryIndex: -1,
-      dialogMode: '',
-      filter: '',
-      filterText: ''
-    }, () => {
-      fire('getEntries');
-      route('/entries', true);
-    });
-  });
+  activateAccount(el, { id, username }, { dialogMode: '' });
 };
 
 function switchAccountFailure (el, userId, err) {

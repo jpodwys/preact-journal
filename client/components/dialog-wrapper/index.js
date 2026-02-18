@@ -4,6 +4,7 @@ import Icon from '../icon';
 import SwitchAccount from '../switch-account';
 import { fire } from '../unifire';
 import { route } from '../router';
+import { getAccounts } from '../../js/utils';
 
 const onLogout = () => {
   fire('linkstate', {
@@ -12,17 +13,8 @@ const onLogout = () => {
   });
 };
 
-function getOtherAccounts (userId) {
-  try {
-    var accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-    return accounts.filter(a => String(a.id) !== String(userId));
-  } catch(e) {
-    return [];
-  }
-}
-
 const onSwitch = (userId) => {
-  if(getOtherAccounts(userId).length > 0) {
+  if(getAccounts().filter(a => String(a.id) !== String(userId)).length > 0) {
     fire('linkstate', {
       key: 'dialogMode',
       cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:switch' }))

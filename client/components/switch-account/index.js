@@ -1,14 +1,7 @@
 import { h } from 'preact';
 import { fire } from '../unifire';
 import { route } from '../router';
-
-function getAccounts () {
-  try {
-    return JSON.parse(localStorage.getItem('accounts')) || [];
-  } catch(e) {
-    return [];
-  }
-}
+import { getAccounts } from '../../js/utils';
 
 const close = () => fire('linkstate', { key: 'dialogMode' });
 

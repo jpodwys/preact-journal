@@ -15,6 +15,12 @@ function updateIdbEntries (userId, updater) {
   });
 }
 
+function isStaleUser (el, userId, updater) {
+  if(el.state.userId === userId) return false;
+  if(updater) updateIdbEntries(userId, updater);
+  return true;
+}
+
 function boot (el, { entries }){
   el.set({ entries }, () => {
     getEntries(el);
@@ -56,8 +62,7 @@ function getAllEntries (el){
 };
 
 function getAllEntriesSuccess (el, userId, { timestamp, entries }){
-  if(el.state.userId !== userId) {
-    updateIdbEntries(userId, idbEntries => idbEntries.concat(entries));
+  if(isStaleUser(el, userId, idbEntries => idbEntries.concat(entries))) {
     localStorage.setItem('timestamp_' + userId, timestamp);
     return;
   }
@@ -99,18 +104,17 @@ function resetDataFetched () {
 };
 
 function syncEntriesSuccess (el, userId, { entries, timestamp }){
-  if(el.state.userId !== userId) {
-    updateIdbEntries(userId, idbEntries => {
-      entries.forEach(entry => {
-        var idx = findObjectIndexById(entry.id, idbEntries);
-        if(idx > -1) {
-          if(entry.deleted) idbEntries.splice(idx, 1);
-          else idbEntries[idx] = entry;
-        } else if(!entry.deleted) {
-          idbEntries.push(entry);
-        }
-      });
+  if(isStaleUser(el, userId, idbEntries => {
+    entries.forEach(entry => {
+      var idx = findObjectIndexById(entry.id, idbEntries);
+      if(idx > -1) {
+        if(entry.deleted) idbEntries.splice(idx, 1);
+        else idbEntries[idx] = entry;
+      } else if(!entry.deleted) {
+        idbEntries.push(entry);
+      }
     });
+  })) {
     localStorage.setItem('timestamp_' + userId, timestamp);
     return;
   }
@@ -207,18 +211,15 @@ function createEntry (el, { entry, clientSync }){
 };
 
 function createEntrySuccess (el, userId, oldId, id){
-  if(el.state.userId !== userId) {
-    updateIdbEntries(userId, entries => {
-      var idx = findObjectIndexById(oldId, entries);
-      if(idx > -1) {
-        entries[idx].id = id;
-        delete entries[idx].postPending;
-        delete entries[idx].newEntry;
-        delete entries[idx].needsSync;
-      }
-    });
-    return;
-  }
+  if(isStaleUser(el, userId, entries => {
+    var idx = findObjectIndexById(oldId, entries);
+    if(idx > -1) {
+      entries[idx].id = id;
+      delete entries[idx].postPending;
+      delete entries[idx].newEntry;
+      delete entries[idx].needsSync;
+    }
+  })) return;
 
   var entryIndex = findObjectIndexById(oldId, el.state.entries);
 
@@ -302,13 +303,10 @@ function updateEntry (el, { entry, property, entryId }){
 };
 
 function updateEntrySuccess (el, userId, id){
-  if(el.state.userId !== userId) {
-    updateIdbEntries(userId, entries => {
-      var idx = findObjectIndexById(id, entries);
-      if(idx > -1) delete entries[idx].needsSync;
-    });
-    return;
-  }
+  if(isStaleUser(el, userId, entries => {
+    var idx = findObjectIndexById(id, entries);
+    if(idx > -1) delete entries[idx].needsSync;
+  })) return;
 
   const entries = el.state.entries.slice();
   const entryIndex = findObjectIndexById(id, entries);
@@ -366,13 +364,10 @@ function deleteEntry (el, { id }){
 };
 
 function deleteEntrySuccess (el, userId, id){
-  if(el.state.userId !== userId) {
-    updateIdbEntries(userId, entries => {
-      var idx = findObjectIndexById(id, entries);
-      if(idx > -1) entries.splice(idx, 1);
-    });
-    return;
-  }
+  if(isStaleUser(el, userId, entries => {
+    var idx = findObjectIndexById(id, entries);
+    if(idx > -1) entries.splice(idx, 1);
+  })) return;
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
   el.set({

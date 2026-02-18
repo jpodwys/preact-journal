@@ -61,6 +61,18 @@ function isActiveEntryId (el, id) {
   return el.state.entry.id === id;
 };
 
+function getAccounts () {
+  try {
+    return JSON.parse(localStorage.getItem('accounts')) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveAccounts (accounts) {
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+}
+
 function clearData (userId) {
   if(userId) {
     del('entries_' + userId);
@@ -80,5 +92,7 @@ export {
   applyFilters,
   getViewFromPathname,
   isActiveEntryId,
+  getAccounts,
+  saveAccounts,
   clearData
 };

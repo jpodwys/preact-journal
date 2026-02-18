@@ -1,5 +1,5 @@
 import { get, set } from 'idb-keyval';
-import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData } from '../utils';
+import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData, getAccounts } from '../utils';
 import { fire } from '../../components/unifire';
 
 const filteredViews = ['view', 'sort', 'filter', 'entries', 'filterText'];
@@ -42,14 +42,6 @@ const handler = {
     return true;
   }
 };
-
-function getAccounts () {
-  try {
-    return JSON.parse(localStorage.getItem('accounts')) || [];
-  } catch(e) {
-    return [];
-  }
-}
 
 export default function getInitialState () {
   let accounts = getAccounts();
