@@ -27,7 +27,7 @@ const focusSearchInput = () => {
 
 
 export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText }) => {
-	if(!loggedIn) return;
+	if(!loggedIn || view === '/switch') return;
 	const entryCount = viewEntries.length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
