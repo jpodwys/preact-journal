@@ -392,6 +392,19 @@ header .nav-set > *:not(h1):not(form) {
   cursor: pointer;
 }
 
+.menu-username {
+  margin: -5px -5px 0;
+  padding: 10px 0;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.06);
+  border-radius: 5px 5px 0 0;
+  cursor: default;
+}
+
+body.dark .menu-username {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .menu > li > * {
   vertical-align: middle;
 }
