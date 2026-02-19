@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, removeObjectByIndex, isActiveEntryId, sortObjectsByDate } from '../utils';
+import { findObjectIndexById, isActiveEntryId, sortObjectsByDate } from '../utils';
 import { get, set } from 'idb-keyval';
 import exportAllEntries from '../../js/export-entries';
 import debounce from '../debounce';
@@ -128,7 +128,7 @@ function applySyncPatch (el, entries){
   entries.forEach((entry) => {
     var entryIndex = findObjectIndexById(entry.id, el.state.entries);
     if(entryIndex > -1){
-      if(entry.deleted) el.state.entries = removeObjectByIndex(entryIndex, el.state.entries);
+      if(entry.deleted) { el.state.entries.splice(entryIndex, 1); }
       else el.state.entries[entryIndex] = entry;
     } else {
       entry.slideIn = true;
@@ -357,9 +357,8 @@ function deleteEntrySuccess (el, userId, id){
   })) return;
 
   var entryIndex = findObjectIndexById(id, el.state.entries);
-  el.set({
-    entries: removeObjectByIndex(entryIndex, el.state.entries)
-  });
+  el.state.entries.splice(entryIndex, 1);
+  el.set({ entries: el.state.entries });
 };
 
 function setEntry (el, { id }){

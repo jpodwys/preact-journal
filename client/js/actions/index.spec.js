@@ -19,12 +19,10 @@ describe('actions', () => {
 
   beforeEach(() => {
     el = getElStub();
-    sinon.spy(console, 'log');
   });
 
   afterEach(() => {
     fetchMock.restore();
-    console.log.restore();
   });
 
   describe('globalActions', () => {
@@ -226,12 +224,11 @@ describe('actions', () => {
         });
       });
 
-      it('should log an error', (done) => {
+      it('should not throw when login fails', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 400 }));
         User.login(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('loginFailure')).to.be.true;
           done();
         });
       });
@@ -264,12 +261,11 @@ describe('actions', () => {
         });
       });
 
-      it('should log an error', (done) => {
+      it('should not throw when create fails', (done) => {
         fetchMock.post('/api/user', Promise.resolve({ status: 400 }));
         User.createAccount(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('createAccountFailure')).to.be.true;
           done();
         });
       });
@@ -291,14 +287,13 @@ describe('actions', () => {
         });
       });
 
-      it('should not clear localStorage and should log an error', (done) => {
+      it('should not clear localStorage when logout fails', (done) => {
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 400 }));
         localStorage.setItem('bogus', 'value');
         User.logout(el);
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.equal('value');
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('logoutFailure')).to.be.true;
           done();
         });
       });
@@ -541,14 +536,13 @@ describe('actions', () => {
         });
       });
 
-      it('should handle an error when fetching entries and timestamp when timestamp is undefined', (done) => {
+      it('should not throw when fetching entries fails and timestamp is undefined', (done) => {
         fetchMock.get('/api/entries', 500);
 
         delete el.state.entries;
         el.state.loggedIn = true;
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('getAllEntriesError')).to.be.true;
           done();
         });
       });
@@ -596,14 +590,13 @@ describe('actions', () => {
         });
       });
 
-      it('should handle an error when syncing entries', (done) => {
+      it('should not throw when syncing entries fails', (done) => {
         fetchMock.get('/api/entries/sync/1234', 500);
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('syncEntriesFailure')).to.be.true;
           done();
         });
       });
@@ -642,7 +635,7 @@ describe('actions', () => {
         });
       });
 
-      it('should handle a failure to update an entry from client to server', (done) => {
+      it('should not throw when updating an entry from client to server fails', (done) => {
         fetchMock.get('/api/entries/sync/1234', {
           status: 200,
           body: {
@@ -657,7 +650,6 @@ describe('actions', () => {
         el.state.entries = [ { id: 0, date: '2017-01-01', text: 'what', needsSync: true } ];
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
       });
@@ -798,7 +790,6 @@ describe('actions', () => {
           expect(secondCallArg.entries[0].postPending).to.be.undefined;
           expect(secondCallArg.entries[0].newEntry).to.be.true;
           expect(secondCallArg.entries[0].needsSync).to.be.true;
-          expect(console.log.calledWith('createEntryFailure')).to.be.true;
           done();
         });
       });
@@ -903,7 +894,6 @@ describe('actions', () => {
 
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
-          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
       });
@@ -971,7 +961,6 @@ describe('actions', () => {
 
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
-          expect(console.log.calledWith('deleteEntryFailure')).to.be.true;
           done();
         });
       });

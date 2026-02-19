@@ -1,5 +1,5 @@
 import { fire } from '../../components/unifire';
-import { removeObjectByIndex, getViewFromPathname } from '../utils';
+import { getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
 
 let timeout;
@@ -51,9 +51,8 @@ function handleEntriesView (el) {
   if(Array.isArray(el.state.entries)){
     const entry = el.state.entries[0];
     if(entry && entry.newEntry && !entry.text){
-      el.set({
-        entries: removeObjectByIndex(0, el.state.entries)
-      });
+      el.state.entries.splice(0, 1);
+      el.set({ entries: el.state.entries });
     }
   }
 };
