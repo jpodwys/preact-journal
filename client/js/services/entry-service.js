@@ -1,4 +1,4 @@
-import xhr from '../xhr';
+import xhr from '../api';
 
 const getAll = () => xhr('/api/entries');
 

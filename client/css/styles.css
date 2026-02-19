@@ -79,11 +79,6 @@ svg {
   fill: var(--theme-text);
 }
 
-.half-width {
-  position: relative;
-  width: 50%;
-}
-
 .elevated {
   box-shadow: 0 5px 5px #c1c1c1;
 }
@@ -96,10 +91,6 @@ svg {
 
 .button--fab svg {
   fill: var(--theme-white);
-}
-
-.right {
-  float: right;
 }
 
 .center-text {
@@ -180,6 +171,12 @@ svg {
   color: var(--theme-white);
   box-shadow: none;
   border: none;
+}
+
+.login-cancel {
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 /* Entry */
@@ -309,7 +306,6 @@ header .nav-set > *:not(h1):not(form) {
   background: transparent;
   border: none;
   outline: 0;
-  border: 0;
   color: var(--theme-white);
 }
 
@@ -384,6 +380,19 @@ header .nav-set > *:not(h1):not(form) {
 .menu > li {
   padding: 12.5px 0;
   cursor: pointer;
+}
+
+.menu-username {
+  margin: -5px -5px 0;
+  padding: 10px 0;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.06);
+  border-radius: 5px 5px 0 0;
+  cursor: default;
+}
+
+body.dark .menu-username {
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .menu > li > * {
@@ -526,6 +535,26 @@ body.dark .highlight {
 
 body.dark toast {
   filter: brightness(150%);
+}
+
+body.dark .login-form-wrapper input {
+  background-color: #1a1a1a;
+  border-color: #555;
+  box-shadow: none;
+  color: var(--theme-dark-text) !important;
+}
+
+body.dark .login-form-wrapper input[type=submit] {
+  background-color: var(--theme-dark-blue);
+  border: none;
+}
+
+body.dark .login-form-wrapper legend {
+  border-bottom-color: #555;
+}
+
+body.dark .login-cancel {
+  border-color: #888;
 }
 
 /* Transitions */

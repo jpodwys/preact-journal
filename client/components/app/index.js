@@ -24,7 +24,8 @@ export default (props) => {
         filterText={props.filterText}/>
       <main>
         <Router onChange={(url) => fire('handleRouteChange', url)}>
-          <Login path="/"/>
+          <Login path="/" />
+          <Login path="/switch" cancelable />
           <Entries path="/entries"
             scrollPosition={props.scrollPosition}
             viewEntries={props.viewEntries}
@@ -46,6 +47,8 @@ export default (props) => {
         sort={props.sort}
         entry={props.entry}
         view={props.view}
+        userId={props.userId}
+        username={props.username}
         dialogMode={props.dialogMode}/>
       <Toast toast={props.toast}/>
     </div>

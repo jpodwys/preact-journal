@@ -19,12 +19,10 @@ describe('actions', () => {
 
   beforeEach(() => {
     el = getElStub();
-    sinon.spy(console, 'log');
   });
 
   afterEach(() => {
     fetchMock.restore();
-    console.log.restore();
   });
 
   describe('globalActions', () => {
@@ -146,6 +144,18 @@ describe('actions', () => {
         expect(newEntry.calledWithExactly(provider, undefined, undefined)).to.be.true;
       });
 
+      it('should not redirect on /switch while logged in', () => {
+        el.state.loggedIn = true;
+        Global.handleRouteChange(el, '/switch');
+        expect(replaceStateCall).to.be.undefined;
+        expect(el.set.args[0][0].view).to.equal('/switch');
+      });
+
+      it('should redirect to / on /switch while logged out', () => {
+        Global.handleRouteChange(el, '/switch');
+        expect(replaceStateCall).to.equal('/');
+      });
+
       it('should fire setEntry on /entry/:id', () => {
         const setEntry = sinon.spy();
         const provider = new Provider({
@@ -168,23 +178,57 @@ describe('actions', () => {
 
     describe('login', () => {
 
-      it('should login, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
-        fetchMock.post('/api/user/login', Promise.resolve({ status: 204 }));
-        User.login(el, USER);
-        setTimeout(() => {
-          expect(el.set.args[0][0].loggedIn).to.be.true;
-          expect(typeof el.set.args[0][1]).to.equal('function');
-          // Need to expect that the getEntries action was called
-          done();
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
         });
       });
 
-      it('should log an error', (done) => {
+      it('should login, reset data, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
+        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.login(el, USER);
+        }).then(() => {
+          var args = el.set.args[0][0];
+          expect(args.loggedIn).to.be.true;
+          expect(args.userId).to.equal('1');
+          expect(args.username).to.equal('bogus');
+          expect(args.entries).to.be.an('array');
+          expect(args.entry).to.be.undefined;
+          expect(args.entryIndex).to.equal(-1);
+          expect(args.filter).to.equal('');
+          expect(args.filterText).to.equal('');
+          expect(typeof el.set.args[0][1]).to.equal('function');
+        });
+      });
+
+      it('should add the account to localStorage and deactivate other accounts', () => {
+        localStorage.clear();
+        var existing = [{ id: 5, username: 'other', active: true }];
+        localStorage.setItem('accounts', JSON.stringify(existing));
+        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.login(el, USER);
+        }).then(() => {
+          var accounts = JSON.parse(localStorage.getItem('accounts'));
+          expect(accounts.length).to.equal(2);
+          var newAcct = accounts.find(a => a.id === 1);
+          var oldAcct = accounts.find(a => a.id === 5);
+          expect(newAcct.active).to.be.true;
+          expect(newAcct.username).to.equal('bogus');
+          expect(oldAcct.active).to.be.false;
+        });
+      });
+
+      it('should not throw when login fails', (done) => {
         fetchMock.post('/api/user/login', Promise.resolve({ status: 400 }));
         User.login(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('loginFailure')).to.be.true;
           done();
         });
       });
@@ -193,22 +237,35 @@ describe('actions', () => {
 
     describe('create', () => {
 
-      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', (done) => {
-        fetchMock.post('/api/user', Promise.resolve({ status: 204 }));
-        User.createAccount(el, USER);
-        setTimeout(() => {
-          expect(el.set.args[0][0].loggedIn).to.be.true;
-          expect(typeof el.set.args[0][1]).to.equal('function');
-          done();
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
         });
       });
 
-      it('should log an error', (done) => {
+      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
+        fetchMock.post('/api/user', { status: 200, body: { id: 2, username: 'bogus' } });
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.createAccount(el, USER);
+        }).then(() => {
+          var args = el.set.args[0][0];
+          expect(args.loggedIn).to.be.true;
+          expect(args.userId).to.equal('2');
+          expect(args.username).to.equal('bogus');
+          expect(args.entries).to.be.an('array');
+          expect(args.entry).to.be.undefined;
+          expect(typeof el.set.args[0][1]).to.equal('function');
+        });
+      });
+
+      it('should not throw when create fails', (done) => {
         fetchMock.post('/api/user', Promise.resolve({ status: 400 }));
         User.createAccount(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('createAccountFailure')).to.be.true;
           done();
         });
       });
@@ -219,7 +276,9 @@ describe('actions', () => {
 
       it('should clear localStorage, reset state, and route back to / (the login page)', (done) => {
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
+        localStorage.clear();
         localStorage.setItem('bogus', 'value');
+        el.state.userId = '99';
         User.logout(el);
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.be.null;
@@ -228,16 +287,134 @@ describe('actions', () => {
         });
       });
 
-      it('should not clear localStorage and should log an error', (done) => {
+      it('should not clear localStorage when logout fails', (done) => {
         fetchMock.post('/api/user/logout', Promise.resolve({ status: 400 }));
         localStorage.setItem('bogus', 'value');
         User.logout(el);
         setTimeout(() => {
           expect(localStorage.getItem('bogus')).to.equal('value');
           expect(el.set.called).to.be.false;
-          expect(console.log.calledWith('logoutFailure')).to.be.true;
           done();
         });
+      });
+
+      it('should remove the account from localStorage entirely on logout', (done) => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
+        });
+        localStorage.clear();
+        var accounts = [
+          { id: 99, username: 'current', active: true },
+          { id: 50, username: 'other', active: false }
+        ];
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
+        el.state.userId = '99';
+        User.logout(el);
+        setTimeout(() => {
+          var remaining = JSON.parse(localStorage.getItem('accounts'));
+          expect(remaining.length).to.equal(1);
+          expect(remaining[0].id).to.equal(50);
+          expect(remaining.find(a => a.id === 99)).to.be.undefined;
+          done();
+        }, 10);
+      });
+
+    });
+
+    describe('switchAccount', () => {
+
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
+        });
+      });
+
+      it('should switch to another account and update localStorage', () => {
+        localStorage.clear();
+        var accounts = [
+          { id: 1, username: 'current', active: true },
+          { id: 2, username: 'other', active: false }
+        ];
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+
+        return new Promise(resolve => {
+          el.set = sinon.spy(resolve);
+          User.switchAccount(el, '2');
+        }).then(() => {
+          var updated = JSON.parse(localStorage.getItem('accounts'));
+          expect(updated.find(a => a.id === 2).active).to.be.true;
+          expect(updated.find(a => a.id === 1).active).to.be.false;
+          var args = el.set.args[0][0];
+          expect(args.userId).to.equal('2');
+          expect(args.username).to.equal('other');
+          expect(args.dialogMode).to.equal('');
+        });
+      });
+
+      it('should do nothing when the account is not found', () => {
+        localStorage.clear();
+        var accounts = [
+          { id: 1, username: 'current', active: true }
+        ];
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        User.switchAccount(el, '999');
+        expect(el.set.called).to.be.false;
+      });
+
+    });
+
+    describe('handleExpiredSession', () => {
+
+      beforeEach(() => {
+        new Provider({
+          state: {},
+          actions: { resetDataFetched: Entry.resetDataFetched },
+          children: []
+        });
+      });
+
+      it('should do nothing when userId does not match current state', () => {
+        el.state.userId = '1';
+        User.handleExpiredSession(el, '999');
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should do nothing when userId is falsey', () => {
+        el.state.userId = '1';
+        User.handleExpiredSession(el, '');
+        expect(el.set.called).to.be.false;
+      });
+
+      it('should mark the account as expired and switch to the next valid account', (done) => {
+        localStorage.clear();
+        var accounts = [
+          { id: 1, username: 'expired-user', active: true },
+          { id: 2, username: 'valid-user', active: false }
+        ];
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        el.state.userId = '1';
+        User.handleExpiredSession(el, '1');
+        setTimeout(() => {
+          var updated = JSON.parse(localStorage.getItem('accounts'));
+          var expired = updated.find(a => a.id === 1);
+          expect(expired.expired).to.be.true;
+          expect(expired.active).to.be.false;
+          done();
+        }, 10);
+      });
+
+      it('should reset to login screen when no valid accounts remain', () => {
+        localStorage.clear();
+        var accounts = [{ id: 1, username: 'only-user', active: true }];
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+        el.state.userId = '1';
+        User.handleExpiredSession(el, '1');
+        expect(el.set.calledOnce).to.be.true;
       });
 
     });
@@ -245,6 +422,11 @@ describe('actions', () => {
   });
 
   describe('entryActions', () => {
+
+    beforeEach(() => {
+      localStorage.setItem('accounts', JSON.stringify([{ id: 1, username: 'test', active: true }]));
+      el.state.userId = '1';
+    });
 
     describe('boot', () => {
 
@@ -262,6 +444,43 @@ describe('actions', () => {
       // it('should run handleRouteChange when state.view === "/entry"', () => {
 
       // });
+
+    });
+
+    describe('resetDataFetched', () => {
+
+      it('should allow getEntries to fetch again after being called', (done) => {
+        fetchMock.get('/api/entries', {
+          status: 200,
+          body: { entries: [], timestamp: 1 }
+        });
+
+        el.state.entries = [];
+        el.state.loggedIn = true;
+
+        // First call sets dataFetched = true
+        Entry.getEntries(el);
+        setTimeout(() => {
+          el = getElStub();
+          el.state.entries = [];
+          el.state.loggedIn = true;
+          el.state.userId = '1';
+
+          // Second call should be a no-op (dataFetched is true)
+          Entry.getEntries(el);
+          setTimeout(() => {
+            expect(el.set.called).to.be.false;
+
+            // Reset and try again
+            Entry.resetDataFetched();
+            Entry.getEntries(el);
+            setTimeout(() => {
+              expect(el.set.called).to.be.true;
+              done();
+            }, 10);
+          }, 10);
+        }, 10);
+      });
 
     });
 
@@ -317,14 +536,13 @@ describe('actions', () => {
         });
       });
 
-      it('should handle an error when fetching entries and timestamp when timestamp is undefined', (done) => {
+      it('should not throw when fetching entries fails and timestamp is undefined', (done) => {
         fetchMock.get('/api/entries', 500);
 
         delete el.state.entries;
         el.state.loggedIn = true;
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('getAllEntriesError')).to.be.true;
           done();
         });
       });
@@ -353,7 +571,7 @@ describe('actions', () => {
         });
       });
 
-      it('should set timestamp to localStorage without calling el.set when the sync response contains no entries', (done) => {
+      it('should call el.set with new timestamp when the sync response contains no entries', (done) => {
         fetchMock.get('/api/entries/sync/1234', {
           status: 200,
           body: {
@@ -364,23 +582,21 @@ describe('actions', () => {
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
-        localStorage.setItem('timestamp', 1234);
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(el.set.called).to.be.false;
-          expect(localStorage.getItem('timestamp')).to.equal('4321');
+          expect(el.set.calledOnce).to.be.true;
+          expect(el.set.args[0][0].timestamp).to.equal(4321);
           done();
         });
       });
 
-      it('should handle an error when syncing entries', (done) => {
+      it('should not throw when syncing entries fails', (done) => {
         fetchMock.get('/api/entries/sync/1234', 500);
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('syncEntriesFailure')).to.be.true;
           done();
         });
       });
@@ -419,7 +635,7 @@ describe('actions', () => {
         });
       });
 
-      it('should handle a failure to update an entry from client to server', (done) => {
+      it('should not throw when updating an entry from client to server fails', (done) => {
         fetchMock.get('/api/entries/sync/1234', {
           status: 200,
           body: {
@@ -434,7 +650,6 @@ describe('actions', () => {
         el.state.entries = [ { id: 0, date: '2017-01-01', text: 'what', needsSync: true } ];
         Entry.getEntries(el);
         setTimeout(() => {
-          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
       });
@@ -575,7 +790,6 @@ describe('actions', () => {
           expect(secondCallArg.entries[0].postPending).to.be.undefined;
           expect(secondCallArg.entries[0].newEntry).to.be.true;
           expect(secondCallArg.entries[0].needsSync).to.be.true;
-          expect(console.log.calledWith('createEntryFailure')).to.be.true;
           done();
         });
       });
@@ -680,7 +894,6 @@ describe('actions', () => {
 
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
-          expect(console.log.calledWith('updateEntryFailure')).to.be.true;
           done();
         });
       });
@@ -748,7 +961,6 @@ describe('actions', () => {
 
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
-          expect(console.log.calledWith('deleteEntryFailure')).to.be.true;
           done();
         });
       });

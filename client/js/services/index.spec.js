@@ -31,7 +31,7 @@ describe('services', () => {
       fetchMock.post('/api/user/logout', 204);
       await User.logout();
     });
-      
+
   });
 
   describe('entryService', () => {

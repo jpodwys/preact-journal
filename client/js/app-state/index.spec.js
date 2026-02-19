@@ -4,12 +4,9 @@ import getInitialState from './index';
 describe('appState', () => {
   let state;
 
-  const deleteCookie = (name) => {
-    document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-  };
-
   beforeEach(() => {
     localStorage.clear();
+    history.replaceState(null, '', '/');
     state = getInitialState();
   });
 
@@ -27,6 +24,8 @@ describe('appState', () => {
     expect(state.view).to.equal('/');
     expect(state.filterText).to.equal('');
     expect(state.loggedIn).to.be.false;
+    expect(state.userId).to.equal('');
+    expect(state.username).to.equal('');
     expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
     expect(state.toast).to.be.undefined;
@@ -37,35 +36,30 @@ describe('appState', () => {
     expect(state.toast).to.be.undefined;
     expect(state.dark).to.be.false;
 
-    // const cb = sinon.spy();
-    // document.addEventListener('boot', cb);
-    document.cookie = 'logged_in=true;';
-    set('entries', [ { id: 0, date: '2018-01-01', text: 'yo' } ]);
-    localStorage.setItem('timestamp', '1234');
+    var accounts = [{ id: 42, username: 'testuser', active: true }];
+    localStorage.setItem('accounts', JSON.stringify(accounts));
+    set('entries_42', [ { id: 0, date: '2018-01-01', text: 'yo' } ]);
+    localStorage.setItem('timestamp_42', '1234');
     localStorage.setItem('dark', 'true');
     state = getInitialState();
 
     expect(state.loggedIn).to.be.true;
+    expect(state.userId).to.equal('42');
+    expect(state.username).to.equal('testuser');
     expect(state.timestamp).to.equal('1234');
     expect(state.dark).to.be.true;
-    // This portion of the test is unreliable. Needs attention.
-    // Should ensure that the boot event is fired with the expected entries
-    // expect(state.entries[0].id).to.equal(0);
-    // setTimeout(() => {
-    //   expect(cb.called).to.be.true;
-    //   document.removeEventListener('boot', cb);
-    //   done();
-    // });
-
-    deleteCookie('logged_in');
   });
 
   it('should persist dark, timestamp, and entries (date-sorted) to localStorage when changed', async () => {
-    // I have to manually clear localStorage here to avoid a race condition...
+    // Set up an active account so namespaced keys work
     localStorage.clear();
-    expect(localStorage.getItem('dark')).to.be.null;
-    expect(localStorage.getItem('timestamp')).to.be.null;
-    let entries = await get('entries');
+    var accounts = [{ id: 1, username: 'test', active: true }];
+    localStorage.setItem('accounts', JSON.stringify(accounts));
+    state = getInitialState();
+
+    // getInitialState writes dark:false to localStorage, so clear and re-check
+    expect(localStorage.getItem('timestamp_1')).to.be.null;
+    let entries = await get('entries_1');
     expect(entries).to.be.undefined;
 
     state.dark = true;
@@ -76,9 +70,9 @@ describe('appState', () => {
     state.entries = [ { date: OLDER }, { date: NEWER } ];
 
     expect(localStorage.getItem('dark')).to.equal('true');
-    expect(localStorage.getItem('timestamp')).to.equal('1234');
+    expect(localStorage.getItem('timestamp_1')).to.equal('1234');
 
-    entries = await get('entries');
+    entries = await get('entries_1');
     expect(entries[0].date).to.equal(NEWER);
     expect(entries[1].date).to.equal(OLDER);
   });

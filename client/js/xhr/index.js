@@ -2,7 +2,8 @@ export default (url, config = {}) => {
   config.credentials = 'same-origin';
   config.headers = {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
+    'Accept': 'application/json',
+    ...config.headers
   };
   if(config.body) config.body = JSON.stringify(config.body);
 
