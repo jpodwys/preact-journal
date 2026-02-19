@@ -58,7 +58,7 @@ function getEntries (el){
 function getAllEntries (el){
   Entry.getAll()
     .then(({ data, userId }) => getAllEntriesSuccess(el, userId, data))
-    .catch(err => getAllEntriesError(el, err));
+    .catch(() => {});
 };
 
 function getAllEntriesSuccess (el, userId, { timestamp, entries }){
@@ -70,10 +70,6 @@ function getAllEntriesSuccess (el, userId, { timestamp, entries }){
     timestamp,
     entries: el.state.entries.concat(entries)
   });
-};
-
-function getAllEntriesError (el, err){
-  console.log('getAllEntriesError', err)
 };
 
 // Send updates to the server
@@ -95,7 +91,7 @@ function syncClientEntries (el){
 function syncEntries (el){
   Entry.sync(el.state.timestamp)
     .then(({ data, userId }) => syncEntriesSuccess(el, userId, data))
-    .catch(err => syncEntriesFailure(el, err));
+    .catch(() => {});
   syncClientEntries(el);
 };
 
@@ -152,10 +148,6 @@ function persistSyncPatch (el, timestamp){
   });
 };
 
-function syncEntriesFailure (el, err){
-  console.log('syncEntriesFailure', err)
-};
-
 function createEntry (el, { entry, clientSync }){
   if(!entry || typeof entry.id !== 'number') return;
   /**
@@ -207,7 +199,7 @@ function createEntry (el, { entry, clientSync }){
 
   Entry.create({ date: entry.date, text: entry.text })
     .then(({ data, userId }) => createEntrySuccess(el, userId, entry.id, data.id))
-    .catch(err => createEntryFailure(el, entry.id, err));
+    .catch(() => createEntryFailure(el, entry.id));
 };
 
 function createEntrySuccess (el, userId, oldId, id){
@@ -257,7 +249,7 @@ function createEntrySuccess (el, userId, oldId, id){
   });
 };
 
-function createEntryFailure (el, oldId, err){
+function createEntryFailure (el, oldId){
   /**
    * Only update state.entry if the entry we just
    * modified is still active.
@@ -270,7 +262,6 @@ function createEntryFailure (el, oldId, err){
     entry: Object.assign({}, el.state.entry),
     entries: el.state.entries.slice()
   });
-  console.log('createEntryFailure', err);
 };
 
 function toggleFavorite (el, { id, favorited }){
@@ -299,7 +290,7 @@ function updateEntry (el, { entry, property, entryId }){
 
   Entry.update(entryId, entry)
     .then(({ userId }) => updateEntrySuccess(el, userId, entryId))
-    .catch(err => updateEntryFailure(el, err));
+    .catch(() => {});
 };
 
 function updateEntrySuccess (el, userId, id){
@@ -323,14 +314,10 @@ function updateEntrySuccess (el, userId, id){
   el.set({ entry, entries });
 };
 
-function updateEntryFailure (el, err){
-  console.log('updateEntryFailure', err);
-};
-
 function putEntry (el, { entry }){
   Entry.update(entry.id, entry)
     .then(({ userId }) => updateEntrySuccess(el, userId, entry.id))
-    .catch(err => updateEntryFailure(el, err));
+    .catch(() => {});
 };
 
 function showConfirmDeleteEntryModal (el, { entry }){
@@ -360,7 +347,7 @@ function deleteEntry (el, { id }){
 
   Entry.del(id)
     .then(({ userId }) => deleteEntrySuccess(el, userId, id))
-    .catch(err => deleteEntryFailure(el, err));
+    .catch(() => {});
 };
 
 function deleteEntrySuccess (el, userId, id){
@@ -373,10 +360,6 @@ function deleteEntrySuccess (el, userId, id){
   el.set({
     entries: removeObjectByIndex(entryIndex, el.state.entries)
   });
-};
-
-function deleteEntryFailure (el, err){
-  console.log('deleteEntryFailure', err);
 };
 
 function setEntry (el, { id }){

@@ -69,6 +69,11 @@ function getAccounts () {
   }
 }
 
+function getActiveUserId () {
+  var active = getAccounts().find(a => a.active);
+  return active ? String(active.id) : '';
+}
+
 function saveAccounts (accounts) {
   localStorage.setItem('accounts', JSON.stringify(accounts));
 }
@@ -87,12 +92,11 @@ export {
   findObjectIndexById,
   removeObjectByIndex,
   sortObjectsByDate,
-  filterObjectsByText,
-  filterHiddenEntries,
   applyFilters,
   getViewFromPathname,
   isActiveEntryId,
   getAccounts,
+  getActiveUserId,
   saveAccounts,
   clearData
 };

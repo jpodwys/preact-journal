@@ -26,7 +26,7 @@ export default ({ cancelable }) => {
    */
   const now = Date.now();
   return (
-    <div class="login-page-wrapper">
+    <div class={`login-page-wrapper${cancelable ? ' fade-up' : ''}`}>
       <h1 class="center-text">Journalize</h1>
       <h4 class="center-text">Private journal entries</h4>
         <div class="login-form-wrapper">

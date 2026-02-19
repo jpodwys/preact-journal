@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { Provider, fire } from '../unifire';
+import { Provider } from '../unifire';
 import DialogWrapper from './index';
 
 describe('dialogWrapper', () => {

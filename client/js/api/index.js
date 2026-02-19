@@ -1,18 +1,10 @@
 import xhr from '../xhr';
 import { fire } from '../../components/unifire';
+import { getActiveUserId } from '../utils';
 
-function getActiveUserId () {
-  try {
-    var accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-    var active = accounts.find(a => a.active);
-    return active ? String(active.id) : '';
-  } catch(e) {
-    return '';
-  }
-}
-
-export default (url, config, { skipAuth } = {}) => {
+export default (url, config = {}, { skipAuth } = {}) => {
   var userId = getActiveUserId();
+  if(userId) config.headers = { ...config.headers, 'X-User-Id': userId };
   return xhr(url, config).then(data => {
     return { data, userId };
   }).catch(err => {

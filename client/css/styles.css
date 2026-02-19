@@ -79,11 +79,6 @@ svg {
   fill: var(--theme-text);
 }
 
-.half-width {
-  position: relative;
-  width: 50%;
-}
-
 .elevated {
   box-shadow: 0 5px 5px #c1c1c1;
 }
@@ -96,10 +91,6 @@ svg {
 
 .button--fab svg {
   fill: var(--theme-white);
-}
-
-.right {
-  float: right;
 }
 
 .center-text {
@@ -315,7 +306,6 @@ header .nav-set > *:not(h1):not(form) {
   background: transparent;
   border: none;
   outline: 0;
-  border: 0;
   color: var(--theme-white);
 }
 
