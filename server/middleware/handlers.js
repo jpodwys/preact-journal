@@ -3,7 +3,9 @@ var entryHandlers = require('./entry-handlers');
 
 var defaultHandlers = {
   handleError: function(req, res, err) {
-    res.status(err.status || 500).send(err.message);
+    var status = err.status || 500;
+    var message = (status >= 500) ? 'Internal server error' : err.message;
+    res.status(status).send(message);
   }
 };
 

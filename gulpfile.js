@@ -6,6 +6,8 @@ var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
 var esbuild = require('esbuild');
 var browserslist = require('browserslist');
+var crypto = require('crypto');
+var fs = require('fs');
 var del = require('del');
 var replace = require('gulp-replace');
 
@@ -83,12 +85,21 @@ function inline() {
     .pipe(gulp.dest('./dist'));
 }
 
+function cspHash(cb) {
+  var html = fs.readFileSync('./dist/index.html', 'utf8');
+  var match = html.match(/<script>([\s\S]*?)<\/script>/);
+  var hash = match ? crypto.createHash('sha256').update(match[1]).digest('base64') : '';
+  fs.writeFileSync('./dist/csp-hash.json', JSON.stringify({ hash: hash }));
+  cb();
+}
+
 function build(cb) {
   return gulp.series(
     clean,
     gulp.parallel(scripts, sw, version, manifest, images),
     gulp.parallel(styles, compress),
-    inline
+    inline,
+    cspHash
   )(cb);
 }
 
