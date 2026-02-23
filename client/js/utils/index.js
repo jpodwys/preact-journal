@@ -1,11 +1,6 @@
-import { clear } from 'idb-keyval';
+import { clear, del } from 'idb-keyval';
 
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
-
-function removeObjectByIndex (index, list) {
-  list.splice(index, 1);
-  return list;
-};
 
 function sortObjectsByDate (list, sort = 'desc') {
   if(!list) return [];
@@ -22,7 +17,7 @@ function filterObjectsByText (query, list) {
   return list.reduce((accumulator, obj) => {
     var index = obj.text.toLowerCase().indexOf(query);
     if(~index){
-      obj = Object.assign({}, obj);
+      obj = {...obj};
       index = Math.max(0, index - 40);
       var ellipses = index ? '...' : '';
       obj.previewText = ellipses + obj.text.substr(index);
@@ -34,46 +29,57 @@ function filterObjectsByText (query, list) {
   }, []);
 };
 
-const filterHiddenEntries = entries => entries.filter(entry => !entry.deleted);
-
-function filterByFavorited (entries) {
-  if(!entries) return entries;
-  return entries.filter(entry => entry.favorited);
-};
-
 function applyFilters (view, query, filter, sort, list) {
   if(view === '/search' && !query && !filter) return [];
-  list = filterHiddenEntries(list);
-  if(filter === 'favorites') list = filterByFavorited(list);
+  list = list.filter(entry => !entry.deleted);
+  if(filter === 'favorites') list = list.filter(entry => entry.favorited);
   list = sortObjectsByDate(list, sort);
   return filterObjectsByText(query, list);
 };
 
 function getViewFromPathname (href) {
-  if(~href.indexOf('/new')) return '/new';
-  return href.lastIndexOf('/') > 0
-    ? href.substr(0, href.lastIndexOf('/'))
-    : href;
+  if(href.includes('/new')) return '/new';
+  var i = href.lastIndexOf('/');
+  return i > 0 ? href.substr(0, i) : href;
 };
 
-function isActiveEntryId (el, id) {
-  if(!el.state.entry) return false;
-  return el.state.entry.id === id;
-};
+const isActiveEntryId = (el, id) => el.state.entry?.id === id;
 
-function clearData () {
-  clear();
-  localStorage.clear();
+function getAccounts () {
+  try {
+    return JSON.parse(localStorage.getItem('accounts')) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function getActiveUserId () {
+  var active = getAccounts().find(a => a.active);
+  return active ? String(active.id) : '';
+}
+
+function saveAccounts (accounts) {
+  localStorage.setItem('accounts', JSON.stringify(accounts));
+}
+
+function clearData (userId) {
+  if(userId) {
+    del('entries_' + userId);
+    localStorage.removeItem('timestamp_' + userId);
+  } else {
+    clear();
+    localStorage.clear();
+  }
 };
 
 export {
   findObjectIndexById,
-  removeObjectByIndex,
   sortObjectsByDate,
-  filterObjectsByText,
-  filterHiddenEntries,
   applyFilters,
   getViewFromPathname,
   isActiveEntryId,
+  getAccounts,
+  getActiveUserId,
+  saveAccounts,
   clearData
 };

@@ -5,8 +5,10 @@ module.exports = jwtMW({
   secret: process.env.JWT_KEY,
   credentialsRequired: false,
   getToken: (req) => {
-    if(req.cookies && req.cookies.auth_token){
-      return AES.decrypt(req.cookies.auth_token);
+    var userId = req.headers['x-user-id'];
+    var cookieName = userId ? 'auth_token_' + userId : 'auth_token';
+    if(req.cookies && req.cookies[cookieName]){
+      return AES.decrypt(req.cookies[cookieName]);
     }
     return null;
   }

@@ -93,8 +93,12 @@ module.exports = function(Entry, sequelize){
   }
 
   self.removeAllDeletedEntries = function(){
+    const ninetyOneDaysAgo = new Date(Date.now() - 91 * 24 * 60 * 60 * 1000);
     return Entry.destroy({
-      where: { deleted: 1 }
+      where: {
+        deleted: 1,
+        updatedAt: { [op.lt]: ninetyOneDaysAgo }
+      }
     });
   }
 

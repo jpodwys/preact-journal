@@ -12,6 +12,11 @@ module.exports = function(config) {
         rules: [
           {
             test: /\.js$/,
+            use: 'babel-loader',
+            exclude: /node_modules/,
+          },
+          {
+            test: /\.js$/,
             use: {
               loader: 'istanbul-instrumenter-loader',
               options: { esModules: true }

@@ -25,21 +25,6 @@ module.exports = function(User, sequelize){
     });
   }
 
-  self.updateUser = function(data){
-    // return User.update({
-    //   username: data.username,
-    //   password: data.password
-    // }, {
-    //   where: { id: data.id }
-    // });
-  }
-
-  self.deleteUser = function(id){
-    // return User.destroy({
-    //   where: { id: id }
-    // });
-  }
-
   self.getUserCount = function(){
     return User.count();
   }
