@@ -70,10 +70,15 @@ module.exports = function(Entry, sequelize){
   }
 
   self.updateEntry = function(entryId, data, deviceId){
-    data.updatedAt = date.getUtcZeroTimestamp();
-    data.deviceId = deviceId;
+    var safeData = {
+      updatedAt: date.getUtcZeroTimestamp(),
+      deviceId: deviceId
+    };
+    if(data.text !== undefined) safeData.text = data.text;
+    if(data.date !== undefined) safeData.date = data.date;
+    if(data.favorited !== undefined) safeData.favorited = data.favorited;
 
-    return Entry.update(data, {
+    return Entry.update(safeData, {
       where: {id: entryId}
     });
   }
