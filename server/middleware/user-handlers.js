@@ -6,7 +6,8 @@ function getCookieOpts () {
   return {
     httpOnly: (process.env.NODE_ENV === 'production'),
     secure: (process.env.NODE_ENV === 'production'),
-    expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 90)) // One month
+    sameSite: 'strict',
+    expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 90)) // 90 days
   };
 }
 
@@ -29,7 +30,7 @@ exports.createAccount = loginOrCreate;
 
 exports.logout = function(req, res) {
   var userId = req.user && req.user.id;
-  if(userId) res.clearCookie('auth_token_' + userId);
+  if(userId) res.clearCookie('auth_token_' + userId, getCookieOpts());
   res.sendStatus(204);
 }
 
