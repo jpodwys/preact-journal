@@ -103,8 +103,15 @@ function build(cb) {
   )(cb);
 }
 
+function watch(cb) {
+  gulp.watch('client/js/**/*.js', gulp.series(scripts, compress, inline, cspHash));
+  gulp.watch('client/css/**/*.css', gulp.series(styles, inline, cspHash));
+  gulp.watch('client/index.html', gulp.series(inline, cspHash));
+  cb();
+}
+
 gulp.task('build', build);
 
 gulp.task('serve', serve);
 
-gulp.task('default', serve, build);
+gulp.task('default', gulp.series(build, gulp.parallel(serve, watch)));

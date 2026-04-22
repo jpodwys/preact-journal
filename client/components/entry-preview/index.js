@@ -2,16 +2,17 @@ import { h } from 'preact';
 import Icon from '../icon';
 import { fire } from '../unifire';
 import copyText from '../../js/copy-text';
+import { stripMarkdown } from '../../js/editor';
 
 const getEntryText = (entry, filterText) => {
   if(!entry.previewText){
     return (
       <div class="second-row">
-        {entry.text}
+        {stripMarkdown(entry.text)}
       </div>
     );
   } else {
-    const preview = entry.previewText;
+    const preview = entry.previewText;  // already stripped by filterObjectsByText
     const text = entry.previewText.toLowerCase();
     const query = filterText.toLowerCase();
     const start = text.indexOf(query);

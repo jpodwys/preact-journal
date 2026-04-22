@@ -3,13 +3,31 @@ import Icon from '../icon';
 import { fire } from '../unifire';
 import FourOhFour from '../four-oh-four';
 import debounce from '../../js/debounce';
+import { toHtml, toMarkdown, setupEditor } from '../../js/editor';
 
 export default class Entry extends Component {
-  componentDidUpdate() {
+  attachEditor() {
+    if(this.cleanupEditor) this.cleanupEditor();
+    var el = document.getElementById('entryText');
+    if(el) this.cleanupEditor = setupEditor(el);
+  }
+
+  componentDidMount() {
+    this.attachEditor();
+  }
+
+  componentDidUpdate(prevProps) {
+    if(!prevProps.entry || !this.props.entry || prevProps.entry.id !== this.props.entry.id){
+      this.attachEditor();
+    }
     if(this.props.view === '/new'){
       let entryText = document.getElementById('entryText');
       if(entryText) entryText.focus();
     }
+  }
+
+  componentWillUnmount() {
+    if(this.cleanupEditor) this.cleanupEditor();
   }
 
   shouldComponentUpdate(nextProps) {
@@ -24,7 +42,7 @@ export default class Entry extends Component {
     var entry = this.props.entry;
     if(entry.newEntry){
       entry.date = document.getElementById('entryDate').innerText;
-      entry.text = document.getElementById('entryText').innerText;
+      entry.text = toMarkdown(document.getElementById('entryText'));
       fire('createEntry', { entry });
     } else {
       this.update(e);
@@ -44,7 +62,9 @@ export default class Entry extends Component {
       property: property,
       entryId: this.props.entry.id
     }
-    obj.entry[property] = e.target.innerText.trim();
+    obj.entry[property] = property === 'text'
+      ? toMarkdown(e.target)
+      : e.target.innerText.trim();
     fire('updateEntry', obj);
   }
 
@@ -82,8 +102,8 @@ export default class Entry extends Component {
           contenteditable
           class="entry-text"
           onInput={this.upsert}
-          key={'entry-' + entry.id}>
-          {entry.text}
+          key={'entry-' + entry.id}
+          dangerouslySetInnerHTML={{ __html: toHtml(entry.text) }}>
         </div>
       </div>
     );

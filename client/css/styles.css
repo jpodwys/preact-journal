@@ -200,8 +200,33 @@ svg {
 }
 
 .entry-text {
-  white-space: pre-wrap;
   min-height: calc(100vh - 200px);
+  outline: none;
+}
+
+.entry-text h2 {
+  margin: .5em 0 .25em;
+  font-size: 1.4em;
+}
+
+.entry-text ul,
+.entry-text ol {
+  margin: .25em 0;
+  padding-left: 1.5em;
+}
+
+.entry-text blockquote {
+  margin: .5em 0;
+  padding: .25em 0 .25em 1em;
+  border-left: 3px solid #b0b0b0;
+  color: #666;
+}
+
+.entry-text hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: .75em auto;
+  width: 80%;
 }
 
 /* Entry preview */
@@ -523,6 +548,15 @@ body.dark *, svg {
 
 body.dark .button--fab.add-entry {
   background-color: var(--theme-dark-blue);
+}
+
+body.dark .entry-text blockquote {
+  border-left-color: #888;
+  color: #aaa;
+}
+
+body.dark .entry-text hr {
+  border-top-color: #666;
 }
 
 body.dark .elevated {

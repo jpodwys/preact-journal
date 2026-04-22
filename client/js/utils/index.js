@@ -1,4 +1,5 @@
 import { clear, del } from 'idb-keyval';
+import { stripMarkdown } from '../editor';
 
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
@@ -15,12 +16,13 @@ function filterObjectsByText (query, list) {
   if(!query) return list;
   query = query.toLowerCase();
   return list.reduce((accumulator, obj) => {
-    var index = obj.text.toLowerCase().indexOf(query);
+    var plain = stripMarkdown(obj.text);
+    var index = plain.toLowerCase().indexOf(query);
     if(~index){
       obj = {...obj};
       index = Math.max(0, index - 40);
       var ellipses = index ? '...' : '';
-      obj.previewText = ellipses + obj.text.substr(index);
+      obj.previewText = ellipses + plain.substr(index);
       accumulator.push(obj);
     } else if(~obj.date.indexOf(query)) {
       accumulator.push(obj);
