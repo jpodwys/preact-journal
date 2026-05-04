@@ -1,4 +1,5 @@
 import fetchMock from 'fetch-mock';
+import { get as idbGet, set as idbSet } from 'idb-keyval';
 import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
@@ -898,6 +899,36 @@ describe('actions', () => {
         });
       });
 
+      // Covers the stale-user branch in applyEntryPatch (shared by all four callers).
+      // Models a real production race: user fires a request, switches accounts before
+      // the response lands, and the success handler should patch the original user's
+      // IDB cache rather than mutating the now-current user's in-memory state.
+      it('should patch IDB for the original user (not in-memory state) when the user switches accounts before the response arrives', (done) => {
+        fetchMock.patch('/api/entry/0', 204);
+
+        idbSet('entries_1', [{ id: 0, needsSync: true }]).then(() => {
+          Entry.updateEntry(el, {
+            entry: { date: '2017-01-01' },
+            property: 'date',
+            entryId: 0
+          });
+
+          // Simulate the user switching accounts before the response lands.
+          el.state.userId = '99';
+
+          setTimeout(() => {
+            // Stale path: the success handler should NOT call set a second time.
+            expect(el.set.calledTwice).to.be.false;
+
+            // But it SHOULD have patched user 1's IDB cache to clear needsSync.
+            idbGet('entries_1').then(entries => {
+              expect(entries[0].needsSync).to.be.undefined;
+              done();
+            });
+          }, 50);
+        });
+      });
+
     });
 
     describe('showConfirmDeleteEntryModal', () => {
@@ -961,6 +992,26 @@ describe('actions', () => {
 
         setTimeout(() => {
           expect(el.set.calledTwice).to.be.false;
+          done();
+        });
+      });
+
+      // Regression test for the applyEntryPatch idx === -1 guard. Also protects
+      // updateEntrySuccess, createEntrySuccess, and createEntryFailure, which all share the same helper.
+      it('should not corrupt entries when the target is removed from state before the delete response resolves', (done) => {
+        fetchMock.delete('/api/entry/0', 204);
+        el.state.entries.push({ id: 99 });
+        Entry.deleteEntry(el, { id: 0 });
+
+        // Simulate the entry being removed from state before the response arrives
+        // (e.g. by an account switch or a server-driven sync). Without the guard,
+        // splice(-1, 1) would remove { id: 99 } — the wrong entry.
+        el.state.entries = [{ id: 99 }];
+
+        setTimeout(() => {
+          expect(el.set.calledTwice).to.be.false;
+          expect(el.state.entries.length).to.equal(1);
+          expect(el.state.entries[0].id).to.equal(99);
           done();
         });
       });
