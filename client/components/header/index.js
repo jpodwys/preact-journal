@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import Icon from '../icon';
 import { fire } from '../../components/unifire';
-import copyText from '../../js/copy-text';
 import debounce from '../../js/debounce';
 
 const cancelAndBlur = e => {
@@ -80,8 +79,8 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{entry && !entry.newEntry && isEntry &&
 						<Icon icon="delete" key="header-delete" onclick={() => fire('showConfirmDeleteEntryModal', { entry })} class="fade-up"/>
 					}
-					{isEntry &&
-						<Icon icon="share" key="header-share" onclick={() => copyText(entry.date + ' ' + entry.text)} class="fade-up"/>
+					{isEntry && navigator.share &&
+						<Icon icon="share" key="header-share" onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })} class="fade-up"/>
 					}
 					{entry && !entry.newEntry && isEntry &&
 						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up"/>

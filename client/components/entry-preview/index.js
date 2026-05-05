@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import Icon from '../icon';
 import { fire } from '../unifire';
-import copyText from '../../js/copy-text';
 
 const getEntryText = (entry, filterText) => {
   if(!entry.previewText){
@@ -51,10 +50,10 @@ export default ({ entry, filterText }) => {
           class="hide-icon"
           key={entry.id + 'delete'}
           onclick={() => fire('showConfirmDeleteEntryModal', { entry })}/>
-        <Icon icon="share"
+        {navigator.share && <Icon icon="share"
           class="hide-icon"
           key={entry.id + 'sharre'}
-          onclick={() => copyText(entry.date + ' ' + entry.text)}/>
+          onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })}/>}
         <Icon icon={favoriteIcon}
           class={entry.favorited ? '' : 'hide-icon'}
           key={entry.id + 'favorite'}

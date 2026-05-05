@@ -327,12 +327,6 @@ header .nav-set > *:not(h1):not(form) {
   }
 }
 
-@media (max-width: 648px) {
-  .toast .button--fab.add-entry {
-    bottom: 75px;
-  }
-}
-
 .button--fab.add-entry a {
   height: 25px;
   width: 25px;
@@ -462,33 +456,6 @@ body.dark .menu-username {
   }
 }
 
-/* Toast */
-
-toast {
-  left: 50%;
-  transform: translateX(-50%);
-  position: fixed;
-  text-align: center;
-  height: 50px;
-  background-color: var(--theme-dark);
-  bottom: -50px;
-  transition: bottom linear .1s;
-  z-index: 2;
-  color: var(--theme-white);
-  width: 100%;
-  max-width: 450px;
-}
-
-toast.show {
-  bottom: 0;
-}
-
-.toast-label {
-  display: inline-block;
-  font-size: 16px;
-  padding: 16px 16px;
-}
-
 /* Dark theme */
 
 body.dark {
@@ -531,10 +498,6 @@ body.dark .elevated {
 
 body.dark .highlight {
   background-color: var(--theme-dark-blue);
-}
-
-body.dark toast {
-  filter: brightness(150%);
 }
 
 body.dark .login-form-wrapper input {

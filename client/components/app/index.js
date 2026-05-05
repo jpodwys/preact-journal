@@ -7,14 +7,11 @@ import Entries from '../entries';
 import Search from '../search';
 import Entry from '../entry';
 import DialogWrapper from '../dialog-wrapper';
-import Toast from '../toast';
 import { fire } from '../unifire';
 
 export default (props) => {
-  const toast = props.toast ? 'toast' : '';
-
   return (
-    <div class={`app ${toast}`}>
+    <div class="app">
       <Header
         view={props.view}
         loggedIn={props.loggedIn}
@@ -50,7 +47,6 @@ export default (props) => {
         userId={props.userId}
         username={props.username}
         dialogMode={props.dialogMode}/>
-      <Toast toast={props.toast}/>
     </div>
   );
 };

@@ -28,12 +28,10 @@ describe('appState', () => {
     expect(state.username).to.equal('');
     expect(state.timestamp).to.be.undefined;
     expect(state.entry).to.be.undefined;
-    expect(state.toast).to.be.undefined;
     expect(state.dialogMode).to.be.undefined;
     expect(state.entryIndex).to.equal(-1);
     expect(state.entries.length).to.equal(0);
     expect(state.viewEntries.length).to.equal(0);
-    expect(state.toast).to.be.undefined;
     expect(state.dark).to.be.false;
 
     var accounts = [{ id: 42, username: 'testuser', active: true }];

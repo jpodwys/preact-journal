@@ -2,8 +2,6 @@ import { fire } from '../../components/unifire';
 import { getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
 
-let timeout;
-
 function linkstate (el, { key, val, cb }) {
   el.set({ [key]: val }, cb);
 };
@@ -13,15 +11,6 @@ function toggleDarkMode (el) {
     dark: !el.state.dark,
     dialogMode: ''
   });
-};
-
-// Copied to clipboard confirmation is currently the only toast message.
-function setToast (el) {
-  if(timeout) clearTimeout(timeout);
-  el.set({ toast: 'Entry copied to clipboard!' });
-  timeout = setTimeout(() => {
-    el.set({ toast: '' });
-  }, 2000)
 };
 
 function handleRouteChange (el, url) {
@@ -70,6 +59,5 @@ function handleEntryView (url) {
 export default {
   linkstate,
   toggleDarkMode,
-  setToast,
   handleRouteChange
 };
