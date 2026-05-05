@@ -1,100 +1,88 @@
 import { h } from 'preact';
-import { Provider } from '../unifire';
+import { mount, fireEvent } from '../../../test/mount';
 import DialogWrapper from './index';
 
-describe('dialogWrapper', () => {
-  let actions;
+describe('dialog-wrapper', () => {
+  let env;
+  let pushSpy;
 
   function setAccounts (accounts) {
     localStorage.setItem('accounts', JSON.stringify(accounts));
   }
 
-  function getMenu (overrides) {
-    var props = Object.assign({
-      dialogMode: 'menu',
-      dark: false,
-      view: '/entries',
-      sort: 'desc',
-      userId: '1',
-      username: 'testuser'
-    }, overrides);
-    var vnode = DialogWrapper(props);
-    // vnode is div > div.modal-dialog > ul.menu
-    return vnode.children[0].children[0];
-  }
-
-  function findLi (menu, text) {
-    return menu.children.find(li =>
-      li && li.children && li.children.some && li.children.some(c =>
-        c && c.children && c.children[0] === text
-      )
-    );
-  }
-
-  function getIcon (li) {
-    var svg = li.children.find(c => c && c.attributes && c.attributes.icon);
-    return svg && svg.attributes.icon;
-  }
+  const linkstate = (el, { key, val, cb }) => el.set({ [key]: val }, cb);
 
   beforeEach(() => {
     localStorage.clear();
-    actions = {
-      linkstate: sinon.spy(),
-      switchAccount: sinon.spy()
-    };
-    new Provider({ state: {}, actions, children: [] });
+    // history.pushState is the boundary the router crosses on navigation.
+    pushSpy = sinon.spy(history, 'pushState');
+  });
+
+  afterEach(() => {
+    if(env) env.cleanup();
+    env = null;
+    pushSpy.restore();
+  });
+
+  function mountMenu ({ state = {}, actions = {} } = {}) {
+    return mount(h(DialogWrapper, null), {
+      state: Object.assign({
+        dialogMode: 'menu',
+        dark: false,
+        view: '/entries',
+        sort: 'desc',
+        userId: '1',
+        username: 'testuser'
+      }, state),
+      actions: Object.assign({ linkstate }, actions)
+    });
+  }
+
+  it('renders nothing when dialogMode is falsey', () => {
+    env = mountMenu({ state: { dialogMode: '' } });
+    expect(env.host.querySelector('.menu')).to.not.exist;
+    expect(env.host.querySelector('.modal-overlay')).to.not.exist;
+    expect(env.queryByText('Logout')).to.be.null;
   });
 
   describe('menu username', () => {
-
-    it('should render the username as the first menu item', () => {
+    it('renders the username as the first menu item', () => {
       setAccounts([{ id: 1, username: 'testuser', active: true }]);
-      var menu = getMenu();
-      var firstLi = menu.children[0];
-      expect(firstLi.attributes.class).to.equal('menu-username');
-      expect(firstLi.children[0]).to.equal('testuser');
+      env = mountMenu();
+      const menu = env.host.querySelector('.menu');
+      expect(menu.firstElementChild.textContent).to.equal('testuser');
     });
 
-    it('should render the correct username when changed', () => {
+    it('renders the correct username when state.username changes', () => {
       setAccounts([{ id: 1, username: 'alice', active: true }]);
-      var menu = getMenu({ username: 'alice' });
-      var firstLi = menu.children[0];
-      expect(firstLi.children[0]).to.equal('alice');
+      env = mountMenu({ state: { username: 'alice' } });
+      const menu = env.host.querySelector('.menu');
+      expect(menu.firstElementChild.textContent).to.equal('alice');
     });
-
   });
 
-  describe('single account - Add button', () => {
-
+  describe('with a single logged-in account', () => {
     beforeEach(() => {
       setAccounts([{ id: 1, username: 'testuser', active: true }]);
     });
 
-    it('should show "Add" with person-add icon when only one account is logged in', () => {
-      var menu = getMenu();
-      var addLi = findLi(menu, 'Add');
-      expect(addLi).to.exist;
-      expect(getIcon(addLi)).to.equal('person-add');
+    it('shows Add (with the person-add icon) and not Switch', () => {
+      env = mountMenu();
+      const addRow = env.getByText('Add').parentElement;
+      expect(addRow.querySelector('svg[icon="person-add"]')).to.exist;
+      expect(env.queryByText('Switch')).to.be.null;
     });
 
-    it('should not show "Switch" when only one account is logged in', () => {
-      var menu = getMenu();
-      var switchLi = findLi(menu, 'Switch');
-      expect(switchLi).to.be.undefined;
+    it('closes the menu and routes to /switch when Add is clicked', () => {
+      env = mountMenu();
+      fireEvent.click(env.getByText('Add'));
+      expect(env.queryByText('Add')).to.be.null;
+      expect(pushSpy.calledOnce).to.be.true;
+      expect(pushSpy.args[0][2]).to.equal('/switch');
     });
-
-    it('should close the menu and route to /switch when Add is clicked', () => {
-      var menu = getMenu();
-      var addLi = findLi(menu, 'Add');
-      addLi.attributes.onclick();
-      expect(actions.linkstate.calledOnce).to.be.true;
-      expect(actions.linkstate.args[0][1].key).to.equal('dialogMode');
-    });
-
   });
 
-  describe('two accounts - Switch button', () => {
-
+  describe('with two logged-in accounts', () => {
     beforeEach(() => {
       setAccounts([
         { id: 1, username: 'testuser', active: true },
@@ -102,49 +90,40 @@ describe('dialogWrapper', () => {
       ]);
     });
 
-    it('should show "Switch" with people icon when two accounts are logged in', () => {
-      var menu = getMenu();
-      var switchLi = findLi(menu, 'Switch');
-      expect(switchLi).to.exist;
-      expect(getIcon(switchLi)).to.equal('people');
+    it('shows Switch (with the people icon) and not Add', () => {
+      env = mountMenu();
+      const switchRow = env.getByText('Switch').parentElement;
+      expect(switchRow.querySelector('svg[icon="people"]')).to.exist;
+      expect(env.queryByText('Add')).to.be.null;
     });
 
-    it('should not show "Add" when two accounts are logged in', () => {
-      var menu = getMenu();
-      var addLi = findLi(menu, 'Add');
-      expect(addLi).to.be.undefined;
+    it('closes the menu and fires switchAccount with the other id when Switch is clicked', () => {
+      const switchAccount = sinon.spy();
+      env = mountMenu({ actions: { switchAccount } });
+      fireEvent.click(env.getByText('Switch'));
+      expect(env.queryByText('Switch')).to.be.null;
+      expect(switchAccount.calledOnce).to.be.true;
+      expect(switchAccount.args[0][1]).to.equal('2');
     });
 
-    it('should close the menu and fire switchAccount with the other account id when Switch is clicked', () => {
-      var menu = getMenu();
-      var switchLi = findLi(menu, 'Switch');
-      switchLi.attributes.onclick();
-      expect(actions.linkstate.calledOnce).to.be.true;
-      expect(actions.linkstate.args[0][1].key).to.equal('dialogMode');
-      expect(actions.switchAccount.calledOnce).to.be.true;
-      expect(actions.switchAccount.args[0][1]).to.equal('2');
-    });
-
-    it('should switch to the correct account regardless of order', () => {
+    it('switches to the correct account regardless of stored order', () => {
       setAccounts([
         { id: 5, username: 'other', active: false },
         { id: 1, username: 'testuser', active: true }
       ]);
-      var menu = getMenu();
-      var switchLi = findLi(menu, 'Switch');
-      switchLi.attributes.onclick();
-      expect(actions.switchAccount.args[0][1]).to.equal('5');
+      const switchAccount = sinon.spy();
+      env = mountMenu({ actions: { switchAccount } });
+      fireEvent.click(env.getByText('Switch'));
+      expect(switchAccount.args[0][1]).to.equal('5');
     });
-
   });
 
-  describe('returns nothing when dialogMode is falsey', () => {
-
-    it('should return undefined when dialogMode is empty', () => {
-      var result = DialogWrapper({ dialogMode: '' });
-      expect(result).to.be.undefined;
+  describe('overlay', () => {
+    it('closes the menu when the overlay is clicked', () => {
+      env = mountMenu();
+      fireEvent.click(env.host.querySelector('.modal-overlay'));
+      expect(env.host.querySelector('.menu')).to.not.exist;
+      expect(env.queryByText('Logout')).to.be.null;
     });
-
   });
-
 });
