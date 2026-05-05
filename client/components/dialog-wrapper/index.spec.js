@@ -126,4 +126,65 @@ describe('dialog-wrapper', () => {
       expect(env.queryByText('Logout')).to.be.null;
     });
   });
+
+  describe('modal mode — delete', () => {
+    const entry = { id: 5, date: '2024-01-01', text: 'gone' };
+
+    it('renders the delete-entry confirmation when dialogMode is "modal:delete"', () => {
+      env = mountMenu({ state: { dialogMode: 'modal:delete', entry } });
+      expect(env.getByText('Delete this entry?')).to.exist;
+      expect(env.getByText('Delete')).to.exist;
+      expect(env.getByText('Cancel')).to.exist;
+      expect(env.host.querySelector('.menu')).to.not.exist;
+    });
+
+    it('renders nothing for modal:delete when there is no entry', () => {
+      env = mountMenu({ state: { dialogMode: 'modal:delete', entry: undefined } });
+      expect(env.queryByText('Delete this entry?')).to.be.null;
+      expect(env.host.querySelector('.modal-dialog')).to.not.exist;
+    });
+
+    it('Cancel clears dialogMode and the modal disappears', () => {
+      env = mountMenu({ state: { dialogMode: 'modal:delete', entry } });
+      fireEvent.click(env.getByText('Cancel'));
+      expect(env.queryByText('Delete this entry?')).to.be.null;
+    });
+
+    it('Delete fires deleteEntry with the entry id', () => {
+      const deleteEntry = sinon.spy();
+      env = mountMenu({
+        state: { dialogMode: 'modal:delete', entry },
+        actions: { deleteEntry }
+      });
+      fireEvent.click(env.getByText('Delete'));
+      expect(deleteEntry.calledOnce).to.be.true;
+      expect(deleteEntry.args[0][1]).to.deep.equal({ id: 5 });
+    });
+  });
+
+  describe('modal mode — logout', () => {
+    it('renders the logout confirmation when dialogMode is "modal:logout"', () => {
+      env = mountMenu({ state: { dialogMode: 'modal:logout' } });
+      expect(env.getByText('Logout?')).to.exist;
+      expect(env.getByText('Logout')).to.exist;
+      expect(env.getByText('Cancel')).to.exist;
+    });
+
+    it('Cancel hides the logout modal', () => {
+      env = mountMenu({ state: { dialogMode: 'modal:logout' } });
+      fireEvent.click(env.getByText('Cancel'));
+      expect(env.queryByText('Logout?')).to.be.null;
+    });
+
+    it('confirming Logout fires the logout action', () => {
+      const logout = sinon.spy();
+      env = mountMenu({
+        state: { dialogMode: 'modal:logout' },
+        actions: { logout }
+      });
+      fireEvent.click(env.getByText('Logout'));
+      expect(logout.calledOnce).to.be.true;
+    });
+  });
+
 });
