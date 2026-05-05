@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { mount, fireEvent } from '../../../test/mount';
 import EntryPreview from './index';
 
-describe('entry-preview (DOM)', () => {
+describe('entry-preview', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 

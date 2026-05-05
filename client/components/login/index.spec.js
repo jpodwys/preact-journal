@@ -4,7 +4,7 @@ import { mount, fireEvent } from '../../../test/mount';
 import Login from './index';
 import User from '../../js/services/user-service';
 
-describe('login (DOM)', () => {
+describe('login', () => {
   let env;
 
   beforeEach(() => {

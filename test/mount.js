@@ -14,8 +14,9 @@ export function mount (vnode, { state = {}, actions = {} } = {}) {
   return {
     host,
     cleanup () {
-      // Render an empty tree against the prior root to fire
-      // componentWillUnmount on any class components, then detach.
+      // Diff the live tree against an empty placeholder so Preact 8 fires
+      // componentWillUnmount on any class components. `<span>` is just a
+      // throwaway vnode — Preact 8 doesn't unmount on null/undefined.
       render(h('span', null), host, rendered);
       host.remove();
     },
@@ -28,6 +29,10 @@ export function mount (vnode, { state = {}, actions = {} } = {}) {
 
 // fireEvent(node, 'click') still works; fireEvent.click(node) is the
 // RTL-shaped form preferred in new tests.
+//
+// Note: fireEvent.click on an <input type="submit"> dispatches a synthetic
+// click that does NOT cascade into a form submit (matches RTL semantics).
+// To trigger the form's onsubmit, call fireEvent.submit(form) instead.
 export function fireEvent (node, type, init) {
   const event = new Event(type, Object.assign({ bubbles: true, cancelable: true }, init));
   node.dispatchEvent(event);
@@ -45,11 +50,6 @@ fireEvent.change = (node, value) => {
   if(value !== undefined) node.value = value;
   return fireEvent(node, 'change');
 };
-
-// Kept for legacy specs; prefer fireEvent.input(node, value) in new tests.
-export function typeInto (node, value) {
-  return fireEvent.input(node, value);
-}
 
 // ---- queries ----
 
@@ -81,7 +81,13 @@ function findByText (host, matcher) {
 
 export function getByText (host, matcher) {
   const node = findByText(host, matcher);
-  if(!node) throw new Error(`getByText: no element matches ${formatMatcher(matcher)}`);
+  if(!node) {
+    throw new Error(
+      `getByText: no element matches ${formatMatcher(matcher)}. ` +
+      `Note: only direct text-node children are matched; ` +
+      `text split across child elements (e.g. <button>Click <strong>me</strong></button>) won't match a single string.`
+    );
+  }
   return node;
 }
 

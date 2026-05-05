@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { mount } from '../../../test/mount';
 import Entries from './index';
 
-describe('entries (DOM)', () => {
+describe('entries', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 

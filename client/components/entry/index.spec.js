@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { mount, fireEvent } from '../../../test/mount';
 import Entry from './index';
 
-describe('entry (DOM)', () => {
+describe('entry', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 
@@ -38,28 +38,31 @@ describe('entry (DOM)', () => {
 
   describe('navigation arrows on /entry', () => {
     const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
+    // Both arrows render with icon="left"; the right one is distinguished
+    // by the rotate180 class when visible. Avoid render-order indexing.
+    const LEFT_VISIBLE = 'svg[icon="left"]:not(.hidden):not(.rotate180)';
+    const RIGHT_VISIBLE = 'svg[icon="left"].rotate180';
+    const ANY_HIDDEN = 'svg[icon="left"].hidden';
 
-    it('hides the left arrow at the first entry and shows a rotated right arrow', () => {
+    it('hides the left arrow at the first entry and shows the right rotated', () => {
       env = mountEntry({ entry: items[0], viewEntries: items, entryIndex: 0 });
-      const arrows = env.host.querySelectorAll('svg[icon="left"]');
-      expect(arrows.length).to.equal(2);
-      expect(arrows[0].classList.contains('hidden')).to.be.true;
-      expect(arrows[1].classList.contains('hidden')).to.be.false;
-      expect(arrows[1].classList.contains('rotate180')).to.be.true;
+      expect(env.host.querySelector(RIGHT_VISIBLE)).to.exist;
+      expect(env.host.querySelector(LEFT_VISIBLE)).to.not.exist;
+      expect(env.host.querySelector(ANY_HIDDEN)).to.exist;
     });
 
     it('hides the right arrow at the last entry', () => {
       env = mountEntry({ entry: items[2], viewEntries: items, entryIndex: 2 });
-      const arrows = env.host.querySelectorAll('svg[icon="left"]');
-      expect(arrows[0].classList.contains('hidden')).to.be.false;
-      expect(arrows[1].classList.contains('hidden')).to.be.true;
+      expect(env.host.querySelector(LEFT_VISIBLE)).to.exist;
+      expect(env.host.querySelector(RIGHT_VISIBLE)).to.not.exist;
+      expect(env.host.querySelector(ANY_HIDDEN)).to.exist;
     });
 
     it('shows both arrows for a middle entry', () => {
       env = mountEntry({ entry: items[1], viewEntries: items, entryIndex: 1 });
-      const arrows = env.host.querySelectorAll('svg[icon="left"]');
-      expect(arrows[0].classList.contains('hidden')).to.be.false;
-      expect(arrows[1].classList.contains('hidden')).to.be.false;
+      expect(env.host.querySelector(LEFT_VISIBLE)).to.exist;
+      expect(env.host.querySelector(RIGHT_VISIBLE)).to.exist;
+      expect(env.host.querySelector(ANY_HIDDEN)).to.not.exist;
     });
 
     it('fires shiftEntry(-1) when the left arrow is clicked', () => {
@@ -68,7 +71,7 @@ describe('entry (DOM)', () => {
         { entry: items[1], viewEntries: items, entryIndex: 1 },
         { shiftEntry }
       );
-      fireEvent.click(env.host.querySelectorAll('svg[icon="left"]')[0]);
+      fireEvent.click(env.host.querySelector(LEFT_VISIBLE));
       expect(shiftEntry.calledOnce).to.be.true;
       expect(shiftEntry.args[0][1]).to.equal(-1);
     });
@@ -79,7 +82,7 @@ describe('entry (DOM)', () => {
         { entry: items[1], viewEntries: items, entryIndex: 1 },
         { shiftEntry }
       );
-      fireEvent.click(env.host.querySelectorAll('svg[icon="left"]')[1]);
+      fireEvent.click(env.host.querySelector(RIGHT_VISIBLE));
       expect(shiftEntry.calledOnce).to.be.true;
       expect(shiftEntry.args[0][1]).to.equal(1);
     });

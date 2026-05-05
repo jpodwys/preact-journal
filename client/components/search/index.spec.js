@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { mount, fireEvent } from '../../../test/mount';
 import Search from './index';
 
-describe('search (DOM)', () => {
+describe('search', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 

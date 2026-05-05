@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { mount, fireEvent } from '../../../test/mount';
 import Icon from './index';
 
-describe('icon (DOM)', () => {
+describe('icon', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 
