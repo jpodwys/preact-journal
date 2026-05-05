@@ -8,38 +8,6 @@ describe('Router', () => {
     history.replaceState(null, null, originalPathname);
   });
 
-  describe('matchUrlWithWildCards', () => {
-    let router;
-
-    beforeEach(() => {
-      router = new Router();
-    });
-
-    it('should match an exact path', () => {
-      expect(router.matchUrlWithWildCards('/entries', '/entries')).to.be.true;
-    });
-
-    it('should match a wildcard segment', () => {
-      expect(router.matchUrlWithWildCards('/entry/:id', '/entry/123')).to.be.true;
-    });
-
-    it('should not match when path has more segments than url', () => {
-      expect(router.matchUrlWithWildCards('/entry/:id/edit', '/entry/123')).to.be.false;
-    });
-
-    it('should not match when segments differ and there is no wildcard', () => {
-      expect(router.matchUrlWithWildCards('/entries', '/search')).to.be.false;
-    });
-
-    it('should match root path', () => {
-      expect(router.matchUrlWithWildCards('/', '/')).to.be.true;
-    });
-
-    it('should match when url has more segments with wildcards', () => {
-      expect(router.matchUrlWithWildCards('/entry/:id', '/entry/123')).to.be.true;
-    });
-  });
-
   describe('matchPath', () => {
     let router;
     const children = [

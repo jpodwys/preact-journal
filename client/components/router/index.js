@@ -71,10 +71,6 @@ class Router extends Component {
     }
   }
 
-  matchUrlWithWildCards(path, url) {
-    return matchWild(path, url);
-  }
-
   matchPath(url, children) {
     return children.filter(c => c.attributes.path === url || matchWild(c.attributes.path, url));
   }
