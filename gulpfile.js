@@ -92,9 +92,13 @@ function inline() {
 
 function cspHash(cb) {
   var html = fs.readFileSync('./dist/index.html', 'utf8');
-  var match = html.match(/<script>([\s\S]*?)<\/script>/);
-  var hash = match ? crypto.createHash('sha256').update(match[1]).digest('base64') : '';
-  fs.writeFileSync('./dist/csp-hash.json', JSON.stringify({ hash: hash }));
+  var hashes = [];
+  var re = /<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g;
+  var match;
+  while ((match = re.exec(html)) !== null) {
+    hashes.push(crypto.createHash('sha256').update(match[1]).digest('base64'));
+  }
+  fs.writeFileSync('./dist/csp-hash.json', JSON.stringify({ hashes: hashes }));
   cb();
 }
 

@@ -11,7 +11,8 @@
     <title>Journalize</title>
   </head>
   <body>
-    <script src="/bundle.js" inline></script>
+    <script>var r=indexedDB.open('keyval-store',1);r.onupgradeneeded=function(){r.result.createObjectStore('keyval')};</script>
+    <script src="/bundle.js" inline cachehint="eager"></script>
     <noscript>
       Please enable JavaScript.
     </noscript>

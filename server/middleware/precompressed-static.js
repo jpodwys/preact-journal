@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var applyCsp = require('./csp');
 
 var TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -34,6 +35,7 @@ module.exports = function precompressedStatic(rootDir) {
       res.setHeader('Content-Encoding', 'br');
       res.setHeader('Content-Length', stat.size);
       res.setHeader('Vary', 'Accept-Encoding');
+      if (ext === '.html') applyCsp(res);
 
       if (req.method === 'HEAD') return res.end();
       fs.createReadStream(brPath).pipe(res);

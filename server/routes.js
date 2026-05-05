@@ -4,6 +4,7 @@ var Sequelize = require('sequelize'),
   user = require('./middleware/userMW')(db, Sequelize),
   userHandlers = require('./middleware/user-handlers'),
   entry = require('./middleware/entryMW')(db, Sequelize),
+  applyCsp = require('./middleware/csp'),
   version = require('../dist/version.json').version;
 
 var loginLimiter = rateLimit({
@@ -42,6 +43,7 @@ module.exports = app => {
 
   /* Catch-all view route */
   app.get('/*', (req, res) => {
+    applyCsp(res);
     res.sendFile('index.html', { root: './dist', maxAge: '30d' });
   });
 }
