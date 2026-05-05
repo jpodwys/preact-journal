@@ -7,10 +7,8 @@ import { getAccounts } from '../../js/utils';
 const closeDialog = () => fire('linkstate', { key: 'dialogMode' });
 
 const onLogout = () => {
-  fire('linkstate', {
-    key: 'dialogMode',
-    cb: setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }))
-  });
+  fire('linkstate', { key: 'dialogMode' });
+  setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }));
 };
 
 const onAdd = () => {

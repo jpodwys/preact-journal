@@ -187,4 +187,23 @@ describe('dialog-wrapper', () => {
     });
   });
 
+  describe('opening the logout modal from the menu', () => {
+    let clock;
+    beforeEach(() => { clock = sinon.useFakeTimers(); });
+    afterEach(() => clock.restore());
+
+    it('clicking Logout in the menu closes the menu, then opens the logout modal on the next tick', () => {
+      env = mountMenu();
+      fireEvent.click(env.getByText('Logout'));
+
+      // Synchronously: dialogMode cleared, menu gone, modal not yet open.
+      expect(env.queryByText('testuser')).to.be.null;
+      expect(env.queryByText('Logout?')).to.be.null;
+
+      clock.tick(0);
+
+      expect(env.getByText('Logout?')).to.exist;
+    });
+  });
+
 });
