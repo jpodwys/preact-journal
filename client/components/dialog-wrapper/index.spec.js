@@ -19,8 +19,8 @@ describe('dialogWrapper', () => {
       username: 'testuser'
     }, overrides);
     var vnode = DialogWrapper(props);
-    // vnode is Dialog > ul.menu
-    return vnode.children[0];
+    // vnode is div > div.modal-dialog > ul.menu
+    return vnode.children[0].children[0];
   }
 
   function findLi (menu, text) {

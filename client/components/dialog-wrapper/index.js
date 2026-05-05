@@ -1,9 +1,10 @@
 import { h } from 'preact';
-import Dialog from '../dialog';
 import Icon from '../icon';
 import { fire } from '../unifire';
 import { route } from '../router';
 import { getAccounts } from '../../js/utils';
+
+const closeDialog = () => fire('linkstate', { key: 'dialogMode' });
 
 const onLogout = () => {
   fire('linkstate', {
@@ -106,8 +107,9 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   }
 
   return (
-    <Dialog dialogMode={mode}>
-      { markup }
-    </Dialog>
+    <div>
+      <div class={`modal-dialog modal-${mode} grow`}>{markup}</div>
+      <div class={`modal-overlay modal-${mode} fade-in`} onclick={closeDialog}></div>
+    </div>
   );
 };
