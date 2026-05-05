@@ -69,7 +69,7 @@
     "sinon": "^6.2.0"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "author": "jpodwys",
   "license": "MIT",
