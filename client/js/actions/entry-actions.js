@@ -10,8 +10,8 @@ let dataFetched = false;
 
 function updateIdbEntries (userId, updater) {
   get('entries_' + userId).then((entries = []) => {
-    var updated = updater(entries);
-    if(updated !== false) set('entries_' + userId, sortObjectsByDate(updated || entries));
+    var updated = updater(entries) || entries;
+    set('entries_' + userId, sortObjectsByDate(updated));
   });
 }
 
@@ -19,6 +19,26 @@ function isStaleUser (el, userId, updater) {
   if(el.state.userId === userId) return false;
   if(updater) updateIdbEntries(userId, updater);
   return true;
+}
+
+function applyEntryPatch (el, userId, id, patch) {
+  // userId is optional; pass undefined to skip the stale-user check
+  // (e.g. on failure paths where the response userId isn't available).
+  if(userId !== undefined && isStaleUser(el, userId, entries => {
+    var idx = findObjectIndexById(id, entries);
+    if(idx > -1) patch(entries, idx);
+  })) return;
+
+  var entries = el.state.entries;
+  var idx = findObjectIndexById(id, entries);
+  if(idx === -1) return;
+  patch(entries, idx);
+
+  var entry = isActiveEntryId(el, id) && entries[idx]
+    ? Object.assign({}, entries[idx])
+    : el.state.entry;
+
+  el.set({ entry, entries: entries.slice() });
 }
 
 function boot (el, { entries }){
@@ -202,66 +222,34 @@ function createEntry (el, { entry, clientSync }){
     .catch(() => createEntryFailure(el, entry.id));
 };
 
+/**
+ * Because needsSync is a boolean, removing it here
+ * can introduce a problem.
+ *
+ * For example, if I type one character and pause,
+ * thereby triggering a POST, that will add the
+ * needsSync and postPending flags to the entry. As
+ * a result, anything I type while the POST is
+ * pending (which would normally trigger adding the
+ * needsSync flag to the entry) will be ignored when
+ * the POST returns and triggers a removal of the
+ * entry's needsSync flag.
+ *
+ * A potential solution could be to make needsSync
+ * an integer so I can increment it when it needs
+ * both a POST and a PATCH.
+ */
 function createEntrySuccess (el, userId, oldId, id){
-  if(isStaleUser(el, userId, entries => {
-    var idx = findObjectIndexById(oldId, entries);
-    if(idx > -1) {
-      entries[idx].id = id;
-      delete entries[idx].postPending;
-      delete entries[idx].newEntry;
-      delete entries[idx].needsSync;
-    }
-  })) return;
-
-  var entryIndex = findObjectIndexById(oldId, el.state.entries);
-
-  /**
-   * Only update state.entry if the entry we just
-   * modified is still active.
-   */
-  if(isActiveEntryId(el, oldId)) el.state.entry.id = id;
-
-  el.state.entries[entryIndex].id = id;
-  delete el.state.entries[entryIndex].postPending;
-  delete el.state.entries[entryIndex].newEntry;
-  /**
-   * Because needsSync is a boolean, removing it here
-   * can introduce a problem.
-   *
-   * For example, if I type one character and pause,
-   * thereby triggering a POST, that will add the
-   * needsSync and postPending flags to the entry. As
-   * a result, anything I type while the POST is
-   * pending (which would normally trigger adding the
-   * needsSync flag to the entry) will be ignored when
-   * the POST returns and triggers a removal of the
-   * entry's needsSync flag.
-   *
-   * A potential solution could be to make needsSync
-   * an integer so I can increment it when it needs
-   * both a POST and a PATCH.
-   */
-  delete el.state.entries[entryIndex].needsSync;
-
-  el.set({
-    entry: Object.assign({}, el.state.entry),
-    entries: el.state.entries.slice()
+  applyEntryPatch(el, userId, oldId, (entries, i) => {
+    entries[i].id = id;
+    delete entries[i].postPending;
+    delete entries[i].newEntry;
+    delete entries[i].needsSync;
   });
 };
 
 function createEntryFailure (el, oldId){
-  /**
-   * Only update state.entry if the entry we just
-   * modified is still active.
-   */
-  if(isActiveEntryId(el, oldId)) delete el.state.entry.postPending;
-
-  var entryIndex = findObjectIndexById(oldId, el.state.entries);
-  delete el.state.entries[entryIndex].postPending;
-  el.set({
-    entry: Object.assign({}, el.state.entry),
-    entries: el.state.entries.slice()
-  });
+  applyEntryPatch(el, undefined, oldId, (entries, i) => { delete entries[i].postPending; });
 };
 
 function toggleFavorite (el, { id, favorited }){
@@ -294,24 +282,7 @@ function updateEntry (el, { entry, property, entryId }){
 };
 
 function updateEntrySuccess (el, userId, id){
-  if(isStaleUser(el, userId, entries => {
-    var idx = findObjectIndexById(id, entries);
-    if(idx > -1) delete entries[idx].needsSync;
-  })) return;
-
-  const entries = el.state.entries.slice();
-  const entryIndex = findObjectIndexById(id, entries);
-  delete entries[entryIndex].needsSync;
-
-  /**
-   * Only update state.entry if the entry we just
-   * modified is still active.
-   */
-  const entry = isActiveEntryId(el, id)
-    ? Object.assign({}, entries[entryIndex])
-    : el.state.entry;
-
-  el.set({ entry, entries });
+  applyEntryPatch(el, userId, id, (entries, i) => { delete entries[i].needsSync; });
 };
 
 function putEntry (el, { entry }){
@@ -351,14 +322,7 @@ function deleteEntry (el, { id }){
 };
 
 function deleteEntrySuccess (el, userId, id){
-  if(isStaleUser(el, userId, entries => {
-    var idx = findObjectIndexById(id, entries);
-    if(idx > -1) entries.splice(idx, 1);
-  })) return;
-
-  var entryIndex = findObjectIndexById(id, el.state.entries);
-  el.state.entries.splice(entryIndex, 1);
-  el.set({ entries: el.state.entries });
+  applyEntryPatch(el, userId, id, (entries, i) => entries.splice(i, 1));
 };
 
 function setEntry (el, { id }){
