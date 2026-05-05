@@ -8,8 +8,13 @@ var esbuild = require('esbuild');
 var browserslist = require('browserslist');
 var crypto = require('crypto');
 var fs = require('fs');
+var path = require('path');
+var zlib = require('zlib');
 var del = require('del');
 var replace = require('gulp-replace');
+
+var COMPRESSIBLE_EXTS = /\.(html|js|css|json|svg|txt)$/i;
+var PRECOMPRESS_MIN_BYTES = 1400; // matches shrinkRay threshold
 
 function serve(cb) {
   require('./app.js');
@@ -93,13 +98,31 @@ function cspHash(cb) {
   cb();
 }
 
+function precompress(cb) {
+  fs.readdirSync('./dist').forEach(function (name) {
+    if (!COMPRESSIBLE_EXTS.test(name)) return;
+    var full = path.join('./dist', name);
+    var buf = fs.readFileSync(full);
+    if (buf.length < PRECOMPRESS_MIN_BYTES) return;
+    var br = zlib.brotliCompressSync(buf, {
+      params: {
+        [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+        [zlib.constants.BROTLI_PARAM_SIZE_HINT]: buf.length
+      }
+    });
+    fs.writeFileSync(full + '.br', br);
+  });
+  cb();
+}
+
 function build(cb) {
   return gulp.series(
     clean,
     gulp.parallel(scripts, sw, version, manifest, images),
     gulp.parallel(styles, compress),
     inline,
-    cspHash
+    cspHash,
+    precompress
   )(cb);
 }
 

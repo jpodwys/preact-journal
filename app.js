@@ -4,6 +4,7 @@ var express = require('express'),
   cookieParser = require('cookie-parser'),
   app = express(),
   strictTransportSecurity = require('./server/middleware/strict-transport-security'),
+  precompressedStatic = require('./server/middleware/precompressed-static'),
   forceSsl = require('force-ssl-heroku'),
   jwtPrser = require('./server/middleware/jwt-parser'),
   cron = require('./server/cron'),
@@ -19,6 +20,7 @@ var express = require('express'),
 app.disable('x-powered-by');
 app.use(forceSsl);
 app.use(strictTransportSecurity);
+app.use(precompressedStatic('dist'));
 app.use(shrinkRay({ threshold: '1.4kb' }));
 // app.use(compression({ threshold: '1.4kb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '50kb' }));
