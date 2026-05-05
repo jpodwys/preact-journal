@@ -86,6 +86,52 @@ describe('appState', () => {
     expect(state.viewEntries.length).to.equal(0);
   });
 
+  describe('view observer', () => {
+    it('clears dialogMode on every view change', () => {
+      state.dialogMode = 'menu';
+      state.view = '/entries';
+      expect(state.dialogMode).to.equal('');
+    });
+
+    it('fires clearFilters when navigating from /search to /entries', () => {
+      const clearFilters = sinon.spy();
+      new Provider({ state: {}, actions: { clearFilters }, children: [] });
+      state = getInitialState();
+
+      state.view = '/search';
+      expect(clearFilters.called).to.be.false;
+      state.view = '/entries';
+      expect(clearFilters.calledOnce).to.be.true;
+    });
+
+    it('does not fire clearFilters on other view transitions', () => {
+      const clearFilters = sinon.spy();
+      new Provider({ state: {}, actions: { clearFilters }, children: [] });
+      state = getInitialState();
+
+      state.view = '/entries';
+      state.view = '/entry';
+      state.view = '/new';
+      expect(clearFilters.called).to.be.false;
+    });
+  });
+
+  describe('dark observer', () => {
+    afterEach(() => { document.body.classList.remove('dark'); });
+
+    it('adds the dark class to document.body when dark becomes true', () => {
+      state.dark = false; // baseline (clears any class from a prior test)
+      expect(document.body.classList.contains('dark')).to.be.false;
+
+      state.dark = true;
+      expect(document.body.classList.contains('dark')).to.be.true;
+
+      state.dark = false;
+      expect(document.body.classList.contains('dark')).to.be.false;
+    });
+
+  });
+
   describe('boot hydration from IndexedDB', () => {
     beforeEach(async () => {
       localStorage.clear();

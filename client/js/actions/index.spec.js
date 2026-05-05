@@ -1202,6 +1202,32 @@ describe('actions', () => {
       });
     });
 
+    describe('exportEntries', () => {
+      let createObjectURL;
+      beforeEach(() => {
+        // exportEntries util fires linkstate at the end; satisfy fire() with a stub action.
+        new Provider({ state: {}, actions: { linkstate: sinon.spy() }, children: [] });
+        createObjectURL = sinon.stub(window.URL, 'createObjectURL').returns('blob:t');
+        sinon.stub(window.URL, 'revokeObjectURL');
+      });
+      afterEach(() => {
+        window.URL.createObjectURL.restore();
+        window.URL.revokeObjectURL.restore();
+      });
+
+      it('hands state.viewEntries to the export util', () => {
+        el.state.viewEntries = [{ date: '2024-01-01', text: 'Hello' }];
+        Entry.exportEntries(el);
+        expect(createObjectURL.calledOnce).to.be.true;
+      });
+
+      it('does nothing when there are no viewEntries to export', () => {
+        el.state.viewEntries = [];
+        Entry.exportEntries(el);
+        expect(createObjectURL.called).to.be.false;
+      });
+    });
+
     describe('removeSlideInProp', () => {
 
       it('should remove the slideIn prop from all entries after a 50ms debounce', (done) => {

@@ -1,122 +1,78 @@
-import Router, { route } from './index';
 import { h } from 'preact';
+import { mount } from '../../../test/mount';
+import Router, { route } from './index';
 
+// Black-box: mount a Router with path-tagged children, drive the URL via
+// route() / history, and assert which child rendered.
 describe('Router', () => {
+  let env;
   const originalPathname = location.pathname;
 
   afterEach(() => {
+    if(env) env.cleanup();
+    env = null;
     history.replaceState(null, null, originalPathname);
   });
 
-  describe('matchPath', () => {
-    let router;
-    const children = [
-      { attributes: { path: '/' } },
-      { attributes: { path: '/entries' } },
-      { attributes: { path: '/entry/:id' } }
-    ];
+  // Stub leaf components that mark themselves so we can identify the active route.
+  const Home = () => h('div', { 'data-route': 'home' }, 'home');
+  const Entries = () => h('div', { 'data-route': 'entries' }, 'entries');
+  const Entry = (props) => h('div', { 'data-route': 'entry', 'data-id': props.id || '' });
 
-    beforeEach(() => {
-      router = new Router();
-    });
+  function mountRouter (path, extraProps) {
+    history.replaceState(null, null, path);
+    return mount(h(Router, extraProps || null,
+      h(Home, { path: '/' }),
+      h(Entries, { path: '/entries' }),
+      h(Entry, { path: '/entry/:id' })
+    ));
+  }
 
-    it('should match exact paths', () => {
-      const result = router.matchPath('/entries', children);
-      expect(result).to.have.length(1);
-      expect(result[0].attributes.path).to.equal('/entries');
-    });
-
-    it('should match wildcard paths', () => {
-      const result = router.matchPath('/entry/42', children);
-      expect(result).to.have.length(1);
-      expect(result[0].attributes.path).to.equal('/entry/:id');
-    });
-
-    it('should return root for /', () => {
-      const result = router.matchPath('/', children);
-      expect(result.length).to.be.greaterThan(0);
-      expect(result[0].attributes.path).to.equal('/');
-    });
-
-    it('should return empty for unmatched paths', () => {
-      const result = router.matchPath('/unknown', children);
-      expect(result).to.have.length(0);
-    });
+  it('renders the child whose path matches location.pathname', () => {
+    env = mountRouter('/entries');
+    expect(env.host.querySelector('[data-route="entries"]')).to.exist;
+    expect(env.host.querySelector('[data-route="home"]')).to.not.exist;
   });
 
-  describe('render', () => {
-    it('should render the first matching child', () => {
-      const router = new Router();
-      const childA = h('div', { path: '/' }, 'home');
-      const childB = h('div', { path: '/entries' }, 'entries');
-      const result = router.render({ children: [childA, childB] }, { url: '/entries' });
-      expect(result).to.equal(childB);
-    });
-
-    it('should return undefined for unmatched url', () => {
-      const router = new Router();
-      const childA = h('div', { path: '/' }, 'home');
-      const result = router.render({ children: [childA] }, { url: '/nonexistent' });
-      expect(result).to.be.undefined;
-    });
+  it('renders the root child for /', () => {
+    env = mountRouter('/');
+    expect(env.host.querySelector('[data-route="home"]')).to.exist;
   });
 
-  describe('route', () => {
-    it('should update the URL via pushState', () => {
-      route('/context.html#test-push', true);
-      expect(location.pathname).to.contain('context.html');
-    });
-
-    it('should call onChange when ONCHANGE is set', () => {
-      const onChange = sinon.spy();
-      const router = new Router();
-      router.props = { onChange, children: [] };
-      router.componentWillMount();
-      onChange.resetHistory();
-
-      route('/context.html#test-onchange', true);
-      expect(onChange.calledWith('/context.html#test-onchange')).to.be.true;
-    });
+  it('matches a wildcard path against a concrete URL', () => {
+    env = mountRouter('/entry/42');
+    expect(env.host.querySelector('[data-route="entry"]')).to.exist;
   });
 
-  describe('shouldComponentUpdate', () => {
-    it('should return true when url changes', () => {
-      const router = new Router();
-      router.props = { url: '/old', onChange: null };
-      expect(router.shouldComponentUpdate({ onChange: null }, { url: '/new' })).to.be.true;
-    });
-
-    it('should return true when onChange changes', () => {
-      const router = new Router();
-      const fn1 = () => {};
-      const fn2 = () => {};
-      router.props = { url: '/same', onChange: fn1 };
-      expect(router.shouldComponentUpdate({ onChange: fn2 }, { url: '/same' })).to.be.true;
-    });
+  it('renders nothing when no child path matches', () => {
+    env = mountRouter('/no-such-path');
+    expect(env.host.querySelector('[data-route]')).to.not.exist;
   });
 
-  describe('componentWillMount', () => {
-    it('should set document.onclick and window.onpopstate', () => {
-      const router = new Router();
-      router.props = { children: [] };
-      router.componentWillMount();
-      expect(document.onclick).to.be.a('function');
-      expect(window.onpopstate).to.be.a('function');
-    });
+  it('swaps the rendered child when route() updates the URL', () => {
+    env = mountRouter('/');
+    expect(env.host.querySelector('[data-route="home"]')).to.exist;
 
-    it('should call onChange with current pathname when provided', () => {
-      const onChange = sinon.spy();
-      const router = new Router();
-      router.props = { onChange, children: [] };
-      router.componentWillMount();
-      expect(onChange.calledOnce).to.be.true;
-    });
+    route('/entries');
 
-    it('should not call onChange when not provided', () => {
-      const router = new Router();
-      router.props = { children: [] };
-      router.componentWillMount();
-      // No error thrown means it handled the missing onChange
-    });
+    expect(env.host.querySelector('[data-route="entries"]')).to.exist;
+    expect(env.host.querySelector('[data-route="home"]')).to.not.exist;
+  });
+
+  it('fires the onChange prop with the new URL when route() is called', () => {
+    const onChange = sinon.spy();
+    env = mountRouter('/', { onChange });
+    onChange.resetHistory();
+
+    route('/entries');
+
+    expect(onChange.calledOnce).to.be.true;
+    expect(onChange.args[0][0]).to.equal('/entries');
+  });
+
+  it('fires onChange on initial mount with the current pathname', () => {
+    const onChange = sinon.spy();
+    env = mountRouter('/entries', { onChange });
+    expect(onChange.calledWith('/entries')).to.be.true;
   });
 });
