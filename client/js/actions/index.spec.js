@@ -1157,11 +1157,23 @@ describe('actions', () => {
         Entry.shiftEntry(el, 1);
         expect(replaceSpy.called).to.be.false;
       });
+
+      it('does not navigate before the start of viewEntries', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 1 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Entry.shiftEntry(el, -1);
+        expect(replaceSpy.called).to.be.false;
+      });
     });
 
     describe('toggleFavorite', () => {
-      it('marks the entry favorited and sets needsSync on the in-memory entry', () => {
-        fetchMock.patch('/api/entry/0', 204);
+      // toggleFavorite delegates to updateEntry which fires a PATCH; absorb it
+      // so it doesn't fall through to a real network call. The success
+      // callback (clearing needsSync) is covered by the updateEntry tests.
+      beforeEach(() => fetchMock.patch('/api/entry/0', 204));
+
+      it('delegates to updateEntry: marks favorited and sets needsSync on the in-memory entry', () => {
         el.state.entries = [{ id: 0, favorited: false }];
 
         Entry.toggleFavorite(el, { id: 0, favorited: true });
@@ -1203,16 +1215,16 @@ describe('actions', () => {
     });
 
     describe('exportEntries', () => {
-      let createObjectURL;
+      let createObjectURL, revokeObjectURL;
       beforeEach(() => {
         // exportEntries util fires linkstate at the end; satisfy fire() with a stub action.
         new Provider({ state: {}, actions: { linkstate: sinon.spy() }, children: [] });
         createObjectURL = sinon.stub(window.URL, 'createObjectURL').returns('blob:t');
-        sinon.stub(window.URL, 'revokeObjectURL');
+        revokeObjectURL = sinon.stub(window.URL, 'revokeObjectURL');
       });
       afterEach(() => {
-        window.URL.createObjectURL.restore();
-        window.URL.revokeObjectURL.restore();
+        createObjectURL.restore();
+        revokeObjectURL.restore();
       });
 
       it('hands state.viewEntries to the export util', () => {

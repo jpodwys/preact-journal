@@ -140,11 +140,13 @@ describe('dialog-wrapper', () => {
       expect(toggleSort.calledOnce).to.be.true;
     });
 
-    it('hides the sort item entirely on /entry and /new views', () => {
+    it('hides the sort item on /entry', () => {
       env = mountDialog({ state: { view: '/entry' } });
       expect(env.queryByText('Oldest')).to.be.null;
       expect(env.queryByText('Latest')).to.be.null;
-      env.cleanup();
+    });
+
+    it('hides the sort item on /new', () => {
       env = mountDialog({ state: { view: '/new' } });
       expect(env.queryByText('Oldest')).to.be.null;
       expect(env.queryByText('Latest')).to.be.null;
@@ -177,8 +179,13 @@ describe('dialog-wrapper', () => {
       expect(exportEntries.calledOnce).to.be.true;
     });
 
-    it('hides Export on /entry and /new', () => {
+    it('hides Export on /entry', () => {
       env = mountDialog({ state: { view: '/entry' } });
+      expect(env.queryByText('Export')).to.be.null;
+    });
+
+    it('hides Export on /new', () => {
+      env = mountDialog({ state: { view: '/new' } });
       expect(env.queryByText('Export')).to.be.null;
     });
   });

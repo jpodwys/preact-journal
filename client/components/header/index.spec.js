@@ -6,9 +6,17 @@ describe('header', () => {
   let env;
   afterEach(() => { if(env) env.cleanup(); env = null; });
 
-  function mountHeader (state) {
-    return mount(h(Header, null), { state });
+  function mountHeader (state, actions) {
+    return mount(h(Header, null), { state, actions: actions || {} });
   }
+
+  const SEARCH_VIEW_DEFAULTS = {
+    loggedIn: true,
+    view: '/search',
+    viewEntries: [],
+    filter: '',
+    filterText: ''
+  };
 
   describe('hidden', () => {
     it('renders nothing when not logged in', () => {
@@ -121,22 +129,11 @@ describe('header', () => {
     beforeEach(() => { clock = sinon.useFakeTimers(); });
     afterEach(() => clock.restore());
 
-    function mountSearch (state, actions) {
-      return mount(h(Header, null), {
-        state: Object.assign({
-          loggedIn: true,
-          view: '/search',
-          viewEntries: [],
-          filter: '',
-          filterText: ''
-        }, state),
-        actions: actions || {}
-      });
-    }
+    const searchState = (overrides) => Object.assign({}, SEARCH_VIEW_DEFAULTS, overrides);
 
     it('typing in the filter input fires filterByText after the debounce window', () => {
       const filterByText = sinon.spy();
-      env = mountSearch({}, { filterByText });
+      env = mountHeader(searchState(), { filterByText });
 
       fireEvent.input(env.host.querySelector('#filterTextInput'), 'beach');
       expect(filterByText.called).to.be.false;
@@ -150,7 +147,7 @@ describe('header', () => {
 
     it('coalesces a burst of keystrokes into a single fire', () => {
       const filterByText = sinon.spy();
-      env = mountSearch({}, { filterByText });
+      env = mountHeader(searchState(), { filterByText });
 
       const input = env.host.querySelector('#filterTextInput');
       fireEvent.input(input, 'b');
@@ -166,14 +163,14 @@ describe('header', () => {
 
     it('clicking the clear icon fires clearFilters', () => {
       const clearFilters = sinon.spy();
-      env = mountSearch({}, { clearFilters });
+      env = mountHeader(searchState(), { clearFilters });
       fireEvent.click(env.host.querySelector('.search-form svg[icon="clear"]'));
       expect(clearFilters.calledOnce).to.be.true;
     });
 
     it('clicking the empty-star icon turns the favorites filter on', () => {
       const linkstate = sinon.spy();
-      env = mountSearch({ filter: '' }, { linkstate });
+      env = mountHeader(searchState({ filter: '' }), { linkstate });
       fireEvent.click(env.host.querySelector('.search-form svg[icon="star-empty"]'));
       expect(linkstate.calledOnce).to.be.true;
       expect(linkstate.args[0][1]).to.deep.equal({ key: 'filter', val: 'favorites' });
@@ -181,14 +178,14 @@ describe('header', () => {
 
     it('clicking the filled-star icon turns the favorites filter off', () => {
       const linkstate = sinon.spy();
-      env = mountSearch({ filter: 'favorites' }, { linkstate });
+      env = mountHeader(searchState({ filter: 'favorites' }), { linkstate });
       fireEvent.click(env.host.querySelector('.search-form svg[icon="star-filled"]'));
       expect(linkstate.calledOnce).to.be.true;
       expect(linkstate.args[0][1]).to.deep.equal({ key: 'filter', val: '' });
     });
 
     it('submitting the search form blurs the input (closes the soft keyboard)', () => {
-      env = mountSearch();
+      env = mountHeader(searchState());
       const input = env.host.querySelector('#filterTextInput');
       const blurSpy = sinon.spy(input, 'blur');
       fireEvent.submit(env.host.querySelector('.search-form'));

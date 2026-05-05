@@ -87,13 +87,19 @@ describe('appState', () => {
   });
 
   describe('view observer', () => {
-    it('clears dialogMode on every view change', () => {
-      state.dialogMode = 'menu';
-      state.view = '/entries';
-      expect(state.dialogMode).to.equal('');
+    // The proxy clears dialogMode on every view assignment regardless of
+    // the prev/next pair. Cover several to back up the "every" claim.
+    ['/entries', '/search', '/entry', '/new', '/'].forEach((targetView) => {
+      it(`clears dialogMode when transitioning to ${targetView}`, () => {
+        state.dialogMode = 'menu';
+        state.view = targetView;
+        expect(state.dialogMode).to.equal('');
+      });
     });
 
     it('fires clearFilters when navigating from /search to /entries', () => {
+      // `new Provider(...)` is called for its side-effect: it sets unifire's
+      // module-globals (EL/STATE/ACTIONS) so the observer's fire() lands here.
       const clearFilters = sinon.spy();
       new Provider({ state: {}, actions: { clearFilters }, children: [] });
       state = getInitialState();
@@ -145,6 +151,8 @@ describe('appState', () => {
       const stored = [{ id: 1, date: '2024-05-01', text: 'first' }];
       await set('entries_42', stored);
 
+      // `new Provider(...)` for its side-effect: registers boot in unifire's
+      // ACTIONS module-global so getInitialState's fire('boot') lands here.
       const boot = sinon.spy();
       new Provider({ state: {}, actions: { boot }, children: [] });
 

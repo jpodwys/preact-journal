@@ -61,8 +61,8 @@ describe('virtual-scroll', () => {
     expect(env.host.querySelector('.entry-list')).to.exist;
   });
 
-  it('cleans up the window resize/scroll listeners on unmount', () => {
-    const removeSpy = sinon.spy(window, 'removeEventListener');
+  it('cleans up the same window resize/scroll listeners that were installed on mount', () => {
+    const addSpy = sinon.spy(window, 'addEventListener');
     env = mount(h(ScrollViewport, {
       items: makeItems(3),
       renderer,
@@ -70,12 +70,20 @@ describe('virtual-scroll', () => {
       overscan: 10
     }));
 
+    const resizeAdd = addSpy.args.find(a => a[0] === 'resize');
+    const scrollAdd = addSpy.args.find(a => a[0] === 'scroll');
+    expect(resizeAdd, 'resize listener installed on mount').to.exist;
+    expect(scrollAdd, 'scroll listener installed on mount').to.exist;
+    addSpy.restore();
+
+    const removeSpy = sinon.spy(window, 'removeEventListener');
     env.cleanup();
     env = null;
 
-    const events = removeSpy.args.map(args => args[0]);
-    expect(events).to.include('resize');
-    expect(events).to.include('scroll');
+    // Same handler reference must be passed to removeEventListener — otherwise
+    // the listener stays attached and leaks across tests / route changes.
+    expect(removeSpy.calledWith('resize', resizeAdd[1])).to.be.true;
+    expect(removeSpy.calledWith('scroll', scrollAdd[1])).to.be.true;
     removeSpy.restore();
   });
 });

@@ -14,10 +14,12 @@ describe('Router', () => {
     history.replaceState(null, null, originalPathname);
   });
 
-  // Stub leaf components that mark themselves so we can identify the active route.
-  const Home = () => h('div', { 'data-route': 'home' }, 'home');
-  const Entries = () => h('div', { 'data-route': 'entries' }, 'entries');
-  const Entry = (props) => h('div', { 'data-route': 'entry', 'data-id': props.id || '' });
+  // Stub leaf components that mark themselves with visible text so we can
+  // identify the active route via the same getByText queries production
+  // components are tested with.
+  const Home = () => h('div', null, 'HOME-ROUTE');
+  const Entries = () => h('div', null, 'ENTRIES-ROUTE');
+  const Entry = () => h('div', null, 'ENTRY-ROUTE');
 
   function mountRouter (path, extraProps) {
     history.replaceState(null, null, path);
@@ -30,33 +32,35 @@ describe('Router', () => {
 
   it('renders the child whose path matches location.pathname', () => {
     env = mountRouter('/entries');
-    expect(env.host.querySelector('[data-route="entries"]')).to.exist;
-    expect(env.host.querySelector('[data-route="home"]')).to.not.exist;
+    expect(env.queryByText('ENTRIES-ROUTE')).to.exist;
+    expect(env.queryByText('HOME-ROUTE')).to.be.null;
   });
 
   it('renders the root child for /', () => {
     env = mountRouter('/');
-    expect(env.host.querySelector('[data-route="home"]')).to.exist;
+    expect(env.queryByText('HOME-ROUTE')).to.exist;
   });
 
   it('matches a wildcard path against a concrete URL', () => {
     env = mountRouter('/entry/42');
-    expect(env.host.querySelector('[data-route="entry"]')).to.exist;
+    expect(env.queryByText('ENTRY-ROUTE')).to.exist;
   });
 
   it('renders nothing when no child path matches', () => {
     env = mountRouter('/no-such-path');
-    expect(env.host.querySelector('[data-route]')).to.not.exist;
+    expect(env.queryByText('HOME-ROUTE')).to.be.null;
+    expect(env.queryByText('ENTRIES-ROUTE')).to.be.null;
+    expect(env.queryByText('ENTRY-ROUTE')).to.be.null;
   });
 
   it('swaps the rendered child when route() updates the URL', () => {
     env = mountRouter('/');
-    expect(env.host.querySelector('[data-route="home"]')).to.exist;
+    expect(env.queryByText('HOME-ROUTE')).to.exist;
 
     route('/entries');
 
-    expect(env.host.querySelector('[data-route="entries"]')).to.exist;
-    expect(env.host.querySelector('[data-route="home"]')).to.not.exist;
+    expect(env.queryByText('ENTRIES-ROUTE')).to.exist;
+    expect(env.queryByText('HOME-ROUTE')).to.be.null;
   });
 
   it('fires the onChange prop with the new URL when route() is called', () => {
@@ -75,4 +79,10 @@ describe('Router', () => {
     env = mountRouter('/entries', { onChange });
     expect(onChange.calledWith('/entries')).to.be.true;
   });
+
+  // Note: the legacy spec covered shouldComponentUpdate returning true when
+  // the onChange prop changes between renders. There is no visible
+  // black-box consequence (rendered output is URL-driven), and the harness
+  // doesn't re-render with new props, so this case is intentionally not
+  // covered here.
 });
