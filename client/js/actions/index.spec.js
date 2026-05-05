@@ -40,6 +40,21 @@ describe('actions', () => {
 
     });
 
+    describe('toggleDarkMode', () => {
+
+      it('flips dark and clears dialogMode', () => {
+        el.state.dark = false;
+        Global.toggleDarkMode(el);
+        expect(el.set.args[0][0]).to.deep.equal({ dark: true, dialogMode: '' });
+
+        el.set.resetHistory();
+        el.state.dark = true;
+        Global.toggleDarkMode(el);
+        expect(el.set.args[0][0]).to.deep.equal({ dark: false, dialogMode: '' });
+      });
+
+    });
+
     describe('handleRouteChange', () => {
 
       /* Can't currently test whether route was called. Unfortunately falling back to wrapping the history API. */
@@ -1089,14 +1104,103 @@ describe('actions', () => {
 
     });
 
-    // Can't really test this ATM due to it simply calling route. I don't think spying on route will work here.
-    // describe('shiftEntry', () => {
+    describe('shiftEntry', () => {
+      let replaceSpy;
+      beforeEach(() => { replaceSpy = sinon.spy(history, 'replaceState'); });
+      afterEach(() => replaceSpy.restore());
 
-    //   it('should route to the next or prior entry when appropriate', () => {
+      it('does nothing on views other than /entry', () => {
+        el.state.view = '/entries';
+        el.state.entry = { id: 1 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }];
+        Entry.shiftEntry(el, 1);
+        expect(replaceSpy.called).to.be.false;
+      });
 
-    //   });
+      it('does nothing when count is 0', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 1 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }];
+        Entry.shiftEntry(el, 0);
+        expect(replaceSpy.called).to.be.false;
+      });
 
-    // });
+      it('does nothing when there is no current entry', () => {
+        el.state.view = '/entry';
+        el.state.entry = undefined;
+        el.state.viewEntries = [{ id: 1 }];
+        Entry.shiftEntry(el, 1);
+        expect(replaceSpy.called).to.be.false;
+      });
+
+      it('replaces history with the next entry id when count is 1', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 1 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Entry.shiftEntry(el, 1);
+        expect(replaceSpy.calledOnce).to.be.true;
+        expect(replaceSpy.args[0][2]).to.equal('/entry/2');
+      });
+
+      it('replaces history with the prior entry id when count is -1', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 2 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Entry.shiftEntry(el, -1);
+        expect(replaceSpy.args[0][2]).to.equal('/entry/1');
+      });
+
+      it('does not navigate past the end of viewEntries', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 3 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        Entry.shiftEntry(el, 1);
+        expect(replaceSpy.called).to.be.false;
+      });
+    });
+
+    describe('toggleFavorite', () => {
+      it('marks the entry favorited and sets needsSync on the in-memory entry', () => {
+        fetchMock.patch('/api/entry/0', 204);
+        el.state.entries = [{ id: 0, favorited: false }];
+
+        Entry.toggleFavorite(el, { id: 0, favorited: true });
+
+        const arg = el.set.args[0][0];
+        expect(arg.entry.favorited).to.be.true;
+        expect(arg.entry.needsSync).to.be.true;
+        expect(arg.entry.id).to.equal(0);
+      });
+
+      it('does nothing when no entry with that id exists', () => {
+        el.state.entries = [{ id: 0, favorited: false }];
+        Entry.toggleFavorite(el, { id: 99, favorited: true });
+        expect(el.set.called).to.be.false;
+      });
+    });
+
+    describe('toggleSort', () => {
+      it('flips desc to asc and clears dialogMode', () => {
+        el.state.sort = 'desc';
+        Entry.toggleSort(el);
+        expect(el.set.args[0][0]).to.deep.equal({ sort: 'asc', dialogMode: '' });
+      });
+
+      it('flips asc to desc and clears dialogMode', () => {
+        el.state.sort = 'asc';
+        Entry.toggleSort(el);
+        expect(el.set.args[0][0]).to.deep.equal({ sort: 'desc', dialogMode: '' });
+      });
+    });
+
+    describe('clearFilters', () => {
+      it('clears filter and filterText', () => {
+        el.state.filter = 'favorites';
+        el.state.filterText = 'beach';
+        Entry.clearFilters(el);
+        expect(el.set.args[0][0]).to.deep.equal({ filter: '', filterText: '' });
+      });
+    });
 
     describe('removeSlideInProp', () => {
 

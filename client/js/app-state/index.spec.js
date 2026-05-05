@@ -1,5 +1,6 @@
-import { get, set } from 'idb-keyval';
+import { get, set, clear } from 'idb-keyval';
 import getInitialState from './index';
+import { Provider } from '../../components/unifire';
 
 describe('appState', () => {
   let state;
@@ -85,9 +86,57 @@ describe('appState', () => {
     expect(state.viewEntries.length).to.equal(0);
   });
 
-  it.skip('should get entries from indexedDB and fire the boot event', (done) => {
-    // NEED TO ADD ANOTHER TEST HERE
-    done();
+  describe('boot hydration from IndexedDB', () => {
+    beforeEach(async () => {
+      localStorage.clear();
+      await clear();
+    });
+
+    it('fires boot with the entries stored in IDB for the active account', async () => {
+      localStorage.setItem('accounts', JSON.stringify([
+        { id: 42, username: 'test', active: true }
+      ]));
+      const stored = [{ id: 1, date: '2024-05-01', text: 'first' }];
+      await set('entries_42', stored);
+
+      const boot = sinon.spy();
+      new Provider({ state: {}, actions: { boot }, children: [] });
+
+      getInitialState();
+      // idb-keyval get is async; yield to the microtask + macrotask queues
+      // so the .then(fire('boot')) inside getInitialState can run.
+      await new Promise(r => setTimeout(r, 10));
+
+      expect(boot.calledOnce).to.be.true;
+      const payload = boot.args[0][1];
+      expect(payload.entries).to.have.length(1);
+      expect(payload.entries[0].text).to.equal('first');
+    });
+
+    it('fires boot with an empty array when IDB has nothing for the active account', async () => {
+      localStorage.setItem('accounts', JSON.stringify([
+        { id: 7, username: 'fresh', active: true }
+      ]));
+
+      const boot = sinon.spy();
+      new Provider({ state: {}, actions: { boot }, children: [] });
+
+      getInitialState();
+      await new Promise(r => setTimeout(r, 10));
+
+      expect(boot.calledOnce).to.be.true;
+      expect(boot.args[0][1].entries).to.deep.equal([]);
+    });
+
+    it('does not fire boot when no account is active', async () => {
+      const boot = sinon.spy();
+      new Provider({ state: {}, actions: { boot }, children: [] });
+
+      getInitialState();
+      await new Promise(r => setTimeout(r, 10));
+
+      expect(boot.called).to.be.false;
+    });
   });
 
 });

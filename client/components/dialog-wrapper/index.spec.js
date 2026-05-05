@@ -123,6 +123,66 @@ describe('dialog-wrapper', () => {
     });
   });
 
+  describe('menu — sort toggle', () => {
+    it('shows "Oldest" when sort is desc and fires toggleSort when clicked', () => {
+      const toggleSort = sinon.spy();
+      env = mountDialog({ state: { sort: 'desc' }, actions: { toggleSort } });
+      expect(env.queryByText('Latest')).to.be.null;
+      fireEvent.click(env.getByText('Oldest'));
+      expect(toggleSort.calledOnce).to.be.true;
+    });
+
+    it('shows "Latest" when sort is asc and fires toggleSort when clicked', () => {
+      const toggleSort = sinon.spy();
+      env = mountDialog({ state: { sort: 'asc' }, actions: { toggleSort } });
+      expect(env.queryByText('Oldest')).to.be.null;
+      fireEvent.click(env.getByText('Latest'));
+      expect(toggleSort.calledOnce).to.be.true;
+    });
+
+    it('hides the sort item entirely on /entry and /new views', () => {
+      env = mountDialog({ state: { view: '/entry' } });
+      expect(env.queryByText('Oldest')).to.be.null;
+      expect(env.queryByText('Latest')).to.be.null;
+      env.cleanup();
+      env = mountDialog({ state: { view: '/new' } });
+      expect(env.queryByText('Oldest')).to.be.null;
+      expect(env.queryByText('Latest')).to.be.null;
+    });
+  });
+
+  describe('menu — dark mode toggle', () => {
+    it('shows "Dark" with the moon icon when dark is false and fires toggleDarkMode', () => {
+      const toggleDarkMode = sinon.spy();
+      env = mountDialog({ state: { dark: false }, actions: { toggleDarkMode } });
+      const row = env.getByText('Dark').parentElement;
+      expect(row.querySelector('svg[icon="moon"]')).to.exist;
+      fireEvent.click(env.getByText('Dark'));
+      expect(toggleDarkMode.calledOnce).to.be.true;
+    });
+
+    it('shows "Light" with the sun icon when dark is true', () => {
+      env = mountDialog({ state: { dark: true } });
+      const row = env.getByText('Light').parentElement;
+      expect(row.querySelector('svg[icon="sun"]')).to.exist;
+      expect(env.queryByText('Dark')).to.be.null;
+    });
+  });
+
+  describe('menu — export', () => {
+    it('clicking Export fires exportEntries', () => {
+      const exportEntries = sinon.spy();
+      env = mountDialog({ actions: { exportEntries } });
+      fireEvent.click(env.getByText('Export'));
+      expect(exportEntries.calledOnce).to.be.true;
+    });
+
+    it('hides Export on /entry and /new', () => {
+      env = mountDialog({ state: { view: '/entry' } });
+      expect(env.queryByText('Export')).to.be.null;
+    });
+  });
+
   describe('modal mode — delete', () => {
     const entry = { id: 5, date: '2024-01-01', text: 'gone' };
 
