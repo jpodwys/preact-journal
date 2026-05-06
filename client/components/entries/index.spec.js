@@ -1,14 +1,42 @@
 import { h } from 'preact';
-import { mount } from '../../../test/mount';
+import { mount, fireEvent } from '../../../test/mount';
 import Entries from './index';
 
 describe('entries', () => {
   let env;
-  afterEach(() => { if(env) env.cleanup(); env = null; });
 
-  function mountEntries (state = {}) {
+  // In headless Chrome, document.scrollingElement is documentElement and
+  // body.scrollTop assignments don't stick. Production reads/writes body
+  // .scrollTop directly, so shim it for tests to observe both directions.
+  let bodyScrollTop = 0;
+  let originalScrollTop;
+  before(() => {
+    originalScrollTop = Object.getOwnPropertyDescriptor(
+      Element.prototype, 'scrollTop'
+    );
+    Object.defineProperty(document.body, 'scrollTop', {
+      configurable: true,
+      get() { return bodyScrollTop; },
+      set(v) { bodyScrollTop = v; }
+    });
+  });
+  after(() => {
+    delete document.body.scrollTop;
+    if(originalScrollTop) {
+      Object.defineProperty(Element.prototype, 'scrollTop', originalScrollTop);
+    }
+  });
+
+  afterEach(() => {
+    if(env) env.cleanup();
+    env = null;
+    bodyScrollTop = 0;
+  });
+
+  function mountEntries (state = {}, actions = {}) {
     return mount(h(Entries, null), {
-      state: Object.assign({ viewEntries: [], scrollPosition: 0, filterText: '' }, state)
+      state: Object.assign({ viewEntries: [], scrollPosition: 0, filterText: '' }, state),
+      actions
     });
   }
 
@@ -38,5 +66,38 @@ describe('entries', () => {
     env.cleanup();
     env = null;
     expect(document.body.onscroll).to.be.null;
+  });
+
+  it('applies state.scrollPosition to document.body.scrollTop on render', () => {
+    env = mountEntries({
+      viewEntries: [{ id: 1, date: '2024-01-01', text: 'a' }],
+      scrollPosition: 250
+    });
+    expect(document.body.scrollTop).to.equal(250);
+  });
+
+  describe('body scroll listener', () => {
+    let clock;
+    beforeEach(() => { clock = sinon.useFakeTimers(); });
+    afterEach(() => clock.restore());
+
+    it('fires linkstate with the new scrollPosition after the 50ms debounce', () => {
+      const linkstate = sinon.spy();
+      env = mountEntries(
+        { viewEntries: [{ id: 1, date: 'd', text: 't' }] },
+        { linkstate }
+      );
+
+      document.body.scrollTop = 137;
+      fireEvent(document.body, 'scroll');
+      expect(linkstate.called).to.be.false;
+      clock.tick(50);
+
+      expect(linkstate.calledOnce).to.be.true;
+      expect(linkstate.args[0][1]).to.deep.equal({
+        key: 'scrollPosition',
+        val: 137
+      });
+    });
   });
 });

@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { mount, fireEvent } from '../../../test/mount';
+import { fire } from '../unifire';
 import Entry from './index';
 
 describe('entry', () => {
@@ -97,6 +98,30 @@ describe('entry', () => {
       expect(env.host.querySelector('svg[icon="left"]')).to.not.exist;
       expect(env.host.querySelector('#entryDate')).to.exist;
       expect(env.host.querySelector('#entryText')).to.exist;
+    });
+
+    it('focuses #entryText when the user transitions to /new with a new entry', () => {
+      // shouldComponentUpdate gates on entry.id change, so model the same
+      // transition the production flow does (existing entry → new entry).
+      env = mountEntry(
+        {
+          view: '/entry',
+          entry: { id: 5, date: '2024-04-04', text: 'old' },
+          viewEntries: [{ id: 5 }],
+          entryIndex: 0
+        },
+        {
+          setState: (el, delta) => el.set(delta)
+        }
+      );
+
+      fire('setState', {
+        view: '/new',
+        entry: { id: 'new', date: '2024-12-25', text: '', newEntry: true },
+        entryIndex: -1
+      });
+
+      expect(document.activeElement.id).to.equal('entryText');
     });
   });
 

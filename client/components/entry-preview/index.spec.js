@@ -50,6 +50,40 @@ describe('entry-preview', () => {
     });
   });
 
+  describe('slide-in animation', () => {
+    let clock;
+    beforeEach(() => { clock = sinon.useFakeTimers(); });
+    afterEach(() => clock.restore());
+
+    it('renders fade-right and fires removeSlideInProp 450ms after a slideIn entry mounts', () => {
+      const removeSlideInProp = sinon.spy();
+      env = mountPreview(
+        { id: 1, date: '2024-01-01', text: 'incoming', slideIn: true },
+        '',
+        { removeSlideInProp }
+      );
+
+      expect(env.host.querySelector('.fade-right'), 'fade-right class applied').to.exist;
+      expect(removeSlideInProp.called).to.be.false;
+      clock.tick(449);
+      expect(removeSlideInProp.called).to.be.false;
+      clock.tick(1);
+      expect(removeSlideInProp.calledOnce).to.be.true;
+    });
+
+    it('does not schedule removeSlideInProp when slideIn is unset', () => {
+      const removeSlideInProp = sinon.spy();
+      env = mountPreview(
+        { id: 1, date: '2024-01-01', text: 'static' },
+        '',
+        { removeSlideInProp }
+      );
+      expect(env.host.querySelector('.fade-right')).to.not.exist;
+      clock.tick(500);
+      expect(removeSlideInProp.called).to.be.false;
+    });
+  });
+
   describe('interactions', () => {
     it('fires showConfirmDeleteEntryModal with the entry when delete is clicked', () => {
       const showConfirmDeleteEntryModal = sinon.spy();

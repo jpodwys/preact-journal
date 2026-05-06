@@ -51,4 +51,13 @@ describe('login', () => {
     env = mount(h(Login, null), { state: { cancelable: true } });
     expect(env.getByText('Cancel')).to.exist;
   });
+
+  it('clicking Cancel routes to /entries', () => {
+    const pushSpy = sinon.spy(history, 'pushState');
+    env = mount(h(Login, null), { state: { cancelable: true } });
+    fireEvent.click(env.getByText('Cancel'));
+    expect(pushSpy.calledOnce).to.be.true;
+    expect(pushSpy.args[0][2]).to.equal('/entries');
+    pushSpy.restore();
+  });
 });

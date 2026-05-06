@@ -124,6 +124,89 @@ describe('header', () => {
     });
   });
 
+  describe('back link on /entry and /search', () => {
+    const baseEntry = { id: 'e1', text: 'hello', date: '2024-01-01' };
+
+    it('back link href is /entries on /entry with no filter or search text', () => {
+      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      expect(back.getAttribute('href')).to.equal('/entries');
+    });
+
+    it('back link href is /search when filter is active on /entry', () => {
+      env = mountHeader({
+        loggedIn: true, view: '/entry', entry: baseEntry, filter: 'favorites'
+      });
+      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      expect(back.getAttribute('href')).to.equal('/search');
+    });
+
+    it('back link href is /search when filterText is set on /entry', () => {
+      env = mountHeader({
+        loggedIn: true, view: '/entry', entry: baseEntry, filterText: 'beach'
+      });
+      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      expect(back.getAttribute('href')).to.equal('/search');
+    });
+
+    it('back link href is always /entries on /search regardless of filter', () => {
+      env = mountHeader({
+        loggedIn: true, view: '/search', filter: 'favorites', filterText: 'x'
+      });
+      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      expect(back.getAttribute('href')).to.equal('/entries');
+    });
+
+    it('plain click calls history.back() and preventsDefault on the navigation', () => {
+      const backSpy = sinon.spy(history, 'back');
+      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+      const link = env.host.querySelector('svg[icon="back"]').closest('a');
+      const event = fireEvent.click(link);
+      expect(backSpy.calledOnce).to.be.true;
+      expect(event.defaultPrevented).to.be.true;
+      backSpy.restore();
+    });
+
+    it('cmd/ctrl-click does not preventDefault — lets the browser open in a new tab', () => {
+      const backSpy = sinon.spy(history, 'back');
+      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+      const link = env.host.querySelector('svg[icon="back"]').closest('a');
+      const event = new MouseEvent('click', {
+        bubbles: true, cancelable: true, button: 0, metaKey: true
+      });
+      link.dispatchEvent(event);
+      expect(backSpy.called).to.be.false;
+      expect(event.defaultPrevented).to.be.false;
+      backSpy.restore();
+    });
+  });
+
+  describe('share icon on /entry', () => {
+    const entry = { id: 7, text: 'shareable', date: '2024-05-01' };
+
+    it('renders and calls navigator.share with the entry text when share is supported', () => {
+      const original = navigator.share;
+      const shareSpy = sinon.spy();
+      // navigator.share is read-only in some browsers; define instead of assign.
+      Object.defineProperty(navigator, 'share', {
+        configurable: true, value: shareSpy
+      });
+
+      env = mountHeader({ loggedIn: true, view: '/entry', entry });
+      const shareIcon = env.host.querySelector('svg[icon="share"]');
+      expect(shareIcon, 'share icon rendered when navigator.share exists').to.exist;
+      fireEvent.click(shareIcon);
+
+      expect(shareSpy.calledOnce).to.be.true;
+      expect(shareSpy.args[0][0]).to.deep.equal({
+        text: '2024-05-01 shareable'
+      });
+
+      if(original === undefined) delete navigator.share;
+      else Object.defineProperty(navigator, 'share', { configurable: true, value: original });
+    });
+  });
+
   describe('search interactions on /search', () => {
     let clock;
     beforeEach(() => { clock = sinon.useFakeTimers(); });

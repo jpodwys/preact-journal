@@ -57,6 +57,17 @@ describe('unifire', () => {
       expect(action3.calledOnce).to.be.false;
     });
 
+    it('throws when the named action is not registered', () => {
+      // Locks the contract: a typo in fire('xxx') is a hard error rather
+      // than a silent no-op. Catches stale action names early.
+      new Provider({
+        state: {},
+        actions: { known: () => {} },
+        children: []
+      });
+      expect(() => fire('unknown', {})).to.throw(TypeError);
+    });
+
   });
 
 });

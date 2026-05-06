@@ -121,6 +121,22 @@ describe('dialog-wrapper', () => {
       expect(env.host.querySelector('.menu')).to.not.exist;
       expect(env.queryByText('Logout')).to.be.null;
     });
+
+    it('closes the delete-confirm modal when the overlay is clicked', () => {
+      env = mountDialog({
+        state: { dialogMode: 'modal:delete', entry: { id: 1, date: 'd', text: 't' } }
+      });
+      fireEvent.click(env.host.querySelector('.modal-overlay'));
+      expect(env.queryByText('Delete this entry?')).to.be.null;
+      expect(env.host.querySelector('.modal-dialog')).to.not.exist;
+    });
+
+    it('closes the logout-confirm modal when the overlay is clicked', () => {
+      env = mountDialog({ state: { dialogMode: 'modal:logout' } });
+      fireEvent.click(env.host.querySelector('.modal-overlay'));
+      expect(env.queryByText('Logout?')).to.be.null;
+      expect(env.host.querySelector('.modal-dialog')).to.not.exist;
+    });
   });
 
   describe('menu — sort toggle', () => {
