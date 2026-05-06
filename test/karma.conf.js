@@ -1,4 +1,14 @@
 const path = require('path');
+const fs = require('fs');
+const webpack = require('webpack');
+
+// Read sw.js verbatim and inject it as a string literal into the test bundle
+// via DefinePlugin. The SW spec evaluates this source inside a sandbox with
+// stubbed `self` / `caches` / `fetch`, so production sw.js is unchanged.
+const SW_SOURCE = fs.readFileSync(
+  path.resolve(__dirname, '../client/js/sw.js'),
+  'utf8'
+);
 
 module.exports = function(config) {
   config.set({
@@ -25,7 +35,12 @@ module.exports = function(config) {
             exclude: /node_modules|\/test|\.spec\.js$/,
           }
         ]
-      }
+      },
+      plugins: [
+        new webpack.DefinePlugin({
+          SW_SOURCE: JSON.stringify(SW_SOURCE)
+        })
+      ]
     },
     reporters: [ 'mocha', 'coverage-istanbul' ],
     coverageIstanbulReporter: {
