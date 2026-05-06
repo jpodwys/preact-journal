@@ -100,9 +100,10 @@ describe('entry', () => {
       expect(env.host.querySelector('#entryText')).to.exist;
     });
 
-    it('focuses #entryText when the user transitions to /new with a new entry', () => {
-      // shouldComponentUpdate gates on entry.id change, so model the same
-      // transition the production flow does (existing entry → new entry).
+    it('focuses #entryText when transitioning from an existing entry to /new', () => {
+      // shouldComponentUpdate gates on entry.id change, so the focus only
+      // fires when both view changes AND the entry id rotates — exactly
+      // what production does (clicking the FAB unshifts a new blank entry).
       env = mountEntry(
         {
           view: '/entry',

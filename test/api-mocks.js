@@ -4,8 +4,6 @@ import fetchMock from 'fetch-mock';
 // interacts awkwardly with regex matchers otherwise.
 fetchMock.config.overwriteRoutes = true;
 
-const DEFAULT_USER_ID = '99';
-
 // Build the fetch-mock response. <300 returns the body; >=300 returns just
 // the status code (which fetch-mock expands to { status, body: '' }), so
 // xhr's `if(res.status >= 300) throw res` rejects and the action's .catch

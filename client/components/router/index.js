@@ -72,10 +72,15 @@ class Router extends Component {
   }
 
   componentWillUnmount() {
-    if(ROUTER === this) ROUTER = undefined;
-    ONCHANGE = undefined;
-    document.onclick = null;
-    window.onpopstate = null;
+    // Only clean up the globals this Router installed. If a later Router
+    // mount has overwritten them, leave them alone — the new owner is
+    // responsible for its own cleanup.
+    if(ROUTER === this) {
+      ROUTER = undefined;
+      ONCHANGE = undefined;
+      document.onclick = null;
+      window.onpopstate = null;
+    }
   }
 
   matchPath(url, children) {

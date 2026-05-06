@@ -2,7 +2,17 @@ import { createSwHarness, flush } from '../../test/sw-harness';
 
 describe('service worker', () => {
   let h;
-  beforeEach(() => { h = createSwHarness(); });
+  beforeEach(() => {
+    h = createSwHarness();
+    // Pre-seed /version on both the cache and the network so update()
+    // completes silently for tests that don't explicitly exercise it.
+    // Without this, update()'s outer .catch logs the unhandled error
+    // and pollutes test output. Tests that drive the version-diff
+    // logic re-set both to override the baseline.
+    const baseline = h.fakeResponse({ body: { version: 'baseline' } });
+    h.store.set('/version', baseline);
+    h.setFetchResponse('/version', baseline);
+  });
 
   describe('install', () => {
     it('caches the app shell on install', async () => {
@@ -54,10 +64,9 @@ describe('service worker', () => {
         expect(event.respondWith.calledOnce).to.be.true;
         await event.respondWith.args[0][0];
 
-        // First cache.match call is from fromCache; subsequent calls come
-        // from update()'s /version probe. The first one is what we care
-        // about for the view-route fallback.
-        expect(h.cache.match.args[0][0]).to.equal('/');
+        // fromCache passes the literal '/' string; update()'s probe passes
+        // '/version'. calledWith stays valid regardless of microtask order.
+        expect(h.cache.match.calledWith('/')).to.be.true;
       });
     });
   });
@@ -68,9 +77,11 @@ describe('service worker', () => {
       h.handlers.fetch(event);
 
       await event.respondWith.args[0][0];
-      const arg = h.cache.match.args[0][0];
-      expect(arg).to.be.an('object');
-      expect(arg.url).to.equal('http://x/style.css');
+      // fromCache passes the request object; update() passes the '/version'
+      // string. The matcher only fires on the request-object call.
+      expect(h.cache.match.calledWith(
+        sinon.match({ url: 'http://x/style.css' })
+      )).to.be.true;
     });
   });
 

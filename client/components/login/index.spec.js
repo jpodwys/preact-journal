@@ -53,6 +53,8 @@ describe('login', () => {
   });
 
   it('clicking Cancel routes to /entries', () => {
+    // route() ultimately calls history.pushState (wrapped by Router at
+    // module load to also scrollTo(0, 0)). The spy lands on the wrapper.
     const pushSpy = sinon.spy(history, 'pushState');
     env = mount(h(Login, null), { state: { cancelable: true } });
     fireEvent.click(env.getByText('Cancel'));

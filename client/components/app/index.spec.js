@@ -18,6 +18,9 @@ import {
 } from '../../../test/api-mocks';
 
 const flush = (ms = 50) => new Promise(r => setTimeout(r, ms));
+// 500ms matches the entry component's debounce (client/components/entry/index.js
+// `upsert = debounce(this.slowUpsert, 500)`); the extra 60ms lets the post-
+// debounce promise chain (action → network → handler) settle before assertions.
 const tickDebounce = () => flush(560);
 
 describe('App — integration journeys', () => {

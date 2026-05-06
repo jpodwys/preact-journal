@@ -8,24 +8,17 @@ describe('entries', () => {
   // In headless Chrome, document.scrollingElement is documentElement and
   // body.scrollTop assignments don't stick. Production reads/writes body
   // .scrollTop directly, so shim it for tests to observe both directions.
+  // The override is body-only (Element.prototype is untouched), so deleting
+  // the body's own property restores the prototype lookup chain.
   let bodyScrollTop = 0;
-  let originalScrollTop;
   before(() => {
-    originalScrollTop = Object.getOwnPropertyDescriptor(
-      Element.prototype, 'scrollTop'
-    );
     Object.defineProperty(document.body, 'scrollTop', {
       configurable: true,
       get() { return bodyScrollTop; },
       set(v) { bodyScrollTop = v; }
     });
   });
-  after(() => {
-    delete document.body.scrollTop;
-    if(originalScrollTop) {
-      Object.defineProperty(Element.prototype, 'scrollTop', originalScrollTop);
-    }
-  });
+  after(() => { delete document.body.scrollTop; });
 
   afterEach(() => {
     if(env) env.cleanup();
