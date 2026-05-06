@@ -4,6 +4,16 @@ import Global from './global-actions';
 import User from './user-actions';
 import Entry from './entry-actions';
 import { Provider, fire } from '../../components/unifire';
+import {
+  mockGetAllEntries,
+  mockSyncEntries,
+  mockCreateEntry,
+  mockUpdateEntry,
+  mockDeleteEntry,
+  mockLogin,
+  mockCreateAccount,
+  mockLogout
+} from '../../../test/api-mocks';
 
 describe('actions', () => {
   let el;
@@ -203,7 +213,7 @@ describe('actions', () => {
       });
 
       it('should login, reset data, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
-        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
+        mockLogin({ id: 1, username: 'bogus' });
         return new Promise(resolve => {
           el.set = sinon.spy(resolve);
           User.login(el, USER);
@@ -225,7 +235,7 @@ describe('actions', () => {
         localStorage.clear();
         var existing = [{ id: 5, username: 'other', active: true }];
         localStorage.setItem('accounts', JSON.stringify(existing));
-        fetchMock.post('/api/user/login', { status: 200, body: { id: 1, username: 'bogus' } });
+        mockLogin({ id: 1, username: 'bogus' });
         return new Promise(resolve => {
           el.set = sinon.spy(resolve);
           User.login(el, USER);
@@ -241,7 +251,7 @@ describe('actions', () => {
       });
 
       it('should not throw when login fails', (done) => {
-        fetchMock.post('/api/user/login', Promise.resolve({ status: 400 }));
+        mockLogin({ httpStatus: 400 });
         User.login(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
@@ -262,7 +272,7 @@ describe('actions', () => {
       });
 
       it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
-        fetchMock.post('/api/user', { status: 200, body: { id: 2, username: 'bogus' } });
+        mockCreateAccount({ id: 2, username: 'bogus' });
         return new Promise(resolve => {
           el.set = sinon.spy(resolve);
           User.createAccount(el, USER);
@@ -278,7 +288,7 @@ describe('actions', () => {
       });
 
       it('should not throw when create fails', (done) => {
-        fetchMock.post('/api/user', Promise.resolve({ status: 400 }));
+        mockCreateAccount({ httpStatus: 400 });
         User.createAccount(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
@@ -291,7 +301,7 @@ describe('actions', () => {
     describe('logout', () => {
 
       it('should clear localStorage, reset state, and route back to / (the login page)', (done) => {
-        fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
+        mockLogout();
         localStorage.clear();
         localStorage.setItem('bogus', 'value');
         el.state.userId = '99';
@@ -304,7 +314,7 @@ describe('actions', () => {
       });
 
       it('should not clear localStorage when logout fails', (done) => {
-        fetchMock.post('/api/user/logout', Promise.resolve({ status: 400 }));
+        mockLogout({ httpStatus: 400 });
         localStorage.setItem('bogus', 'value');
         User.logout(el);
         setTimeout(() => {
@@ -326,7 +336,7 @@ describe('actions', () => {
           { id: 50, username: 'other', active: false }
         ];
         localStorage.setItem('accounts', JSON.stringify(accounts));
-        fetchMock.post('/api/user/logout', Promise.resolve({ status: 204 }));
+        mockLogout();
         el.state.userId = '99';
         User.logout(el);
         setTimeout(() => {
@@ -466,10 +476,7 @@ describe('actions', () => {
     describe('resetDataFetched', () => {
 
       it('should allow getEntries to fetch again after being called', (done) => {
-        fetchMock.get('/api/entries', {
-          status: 200,
-          body: { entries: [], timestamp: 1 }
-        });
+        mockGetAllEntries({ entries: [], timestamp: 1 });
 
         el.state.entries = [];
         el.state.loggedIn = true;
@@ -533,12 +540,9 @@ describe('actions', () => {
       });
 
       it('should fetch entries and timestamp when timestamp is undefined', (done) => {
-        fetchMock.get('/api/entries', {
-          status: 200,
-          body: {
-            entries: [ { id: 0, date: '2018-01-01', text: 'bogus' } ],
-            timestamp: 1234
-          }
+        mockGetAllEntries({
+          entries: [ { id: 0, date: '2018-01-01', text: 'bogus' } ],
+          timestamp: 1234
         });
 
         el.state.entries = [];
@@ -553,7 +557,7 @@ describe('actions', () => {
       });
 
       it('should not throw when fetching entries fails and timestamp is undefined', (done) => {
-        fetchMock.get('/api/entries', 500);
+        mockGetAllEntries({ httpStatus: 500 });
 
         delete el.state.entries;
         el.state.loggedIn = true;
@@ -564,12 +568,9 @@ describe('actions', () => {
       });
 
       it('should sync entries from the server to the cleint when there is a timestamp', (done) => {
-        fetchMock.get('/api/entries/sync/1234', {
-          status: 200,
-          body: {
-            entries: [ { id: 0, deleted: 1 }, { id: 1, date: '2018-01-01' }, { id: 2, date: '2017-01-01' } ],
-            timestamp: 4321
-          }
+        mockSyncEntries({
+          entries: [ { id: 0, deleted: 1 }, { id: 1, date: '2018-01-01' }, { id: 2, date: '2017-01-01' } ],
+          timestamp: 4321
         });
 
         el.state.loggedIn = true;
@@ -588,13 +589,7 @@ describe('actions', () => {
       });
 
       it('should call el.set with new timestamp when the sync response contains no entries', (done) => {
-        fetchMock.get('/api/entries/sync/1234', {
-          status: 200,
-          body: {
-            entries: [],
-            timestamp: 4321
-          }
-        });
+        mockSyncEntries({ entries: [], timestamp: 4321 });
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
@@ -607,7 +602,7 @@ describe('actions', () => {
       });
 
       it('should not throw when syncing entries fails', (done) => {
-        fetchMock.get('/api/entries/sync/1234', 500);
+        mockSyncEntries({ httpStatus: 500 });
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
@@ -618,19 +613,10 @@ describe('actions', () => {
       });
 
       it('should sync entries from the client to the server when one or more entries has the needsSync flag', (done) => {
-        fetchMock.get('/api/entries/sync/1234', {
-          status: 200,
-          body: {
-            entries: [],
-            timestamp: 4321
-          }
-        });
-        fetchMock.post('/api/entry', {
-          status: 200,
-          body: { id: 3 }
-        });
-        fetchMock.patch('/api/entry/1', 204);
-        fetchMock.delete('/api/entry/2', 204);
+        mockSyncEntries({ entries: [], timestamp: 4321 });
+        mockCreateEntry({ id: 3 });
+        mockUpdateEntry(1);
+        mockDeleteEntry(2);
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
@@ -652,14 +638,8 @@ describe('actions', () => {
       });
 
       it('should not throw when updating an entry from client to server fails', (done) => {
-        fetchMock.get('/api/entries/sync/1234', {
-          status: 200,
-          body: {
-            entries: [],
-            timestamp: 4321
-          }
-        });
-        fetchMock.patch('/api/entry/0', 500);
+        mockSyncEntries({ entries: [], timestamp: 4321 });
+        mockUpdateEntry(0, { httpStatus: 500 });
 
         el.state.loggedIn = true;
         el.state.timestamp = 1234;
@@ -713,10 +693,7 @@ describe('actions', () => {
       });
 
       it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
-        fetchMock.post('/api/entry', {
-          status: 200,
-          body: { id: 1 }
-        });
+        mockCreateEntry({ id: 1 });
         Entry.createEntry(el, { entry: entry });
 
         const firstCallArg = el.set.args[0][0];
@@ -738,10 +715,7 @@ describe('actions', () => {
       });
 
       it('should call set twice (with the correct params, of course) and set postPending to true if clientSync is true even when postPending is true', (done) => {
-        fetchMock.post('/api/entry', {
-          status: 200,
-          body: { id: 1 }
-        });
+        mockCreateEntry({ id: 1 });
         el.state.entry = postPendingEntry;
         Entry.createEntry(el, { entry: postPendingEntry, clientSync: true });
 
@@ -764,10 +738,7 @@ describe('actions', () => {
       });
 
       it('should call set twice (with the correct params, of course) and set postPending to true if !postPending', (done) => {
-        fetchMock.post('/api/entry', {
-          status: 200,
-          body: { id: 1 }
-        });
+        mockCreateEntry({ id: 1 });
         Entry.createEntry(el, { entry: entry });
 
         const firstCallArg = el.set.args[0][0];
@@ -789,7 +760,7 @@ describe('actions', () => {
       });
 
       it('should handle a network call failure correctly', (done) => {
-        fetchMock.post('/api/entry', 500);
+        mockCreateEntry({ httpStatus: 500 });
         Entry.createEntry(el, { entry: entry });
 
         const firstCallArg = el.set.args[0][0];
@@ -844,7 +815,7 @@ describe('actions', () => {
       });
 
       it('should set state.entry.date, mark state.entries[entryIndex] for update, and remove the needsSync flag when the network call succeedes', (done) => {
-        fetchMock.patch('/api/entry/0', 204);
+        mockUpdateEntry(0);
         const updateObj = {
           entry: { date: '2017-01-01' },
           property: 'date',
@@ -869,7 +840,7 @@ describe('actions', () => {
       });
 
       it('should set state.entry.text, mark state.entries[entryIndex] for update, and remove the needsSync flag when the network call succeedes', (done) => {
-        fetchMock.patch('/api/entry/0', 204);
+        mockUpdateEntry(0);
         const updateObj = {
           entry: { text: 'b' },
           property: 'text',
@@ -894,7 +865,7 @@ describe('actions', () => {
       });
 
       it('should set state.entry.text, mark state.entries[entryIndex] for update, and not remove the needsSync flag when the network call fails', (done) => {
-        fetchMock.patch('/api/entry/0', 500);
+        mockUpdateEntry(0, { httpStatus: 500 });
         const updateObj = {
           entry: { text: 'b' },
           property: 'text',
@@ -919,7 +890,7 @@ describe('actions', () => {
       // the response lands, and the success handler should patch the original user's
       // IDB cache rather than mutating the now-current user's in-memory state.
       it('should patch IDB for the original user (not in-memory state) when the user switches accounts before the response arrives', (done) => {
-        fetchMock.patch('/api/entry/0', 204);
+        mockUpdateEntry(0);
 
         idbSet('entries_1', [{ id: 0, needsSync: true }]).then(() => {
           Entry.updateEntry(el, {
@@ -977,7 +948,7 @@ describe('actions', () => {
       });
 
       it('should set state.entry to undefined, mark state.entries[entryIndex] for deletion, provide a callback to set, and remove the correct entry when the network call succeedes', (done) => {
-        fetchMock.delete('/api/entry/0', 204);
+        mockDeleteEntry(0);
         Entry.deleteEntry(el, { id: 0 });
 
         const firstCallArgs = el.set.args[0];
@@ -995,7 +966,7 @@ describe('actions', () => {
       });
 
       it('should set state.entry to undefined, mark state.entries[entryIndex] for deletion, provide a callback to set, and not remove the entry when the network call fails', (done) => {
-        fetchMock.delete('/api/entry/0', 500);
+        mockDeleteEntry(0, { httpStatus: 500 });
         Entry.deleteEntry(el, { id: 0 });
 
         const firstCallArgs = el.set.args[0];
@@ -1014,7 +985,7 @@ describe('actions', () => {
       // Regression test for the applyEntryPatch idx === -1 guard. Also protects
       // updateEntrySuccess, createEntrySuccess, and createEntryFailure, which all share the same helper.
       it('should not corrupt entries when the target is removed from state before the delete response resolves', (done) => {
-        fetchMock.delete('/api/entry/0', 204);
+        mockDeleteEntry(0);
         el.state.entries.push({ id: 99 });
         Entry.deleteEntry(el, { id: 0 });
 
@@ -1171,7 +1142,7 @@ describe('actions', () => {
       // toggleFavorite delegates to updateEntry which fires a PATCH; absorb it
       // so it doesn't fall through to a real network call. The success
       // callback (clearing needsSync) is covered by the updateEntry tests.
-      beforeEach(() => fetchMock.patch('/api/entry/0', 204));
+      beforeEach(() => mockUpdateEntry(0));
 
       it('delegates to updateEntry: marks favorited and sets needsSync on the in-memory entry', () => {
         el.state.entries = [{ id: 0, favorited: false }];

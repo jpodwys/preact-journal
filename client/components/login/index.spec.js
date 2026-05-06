@@ -3,16 +3,14 @@ import fetchMock from 'fetch-mock';
 import { mount, fireEvent } from '../../../test/mount';
 import Login from './index';
 import User from '../../js/services/user-service';
+import { mockLogin } from '../../../test/api-mocks';
 
 describe('login', () => {
   let env;
 
   beforeEach(() => {
     localStorage.clear();
-    fetchMock.post('/api/user/login', {
-      status: 200,
-      body: { id: 99, username: 'alice' }
-    });
+    mockLogin();
   });
 
   afterEach(() => {

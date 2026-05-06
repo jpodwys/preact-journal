@@ -71,6 +71,13 @@ class Router extends Component {
     }
   }
 
+  componentWillUnmount() {
+    if(ROUTER === this) ROUTER = undefined;
+    ONCHANGE = undefined;
+    document.onclick = null;
+    window.onpopstate = null;
+  }
+
   matchPath(url, children) {
     return children.filter(c => c.attributes.path === url || matchWild(c.attributes.path, url));
   }

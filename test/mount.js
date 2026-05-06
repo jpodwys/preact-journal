@@ -38,7 +38,13 @@ export function fireEvent (node, type, init) {
   node.dispatchEvent(event);
   return event;
 }
-fireEvent.click  = (node) => fireEvent(node, 'click');
+fireEvent.click  = (node) => {
+  // Use MouseEvent so e.button === 0 — generic Event leaves it undefined,
+  // which trips Router's `e.button !== 0` early-return for non-primary clicks.
+  const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
+  node.dispatchEvent(event);
+  return event;
+};
 fireEvent.submit = (node) => fireEvent(node, 'submit');
 fireEvent.focus  = (node) => fireEvent(node, 'focus');
 fireEvent.blur   = (node) => fireEvent(node, 'blur');
