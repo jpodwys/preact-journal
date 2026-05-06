@@ -19,11 +19,11 @@ describe('virtual-scroll', () => {
       items,
       renderer,
       rowHeight: 50,
-      overscan: 10,
       internalClass: 'inner'
     }));
 
-    // All 5 fit within the initial visible window (overscan + window height).
+    // All 5 fit within the initial visible window (internal OVERSCAN buffer
+    // of 20 rows + window height).
     const rows = env.host.querySelectorAll('.row');
     expect(rows.length).to.equal(5);
     expect(rows[0].textContent).to.equal('item 0');
@@ -44,8 +44,7 @@ describe('virtual-scroll', () => {
     env = mount(h(ScrollViewport, {
       items: makeItems(100),
       renderer,
-      rowHeight: 83,
-      overscan: 20
+      rowHeight: 83
     }));
     expect(env.host.firstElementChild.style.height).to.equal((100 * 83) + 'px');
   });
@@ -55,7 +54,6 @@ describe('virtual-scroll', () => {
       items: makeItems(2),
       renderer,
       rowHeight: 40,
-      overscan: 10,
       class: 'entry-list'
     }));
     expect(env.host.querySelector('.entry-list')).to.exist;
@@ -66,8 +64,7 @@ describe('virtual-scroll', () => {
     env = mount(h(ScrollViewport, {
       items: makeItems(3),
       renderer,
-      rowHeight: 30,
-      overscan: 10
+      rowHeight: 30
     }));
 
     const resizeAdd = addSpy.args.find(a => a[0] === 'resize');

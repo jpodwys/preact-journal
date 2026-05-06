@@ -36,7 +36,6 @@ export default class Entries extends Component {
         items={viewEntries}
         renderer={renderer}
         rowHeight={83}
-        overscan={20}
         internalClass="fade-down">
       </ScrollViewport>
     );

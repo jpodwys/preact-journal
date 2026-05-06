@@ -11,6 +11,11 @@ const EVENT_OPTS = {
 	capture: true
 };
 
+// Buffer of extra rows rendered beyond the visible window in each direction.
+// Also the alignment chunk for the start index so we don't shift on every
+// scroll tick. Tuned for the entries list; not configurable.
+const OVERSCAN = 20;
+
 export default class ScrollViewport extends Component {
 	resized = () => {
 		let height = innerHeight;
@@ -40,17 +45,15 @@ export default class ScrollViewport extends Component {
 		removeEventListener('scroll', this.scrolled, EVENT_OPTS);
 	}
 
-	render({ items, renderer, overscan=10, rowHeight, internalClass, ...props }, { offset=0, height=0 }) {
+	render({ items, renderer, rowHeight, internalClass, ...props }, { offset=0, height=0 }) {
 		let estimatedHeight = rowHeight * items.length;
 		(props.style || (props.style={})).height = estimatedHeight + 'px';
 
 		let start = (offset / rowHeight)|0;
 		let visibleRowCount = (height / rowHeight)|0;
 
-		if (overscan) {
-			start = Math.max(0, start - (start % overscan));
-			visibleRowCount += overscan;
-		}
+		start = Math.max(0, start - (start % OVERSCAN));
+		visibleRowCount += OVERSCAN;
 
 		let end = start + 1 + visibleRowCount;
 		let visible = items.slice(start, end);
