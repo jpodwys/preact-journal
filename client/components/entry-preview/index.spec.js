@@ -84,6 +84,29 @@ describe('entry-preview', () => {
     });
   });
 
+  describe('share icon', () => {
+    it('renders and calls navigator.share with the entry text when share is supported', () => {
+      const original = Object.getOwnPropertyDescriptor(navigator, 'share');
+      const shareSpy = sinon.spy();
+      Object.defineProperty(navigator, 'share', {
+        configurable: true, value: shareSpy
+      });
+
+      env = mountPreview({ id: 9, date: '2024-05-01', text: 'shareable' });
+      const shareIcon = env.host.querySelector('svg[icon="share"]');
+      expect(shareIcon, 'share icon rendered when navigator.share exists').to.exist;
+      fireEvent.click(shareIcon);
+
+      expect(shareSpy.calledOnce).to.be.true;
+      expect(shareSpy.args[0][0]).to.deep.equal({
+        text: '2024-05-01 shareable'
+      });
+
+      if(original) Object.defineProperty(navigator, 'share', original);
+      else delete navigator.share;
+    });
+  });
+
   describe('interactions', () => {
     it('fires showConfirmDeleteEntryModal with the entry when delete is clicked', () => {
       const showConfirmDeleteEntryModal = sinon.spy();
