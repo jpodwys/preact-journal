@@ -7,6 +7,8 @@ describe('api', () => {
 
   before(() => {
     fetchMock.get('api-200', { hello: 'world' });
+    fetchMock.get('api-204', 204);
+    fetchMock.post('api-post-204', 204);
     fetchMock.get('api-401', 401);
     fetchMock.get('api-500', 500);
   });
@@ -25,10 +27,30 @@ describe('api', () => {
     });
   });
 
-  it('should pass requests through to xhr and return { data, userId }', async () => {
+  it('should make a GET and return { data, userId } with parsed JSON', async () => {
     const response = await api('api-200');
     expect(response.data.hello).to.equal('world');
     expect(response.userId).to.be.a('string');
+  });
+
+  it('should set credentials and default JSON headers on every request', async () => {
+    await api('api-200');
+    const options = fetchMock.lastOptions();
+    expect(options.credentials).to.equal('same-origin');
+    expect(options.headers['Content-Type']).to.equal('application/json');
+    expect(options.headers['Accept']).to.equal('application/json');
+  });
+
+  it('should leave data undefined on a 204', async () => {
+    const response = await api('api-204');
+    expect(response.data).to.be.undefined;
+  });
+
+  it('should JSON-stringify request bodies', async () => {
+    await api('api-post-204', { method: 'POST', body: { a: 'a' } });
+    const options = fetchMock.lastOptions();
+    expect(typeof options.body).to.equal('string');
+    expect(JSON.parse(options.body).a).to.equal('a');
   });
 
   it('should fire handleExpiredSession with the active userId on 401', (done) => {
