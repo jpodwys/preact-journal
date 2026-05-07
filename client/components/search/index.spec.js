@@ -56,7 +56,7 @@ describe('search', () => {
       env = mountSearch({ viewEntries: [{ id: 1, date: 'today', text: 'first' }] });
       expect(env.queryByText('Favorites')).to.be.null;
       expect(env.queryByText("It's empty in here!")).to.be.null;
-      expect(env.host.querySelector('.entry-list')).to.exist;
+      expect(env.host.querySelector('.entry-preview')).to.exist;
     });
   });
 });

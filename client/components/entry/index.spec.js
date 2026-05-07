@@ -21,7 +21,6 @@ describe('entry', () => {
     env = mountEntry({ entry: null });
     const heading = env.getByRole('heading');
     expect(heading.textContent).to.equal("Looks like that doesn't exist!");
-    expect(env.host.querySelector('.entry')).to.not.exist;
   });
 
   it('renders the entry date and text in contenteditable elements', () => {

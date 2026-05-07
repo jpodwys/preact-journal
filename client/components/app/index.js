@@ -11,7 +11,7 @@ import { fire } from '../unifire';
 
 export default (props) => {
   return (
-    <div class="app">
+    <div>
       <Header
         view={props.view}
         loggedIn={props.loggedIn}

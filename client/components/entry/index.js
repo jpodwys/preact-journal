@@ -50,7 +50,7 @@ export default class Entry extends Component {
   render({ view, entry, viewEntries, entryIndex }) {
     if(!entry) return <h2 class="center-text fade-up">Looks like that doesn't exist!</h2>
     return (
-      <div class="entry fade-up">
+      <div class="fade-up">
         <div class="entry-header nav-set dark-fill">
           {view !== '/new' &&
             <Icon

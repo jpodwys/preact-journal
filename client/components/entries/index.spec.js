@@ -36,7 +36,7 @@ describe('entries', () => {
   it('renders the zero-state when there are no entries', () => {
     env = mountEntries();
     expect(env.getByText("It's empty in here!")).to.exist;
-    expect(env.host.querySelector('.entry-list')).to.not.exist;
+    expect(env.host.querySelector('.entry-preview')).to.not.exist;
   });
 
   it('renders the entry list (no zero-state) when entries are present', () => {
@@ -47,7 +47,7 @@ describe('entries', () => {
       ]
     });
     expect(env.queryByText("It's empty in here!")).to.be.null;
-    expect(env.host.querySelector('.entry-list')).to.exist;
+    expect(env.host.querySelector('.entry-preview')).to.exist;
     // The first entry's date appears via the rendered EntryPreview.
     expect(env.getByText('2024-01-01')).to.exist;
   });

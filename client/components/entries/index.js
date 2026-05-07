@@ -31,7 +31,6 @@ export default class Entries extends Component {
 
     return (
       <ScrollViewport
-        class="entry-list"
         items={viewEntries}
         renderer={renderer}
         rowHeight={83}>
