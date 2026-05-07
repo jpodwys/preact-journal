@@ -45,7 +45,7 @@ export default class ScrollViewport extends Component {
 		removeEventListener('scroll', this.scrolled, EVENT_OPTS);
 	}
 
-	render({ items, renderer, rowHeight, internalClass, ...props }, { offset=0, height=0 }) {
+	render({ items, renderer, rowHeight, ...props }, { offset=0, height=0 }) {
 		let estimatedHeight = rowHeight * items.length;
 		(props.style || (props.style={})).height = estimatedHeight + 'px';
 
@@ -60,7 +60,7 @@ export default class ScrollViewport extends Component {
 
 		return (
 			<div {...props}>
-				<div class={internalClass} style={{ position: 'relative', top: start*rowHeight }}>
+				<div class="fade-down" style={{ position: 'relative', top: start*rowHeight }}>
 					{renderer(visible)}
 				</div>
 			</div>

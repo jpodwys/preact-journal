@@ -71,10 +71,6 @@ svg {
   transition: all ease .2s;
 }
 
-.nav-set > .full-height {
-  padding: 5px;
-}
-
 .dark-fill svg {
   fill: var(--theme-text);
 }

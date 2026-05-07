@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import ScrollViewport from '../virtual-scroll';
 import EntryPreview from '../entry-preview';
-import ZeroState from '../zero-state';
 import { fire } from '../unifire';
 import debounce from '../../js/debounce';
 
@@ -22,7 +21,7 @@ export default class Entries extends Component {
 
   render({ viewEntries = [], scrollPosition, filterText }) {
     if(!viewEntries.length){
-      return <ZeroState/>
+      return <h2 class="center-text fade-up entry-text">It's empty in here!</h2>
     }
     document.body.scrollTop = scrollPosition;
 
@@ -35,8 +34,7 @@ export default class Entries extends Component {
         class="entry-list"
         items={viewEntries}
         renderer={renderer}
-        rowHeight={83}
-        internalClass="fade-down">
+        rowHeight={83}>
       </ScrollViewport>
     );
   }

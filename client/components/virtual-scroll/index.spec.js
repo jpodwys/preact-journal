@@ -18,8 +18,7 @@ describe('virtual-scroll', () => {
     env = mount(h(ScrollViewport, {
       items,
       renderer,
-      rowHeight: 50,
-      internalClass: 'inner'
+      rowHeight: 50
     }));
 
     // All 5 fit within the initial visible window (internal OVERSCAN buffer
@@ -34,8 +33,8 @@ describe('virtual-scroll', () => {
     const outer = env.host.firstElementChild;
     expect(outer.style.height).to.equal('250px');
 
-    // Inner container carries the requested class for animation hooks.
-    const inner = outer.querySelector('.inner');
+    // Inner container carries the fade-down class for animation hooks.
+    const inner = outer.querySelector('.fade-down');
     expect(inner).to.exist;
     expect(inner.style.position).to.equal('relative');
   });

@@ -63,33 +63,6 @@ const menu = (dark, view, sort, userId, username) => {
   );
 };
 
-const modal = (message, confirmText, onConfirm) => (
-  <div>
-    <div class="modal-message">{message}</div>
-    <div>
-      <button class="mdl-button" onclick={() => fire('linkstate', { key: 'dialogMode' })}>Cancel</button>
-      <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
-    </div>
-  </div>
-);
-
-const modalOptions = (modalType, entry) => {
-  if(modalType === 'delete'){
-    return {
-      message: 'Delete this entry?',
-      confirmText: 'Delete',
-      onConfirm: () => fire('deleteEntry', { id: entry.id })
-    }
-  }
-  if(modalType === 'logout'){
-    return {
-      message: 'Logout?',
-      confirmText: 'Logout',
-      onConfirm: () => fire('logout')
-    }
-  }
-};
-
 export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   if(!dialogMode) return;
 
@@ -99,8 +72,20 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'delete' && !entry) return;
-    const { message, confirmText, onConfirm } = modalOptions(modalType, entry);
-    markup = modal(message, confirmText, onConfirm);
+    const message = modalType === 'delete' ? 'Delete this entry?' : 'Logout?';
+    const confirmText = modalType === 'delete' ? 'Delete' : 'Logout';
+    const onConfirm = modalType === 'delete'
+      ? () => fire('deleteEntry', { id: entry.id })
+      : () => fire('logout');
+    markup = (
+      <div>
+        <div class="modal-message">{message}</div>
+        <div>
+          <button class="mdl-button" onclick={closeDialog}>Cancel</button>
+          <button class="mdl-button" onclick={onConfirm}>{confirmText}</button>
+        </div>
+      </div>
+    );
     mode = 'modal';
   }
 

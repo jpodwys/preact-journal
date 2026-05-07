@@ -11,7 +11,6 @@ import {
   mockUpdateEntry,
   mockDeleteEntry,
   mockLogin,
-  mockCreateAccount,
   mockLogout
 } from '../../../test/api-mocks';
 
@@ -253,43 +252,6 @@ describe('actions', () => {
       it('should not throw when login fails', (done) => {
         mockLogin({ httpStatus: 400 });
         User.login(el, USER);
-        setTimeout(() => {
-          expect(el.set.called).to.be.false;
-          done();
-        });
-      });
-
-    });
-
-    describe('create', () => {
-
-      beforeEach(() => {
-        new Provider({
-          state: {},
-          actions: { resetDataFetched: Entry.resetDataFetched },
-          children: []
-        });
-      });
-
-      it('should create account, and provide a callback to .set (which routes to /entries, but testing that is beyond this test\'s scope)', () => {
-        mockCreateAccount({ id: 2, username: 'bogus' });
-        return new Promise(resolve => {
-          el.set = sinon.spy(resolve);
-          User.createAccount(el, USER);
-        }).then(() => {
-          var args = el.set.args[0][0];
-          expect(args.loggedIn).to.be.true;
-          expect(args.userId).to.equal('2');
-          expect(args.username).to.equal('bogus');
-          expect(args.entries).to.be.an('array');
-          expect(args.entry).to.be.undefined;
-          expect(typeof el.set.args[0][1]).to.equal('function');
-        });
-      });
-
-      it('should not throw when create fails', (done) => {
-        mockCreateAccount({ httpStatus: 400 });
-        User.createAccount(el, USER);
         setTimeout(() => {
           expect(el.set.called).to.be.false;
           done();

@@ -1,7 +1,6 @@
 import { h } from 'preact';
 import Entries from '../entries';
 import Icon from '../icon';
-import ZeroState from '../zero-state';
 import { fire } from '../unifire';
 
 export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
@@ -21,7 +20,7 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
       );
     } else {
       return (
-        <ZeroState/>
+        <h2 class="center-text fade-up entry-text">It's empty in here!</h2>
       );
     }
   }

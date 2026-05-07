@@ -11,14 +11,6 @@ describe('services', () => {
       fetchMock.restore();
     });
 
-    it('should call the create endpoint with a user object', async () => {
-      fetchMock.post('/api/user', 204);
-      await User.create(fakeUser);
-      const options = fetchMock.lastOptions();
-      expect(typeof options.body).to.equal('string');
-      expect(JSON.parse(options.body).username).to.equal('u');
-    });
-
     it('should call the login endpoint with a user object', async () => {
       fetchMock.post('/api/user/login', 204);
       User.login(fakeUser);

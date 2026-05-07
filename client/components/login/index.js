@@ -7,11 +7,6 @@ const getUser = prefix => ({
   password: document.getElementById(prefix + 'pass').value
 })
 
-// const join = e => {
-//   e.preventDefault();
-//   fire('createAccount', getUser('c'));
-// }
-
 const login = e => {
   e.preventDefault();
   fire('login', getUser('l'));
@@ -30,14 +25,6 @@ export default ({ cancelable }) => {
       <h1 class="center-text">Journalize</h1>
       <h4 class="center-text">Private journal entries</h4>
         <div class="login-form-wrapper">
-          {/* <form onsubmit={join} class="full-width full-width--all">
-            <fieldset>
-              <legend>Create an Account</legend>
-              <input id="cuser" placeholder="username" autocapitalize="off" key={now + 1}/>
-              <input id="cpass" type="password" placeholder="password" key={now + 2}/>
-              <input type="submit" value="Submit"/>
-            </fieldset>
-          </form> */}
           <form onsubmit={login} class="full-width full-width--all">
             <fieldset>
               <legend>Login</legend>

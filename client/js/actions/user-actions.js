@@ -44,11 +44,6 @@ function loginSuccess (el, { id, username }){
   activateAccount(el, { id, username }, { loggedIn: true });
 };
 
-function createAccount (el, user){
-  User.create(user)
-    .then(({ data }) => loginSuccess(el, data));
-};
-
 function logout (el){
   User.logout()
     .then(() => logoutSuccess(el));
@@ -97,4 +92,4 @@ function handleExpiredSession (el, userId) {
   }
 };
 
-export default { login, createAccount, logout, switchAccount, handleExpiredSession };
+export default { login, logout, switchAccount, handleExpiredSession };

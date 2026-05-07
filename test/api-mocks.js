@@ -34,9 +34,6 @@ export const mockDeleteEntry = (id, { httpStatus = 204 } = {}) =>
 export const mockLogin = ({ id = 99, username = 'alice', httpStatus = 200 } = {}) =>
   fetchMock.post('/api/user/login', respond(httpStatus, { id, username }));
 
-export const mockCreateAccount = ({ id = 99, username = 'alice', httpStatus = 200 } = {}) =>
-  fetchMock.post('/api/user', respond(httpStatus, { id, username }));
-
 export const mockLogout = ({ httpStatus = 204 } = {}) =>
   fetchMock.post('/api/user/logout', httpStatus);
 
