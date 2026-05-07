@@ -23,52 +23,47 @@ const onSwitch = (userId) => {
   fire('switchAccount', String(other.id));
 };
 
-const menu = (dark, view, sort, userId, username) => {
-  var hasOtherAccount = getAccounts().filter(a => String(a.id) !== String(userId)).length > 0;
-
-  return (
-    <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
-      <li class="menu-username">{username}</li>
-      <li onclick={() => fire('toggleDarkMode')}>
-        <Icon icon={dark ? 'sun' : 'moon'}/>
-        <span>{dark ? 'Light' : 'Dark'}</span>
-      </li>
-      {view !== '/entry' && view !== '/new' &&
-        <li onclick={() => fire('toggleSort')}>
-          <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
-          <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
-        </li>
-      }
-      {view !== '/entry' && view !== '/new' &&
-        <li onclick={() => fire('exportEntries')}>
-          <Icon icon="download"/>
-          <span>Export</span>
-        </li>
-      }
-      {hasOtherAccount
-        ? <li onclick={() => onSwitch(userId)}>
-            <Icon icon="people"/>
-            <span>Switch</span>
-          </li>
-        : <li onclick={onAdd}>
-            <Icon icon="person-add"/>
-            <span>Add</span>
-          </li>
-      }
-      <li onclick={onLogout}>
-        <Icon icon="logout"/>
-        <span>Logout</span>
-      </li>
-    </ul>
-  );
-};
-
 export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   if(!dialogMode) return;
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
-    markup = menu(dark, view, sort, userId, username);
+    var hasOtherAccount = getAccounts().filter(a => String(a.id) !== String(userId)).length > 0;
+    markup = (
+      <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
+        <li class="menu-username">{username}</li>
+        <li onclick={() => fire('toggleDarkMode')}>
+          <Icon icon={dark ? 'sun' : 'moon'}/>
+          <span>{dark ? 'Light' : 'Dark'}</span>
+        </li>
+        {view !== '/entry' && view !== '/new' &&
+          <li onclick={() => fire('toggleSort')}>
+            <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
+            <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
+          </li>
+        }
+        {view !== '/entry' && view !== '/new' &&
+          <li onclick={() => fire('exportEntries')}>
+            <Icon icon="download"/>
+            <span>Export</span>
+          </li>
+        }
+        {hasOtherAccount
+          ? <li onclick={() => onSwitch(userId)}>
+              <Icon icon="people"/>
+              <span>Switch</span>
+            </li>
+          : <li onclick={onAdd}>
+              <Icon icon="person-add"/>
+              <span>Add</span>
+            </li>
+        }
+        <li onclick={onLogout}>
+          <Icon icon="logout"/>
+          <span>Logout</span>
+        </li>
+      </ul>
+    );
   } else {
     const modalType = dialogMode.split(':')[1];
     if(modalType === 'delete' && !entry) return;
