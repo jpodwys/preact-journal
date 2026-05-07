@@ -8,6 +8,7 @@ var gzip = util.promisify(zlib.gzip);
 
 var FINGERPRINT_PATH = 'data/latest-fingerprint.json';
 var GITHUB_API = 'https://api.github.com';
+var GITHUB_TIMEOUT_MS = 30000;
 
 module.exports = function(deps){
   var entryModel = deps.entryModel;
@@ -107,6 +108,7 @@ function stripMeta(fp){
 async function fetchLatestFingerprint(repo, pat){
   var res = await fetch(GITHUB_API + '/repos/' + repo + '/contents/' + FINGERPRINT_PATH, {
     headers: ghHeaders(pat),
+    signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
   });
   if(res.status === 404) return null;
   if(!res.ok) throw new Error('Fingerprint fetch failed: ' + res.status + ' ' + (await res.text()));
@@ -136,6 +138,7 @@ async function pushFile(repo, pat, path, buffer, message, sha){
     method: 'PUT',
     headers: Object.assign({ 'Content-Type': 'application/json' }, ghHeaders(pat)),
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
   });
   if(!res.ok) throw new Error('Push failed (' + path + '): ' + res.status + ' ' + (await res.text()));
 }
@@ -173,7 +176,7 @@ async function snapshotDatabase(connectionString){
     parts.push('SET FOREIGN_KEY_CHECKS = 0;');
     parts.push('');
 
-    for(var i = 0; i < tableNames.length; i++){
+    for(let i = 0; i < tableNames.length; i++){
       var name = tableNames[i];
       var [createRows] = await conn.query('SHOW CREATE TABLE ??', [name]);
       var createSql = createRows[0]['Create Table'];
@@ -183,14 +186,14 @@ async function snapshotDatabase(connectionString){
       parts.push('');
     }
 
-    for(var i = 0; i < tableNames.length; i++){
+    for(let i = 0; i < tableNames.length; i++){
       var name = tableNames[i];
       var [rows] = await conn.query('SELECT * FROM ??', [name]);
       if(rows.length === 0) continue;
       parts.push('-- Data: ' + name);
       var cols = Object.keys(rows[0]);
       var colList = cols.map(function(c){ return '`' + c + '`'; }).join(', ');
-      for(var j = 0; j < rows.length; j++){
+      for(let j = 0; j < rows.length; j++){
         var values = cols.map(function(c){ return mysql.escape(rows[j][c]); }).join(', ');
         parts.push('INSERT INTO `' + name + '` (' + colList + ') VALUES (' + values + ');');
       }

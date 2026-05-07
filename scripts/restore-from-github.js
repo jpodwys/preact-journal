@@ -12,6 +12,7 @@ var util = require('util');
 var gunzip = util.promisify(zlib.gunzip);
 
 var GITHUB_API = 'https://api.github.com';
+var GITHUB_TIMEOUT_MS = 30000;
 
 async function main(){
   var arg = process.argv[2];
@@ -58,6 +59,7 @@ async function main(){
 async function ghJson(repo, pat, contentPath){
   var res = await fetch(GITHUB_API + '/repos/' + repo + '/contents/' + contentPath, {
     headers: ghHeaders(pat),
+    signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
   });
   if(!res.ok) throw new Error('GitHub fetch failed (' + contentPath + '): ' + res.status + ' ' + (await res.text()));
   return res.json();
@@ -69,7 +71,10 @@ async function fetchContent(meta, pat){
     return Buffer.from(meta.content.replace(/\n/g, ''), 'base64');
   }
   if(meta.download_url){
-    var res = await fetch(meta.download_url, { headers: ghHeaders(pat) });
+    var res = await fetch(meta.download_url, {
+      headers: ghHeaders(pat),
+      signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
+    });
     if(!res.ok) throw new Error('Download failed: ' + res.status);
     return Buffer.from(await res.arrayBuffer());
   }

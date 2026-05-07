@@ -18,18 +18,25 @@ module.exports = function(){
       encryptionKey: process.env.BACKUP_ENCRYPTION_KEY,
     });
 
+  // Log err.message + err.stack rather than the full err object — mysql2 attaches
+  // properties to its errors that can include the JAWSDB_URL connection string.
+  function logFailure(label, err){
+    console.error(label + ':', err.message);
+    if(err.stack) console.error(err.stack);
+  }
+
   async function runDailyMaintenance(){
     console.log('[maintenance] starting');
     try {
       var removed = await entryService.removeAllDeletedEntries();
       console.log('[maintenance] cleanup hard-deleted ' + removed + ' entries');
     } catch(err) {
-      console.error('[maintenance] cleanup failed', err);
+      logFailure('[maintenance] cleanup failed', err);
     }
     try {
       await backupService.run();
     } catch(err) {
-      console.error('[maintenance] backup failed', err);
+      logFailure('[maintenance] backup failed', err);
     }
     console.log('[maintenance] done');
   }
