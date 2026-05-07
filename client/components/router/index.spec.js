@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { mount } from '../../../test/mount';
+import { mount, fireEvent } from '../../../test/mount';
 import Router, { route } from './index';
 
 // Black-box: mount a Router with path-tagged children, drive the URL via
@@ -78,6 +78,67 @@ describe('Router', () => {
     const onChange = sinon.spy();
     env = mountRouter('/entries', { onChange });
     expect(onChange.calledWith('/entries')).to.be.true;
+  });
+
+  // The Router installs a document-level click listener that intercepts
+  // internal links and routes via history.pushState. The handler walks up
+  // from e.target to find the enclosing <a>, so a click on a nested element
+  // inside a link still routes.
+  describe('document click interception', () => {
+    // The Router only preventDefaults internal /-prefixed links without
+    // modifier keys. Bail-out paths leave the default action in place,
+    // which Karma's headless Chrome treats as a real navigation request
+    // and reports as a page reload. Swallow the default at the test level
+    // so we can assert against routing observably without losing the page.
+    const swallowDefault = e => e.preventDefault();
+    beforeEach(() => document.addEventListener('click', swallowDefault));
+    afterEach(() => document.removeEventListener('click', swallowDefault));
+
+    it('routes internal /-prefixed links and walks up to the enclosing <a>', () => {
+      env = mountRouter('/');
+      expect(env.queryByText('HOME-ROUTE')).to.exist;
+
+      const link = document.createElement('a');
+      link.href = '/entries';
+      const inner = document.createElement('span');
+      inner.textContent = 'go';
+      link.appendChild(inner);
+      env.host.appendChild(link);
+
+      fireEvent.click(inner);
+
+      expect(env.queryByText('ENTRIES-ROUTE')).to.exist;
+      expect(env.queryByText('HOME-ROUTE')).to.be.null;
+    });
+
+    it('does not route when a modifier key is held', () => {
+      env = mountRouter('/');
+
+      const link = document.createElement('a');
+      link.href = '/entries';
+      env.host.appendChild(link);
+
+      // fireEvent.click can't pass modifier flags; build the MouseEvent
+      // directly so the handler's early-return is exercised honestly.
+      link.dispatchEvent(new MouseEvent('click', {
+        bubbles: true, cancelable: true, button: 0, ctrlKey: true
+      }));
+
+      expect(env.queryByText('HOME-ROUTE')).to.exist;
+      expect(env.queryByText('ENTRIES-ROUTE')).to.be.null;
+    });
+
+    it('ignores clicks on links whose href does not start with /', () => {
+      env = mountRouter('/');
+
+      const link = document.createElement('a');
+      link.href = 'https://example.com';
+      env.host.appendChild(link);
+
+      fireEvent.click(link);
+
+      expect(env.queryByText('HOME-ROUTE')).to.exist;
+    });
   });
 
   // Note: the legacy spec covered shouldComponentUpdate returning true when

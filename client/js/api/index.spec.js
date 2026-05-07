@@ -39,6 +39,9 @@ describe('api', () => {
     expect(options.credentials).to.equal('same-origin');
     expect(options.headers['Content-Type']).to.equal('application/json');
     expect(options.headers['Accept']).to.equal('application/json');
+    // No active account in beforeEach, so no X-User-Id header is added.
+    // Guards against a 4th default header sneaking in unnoticed.
+    expect(Object.keys(options.headers).length).to.equal(2);
   });
 
   it('should leave data undefined on a 204', async () => {
