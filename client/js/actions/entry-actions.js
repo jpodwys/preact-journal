@@ -161,10 +161,6 @@ function persistSyncPatch (el, timestamp){
   el.set({
     timestamp,
     entries: el.state.entries.slice()
-  }, () => {
-    if(el.state.view === '/entry' && el.state.entryId){
-      setEntry(el, {id: el.state.entryId});
-    }
   });
 };
 
