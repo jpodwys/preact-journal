@@ -12,41 +12,17 @@ import { fire } from '../unifire';
 export default (props) => {
   return (
     <div>
-      <Header
-        view={props.view}
-        loggedIn={props.loggedIn}
-        viewEntries={props.viewEntries}
-        entry={props.entry}
-        filter={props.filter}
-        filterText={props.filterText}/>
+      <Header {...props}/>
       <main>
         <Router onChange={(url) => fire('handleRouteChange', url)}>
-          <Login path="/" />
-          <Login path="/switch" cancelable />
-          <Entries path="/entries"
-            scrollPosition={props.scrollPosition}
-            viewEntries={props.viewEntries}
-            filterText={props.filterText}/>
-          <Search path="/search"
-            filter={props.filter}
-            filterText={props.filterText}
-            scrollPosition={props.scrollPosition}
-            viewEntries={props.viewEntries}/>
-          <Entry path="/entry/:id"
-            view={props.view}
-            entry={props.entry}
-            viewEntries={props.viewEntries}
-            entryIndex={props.entryIndex}/>
+          <Login path="/"/>
+          <Login path="/switch" cancelable/>
+          <Entries {...props} path="/entries"/>
+          <Search {...props} path="/search"/>
+          <Entry {...props} path="/entry/:id"/>
         </Router>
       </main>
-      <DialogWrapper
-        dark={props.dark}
-        sort={props.sort}
-        entry={props.entry}
-        view={props.view}
-        userId={props.userId}
-        username={props.username}
-        dialogMode={props.dialogMode}/>
+      <DialogWrapper {...props}/>
     </div>
   );
 };
