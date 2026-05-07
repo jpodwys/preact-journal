@@ -17,9 +17,10 @@ describe('entry', () => {
     });
   }
 
-  it('renders the 404 component when there is no entry', () => {
+  it('renders a not-found heading when there is no entry', () => {
     env = mountEntry({ entry: null });
-    expect(env.getByText("Looks like that doesn't exist!")).to.exist;
+    const heading = env.getByRole('heading');
+    expect(heading.textContent).to.equal("Looks like that doesn't exist!");
     expect(env.host.querySelector('.entry')).to.not.exist;
   });
 
