@@ -39,6 +39,7 @@
     "idb-keyval": "^4.0.1",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.12.0",
+    "node-cron": "^4.2.1",
     "preact": "^8.3.1",
     "sequelize": "^6.37.5",
     "shrink-ray": "https://github.com/jpodwys/shrink-ray#master",
