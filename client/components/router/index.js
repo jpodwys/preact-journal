@@ -11,25 +11,14 @@ history.pushState = (a, b, url) => {
 let ROUTER;
 let ONCHANGE;
 
-const shouldFollowLink = node => {
-  if(node && node.getAttribute) {
-    let href = node.getAttribute('href'),
-      target = node.getAttribute('target');
-    if(href && href[0] === '/' && (!target || /^_?self$/i.test(target))) return href;
-  }
-};
-
-const getLinkTarget = target => {
-  while(target && target.nodeName !== 'A'){
-    target = target.parentNode;
-  }
-  return target;
-};
-
 const clickListener = e => {
   if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
-  let href = shouldFollowLink(getLinkTarget(e.target));
-  if(href){
+  let node = e.target;
+  while(node && node.nodeName !== 'A') node = node.parentNode;
+  if(!node || !node.getAttribute) return;
+  let href = node.getAttribute('href'),
+    target = node.getAttribute('target');
+  if(href && href[0] === '/' && (!target || /^_?self$/i.test(target))){
     e.preventDefault();
     route(href);
   }
@@ -44,11 +33,6 @@ const route = (url, replace) => {
   if(ONCHANGE) ONCHANGE(url);
   if(ROUTER) ROUTER.setState({ url });
   history[replace ? 'replaceState' : 'pushState'](null, null, url);
-};
-
-const matchWild = (path, url) => {
-  let p = path.split('/'), u = url.split('/');
-  return p.length <= u.length && u.every((s, i) => p[i] === s || (p[i] && p[i][0] === ':'));
 };
 
 class Router extends Component {
@@ -83,12 +67,13 @@ class Router extends Component {
     }
   }
 
-  matchPath(url, children) {
-    return children.filter(c => c.attributes.path === url || matchWild(c.attributes.path, url));
-  }
-
   render({ children }, { url }) {
-    return this.matchPath(url, children)[0];
+    return children.find(c => {
+      const path = c.attributes.path;
+      if(path === url) return true;
+      const p = path.split('/'), u = url.split('/');
+      return p.length <= u.length && u.every((s, i) => p[i] === s || (p[i] && p[i][0] === ':'));
+    });
   }
 }
 
