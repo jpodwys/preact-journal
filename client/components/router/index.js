@@ -8,6 +8,11 @@ history.pushState = (a, b, url) => {
   scrollTo(0, 0);
 };
 
+// Opt out of browser scroll restoration on popstate so it can't race
+// Entries' render-time `body.scrollTop = state.scrollPosition` assignment
+// and snap the user back to where they originally clicked into /entry.
+if (history.scrollRestoration) history.scrollRestoration = 'manual';
+
 let ROUTER;
 let ONCHANGE;
 
