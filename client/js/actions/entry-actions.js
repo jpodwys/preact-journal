@@ -418,7 +418,7 @@ export default {
   toggleFavorite,
   clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50),
-  clearLastViewedEntryId: debounce(clearLastViewedEntryId, 1000),
+  clearLastViewedEntryId: debounce(clearLastViewedEntryId, 2000),
   exportEntries,
   toggleSort
 };

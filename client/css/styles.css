@@ -600,9 +600,9 @@ body.dark .login-cancel {
 }
 
 .entry-preview.flash-highlight {
-  animation: flash-highlight ease .7s;
+  animation: flash-highlight ease 1.4s;
 }
 
 body.dark .entry-preview.flash-highlight {
-  animation: flash-highlight-dark ease .7s;
+  animation: flash-highlight-dark ease 1.4s;
 }

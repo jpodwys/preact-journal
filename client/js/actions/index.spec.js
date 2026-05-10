@@ -1215,11 +1215,11 @@ describe('actions', () => {
       beforeEach(() => { clock = sinon.useFakeTimers(); });
       afterEach(() => clock.restore());
 
-      it('should clear lastViewedEntryId after a 1000ms debounce when set', () => {
+      it('should clear lastViewedEntryId after a 2000ms debounce when set', () => {
         el.state.lastViewedEntryId = 42;
         Entry.clearLastViewedEntryId(el);
         expect(el.set.called).to.be.false;
-        clock.tick(999);
+        clock.tick(1999);
         expect(el.set.called).to.be.false;
         clock.tick(1);
         expect(el.set.calledOnce).to.be.true;
@@ -1228,7 +1228,7 @@ describe('actions', () => {
 
       it('should not call set when lastViewedEntryId is already undefined', () => {
         Entry.clearLastViewedEntryId(el);
-        clock.tick(1100);
+        clock.tick(2100);
         expect(el.set.called).to.be.false;
       });
 
