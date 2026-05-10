@@ -12,9 +12,23 @@ var path = require('path');
 var zlib = require('zlib');
 var del = require('del');
 var replace = require('gulp-replace');
+var Transform = require('stream').Transform;
 
 var COMPRESSIBLE_EXTS = /\.(html|js|css|json|svg|txt)$/i;
 var PRECOMPRESS_MIN_BYTES = 1400; // matches shrinkRay threshold
+
+// gulp.dest preserves vinyl File.stat.mtime, which by default mirrors the
+// source file's mtime. That makes `ls dist/` look stale even after a fresh
+// build. Pipe through this to stamp the current time on every emitted file.
+function touchMtime() {
+  return new Transform({
+    objectMode: true,
+    transform: function (file, _, cb) {
+      if (file.stat) file.stat.mtime = new Date();
+      cb(null, file);
+    }
+  });
+}
 
 function serve(cb) {
   require('./app.js');
@@ -41,28 +55,33 @@ function sw() {
   return gulp.src('client/js/sw.js')
     .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
     .pipe(gulpTerser())
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
 function version() {
   return gulp.src('client/js/version.json')
     .pipe(replace('""', '"' + Date.now() + '"'))
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
 function images() {
   return gulp.src('client/images/**.*')
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
 function manifest() {
   return gulp.src('client/manifest.json')
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
 function styles() {
   return gulp.src('client/css/styles.css')
     .pipe(cleanCSS())
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
@@ -73,6 +92,7 @@ function clean() {
 function compress() {
   return gulp.src('dist/bundle.js')
     .pipe(gulpTerser())
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
@@ -87,6 +107,7 @@ function inline() {
       rootpath: __dirname + '/dist',
       compress: false
     }))
+    .pipe(touchMtime())
     .pipe(gulp.dest('./dist'));
 }
 
