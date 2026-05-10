@@ -24,13 +24,15 @@ const getEntryText = (entry, filterText) => {
   }
 };
 
-export default ({ entry, filterText }) => {
+export default ({ entry, filterText, justViewed }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
   const fadeRight = entry.slideIn ? 'fade-right' : '';
   if(fadeRight) setTimeout(() => fire('removeSlideInProp'), 450);
+  const flash = justViewed ? 'flash-highlight' : '';
+  const className = ['entry-preview', fadeRight, flash].filter(Boolean).join(' ');
 
   return (
-    <div class={`entry-preview ${fadeRight}`}>
+    <div class={className}>
       <a href={"/entry/" + entry.id}>
         <div class="list-item">
           <div class="first-row">

@@ -3,6 +3,7 @@ import ScrollViewport from '../virtual-scroll';
 import EntryPreview from '../entry-preview';
 import { fire } from '../unifire';
 import debounce from '../../js/debounce';
+import { ROW_HEIGHT } from '../../js/utils';
 
 export default class Entries extends Component {
   componentDidMount() {
@@ -16,24 +17,31 @@ export default class Entries extends Component {
   }
 
   shouldComponentUpdate(np) {
-    return this.props.viewEntries !== np.viewEntries;
+    return this.props.viewEntries !== np.viewEntries
+      || this.props.lastViewedEntryId !== np.lastViewedEntryId;
   }
 
-  render({ viewEntries = [], scrollPosition, filterText }) {
+  render({ viewEntries = [], scrollPosition, filterText, lastViewedEntryId }) {
     if(!viewEntries.length){
       return <h2 class="center-text fade-up entry-text">It's empty in here!</h2>
     }
     document.body.scrollTop = scrollPosition;
 
     const renderer = (items) => {
-      return items.map(entry => <EntryPreview entry={entry} filterText={filterText}/>)
+      return items.map(entry => (
+        <EntryPreview
+          key={entry.id}
+          entry={entry}
+          filterText={filterText}
+          justViewed={entry.id === lastViewedEntryId}/>
+      ))
     };
 
     return (
       <ScrollViewport
         items={viewEntries}
         renderer={renderer}
-        rowHeight={83}>
+        rowHeight={ROW_HEIGHT}>
       </ScrollViewport>
     );
   }

@@ -1,5 +1,10 @@
 import { clear, del } from 'idb-keyval';
 
+// Pixel height of a single row in the entries list. Used by the virtual
+// scroll viewport to size and position rows, and by shiftEntry to keep
+// state.scrollPosition in lockstep with arrow-driven entry navigation.
+const ROW_HEIGHT = 83;
+
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
 function sortObjectsByDate (list, sort = 'desc') {
@@ -73,6 +78,7 @@ function clearData (userId) {
 };
 
 export {
+  ROW_HEIGHT,
   findObjectIndexById,
   sortObjectsByDate,
   applyFilters,

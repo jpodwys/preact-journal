@@ -569,6 +569,16 @@ body.dark .login-cancel {
   }
 }
 
+@keyframes flash-highlight {
+  from { background-color: rgba(66, 133, 244, .3); }
+  to   { background-color: transparent; }
+}
+
+@keyframes flash-highlight-dark {
+  from { background-color: rgba(45, 80, 175, .55); }
+  to   { background-color: transparent; }
+}
+
 .fade-in {
   animation: fade-in ease .2s;
 }
@@ -587,4 +597,12 @@ body.dark .login-cancel {
 
 .grow {
   animation: grow ease .2s;
+}
+
+.entry-preview.flash-highlight {
+  animation: flash-highlight ease .7s;
+}
+
+body.dark .entry-preview.flash-highlight {
+  animation: flash-highlight-dark ease .7s;
 }

@@ -1,5 +1,5 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, isActiveEntryId, sortObjectsByDate } from '../utils';
+import { findObjectIndexById, isActiveEntryId, sortObjectsByDate, ROW_HEIGHT } from '../utils';
 import { get, set } from 'idb-keyval';
 import exportAllEntries from '../../js/export-entries';
 import debounce from '../debounce';
@@ -373,7 +373,9 @@ function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
   var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
   let entry = el.state.viewEntries[entryIndex + count];
-  if(entry) route('/entry/' + entry.id, true);
+  if(!entry) return;
+  el.set({ scrollPosition: Math.max(0, (el.state.scrollPosition || 0) + count * ROW_HEIGHT) });
+  route('/entry/' + entry.id, true);
 };
 
 function clearFilters (el) {
@@ -390,6 +392,11 @@ function removeSlideInProp (el) {
   });
 
   el.set({ entries });
+}
+
+function clearLastViewedEntryId (el) {
+  if(el.state.lastViewedEntryId === undefined) return;
+  el.set({ lastViewedEntryId: undefined });
 };
 
 function exportEntries (el) {
@@ -411,6 +418,7 @@ export default {
   toggleFavorite,
   clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50),
+  clearLastViewedEntryId: debounce(clearLastViewedEntryId, 1000),
   exportEntries,
   toggleSort
 };

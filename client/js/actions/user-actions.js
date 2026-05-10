@@ -27,6 +27,7 @@ function activateAccount (el, { id, username }, extra) {
       timestamp,
       entry: undefined,
       entryIndex: -1,
+      lastViewedEntryId: undefined,
       filter: '',
       filterText: ''
     }, extra), () => {

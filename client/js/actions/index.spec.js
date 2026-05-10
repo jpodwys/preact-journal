@@ -1098,6 +1098,43 @@ describe('actions', () => {
         Entry.shiftEntry(el, -1);
         expect(replaceSpy.called).to.be.false;
       });
+
+      it('bumps scrollPosition by +ROW_HEIGHT when shifting forward', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 1 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        el.state.scrollPosition = 100;
+        Entry.shiftEntry(el, 1);
+        expect(el.set.calledOnce).to.be.true;
+        expect(el.set.args[0][0]).to.deep.equal({ scrollPosition: 183 });
+      });
+
+      it('bumps scrollPosition by -ROW_HEIGHT when shifting backward', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 2 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        el.state.scrollPosition = 200;
+        Entry.shiftEntry(el, -1);
+        expect(el.set.args[0][0]).to.deep.equal({ scrollPosition: 117 });
+      });
+
+      it('clamps scrollPosition at 0 when shifting backward would go negative', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 2 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        el.state.scrollPosition = 10;
+        Entry.shiftEntry(el, -1);
+        expect(el.set.args[0][0]).to.deep.equal({ scrollPosition: 0 });
+      });
+
+      it('does not touch scrollPosition when the shift is rejected (no neighbor entry)', () => {
+        el.state.view = '/entry';
+        el.state.entry = { id: 3 };
+        el.state.viewEntries = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        el.state.scrollPosition = 200;
+        Entry.shiftEntry(el, 1);
+        expect(el.set.called).to.be.false;
+      });
     });
 
     describe('toggleFavorite', () => {
@@ -1171,6 +1208,30 @@ describe('actions', () => {
         Entry.exportEntries(el);
         expect(createObjectURL.called).to.be.false;
       });
+    });
+
+    describe('clearLastViewedEntryId', () => {
+      let clock;
+      beforeEach(() => { clock = sinon.useFakeTimers(); });
+      afterEach(() => clock.restore());
+
+      it('should clear lastViewedEntryId after a 1000ms debounce when set', () => {
+        el.state.lastViewedEntryId = 42;
+        Entry.clearLastViewedEntryId(el);
+        expect(el.set.called).to.be.false;
+        clock.tick(999);
+        expect(el.set.called).to.be.false;
+        clock.tick(1);
+        expect(el.set.calledOnce).to.be.true;
+        expect(el.set.args[0][0]).to.deep.equal({ lastViewedEntryId: undefined });
+      });
+
+      it('should not call set when lastViewedEntryId is already undefined', () => {
+        Entry.clearLastViewedEntryId(el);
+        clock.tick(1100);
+        expect(el.set.called).to.be.false;
+      });
+
     });
 
     describe('removeSlideInProp', () => {

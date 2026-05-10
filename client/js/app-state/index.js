@@ -17,6 +17,12 @@ const observe = (obj, prop, next, prev) => {
       if(prev === '/search' && next === '/entries'){
         fire('clearFilters');
       }
+      if(prev === '/entry' && next !== '/entry' && obj.entry){
+        obj.lastViewedEntryId = obj.entry.id;
+        fire('clearLastViewedEntryId');
+      } else if(next === '/entry') {
+        obj.lastViewedEntryId = undefined;
+      }
       break;
     }
     case 'entries': {
@@ -64,6 +70,7 @@ export default function getInitialState () {
     filterText: '',
     entryIndex: -1,
     entry: undefined,
+    lastViewedEntryId: undefined,
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: userId ? localStorage.getItem('timestamp_' + userId) || undefined : undefined

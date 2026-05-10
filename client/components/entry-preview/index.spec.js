@@ -84,6 +84,25 @@ describe('entry-preview', () => {
     });
   });
 
+  describe('flash highlight', () => {
+    function mountWith (entry, justViewed) {
+      return mount(h(EntryPreview, null), {
+        state: { entry, filterText: '', justViewed },
+        actions: {}
+      });
+    }
+
+    it('applies flash-highlight when justViewed is true', () => {
+      env = mountWith({ id: 1, date: '2024-01-01', text: 't' }, true);
+      expect(env.host.querySelector('.entry-preview').classList.contains('flash-highlight')).to.be.true;
+    });
+
+    it('does not apply flash-highlight when justViewed is false or absent', () => {
+      env = mountWith({ id: 1, date: '2024-01-01', text: 't' }, false);
+      expect(env.host.querySelector('.flash-highlight')).to.not.exist;
+    });
+  });
+
   describe('share icon', () => {
     it('renders and calls navigator.share with the entry text when share is supported', () => {
       const original = Object.getOwnPropertyDescriptor(navigator, 'share');

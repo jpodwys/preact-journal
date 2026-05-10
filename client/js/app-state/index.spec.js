@@ -120,6 +120,39 @@ describe('appState', () => {
       state.view = '/new';
       expect(clearFilters.called).to.be.false;
     });
+
+    it('captures entry.id as lastViewedEntryId and fires clearLastViewedEntryId when leaving /entry', () => {
+      const clearLastViewedEntryId = sinon.spy();
+      new Provider({ state: {}, actions: { clearLastViewedEntryId }, children: [] });
+      state = getInitialState();
+
+      state.entry = { id: 42 };
+      state.view = '/entry';
+      expect(state.lastViewedEntryId).to.be.undefined;
+      expect(clearLastViewedEntryId.called).to.be.false;
+
+      state.view = '/entries';
+      expect(state.lastViewedEntryId).to.equal(42);
+      expect(clearLastViewedEntryId.calledOnce).to.be.true;
+    });
+
+    it('clears lastViewedEntryId on entering /entry', () => {
+      state = getInitialState();
+      state.lastViewedEntryId = 99;
+      state.view = '/entry';
+      expect(state.lastViewedEntryId).to.be.undefined;
+    });
+
+    it('does not capture lastViewedEntryId when there is no current entry', () => {
+      const clearLastViewedEntryId = sinon.spy();
+      new Provider({ state: {}, actions: { clearLastViewedEntryId }, children: [] });
+      state = getInitialState();
+
+      state.view = '/entry';
+      state.view = '/entries';
+      expect(state.lastViewedEntryId).to.be.undefined;
+      expect(clearLastViewedEntryId.called).to.be.false;
+    });
   });
 
   describe('dark observer', () => {
