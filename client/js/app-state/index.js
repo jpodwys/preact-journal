@@ -58,7 +58,6 @@ export default function getInitialState () {
     username,
     entries: [],
     viewEntries: [],
-    scrollPosition: 0,
     sort: 'desc',
     filter: '',
     filterText: '',
