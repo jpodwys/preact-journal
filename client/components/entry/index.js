@@ -78,7 +78,7 @@ export default class Entry extends Component {
         </div>
         <div
           id="entryText"
-          contenteditable
+          contenteditable="plaintext-only"
           class="entry-text"
           onInput={this.upsert}
           key={'entry-' + entry.id}>
