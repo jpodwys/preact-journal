@@ -12,7 +12,7 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
             <Icon icon="star-filled"/>
             <span>Favorites</span>
           </li>
-          <li onclick={() => fire('linkstate', { key: 'filterText', val: new Date().toISOString().slice(4, 10) })}>
+          <li onclick={() => fire('linkstate', { key: 'filterText', val: new Date().toLocaleDateString('en-CA').slice(5) })}>
             <Icon icon="calendar"/>
             <span>On this day</span>
           </li>

@@ -341,7 +341,7 @@ function setEntry (el, { id }){
 function newEntry (el){
   var entry = {
     id: Date.now(),
-    date: new Date().toISOString().slice(0, 10),
+    date: new Date().toLocaleDateString('en-CA'),
     text: '',
     needsSync: true,
     newEntry: true,

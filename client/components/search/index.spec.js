@@ -47,7 +47,7 @@ describe('search', () => {
       fireEvent.click(env.getByText('On this day'));
       const payload = linkstate.args[0][1];
       expect(payload.key).to.equal('filterText');
-      expect(payload.val).to.equal(new Date().toISOString().slice(4, 10));
+      expect(payload.val).to.equal(new Date().toLocaleDateString('en-CA').slice(5));
     });
   });
 
