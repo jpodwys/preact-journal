@@ -3,7 +3,7 @@ import Entries from '../entries';
 import Icon from '../icon';
 import { fire } from '../unifire';
 
-export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
+export default ({ filter, filterText, viewEntries = [] }) => {
   if(!viewEntries.length){
     if(!filter && !filterText){
       return (
@@ -27,7 +27,6 @@ export default ({ filter, filterText, viewEntries = [], scrollPosition }) => {
 
   return (
     <Entries
-      scrollPosition={scrollPosition}
       viewEntries={viewEntries}
       filterText={filterText}/>
   );

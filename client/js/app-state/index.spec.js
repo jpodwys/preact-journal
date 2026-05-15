@@ -21,7 +21,6 @@ describe('appState', () => {
 
     expect(localStorage.getItem('bogus')).to.be.null;
     expect(typeof state).to.equal('object');
-    expect(state.scrollPosition).to.equal(0);
     expect(state.view).to.equal('/');
     expect(state.filterText).to.equal('');
     expect(state.loggedIn).to.be.false;
