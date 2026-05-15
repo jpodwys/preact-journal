@@ -131,27 +131,27 @@ svg {
 
 /* Login */
 
-.lfw {
+.login-form-wrapper {
   max-width: 400px;
   margin: auto;
 }
 
-.lfw fieldset {
+.login-form-wrapper fieldset {
   border: none;
   padding: 0;
 }
 
-.lfw fieldset * {
+.login-form-wrapper fieldset * {
   margin-bottom: 2px;
 }
 
-.lfw legend {
+.login-form-wrapper legend {
   padding: .3em 0;
   margin-bottom: 10px;
   border-bottom: 1px solid #e5e5e5;
 }
 
-.lfw input {
+.login-form-wrapper input {
   font-size: 16px;
   padding: .5em .6em;
   display: inline-block;
@@ -161,7 +161,7 @@ svg {
   box-sizing: border-box;
 }
 
-.lfw input[type=submit] {
+.login-form-wrapper input[type=submit] {
   cursor: pointer;
   background-color: var(--theme-blue);
   color: var(--theme-white);
@@ -206,23 +206,23 @@ svg {
   position: relative;
 }
 
-.epi {
+.entry-preview--icons {
   position: absolute;
   top: 0;
   right: -12.5px;
 }
 
-.epi .hide-icon {
+.entry-preview--icons .hide-icon {
   display: none;
 }
 
 @media (hover: hover) {
-  .entry-preview:hover .epi .hide-icon {
+  .entry-preview:hover .entry-preview--icons .hide-icon {
     display: block;
   }
 }
 
-.epi svg {
+.entry-preview--icons svg {
   padding: 10px 12.5px 5px;
 }
 
@@ -496,19 +496,19 @@ body.dark .highlight {
   background-color: var(--theme-dark-blue);
 }
 
-body.dark .lfw input {
+body.dark .login-form-wrapper input {
   background-color: #1a1a1a;
   border-color: #555;
   box-shadow: none;
   color: var(--theme-dark-text) !important;
 }
 
-body.dark .lfw input[type=submit] {
+body.dark .login-form-wrapper input[type=submit] {
   background-color: var(--theme-dark-blue);
   border: none;
 }
 
-body.dark .lfw legend {
+body.dark .login-form-wrapper legend {
   border-bottom-color: #555;
 }
 
@@ -522,12 +522,19 @@ body.dark .login-cancel {
   from {
     opacity: .25;
   }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-up {
   from {
     opacity: .25;
     transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -536,6 +543,10 @@ body.dark .login-cancel {
     opacity: .25;
     transform: translateY(-25px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-right {
@@ -543,11 +554,18 @@ body.dark .login-cancel {
     opacity: .25;
     transform: translateX(-250px);
   }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes grow {
   from {
     transform: scale(.2);
+  }
+  to {
+    transform: scale(1);
   }
 }
 

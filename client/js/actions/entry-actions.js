@@ -35,7 +35,7 @@ function applyEntryPatch (el, userId, id, patch) {
   patch(entries, idx);
 
   var entry = isActiveEntryId(el, id) && entries[idx]
-    ? {...entries[idx]}
+    ? Object.assign({}, entries[idx])
     : el.state.entry;
 
   el.set({ entry, entries: entries.slice() });
@@ -268,7 +268,7 @@ function updateEntry (el, { entry, property, entryId }){
   activeEntry[property] = entry[property];
   activeEntry.needsSync = true;
   el.set({
-    entry: {...activeEntry},
+    entry: Object.assign({}, activeEntry),
     entries: el.state.entries.slice()
   });
 

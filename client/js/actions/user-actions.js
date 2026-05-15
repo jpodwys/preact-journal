@@ -5,6 +5,10 @@ import getInitialState from '../app-state';
 import { route } from '../../components/router';
 import { fire } from '../../components/unifire';
 
+function setActiveAccount (accounts, id) {
+  return accounts.map(a => Object.assign({}, a, { active: a.id === id }));
+}
+
 function login (el, user){
   User.login(user)
     .then(({ data }) => loginSuccess(el, data));
@@ -16,7 +20,7 @@ function activateAccount (el, { id, username }, extra) {
   get('entries_' + id).then((entries = []) => {
     var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
 
-    el.set({
+    el.set(Object.assign({
       userId: String(id),
       username,
       entries,
@@ -24,9 +28,8 @@ function activateAccount (el, { id, username }, extra) {
       entry: undefined,
       entryIndex: -1,
       filter: '',
-      filterText: '',
-      ...extra
-    }, () => {
+      filterText: ''
+    }, extra), () => {
       fire('getEntries');
       route('/entries', true);
     });
@@ -35,8 +38,8 @@ function activateAccount (el, { id, username }, extra) {
 
 function loginSuccess (el, { id, username }){
   var accounts = getAccounts().filter(a => a.id !== id);
-  accounts.forEach(a => { a.active = false; });
   accounts.push({ id, username, active: true });
+  accounts = setActiveAccount(accounts, id);
   saveAccounts(accounts);
   activateAccount(el, { id, username }, { loggedIn: true });
 };
@@ -66,7 +69,7 @@ function switchAccount (el, userId) {
   var accounts = getAccounts();
   var account = accounts.find(a => String(a.id) === String(userId));
   if(!account) return;
-  accounts.forEach(a => { a.active = a.id === account.id; });
+  accounts = setActiveAccount(accounts, account.id);
   saveAccounts(accounts);
   activateAccount(el, { id: account.id, username: account.username }, { dialogMode: '' });
 };
@@ -75,7 +78,7 @@ function handleExpiredSession (el, userId) {
   if(!userId || el.state.userId !== userId) return;
 
   var accounts = getAccounts().map(a =>
-    String(a.id) === userId ? {...a, expired: true, active: false} : a
+    String(a.id) === userId ? Object.assign({}, a, { expired: true, active: false }) : a
   );
   var remaining = accounts.filter(a => !a.expired);
   saveAccounts(accounts);

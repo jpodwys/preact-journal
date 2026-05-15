@@ -14,7 +14,7 @@ function start(e) {
 
 function end(e) {
   const el = document.activeElement;
-  if(el && el.matches('input,textarea,[contenteditable]')) return;
+  if(el && el.matches('input') || el.matches('textarea') || el.hasAttribute('contenteditable')) return;
   e = e.changedTouches ? e.changedTouches[0] : e;
   var dx = e.pageX - startX, dy = e.pageY - startY;
   if (Date.now() - startTime <= 1000 && Math.abs(dx) >= 30 && Math.abs(dy) < 20){

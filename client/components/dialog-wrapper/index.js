@@ -7,19 +7,19 @@ import { getAccounts } from '../../js/utils';
 const closeDialog = () => fire('linkstate', { key: 'dialogMode' });
 
 const onLogout = () => {
-  closeDialog();
+  fire('linkstate', { key: 'dialogMode' });
   setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }));
 };
 
 const onAdd = () => {
-  closeDialog();
+  fire('linkstate', { key: 'dialogMode' });
   route('/switch');
 };
 
 const onSwitch = (userId) => {
   var other = getAccounts().find(a => String(a.id) !== String(userId));
   if(!other) return;
-  closeDialog();
+  fire('linkstate', { key: 'dialogMode' });
   fire('switchAccount', String(other.id));
 };
 

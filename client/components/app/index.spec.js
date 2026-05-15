@@ -76,11 +76,11 @@ describe('App — integration journeys', () => {
         expect(fab, 'FAB rendered on /entries').to.exist;
         fireEvent.click(fab);
 
-        const et = env.host.querySelector('#et');
-        expect(et, 'should land on /new').to.exist;
+        const entryText = env.host.querySelector('#entryText');
+        expect(entryText, 'should land on /new').to.exist;
 
-        et.innerText = 'first entry';
-        fireEvent.input(et);
+        entryText.innerText = 'first entry';
+        fireEvent.input(entryText);
         await tickDebounce();
         await flush(); // POST resolves → createEntrySuccess clears flags
 
@@ -104,9 +104,9 @@ describe('App — integration journeys', () => {
         await bootApp();
 
         fireEvent.click(env.host.querySelector('a[href="/entry/new"]'));
-        const et = env.host.querySelector('#et');
-        et.innerText = 'offline entry';
-        fireEvent.input(et);
+        const entryText = env.host.querySelector('#entryText');
+        entryText.innerText = 'offline entry';
+        fireEvent.input(entryText);
         await tickDebounce();
         await flush();
 
@@ -160,11 +160,11 @@ describe('App — integration journeys', () => {
         expect(row, 'list row rendered').to.exist;
         fireEvent.click(row);
 
-        const et = env.host.querySelector('#et');
-        expect(et, 'on entry view').to.exist;
+        const entryText = env.host.querySelector('#entryText');
+        expect(entryText, 'on entry view').to.exist;
 
-        et.innerText = 'edited online';
-        fireEvent.input(et);
+        entryText.innerText = 'edited online';
+        fireEvent.input(entryText);
         await tickDebounce();
         await flush();
 
@@ -180,9 +180,9 @@ describe('App — integration journeys', () => {
         await bootApp();
 
         fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        const et = env.host.querySelector('#et');
-        et.innerText = 'edited offline';
-        fireEvent.input(et);
+        const entryText = env.host.querySelector('#entryText');
+        entryText.innerText = 'edited offline';
+        fireEvent.input(entryText);
         await tickDebounce();
         await flush();
 
@@ -354,7 +354,7 @@ describe('App — integration journeys', () => {
       expect(env.queryByText('Favorites')).to.exist;
       expect(env.host.querySelectorAll('.entry-preview').length).to.equal(0);
 
-      const input = env.host.querySelector('#fi');
+      const input = env.host.querySelector('#filterTextInput');
       fireEvent.input(input, 'beach');
       await flush(160); // header debounce is 100ms
 

@@ -45,7 +45,7 @@ export default ({ entry, filterText }) => {
         </div>
       </a>
 
-      <span class="nav-set dark-fill epi">
+      <span class="nav-set dark-fill entry-preview--icons">
         <Icon icon="delete"
           class="hide-icon"
           key={entry.id + 'delete'}

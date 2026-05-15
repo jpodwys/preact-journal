@@ -5,7 +5,7 @@ import debounce from '../../js/debounce';
 
 const cancelAndBlur = e => {
 	e.preventDefault();
-	document.getElementById('fi').blur();
+	document.getElementById('filterTextInput').blur();
 }
 
 const getBackHref = (view, filter, filterText) => {
@@ -21,7 +21,7 @@ const onBack = e => {
 };
 
 const focusSearchInput = () => {
-	setTimeout(() => document.getElementById('fi').focus(), 200);
+	setTimeout(() => document.getElementById('filterTextInput').focus(), 200);
 };
 
 
@@ -55,7 +55,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 								<Icon icon={filterIcon} onclick={() => fire('linkstate', { key: 'filter', val: filterTo })}/>
 							</span>
 							<input
-								id="fi"
+								id="filterTextInput"
 								autocomplete="off"
 								value={filterText}
 								placeholder="Search"
