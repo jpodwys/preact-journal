@@ -522,19 +522,12 @@ body.dark .login-cancel {
   from {
     opacity: .25;
   }
-  to {
-    opacity: 1;
-  }
 }
 
 @keyframes fade-up {
   from {
     opacity: .25;
     transform: translateY(25px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -543,10 +536,6 @@ body.dark .login-cancel {
     opacity: .25;
     transform: translateY(-25px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @keyframes fade-right {
@@ -554,18 +543,11 @@ body.dark .login-cancel {
     opacity: .25;
     transform: translateX(-250px);
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 @keyframes grow {
   from {
     transform: scale(.2);
-  }
-  to {
-    transform: scale(1);
   }
 }
 

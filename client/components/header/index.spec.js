@@ -218,7 +218,7 @@ describe('header', () => {
       const filterByText = sinon.spy();
       env = mountHeader(searchState(), { filterByText });
 
-      fireEvent.input(env.host.querySelector('#filterTextInput'), 'beach');
+      fireEvent.input(env.host.querySelector('#fi'), 'beach');
       expect(filterByText.called).to.be.false;
       clock.tick(99);
       expect(filterByText.called).to.be.false;
@@ -232,7 +232,7 @@ describe('header', () => {
       const filterByText = sinon.spy();
       env = mountHeader(searchState(), { filterByText });
 
-      const input = env.host.querySelector('#filterTextInput');
+      const input = env.host.querySelector('#fi');
       fireEvent.input(input, 'b');
       clock.tick(50);
       fireEvent.input(input, 'be');
@@ -269,7 +269,7 @@ describe('header', () => {
 
     it('submitting the search form blurs the input (closes the soft keyboard)', () => {
       env = mountHeader(searchState());
-      const input = env.host.querySelector('#filterTextInput');
+      const input = env.host.querySelector('#fi');
       const blurSpy = sinon.spy(input, 'blur');
       fireEvent.submit(env.host.querySelector('.search-form'));
       expect(blurSpy.calledOnce).to.be.true;

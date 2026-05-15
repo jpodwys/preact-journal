@@ -29,8 +29,8 @@ describe('entry', () => {
       viewEntries: [{ id: 5 }],
       entryIndex: 0
     });
-    const date = env.host.querySelector('#entryDate');
-    const text = env.host.querySelector('#entryText');
+    const date = env.host.querySelector('#ed');
+    const text = env.host.querySelector('#et');
     expect(date.textContent.trim()).to.equal('2024-04-04');
     expect(text.textContent.trim()).to.equal('hello world');
     expect(date.hasAttribute('contenteditable')).to.be.true;
@@ -96,11 +96,11 @@ describe('entry', () => {
         entry: { id: 'new', date: '', text: '', newEntry: true }
       });
       expect(env.host.querySelector('svg[icon="left"]')).to.not.exist;
-      expect(env.host.querySelector('#entryDate')).to.exist;
-      expect(env.host.querySelector('#entryText')).to.exist;
+      expect(env.host.querySelector('#ed')).to.exist;
+      expect(env.host.querySelector('#et')).to.exist;
     });
 
-    it('focuses #entryText when transitioning from an existing entry to /new', () => {
+    it('focuses #et when transitioning from an existing entry to /new', () => {
       // shouldComponentUpdate gates on entry.id change, so the focus only
       // fires when both view changes AND the entry id rotates — exactly
       // what production does (clicking the FAB unshifts a new blank entry).
@@ -122,7 +122,7 @@ describe('entry', () => {
         entryIndex: -1
       });
 
-      expect(document.activeElement.id).to.equal('entryText');
+      expect(document.activeElement.id).to.equal('et');
     });
   });
 
@@ -139,7 +139,7 @@ describe('entry', () => {
         { updateEntry }
       );
 
-      const text = env.host.querySelector('#entryText');
+      const text = env.host.querySelector('#et');
       text.innerText = 'edited text';
       fireEvent.input(text);
 
@@ -164,7 +164,7 @@ describe('entry', () => {
         { updateEntry }
       );
 
-      const date = env.host.querySelector('#entryDate');
+      const date = env.host.querySelector('#ed');
       date.innerText = '  2025-12-31  ';
       fireEvent.input(date);
       clock.tick(500);
@@ -185,7 +185,7 @@ describe('entry', () => {
         { updateEntry }
       );
 
-      const text = env.host.querySelector('#entryText');
+      const text = env.host.querySelector('#et');
       text.innerText = 'ab';
       fireEvent.input(text);
       clock.tick(200);
@@ -210,9 +210,9 @@ describe('entry', () => {
         { createEntry }
       );
 
-      env.host.querySelector('#entryDate').innerText = '2024-12-25';
-      env.host.querySelector('#entryText').innerText = 'first entry';
-      fireEvent.input(env.host.querySelector('#entryText'));
+      env.host.querySelector('#ed').innerText = '2024-12-25';
+      env.host.querySelector('#et').innerText = 'first entry';
+      fireEvent.input(env.host.querySelector('#et'));
       clock.tick(500);
 
       expect(createEntry.calledOnce).to.be.true;
