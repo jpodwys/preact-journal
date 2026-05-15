@@ -92,7 +92,7 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 				</div>
 
 				{view === '/entries' &&
-					<div class="button button--fab add-entry elevated grow">
+					<div class="button--fab add-entry elevated grow">
 						<a href="/entry/new">
 							<Icon icon="clear" key="header-add" class="rotate45"/>
 						</a>

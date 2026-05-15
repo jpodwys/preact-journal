@@ -29,6 +29,7 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
     var hasOtherAccount = getAccounts().filter(a => String(a.id) !== String(userId)).length > 0;
+    var notOnEntry = view !== '/entry' && view !== '/new';
     markup = (
       <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
         <li class="menu-username">{username}</li>
@@ -36,13 +37,13 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
           <Icon icon={dark ? 'sun' : 'moon'}/>
           <span>{dark ? 'Light' : 'Dark'}</span>
         </li>
-        {view !== '/entry' && view !== '/new' &&
+        {notOnEntry &&
           <li onclick={() => fire('toggleSort')}>
             <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
         }
-        {view !== '/entry' && view !== '/new' &&
+        {notOnEntry &&
           <li onclick={() => fire('exportEntries')}>
             <Icon icon="download"/>
             <span>Export</span>
@@ -65,11 +66,11 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
       </ul>
     );
   } else {
-    const modalType = dialogMode.split(':')[1];
-    if(modalType === 'delete' && !entry) return;
-    const message = modalType === 'delete' ? 'Delete this entry?' : 'Logout?';
-    const confirmText = modalType === 'delete' ? 'Delete' : 'Logout';
-    const onConfirm = modalType === 'delete'
+    const isDel = dialogMode.includes('delete');
+    if(isDel && !entry) return;
+    const message = isDel ? 'Delete this entry?' : 'Logout?';
+    const confirmText = isDel ? 'Delete' : 'Logout';
+    const onConfirm = isDel
       ? () => fire('deleteEntry', { id: entry.id })
       : () => fire('logout');
     markup = (
