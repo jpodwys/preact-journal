@@ -28,7 +28,9 @@ function activateAccount (el, { id, username }, extra) {
       ...extra
     }, () => {
       fire('getEntries');
-      route('/entries', true);
+      // Route to '/' so the login guard immediately bounces to '/entries',
+      // remounting the entries list and replaying the fade-down animation.
+      route('/', true);
     });
   });
 }
