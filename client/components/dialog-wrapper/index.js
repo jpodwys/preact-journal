@@ -43,12 +43,12 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
         }
-        {/* {notOnEntry &&
+        {notOnEntry &&
           <li onclick={() => fire('exportEntries')}>
             <Icon icon="download"/>
             <span>Export</span>
           </li>
-        } */}
+        }
         {hasOtherAccount
           ? <li onclick={() => onSwitch(userId)}>
               <Icon icon="people"/>
