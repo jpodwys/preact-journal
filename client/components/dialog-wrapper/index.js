@@ -23,13 +23,13 @@ const onSwitch = (userId) => {
   fire('switchAccount', String(other.id));
 };
 
-export default ({ dialogMode, dark, entry, view, userId, username }) => {
+export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
   if(!dialogMode) return;
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
     var hasOtherAccount = getAccounts().filter(a => String(a.id) !== String(userId)).length > 0;
-    // var notOnEntry = view !== '/entry' && view !== '/new';
+    var notOnEntry = view !== '/entry' && view !== '/new';
     markup = (
       <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
         <li class="menu-username">{username}</li>
@@ -37,12 +37,12 @@ export default ({ dialogMode, dark, entry, view, userId, username }) => {
           <Icon icon={dark ? 'sun' : 'moon'}/>
           <span>{dark ? 'Light' : 'Dark'}</span>
         </li>
-        {/* {notOnEntry &&
+        {notOnEntry &&
           <li onclick={() => fire('toggleSort')}>
             <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
-        } */}
+        }
         {/* {notOnEntry &&
           <li onclick={() => fire('exportEntries')}>
             <Icon icon="download"/>

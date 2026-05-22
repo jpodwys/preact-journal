@@ -2,7 +2,7 @@ import { get, set } from 'idb-keyval';
 import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData, getAccounts } from '../utils';
 import { fire } from '../../components/unifire';
 
-const filteredViews = ['view', /* 'sort', */ 'filter', 'entries', 'filterText'];
+const filteredViews = ['view', 'sort', 'filter', 'entries', 'filterText'];
 
 const compute = (obj, prop) => {
   if (filteredViews.includes(prop)) {
@@ -58,7 +58,7 @@ export default function getInitialState () {
     username,
     entries: [],
     viewEntries: [],
-    // sort: 'desc',
+    sort: 'desc',
     filter: '',
     filterText: '',
     entryIndex: -1,
