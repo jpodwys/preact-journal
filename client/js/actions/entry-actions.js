@@ -361,13 +361,13 @@ function filterByText (el, query = ''){
   el.set({ filterText: query });
 };
 
-function toggleSort (el){
-  const sort = el.state.sort;
-  el.set({
-    sort: sort === 'desc' ? 'asc' : 'desc',
-    dialogMode: ''
-  });
-};
+// function toggleSort (el){
+//   const sort = el.state.sort;
+//   el.set({
+//     sort: sort === 'desc' ? 'asc' : 'desc',
+//     dialogMode: ''
+//   });
+// };
 
 function shiftEntry (el, count){
   if(el.state.view !== '/entry' || !count || !el.state.entry) return;
@@ -412,5 +412,5 @@ export default {
   clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50),
   // exportEntries,
-  toggleSort
+  // toggleSort
 };
