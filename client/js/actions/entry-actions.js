@@ -1,7 +1,7 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById, isActiveEntryId, sortObjectsByDate } from '../utils';
 import { get, set } from 'idb-keyval';
-import exportAllEntries from '../../js/export-entries';
+// import exportAllEntries from '../../js/export-entries';
 import debounce from '../debounce';
 import { route } from '../../components/router';
 import { fire } from '../../components/unifire';
@@ -392,9 +392,9 @@ function removeSlideInProp (el) {
   el.set({ entries });
 };
 
-function exportEntries (el) {
-  exportAllEntries(el.state.viewEntries);
-};
+// function exportEntries (el) {
+//   exportAllEntries(el.state.viewEntries);
+// };
 
 export default {
   boot,
@@ -411,6 +411,6 @@ export default {
   toggleFavorite,
   clearFilters,
   removeSlideInProp: debounce(removeSlideInProp, 50),
-  exportEntries,
+  // exportEntries,
   toggleSort
 };
