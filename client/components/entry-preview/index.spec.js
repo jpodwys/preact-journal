@@ -37,15 +37,15 @@ describe('entry-preview', () => {
   describe('favorite icon', () => {
     it('shows star-filled (visible) when the entry is favorited', () => {
       env = mountPreview({ id: 1, date: 'd', text: 't', favorited: true });
-      const icon = env.host.querySelector('svg[icon="star-filled"]');
-      expect(icon).to.exist;
+      const icon = env.getByRole('button', { name: 'Toggle favorite' });
+      expect(icon.getAttribute('icon')).to.equal('star-filled');
       expect(icon.classList.contains('hide-icon')).to.be.false;
     });
 
     it('shows star-empty (hidden until hover) when the entry is not favorited', () => {
       env = mountPreview({ id: 1, date: 'd', text: 't', favorited: false });
-      const icon = env.host.querySelector('svg[icon="star-empty"]');
-      expect(icon).to.exist;
+      const icon = env.getByRole('button', { name: 'Toggle favorite' });
+      expect(icon.getAttribute('icon')).to.equal('star-empty');
       expect(icon.classList.contains('hide-icon')).to.be.true;
     });
   });
@@ -93,7 +93,7 @@ describe('entry-preview', () => {
       });
 
       env = mountPreview({ id: 9, date: '2024-05-01', text: 'shareable' });
-      const shareIcon = env.host.querySelector('svg[icon="share"]');
+      const shareIcon = env.getByRole('button', { name: 'Share entry' });
       expect(shareIcon, 'share icon rendered when navigator.share exists').to.exist;
       fireEvent.click(shareIcon);
 
@@ -112,7 +112,7 @@ describe('entry-preview', () => {
       const showConfirmDeleteEntryModal = sinon.spy();
       const entry = { id: 9, date: 'd', text: 't' };
       env = mountPreview(entry, '', { showConfirmDeleteEntryModal });
-      fireEvent.click(env.host.querySelector('svg[icon="delete"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
       expect(showConfirmDeleteEntryModal.calledOnce).to.be.true;
       expect(showConfirmDeleteEntryModal.args[0][1].entry).to.equal(entry);
     });
@@ -121,7 +121,7 @@ describe('entry-preview', () => {
       const toggleFavorite = sinon.spy();
       const entry = { id: 9, date: 'd', text: 't', favorited: true };
       env = mountPreview(entry, '', { toggleFavorite });
-      fireEvent.click(env.host.querySelector('svg[icon="star-filled"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
       expect(toggleFavorite.calledOnce).to.be.true;
       expect(toggleFavorite.args[0][1]).to.deep.equal({ id: 9, favorited: false });
     });

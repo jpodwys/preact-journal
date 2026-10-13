@@ -49,14 +49,20 @@ export default ({ entry, filterText }) => {
         <Icon icon="delete"
           class="hide-icon"
           key={entry.id + 'delete'}
+          role="button"
+          aria-label="Delete entry"
           onclick={() => fire('showConfirmDeleteEntryModal', { entry })}/>
         {navigator.share && <Icon icon="share"
           class="hide-icon"
           key={entry.id + 'sharre'}
+          role="button"
+          aria-label="Share entry"
           onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })}/>}
         <Icon icon={favoriteIcon}
           class={entry.favorited ? '' : 'hide-icon'}
           key={entry.id + 'favorite'}
+          role="button"
+          aria-label="Toggle favorite"
           onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>

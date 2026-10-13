@@ -110,16 +110,29 @@ const ROLE_SELECTORS = {
   heading:  'h1, h2, h3, h4, h5, h6',
   list:     'ul, ol',
   listitem: 'li',
-  img:      'img'
+  img:      'img',
+  banner:   'header'
 };
 
+// Accessible name: an explicit aria-label wins (it's the author's deliberate
+// name for a non-text element, e.g. an icon button), otherwise fall back to
+// the element's own text content.
+function accessibleName (el) {
+  const label = el.getAttribute('aria-label');
+  return label != null ? label : el.textContent;
+}
+
 function findByRole (host, role, options) {
-  const selector = ROLE_SELECTORS[role];
-  if(!selector) throw new Error(`getByRole: unsupported role "${role}"`);
+  const implicitSelector = ROLE_SELECTORS[role];
+  if(!implicitSelector) throw new Error(`getByRole: unsupported role "${role}"`);
+  // An element gets a role either implicitly (matches the tag-based selector
+  // above) or explicitly via role="x" — real accessible-name computation
+  // supports both, and icon buttons in this app rely on the explicit form.
+  const selector = `${implicitSelector}, [role="${role}"]`;
   const matches = host.querySelectorAll(selector);
   if(!options || options.name == null) return matches[0] || null;
   for(let i = 0; i < matches.length; i++) {
-    if(matchText(matches[i].textContent, options.name)) return matches[i];
+    if(matchText(accessibleName(matches[i]), options.name)) return matches[i];
   }
   return null;
 }

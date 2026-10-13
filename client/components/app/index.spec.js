@@ -225,7 +225,7 @@ describe('App — integration journeys', () => {
         await bootApp();
 
         fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        const deleteIcon = env.host.querySelector('header svg[icon="delete"]');
+        const deleteIcon = env.getByRole('button', { name: 'Delete entry' });
         expect(deleteIcon, 'delete icon on entry view').to.exist;
         fireEvent.click(deleteIcon);
 
@@ -245,7 +245,7 @@ describe('App — integration journeys', () => {
         await bootApp();
 
         fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        fireEvent.click(env.host.querySelector('header svg[icon="delete"]'));
+        fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
         fireEvent.click(env.getByText('Delete'));
         await flush();
 
@@ -289,14 +289,14 @@ describe('App — integration journeys', () => {
 
         fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
 
-        const star = env.host.querySelector('header svg[icon="star-empty"]');
+        const star = env.getByRole('button', { name: 'Toggle favorite' });
         expect(star, 'empty star on entry view').to.exist;
         fireEvent.click(star);
         await flush();
 
         expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired').to.be.true;
         expect(lastBody('/api/entry/5')).to.deep.equal({ favorited: true });
-        expect(env.host.querySelector('header svg[icon="star-filled"]'), 'star is now filled').to.exist;
+        expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon'), 'star is now filled').to.equal('star-filled');
       });
     });
 
@@ -307,7 +307,7 @@ describe('App — integration journeys', () => {
         await bootApp();
 
         fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        fireEvent.click(env.host.querySelector('header svg[icon="star-empty"]'));
+        fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
         await flush();
 
         const stored = await idbGet('entries_99');
@@ -419,7 +419,7 @@ describe('App — integration journeys', () => {
 
       expect(env.host.querySelector('a[href="/entry/11"]'), 'alice entry visible').to.exist;
 
-      fireEvent.click(env.host.querySelector('header svg[icon="menu"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Menu' }));
       fireEvent.click(env.getByText('Switch'));
       // activateAccount → IDB get → setState → getEntries → GET → success
       await flush();

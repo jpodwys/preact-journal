@@ -39,31 +39,23 @@ describe('entry', () => {
 
   describe('navigation arrows on /entry', () => {
     const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
-    // Both arrows render with icon="left"; the right one is distinguished
-    // by the rotate180 class when visible. Avoid render-order indexing.
-    const LEFT_VISIBLE = 'svg[icon="left"]:not(.hidden):not(.rotate180)';
-    const RIGHT_VISIBLE = 'svg[icon="left"].rotate180';
-    const ANY_HIDDEN = 'svg[icon="left"].hidden';
 
     it('hides the left arrow at the first entry and shows the right rotated', () => {
       env = mountEntry({ entry: items[0], viewEntries: items, entryIndex: 0 });
-      expect(env.host.querySelector(RIGHT_VISIBLE)).to.exist;
-      expect(env.host.querySelector(LEFT_VISIBLE)).to.not.exist;
-      expect(env.host.querySelector(ANY_HIDDEN)).to.exist;
+      expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.true;
+      expect(env.getByRole('button', { name: 'Next entry' }).classList.contains('hidden')).to.be.false;
     });
 
     it('hides the right arrow at the last entry', () => {
       env = mountEntry({ entry: items[2], viewEntries: items, entryIndex: 2 });
-      expect(env.host.querySelector(LEFT_VISIBLE)).to.exist;
-      expect(env.host.querySelector(RIGHT_VISIBLE)).to.not.exist;
-      expect(env.host.querySelector(ANY_HIDDEN)).to.exist;
+      expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.false;
+      expect(env.getByRole('button', { name: 'Next entry' }).classList.contains('hidden')).to.be.true;
     });
 
     it('shows both arrows for a middle entry', () => {
       env = mountEntry({ entry: items[1], viewEntries: items, entryIndex: 1 });
-      expect(env.host.querySelector(LEFT_VISIBLE)).to.exist;
-      expect(env.host.querySelector(RIGHT_VISIBLE)).to.exist;
-      expect(env.host.querySelector(ANY_HIDDEN)).to.not.exist;
+      expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.false;
+      expect(env.getByRole('button', { name: 'Next entry' }).classList.contains('hidden')).to.be.false;
     });
 
     it('fires shiftEntry(-1) when the left arrow is clicked', () => {
@@ -72,7 +64,7 @@ describe('entry', () => {
         { entry: items[1], viewEntries: items, entryIndex: 1 },
         { shiftEntry }
       );
-      fireEvent.click(env.host.querySelector(LEFT_VISIBLE));
+      fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
       expect(shiftEntry.calledOnce).to.be.true;
       expect(shiftEntry.args[0][1]).to.equal(-1);
     });
@@ -83,7 +75,7 @@ describe('entry', () => {
         { entry: items[1], viewEntries: items, entryIndex: 1 },
         { shiftEntry }
       );
-      fireEvent.click(env.host.querySelector(RIGHT_VISIBLE));
+      fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
       expect(shiftEntry.calledOnce).to.be.true;
       expect(shiftEntry.args[0][1]).to.equal(1);
     });
@@ -95,7 +87,8 @@ describe('entry', () => {
         view: '/new',
         entry: { id: 'new', date: '', text: '', newEntry: true }
       });
-      expect(env.host.querySelector('svg[icon="left"]')).to.not.exist;
+      expect(env.queryByRole('button', { name: 'Previous entry' })).to.not.exist;
+      expect(env.queryByRole('button', { name: 'Next entry' })).to.not.exist;
       expect(env.host.querySelector('#ed')).to.exist;
       expect(env.host.querySelector('#et')).to.exist;
     });

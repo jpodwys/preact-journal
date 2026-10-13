@@ -30,7 +30,7 @@ describe('dialog-wrapper', () => {
 
   it('renders nothing when dialogMode is falsey', () => {
     env = mountDialog({ state: { dialogMode: '' } });
-    expect(env.host.querySelector('.menu')).to.not.exist;
+    expect(env.queryByRole('list')).to.not.exist;
     expect(env.host.querySelector('.modal-overlay')).to.not.exist;
     expect(env.queryByText('Logout')).to.be.null;
   });
@@ -39,14 +39,14 @@ describe('dialog-wrapper', () => {
     it('renders the username as the first menu item', () => {
       setAccounts([{ id: 1, username: 'testuser', active: true }]);
       env = mountDialog();
-      const menu = env.host.querySelector('.menu');
+      const menu = env.getByRole('list');
       expect(menu.firstElementChild.textContent).to.equal('testuser');
     });
 
     it('renders the correct username when state.username changes', () => {
       setAccounts([{ id: 1, username: 'alice', active: true }]);
       env = mountDialog({ state: { username: 'alice' } });
-      const menu = env.host.querySelector('.menu');
+      const menu = env.getByRole('list');
       expect(menu.firstElementChild.textContent).to.equal('alice');
     });
   });
@@ -118,7 +118,7 @@ describe('dialog-wrapper', () => {
     it('closes the menu when the overlay is clicked', () => {
       env = mountDialog();
       fireEvent.click(env.host.querySelector('.modal-overlay'));
-      expect(env.host.querySelector('.menu')).to.not.exist;
+      expect(env.queryByRole('list')).to.not.exist;
       expect(env.queryByText('Logout')).to.be.null;
     });
 
@@ -214,7 +214,7 @@ describe('dialog-wrapper', () => {
       expect(env.getByText('Delete this entry?')).to.exist;
       expect(env.getByText('Delete')).to.exist;
       expect(env.getByText('Cancel')).to.exist;
-      expect(env.host.querySelector('.menu')).to.not.exist;
+      expect(env.queryByRole('list')).to.not.exist;
     });
 
     it('renders nothing for modal:delete when there is no entry', () => {

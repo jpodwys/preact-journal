@@ -48,7 +48,9 @@ export default class Entry extends Component {
               icon="left"
               key={entry.id + '-left'}
               onclick={() => fire('shiftEntry', -1)}
-              class={entryIndex > 0 ? 'dark-fill' : 'hidden'}/>
+              class={entryIndex > 0 ? 'dark-fill' : 'hidden'}
+              role="button"
+              aria-label="Previous entry"/>
           }
           <div class="entry-date-wrapper">
             <h1
@@ -64,7 +66,9 @@ export default class Entry extends Component {
               icon="left"
               key={entry.id + '-right'}
               onclick={() => fire('shiftEntry', 1)}
-              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill rotate180' : 'hidden'}/>
+              class={entryIndex < (viewEntries.length - 1) ? 'dark-fill rotate180' : 'hidden'}
+              role="button"
+              aria-label="Next entry"/>
           }
         </div>
         <div

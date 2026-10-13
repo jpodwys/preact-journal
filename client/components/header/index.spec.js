@@ -21,12 +21,12 @@ describe('header', () => {
   describe('hidden', () => {
     it('renders nothing when not logged in', () => {
       env = mountHeader({ loggedIn: false, view: '/entries' });
-      expect(env.host.querySelector('header')).to.not.exist;
+      expect(env.queryByRole('banner')).to.not.exist;
     });
 
     it('renders nothing on /switch even when logged in', () => {
       env = mountHeader({ loggedIn: true, view: '/switch' });
-      expect(env.host.querySelector('header')).to.not.exist;
+      expect(env.queryByRole('banner')).to.not.exist;
     });
   });
 
@@ -38,15 +38,15 @@ describe('header', () => {
         viewEntries: [{}, {}, {}]
       });
       expect(env.getByText('3 Entries')).to.exist;
-      expect(env.host.querySelector('a[href="/search"]')).to.exist;
-      expect(env.host.querySelector('a[href="/entry/new"]')).to.exist;
+      expect(env.getByRole('link', { name: 'Search' })).to.exist;
+      expect(env.getByRole('link', { name: 'New entry' })).to.exist;
       expect(env.host.querySelector('.add-entry')).to.exist;
-      expect(env.host.querySelector('.search-form')).to.not.exist;
+      expect(env.queryByRole('form', { name: 'Search' })).to.not.exist;
     });
 
     it('does not show a back link', () => {
       env = mountHeader({ loggedIn: true, view: '/entries', viewEntries: [] });
-      expect(env.host.querySelector('svg[icon="back"]')).to.not.exist;
+      expect(env.queryByRole('link', { name: 'Back' })).to.not.exist;
     });
   });
 
@@ -59,7 +59,7 @@ describe('header', () => {
         filter: '',
         filterText: 'foo'
       });
-      expect(env.host.querySelector('.search-form')).to.exist;
+      expect(env.getByRole('form', { name: 'Search' })).to.exist;
       const input = env.getByRole('textbox');
       expect(input.value).to.equal('foo');
       expect(env.getByText('2')).to.exist;
@@ -74,7 +74,7 @@ describe('header', () => {
         filter: '',
         filterText: ''
       });
-      expect(env.host.querySelector('.search-form svg[icon="star-empty"]')).to.exist;
+      expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-empty');
     });
 
     it('uses star-filled when the favorites filter is on', () => {
@@ -85,7 +85,7 @@ describe('header', () => {
         filter: 'favorites',
         filterText: ''
       });
-      expect(env.host.querySelector('.search-form svg[icon="star-filled"]')).to.exist;
+      expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-filled');
     });
   });
 
@@ -94,9 +94,9 @@ describe('header', () => {
 
     it('shows back, delete and a filled favorite icon — and no FAB', () => {
       env = mountHeader({ loggedIn: true, view: '/entry', entry });
-      expect(env.host.querySelector('svg[icon="back"]')).to.exist;
-      expect(env.host.querySelector('svg[icon="delete"]')).to.exist;
-      expect(env.host.querySelector('svg[icon="star-filled"]')).to.exist;
+      expect(env.getByRole('link', { name: 'Back' })).to.exist;
+      expect(env.getByRole('button', { name: 'Delete entry' })).to.exist;
+      expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-filled');
       expect(env.host.querySelector('.add-entry')).to.not.exist;
     });
 
@@ -106,8 +106,7 @@ describe('header', () => {
         view: '/entry',
         entry: Object.assign({}, entry, { favorited: false })
       });
-      expect(env.host.querySelector('svg[icon="star-empty"]')).to.exist;
-      expect(env.host.querySelector('svg[icon="star-filled"]')).to.not.exist;
+      expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-empty');
     });
   });
 
@@ -118,9 +117,8 @@ describe('header', () => {
         view: '/new',
         entry: { newEntry: true }
       });
-      expect(env.host.querySelector('svg[icon="delete"]')).to.not.exist;
-      expect(env.host.querySelector('svg[icon="star-empty"]')).to.not.exist;
-      expect(env.host.querySelector('svg[icon="star-filled"]')).to.not.exist;
+      expect(env.queryByRole('button', { name: 'Delete entry' })).to.not.exist;
+      expect(env.queryByRole('button', { name: 'Toggle favorite' })).to.not.exist;
     });
   });
 
@@ -129,7 +127,7 @@ describe('header', () => {
 
     it('back link href is /entries on /entry with no filter or search text', () => {
       env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
-      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      const back = env.getByRole('link', { name: 'Back' });
       expect(back.getAttribute('href')).to.equal('/entries');
     });
 
@@ -137,7 +135,7 @@ describe('header', () => {
       env = mountHeader({
         loggedIn: true, view: '/entry', entry: baseEntry, filter: 'favorites'
       });
-      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      const back = env.getByRole('link', { name: 'Back' });
       expect(back.getAttribute('href')).to.equal('/search');
     });
 
@@ -145,7 +143,7 @@ describe('header', () => {
       env = mountHeader({
         loggedIn: true, view: '/entry', entry: baseEntry, filterText: 'beach'
       });
-      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      const back = env.getByRole('link', { name: 'Back' });
       expect(back.getAttribute('href')).to.equal('/search');
     });
 
@@ -153,14 +151,14 @@ describe('header', () => {
       env = mountHeader({
         loggedIn: true, view: '/search', filter: 'favorites', filterText: 'x'
       });
-      const back = env.host.querySelector('svg[icon="back"]').closest('a');
+      const back = env.getByRole('link', { name: 'Back' });
       expect(back.getAttribute('href')).to.equal('/entries');
     });
 
     it('plain click calls history.back() and preventsDefault on the navigation', () => {
       const backSpy = sinon.spy(history, 'back');
       env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
-      const link = env.host.querySelector('svg[icon="back"]').closest('a');
+      const link = env.getByRole('link', { name: 'Back' });
       const event = fireEvent.click(link);
       expect(backSpy.calledOnce).to.be.true;
       expect(event.defaultPrevented).to.be.true;
@@ -170,7 +168,7 @@ describe('header', () => {
     it('cmd/ctrl-click does not preventDefault — lets the browser open in a new tab', () => {
       const backSpy = sinon.spy(history, 'back');
       env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
-      const link = env.host.querySelector('svg[icon="back"]').closest('a');
+      const link = env.getByRole('link', { name: 'Back' });
       const event = new MouseEvent('click', {
         bubbles: true, cancelable: true, button: 0, metaKey: true
       });
@@ -193,7 +191,7 @@ describe('header', () => {
       });
 
       env = mountHeader({ loggedIn: true, view: '/entry', entry });
-      const shareIcon = env.host.querySelector('svg[icon="share"]');
+      const shareIcon = env.getByRole('button', { name: 'Share entry' });
       expect(shareIcon, 'share icon rendered when navigator.share exists').to.exist;
       fireEvent.click(shareIcon);
 
@@ -247,14 +245,14 @@ describe('header', () => {
     it('clicking the clear icon fires clearFilters', () => {
       const clearFilters = sinon.spy();
       env = mountHeader(searchState(), { clearFilters });
-      fireEvent.click(env.host.querySelector('.search-form svg[icon="clear"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Clear filters' }));
       expect(clearFilters.calledOnce).to.be.true;
     });
 
     it('clicking the empty-star icon turns the favorites filter on', () => {
       const linkstate = sinon.spy();
       env = mountHeader(searchState({ filter: '' }), { linkstate });
-      fireEvent.click(env.host.querySelector('.search-form svg[icon="star-empty"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Toggle favorites filter' }));
       expect(linkstate.calledOnce).to.be.true;
       expect(linkstate.args[0][1]).to.deep.equal({ key: 'filter', val: 'favorites' });
     });
@@ -262,7 +260,7 @@ describe('header', () => {
     it('clicking the filled-star icon turns the favorites filter off', () => {
       const linkstate = sinon.spy();
       env = mountHeader(searchState({ filter: 'favorites' }), { linkstate });
-      fireEvent.click(env.host.querySelector('.search-form svg[icon="star-filled"]'));
+      fireEvent.click(env.getByRole('button', { name: 'Toggle favorites filter' }));
       expect(linkstate.calledOnce).to.be.true;
       expect(linkstate.args[0][1]).to.deep.equal({ key: 'filter', val: '' });
     });
@@ -271,7 +269,7 @@ describe('header', () => {
       env = mountHeader(searchState());
       const input = env.host.querySelector('#fi');
       const blurSpy = sinon.spy(input, 'blur');
-      fireEvent.submit(env.host.querySelector('.search-form'));
+      fireEvent.submit(env.getByRole('form', { name: 'Search' }));
       expect(blurSpy.calledOnce).to.be.true;
     });
   });
