@@ -1,23 +1,45 @@
-import { h, render, options } from 'preact';
-import { Provider } from '../client/components/unifire';
+import { h, render } from '../client/packages/kyvo/core';
+import { app, resetState } from '../client/js/app-state';
 
-// Render synchronously in tests so DOM assertions can run immediately after
-// a state change instead of waiting on Preact's animation-frame batch.
-options.debounceRendering = f => f();
+// Renders are always deferred to requestAnimationFrame (that is the framework's
+// only scheduler), so tests wait with `await settle()`. Real events dispatched
+// through `fireEvent` additionally re-render every mounted root synchronously
+// afterwards (render() is synchronous), so component specs can assert right
+// after a click without awaiting a frame.
+export async function settle () {
+  await Promise.resolve();
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+}
 
-export function mount (vnode, { state = {}, actions = {} } = {}) {
+// The shipped build (and the minified test:prod bundle) defines __DEV__ as false, which
+// strips the framework's dev-only checks (deep-freeze TypeErrors, call-misuse errors,
+// the render-loop guard). A spec asserting one of those must use `devOnly(...)` instead of
+// `it(...)`: it runs in the normal suite and is skipped in the prod-shaped bundles.
+export const devOnly = (typeof __DEV__ === 'undefined' || __DEV__) ? it : it.skip;
+
+const mounted = new Set();
+const flushAll = () => mounted.forEach(m => render(m.vnode, m.host));
+
+// `state` is merged over a freshly computed initial state (the store is a
+// module singleton, so every mount starts from a clean slate).
+export function mount (vnode, { state = {} } = {}) {
+  resetState();
+  // viewEntries() is derived from entries/view/filter/sort, so a spec that lists the rows to
+  // show gives them as `entries` (unless it also gives entries).
+  const { viewEntries, ...rest } = state;
+  Object.assign(app, rest);
+  if(viewEntries && !rest.entries) app.entries = viewEntries;
   const host = document.createElement('div');
   document.body.appendChild(host);
-  // Preact 8's render needs the prior root passed as `merge` to diff
-  // against (and thus unmount) the existing tree on the next call.
-  const rendered = render(h(Provider, { state, actions }, vnode), host);
+  const m = { vnode, host };
+  mounted.add(m);
+  render(vnode, host);
   return {
     host,
+    flush: () => render(vnode, host),
     cleanup () {
-      // Diff the live tree against an empty placeholder so Preact 8 fires
-      // componentWillUnmount on any class components. `<span>` is just a
-      // throwaway vnode — Preact 8 doesn't unmount on null/undefined.
-      render(h('span', null), host, rendered);
+      mounted.delete(m);
+      render(null, host);
       host.remove();
     },
     getByText: (matcher) => getByText(host, matcher),
@@ -33,17 +55,19 @@ export function mount (vnode, { state = {}, actions = {} } = {}) {
 // Note: fireEvent.click on an <input type="submit"> dispatches a synthetic
 // click that does NOT cascade into a form submit (matches RTL semantics).
 // To trigger the form's onsubmit, call fireEvent.submit(form) instead.
-export function fireEvent (node, type, init) {
-  const event = new Event(type, Object.assign({ bubbles: true, cancelable: true }, init));
+function dispatch (node, event) {
   node.dispatchEvent(event);
+  flushAll();
   return event;
+}
+
+export function fireEvent (node, type, init) {
+  return dispatch(node, new Event(type, Object.assign({ bubbles: true, cancelable: true }, init)));
 }
 fireEvent.click  = (node) => {
   // Use MouseEvent so e.button === 0 — generic Event leaves it undefined,
   // which trips Router's `e.button !== 0` early-return for non-primary clicks.
-  const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 });
-  node.dispatchEvent(event);
-  return event;
+  return dispatch(node, new MouseEvent('click', { bubbles: true, cancelable: true, button: 0 }));
 };
 fireEvent.submit = (node) => fireEvent(node, 'submit');
 fireEvent.focus  = (node) => fireEvent(node, 'focus');

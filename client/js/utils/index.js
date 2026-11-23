@@ -43,25 +43,6 @@ function getViewFromPathname (href) {
   return i > 0 ? href.substr(0, i) : href;
 };
 
-const isActiveEntryId = (el, id) => el.state.entry?.id === id;
-
-function getAccounts () {
-  try {
-    return JSON.parse(localStorage.getItem('accounts')) || [];
-  } catch(e) {
-    return [];
-  }
-}
-
-function getActiveUserId () {
-  var active = getAccounts().find(a => a.active);
-  return active ? String(active.id) : '';
-}
-
-function saveAccounts (accounts) {
-  localStorage.setItem('accounts', JSON.stringify(accounts));
-}
-
 function clearData (userId) {
   if(userId) {
     del('entries_' + userId);
@@ -77,9 +58,5 @@ export {
   sortObjectsByDate,
   applyFilters,
   getViewFromPathname,
-  isActiveEntryId,
-  getAccounts,
-  getActiveUserId,
-  saveAccounts,
   clearData
 };

@@ -1,11 +1,12 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
+import { debounced } from '../../packages/kyvo/helpers';
 import Icon from '../icon';
-import { fire } from '../../components/unifire';
-import debounce from '../../js/debounce';
+import { app, viewEntries } from '../../js/app-state';
+import { filterByText, clearFilters, showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const cancelAndBlur = e => {
 	e.preventDefault();
-	document.getElementById('fi').blur();
+	e.currentTarget.elements.fi.blur();
 }
 
 const getBackHref = (view, filter, filterText) => {
@@ -25,9 +26,11 @@ const focusSearchInput = () => {
 };
 
 
-export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText }) => {
+export default (props, ctx) => {
+	const search = debounced(ctx, e => filterByText(e.target.value), 100);
+	const { view, loggedIn, entry, filter, filterText } = app;
 	if(!loggedIn || view === '/switch') return;
-	const entryCount = viewEntries.length;
+	const entryCount = viewEntries().length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';
 	const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
@@ -52,19 +55,19 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 					{view === '/search' &&
 						<form class="search-form fade-up" onsubmit={cancelAndBlur} aria-label="Search">
 							<span class="nav-set">
-								<Icon icon={filterIcon} onclick={() => fire('linkstate', { key: 'filter', val: filterTo })} role="button" aria-label="Toggle favorites filter"/>
+								<Icon icon={filterIcon} onclick={() => { app.filter = filterTo; }} role="button" aria-label="Toggle favorites filter"/>
 							</span>
 							<input
 								id="fi"
 								autocomplete="off"
 								value={filterText}
 								placeholder="Search"
-								oninput={debounce((e) => fire('filterByText', e.target.value), 100)}/>
+								oninput={search}/>
 							<span class="nav-set">
 								<span class="search-entry-count">{entryCount}</span>
 							</span>
 							<span class="nav-set">
-								<Icon icon="clear" key="header-clear" onclick={() => fire('clearFilters')} role="button" aria-label="Clear filters"/>
+								<Icon icon="clear" key="header-clear" onclick={clearFilters} role="button" aria-label="Clear filters"/>
 							</span>
 						</form>
 					}
@@ -77,18 +80,18 @@ export default ({ view, loggedIn, viewEntries = [], entry, filter, filterText })
 						</a>
 					}
 					{entry && !entry.newEntry && isEntry &&
-						<Icon icon="delete" key="header-delete" onclick={() => fire('showConfirmDeleteEntryModal', { entry })} class="fade-up" role="button" aria-label="Delete entry"/>
+						<Icon icon="delete" key="header-delete" onclick={() => showConfirmDeleteEntryModal({ entry })} class="fade-up" role="button" aria-label="Delete entry"/>
 					}
 					{isEntry && navigator.share &&
 						<Icon icon="share" key="header-share" onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })} class="fade-up" role="button" aria-label="Share entry"/>
 					}
 					{entry && !entry.newEntry && isEntry &&
-						<Icon icon={favoriteIcon} onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })} class="fade-up" role="button" aria-label="Toggle favorite"/>
+						<Icon icon={favoriteIcon} onclick={() => toggleFavorite({ id: entry.id, favorited: !entry.favorited })} class="fade-up" role="button" aria-label="Toggle favorite"/>
 					}
 				</div>
 
 				<div class="nav-set">
-					<Icon icon="menu" key="header-menu" onclick={() => fire('linkstate', {key: 'dialogMode', val: 'menu'})} class="fade-down" role="button" aria-label="Menu"/>
+					<Icon icon="menu" key="header-menu" onclick={() => { app.dialogMode = 'menu'; }} class="fade-down" role="button" aria-label="Menu"/>
 				</div>
 
 				{view === '/entries' &&

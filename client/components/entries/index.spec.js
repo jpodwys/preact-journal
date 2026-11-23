@@ -1,19 +1,16 @@
-import { h } from 'preact';
-import { mount } from '../../../test/mount';
+import { h } from '../../packages/kyvo/core';
+import { mount, settle } from '../../../test/mount';
+import { app } from '../../js/app-state';
 import Entries from './index';
 
 describe('entries', () => {
   let env;
+  beforeEach(() => localStorage.clear());
+  afterEach(() => { if(env) env.cleanup(); env = null; });
 
-  afterEach(() => {
-    if(env) env.cleanup();
-    env = null;
-  });
-
-  function mountEntries (state = {}, actions = {}) {
+  function mountEntries (state = {}) {
     return mount(h(Entries, null), {
-      state: Object.assign({ viewEntries: [], filterText: '' }, state),
-      actions
+      state: Object.assign({ viewEntries: [], filterText: '' }, state)
     });
   }
 
@@ -31,8 +28,26 @@ describe('entries', () => {
       ]
     });
     expect(env.queryByText("It's empty in here!")).to.be.null;
-    expect(env.host.querySelector('.entry-preview')).to.exist;
-    // The first entry's date appears via the rendered EntryPreview.
+    expect(env.host.querySelectorAll('.entry-preview').length).to.equal(2);
     expect(env.getByText('2024-01-01')).to.exist;
+    expect(env.getByText('second')).to.exist;
+    // Rows are 83px tall in the virtual list.
+    expect(env.host.firstElementChild.style.height).to.equal(2 * 83 + 'px');
+  });
+
+  it('passes filterText through so previews highlight the match', () => {
+    env = mountEntries({
+      filterText: 'mid',
+      entries: [{ id: 1, date: '2024-01-01', text: 'a mid b' }]
+    });
+    expect(env.host.querySelector('.highlight').textContent).to.equal('mid');
+  });
+
+  it('re-renders from the store: entries appearing replace the zero-state', async () => {
+    env = mountEntries();
+    app.entries = [{ id: 3, date: '2024-03-03', text: 'arrived' }];
+    await settle();
+    expect(env.queryByText("It's empty in here!")).to.be.null;
+    expect(env.getByText('arrived')).to.exist;
   });
 });

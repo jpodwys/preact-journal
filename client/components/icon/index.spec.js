@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import { mount, fireEvent } from '../../../test/mount';
 import Icon from './index';
 
@@ -16,9 +16,16 @@ describe('icon', () => {
     expect(path.getAttribute('d')).to.have.length.greaterThan(0);
   });
 
-  it('spreads arbitrary props onto the svg (class, custom attrs)', () => {
-    env = mount(h(Icon, { icon: 'menu', class: 'foo bar', 'data-test': 'baz' }));
-    const svg = env.host.querySelector('svg');
+  it('creates the svg and path in the SVG namespace', () => {
+    env = mount(h(Icon, { icon: 'back' }));
+    const ns = 'http://www.w3.org/2000/svg';
+    expect(env.host.querySelector('svg').namespaceURI).to.equal(ns);
+    expect(env.host.querySelector('path').namespaceURI).to.equal(ns);
+  });
+
+  it('spreads arbitrary props onto the svg (class, custom attrs, role/aria-label)', () => {
+    env = mount(h(Icon, { icon: 'menu', class: 'foo bar', 'data-test': 'baz', role: 'button', 'aria-label': 'Menu' }));
+    const svg = env.getByRole('button', { name: 'Menu' });
     expect(svg.getAttribute('class')).to.equal('foo bar');
     expect(svg.getAttribute('data-test')).to.equal('baz');
   });

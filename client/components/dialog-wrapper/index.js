@@ -1,14 +1,16 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { fire } from '../unifire';
+import { app } from '../../js/app-state';
 import { route } from '../router';
-import { getAccounts } from '../../js/utils';
+import { toggleDarkMode } from '../../js/actions/global-actions';
+import { deleteEntry, toggleSort, exportEntries } from '../../js/actions/entry-actions';
+import { logout, switchAccount } from '../../js/actions/user-actions';
 
-const closeDialog = () => fire('linkstate', { key: 'dialogMode' });
+const closeDialog = () => { app.dialogMode = ''; };
 
 const onLogout = () => {
   closeDialog();
-  setTimeout(() => fire('linkstate', { key: 'dialogMode', val: 'modal:logout' }));
+  setTimeout(() => { app.dialogMode = 'modal:logout'; });
 };
 
 const onAdd = () => {
@@ -17,34 +19,35 @@ const onAdd = () => {
 };
 
 const onSwitch = (userId) => {
-  var other = getAccounts().find(a => String(a.id) !== String(userId));
+  var other = app.accounts.find(a => String(a.id) !== String(userId));
   if(!other) return;
   closeDialog();
-  fire('switchAccount', String(other.id));
+  switchAccount(String(other.id));
 };
 
-export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
+export default () => {
+  const { dialogMode, dark, entry, view, sort, userId, username, accounts } = app;
   if(!dialogMode) return;
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
-    var hasOtherAccount = getAccounts().filter(a => String(a.id) !== String(userId)).length > 0;
+    var hasOtherAccount = accounts.some(a => String(a.id) !== String(userId));
     var notOnEntry = view !== '/entry' && view !== '/new';
     markup = (
       <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
         <li class="menu-username">{username}</li>
-        <li onclick={() => fire('toggleDarkMode')}>
+        <li onclick={toggleDarkMode}>
           <Icon icon={dark ? 'sun' : 'moon'}/>
           <span>{dark ? 'Light' : 'Dark'}</span>
         </li>
         {notOnEntry &&
-          <li onclick={() => fire('toggleSort')}>
+          <li onclick={toggleSort}>
             <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
         }
         {notOnEntry &&
-          <li onclick={() => fire('exportEntries')}>
+          <li onclick={exportEntries}>
             <Icon icon="download"/>
             <span>Export</span>
           </li>
@@ -71,8 +74,8 @@ export default ({ dialogMode, dark, entry, view, sort, userId, username }) => {
     const message = isDel ? 'Delete this entry?' : 'Logout?';
     const confirmText = isDel ? 'Delete' : 'Logout';
     const onConfirm = isDel
-      ? () => fire('deleteEntry', { id: entry.id })
-      : () => fire('logout');
+      ? () => deleteEntry({ id: entry.id })
+      : logout;
     markup = (
       <div>
         <div class="modal-message">{message}</div>

@@ -1,82 +1,89 @@
-import { get, set } from 'idb-keyval';
-import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData, getAccounts } from '../utils';
-import { fire } from '../../components/unifire';
+import { set as idbSet } from 'idb-keyval';
+import { store, watch } from '../../packages/kyvo/core';
+import { getViewFromPathname, applyFilters, clearData } from '../utils';
 
-const filteredViews = ['view', 'sort', 'filter', 'entries', 'filterText'];
-
-const compute = (obj, prop) => {
-  if (filteredViews.includes(prop)) {
-    obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.sort, obj.entries);
+// The one global store. Components import `app` and read it during render; any
+// write re-renders the app on the next frame. Replace values, never mutate them
+// in place (dev builds freeze assigned values so a mutation throws).
+// The 'accounts' localStorage key is read here, once, and written by the watcher below, once.
+const loadAccounts = () => {
+  try {
+    return JSON.parse(localStorage.getItem('accounts')) || [];
+  } catch(e) {
+    return [];
   }
 };
 
-const observe = (obj, prop, next, prev) => {
-  switch(prop) {
-    case 'view': {
-      obj.dialogMode = '';
-      if(prev === '/search' && next === '/entries'){
-        fire('clearFilters');
-      }
-      break;
-    }
-    case 'entries': {
-      obj.entries = sortObjectsByDate(next);
-      set('entries_' + obj.userId, obj.entries);
-      break;
-    }
-    case 'dark': {
-      localStorage.setItem('dark', !!next);
-      document.body.classList.toggle('dark', !!next);
-      break;
-    }
-    case 'timestamp': localStorage.setItem('timestamp_' + obj.userId, next); break;
-  }
-};
-
-const handler = {
-  set: function(obj, prop, next) {
-    const prev = obj[prop];
-    obj[prop] = next;
-    compute(obj, prop);
-    observe(obj, prop, next, prev);
-    return true;
-  }
-};
-
-export default function getInitialState () {
-  let accounts = getAccounts();
-  let active = accounts.find(a => a.active);
-  let loggedIn = !!active;
-  let userId = active ? String(active.id) : '';
-  let username = active ? active.username : '';
-
-  if(!loggedIn && accounts.length === 0) clearData();
-
-  let state = {
+export const initialState = () => {
+  const accounts = loadAccounts();
+  const active = accounts.find(a => a.active);
+  const loggedIn = !!active;
+  const userId = active ? String(active.id) : '';
+  if (!loggedIn && accounts.length === 0) clearData();
+  return {
+    accounts,
     loggedIn,
     userId,
-    username,
+    username: active ? active.username : '',
     entries: [],
-    viewEntries: [],
     sort: 'desc',
     filter: '',
     filterText: '',
     entryIndex: -1,
     entry: undefined,
+    dialogMode: '',
+    fresh: [],
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: userId ? localStorage.getItem('timestamp_' + userId) || undefined : undefined
   };
-
-  if(loggedIn) {
-    get('entries_' + userId).then((entries = []) => {
-      fire('boot', { entries });
-    }).catch();
-  }
-
-  // Now that I'm setting a class to body, I
-  // have to ensure it gets set on load.
-  observe(null, 'dark', state.dark);
-
-  return new Proxy(state, handler);
 };
+
+export const app = store(initialState());
+
+// Back to a freshly computed initial state (logout, expired session, tests).
+// A reset must not persist: assigning the blank `entries` would overwrite the
+// user's cached entries in IndexedDB.
+let resetting;
+export const resetState = () => {
+  resetting = 1;
+  try { Object.assign(app, initialState()); } finally { resetting = 0; }
+};
+
+// Derived, not stored: there is no field to assign. Memoized on its inputs.
+let inputs = [], view;
+export const viewEntries = () => {
+  const now = [app.view, app.filterText, app.filter, app.sort, app.entries];
+  if (now.some((v, i) => v !== inputs[i])) {
+    view = applyFilters(...now);
+    if (typeof __DEV__ === 'undefined' || __DEV__) Object.freeze(view);
+    inputs = now;
+  }
+  return view;
+};
+
+// Computed state plus persistence, in one place so no action can forget either.
+watch(app, (key, next, prev) => {
+  switch (key) {
+    case 'view':
+      app.dialogMode = '';
+      if (prev === '/search' && next === '/entries') Object.assign(app, { filter: '', filterText: '' });
+      break;
+    case 'accounts':
+      if (!resetting) localStorage.setItem('accounts', JSON.stringify(next));
+      break;
+    case 'entries':
+      if (app.userId && !resetting) idbSet('entries_' + app.userId, next);
+      break;
+    case 'dark':
+      localStorage.setItem('dark', !!next);
+      document.body.classList.toggle('dark', !!next);
+      break;
+    case 'timestamp':
+      if (app.userId && next !== undefined) localStorage.setItem('timestamp_' + app.userId, next);
+      break;
+  }
+});
+
+// The body class must match the stored preference on load.
+document.body.classList.toggle('dark', app.dark);

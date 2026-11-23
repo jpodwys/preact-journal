@@ -31,6 +31,7 @@ function scripts() {
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
     loader: { '.js': 'jsx' },
+    define: { __DEV__: 'false' }, // strips kyvo's dev-only checks from the production bundle
     target: browserslist('last 2 versions, not dead, not ie > 0')
       .filter(b => ['chrome', 'firefox', 'safari', 'edge', 'opera'].some(name => b.startsWith(name)))
       .map(b => b.replace(' ', '')),

@@ -1,4 +1,5 @@
-import { h, Component } from 'preact';
+import { h, store } from '../../packages/kyvo/core';
+import { listen } from '../../packages/kyvo/helpers';
 
 // Make sure new pages are always scrolled to the top
 // while history entries maintain their scroll position.
@@ -8,8 +9,13 @@ history.pushState = (a, b, url) => {
   scrollTo(0, 0);
 };
 
-let ROUTER;
-let ONCHANGE;
+// `location` IS the router state: the Router renders from location.pathname, so there is
+// nothing to keep in sync. This store exists only so that a navigation re-renders the app.
+const nav = store({ n: 0 });
+
+// There is one Router; this is its live props (for onChange).
+let LIVE;
+const notify = url => LIVE && LIVE.onChange && LIVE.onChange(url);
 
 const clickListener = e => {
   if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
@@ -24,57 +30,32 @@ const clickListener = e => {
   }
 };
 
-const popstateListener = e => {
-  if(ONCHANGE) ONCHANGE(location.pathname);
-  if(ROUTER) ROUTER.setState({ url: location.pathname });
+const popstateListener = () => {
+  notify(location.pathname);
+  nav.n++;
 };
 
 const route = (url, replace) => {
-  if(ONCHANGE) ONCHANGE(url);
-  if(ROUTER) ROUTER.setState({ url });
+  notify(url);
   history[replace ? 'replaceState' : 'pushState'](null, null, url);
+  nav.n++;
 };
 
-class Router extends Component {
-  constructor() {
-    super();
-    this.state = { url: location.pathname };
-  }
+const matches = (path, url) => {
+  if(path === url) return true;
+  const p = path.split('/'), u = url.split('/');
+  return p.length <= u.length && u.every((s, i) => p[i] === s || (p[i] && p[i][0] === ':'));
+};
 
-  shouldComponentUpdate({ onChange }, { url }) {
-    return url !== this.props.url || onChange !== this.props.onChange;
-  }
-
-  componentWillMount() {
-    ROUTER = this;
-    document.onclick = clickListener;
-    window.onpopstate = popstateListener;
-    if(this.props.onChange){
-      ONCHANGE = this.props.onChange;
-      ONCHANGE(location.pathname);
-    }
-  }
-
-  componentWillUnmount() {
-    // Only clean up the globals this Router installed. If a later Router
-    // mount has overwritten them, leave them alone — the new owner is
-    // responsible for its own cleanup.
-    if(ROUTER === this) {
-      ROUTER = undefined;
-      ONCHANGE = undefined;
-      document.onclick = null;
-      window.onpopstate = null;
-    }
-  }
-
-  render({ children }, { url }) {
-    return children.find(c => {
-      const path = c.attributes.path;
-      if(path === url) return true;
-      const p = path.split('/'), u = url.split('/');
-      return p.length <= u.length && u.every((s, i) => p[i] === s || (p[i] && p[i][0] === ':'));
-    });
-  }
+function Router(props, ctx) {
+  listen(ctx, document, 'click', clickListener);
+  listen(ctx, window, 'popstate', popstateListener);
+  ctx.mount(() => {
+    LIVE = props;
+    notify(location.pathname);
+    return () => { LIVE = undefined; };
+  });
+  return props.children.find(c => matches(c.props.path, location.pathname));
 }
 
 export { Router, route };

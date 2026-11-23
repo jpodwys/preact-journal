@@ -1,6 +1,7 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { fire } from '../unifire';
+import { app } from '../../js/app-state';
+import { showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const getEntryText = (entry, filterText) => {
   if(!entry.previewText){
@@ -26,8 +27,7 @@ const getEntryText = (entry, filterText) => {
 
 export default ({ entry, filterText }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-  const fadeRight = entry.slideIn ? 'fade-right' : '';
-  if(fadeRight) setTimeout(() => fire('removeSlideInProp'), 450);
+  const fadeRight = app.fresh.includes(entry.id) ? 'fade-right' : '';
 
   return (
     <div class={`entry-preview ${fadeRight}`}>
@@ -51,7 +51,7 @@ export default ({ entry, filterText }) => {
           key={entry.id + 'delete'}
           role="button"
           aria-label="Delete entry"
-          onclick={() => fire('showConfirmDeleteEntryModal', { entry })}/>
+          onclick={() => showConfirmDeleteEntryModal({ entry })}/>
         {navigator.share && <Icon icon="share"
           class="hide-icon"
           key={entry.id + 'sharre'}
@@ -63,7 +63,7 @@ export default ({ entry, filterText }) => {
           key={entry.id + 'favorite'}
           role="button"
           aria-label="Toggle favorite"
-          onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
+          onclick={() => toggleFavorite({ id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>
   );

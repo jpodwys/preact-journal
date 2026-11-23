@@ -4,3 +4,9 @@ coverage
 .env
 *.log
 .DS_Store
+.test-build
+.test-build-boot
+.test-artifact
+test/.prod/
+test/.prod-boot/
+test/.entry-*.js

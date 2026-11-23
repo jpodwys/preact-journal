@@ -1,22 +1,24 @@
 import { get } from 'idb-keyval';
-import { clearData, getAccounts, saveAccounts } from '../utils';
+import { clearData } from '../utils';
 import User from '../services/user-service';
-import getInitialState from '../app-state';
+import { app, resetState } from '../app-state';
 import { route } from '../../components/router';
-import { fire } from '../../components/unifire';
+import { getEntries, resetDataFetched } from './entry-actions';
 
-function login (el, user){
+const set = delta => Object.assign(app, delta);
+
+export function login (user){
   User.login(user)
-    .then(({ data }) => loginSuccess(el, data));
+    .then(loginSuccess);
 };
 
-function activateAccount (el, { id, username }, extra) {
-  fire('resetDataFetched');
+function activateAccount ({ id, username }, extra) {
+  resetDataFetched();
 
   get('entries_' + id).then((entries = []) => {
-    var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
+    const timestamp = localStorage.getItem('timestamp_' + id) || undefined;
 
-    el.set({
+    set({
       userId: String(id),
       username,
       entries,
@@ -26,67 +28,59 @@ function activateAccount (el, { id, username }, extra) {
       filter: '',
       filterText: '',
       ...extra
-    }, () => {
-      fire('getEntries');
-      route('/entries', true);
     });
+    getEntries();
+    route('/entries', true);
   });
 }
 
-function loginSuccess (el, { id, username }){
-  var accounts = getAccounts().filter(a => a.id !== id);
-  accounts.forEach(a => { a.active = false; });
-  accounts.push({ id, username, active: true });
-  saveAccounts(accounts);
-  activateAccount(el, { id, username }, { loggedIn: true });
+function loginSuccess ({ id, username }){
+  app.accounts = [...app.accounts.filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
+  activateAccount({ id, username }, { loggedIn: true });
 };
 
-function logout (el){
+export function logout (){
   User.logout()
-    .then(() => logoutSuccess(el));
+    .then(() => logoutSuccess());
 };
 
-function logoutSuccess (el){
-  var userId = el.state.userId;
-  var accounts = getAccounts().filter(a => String(a.id) !== userId);
-  saveAccounts(accounts);
+function logoutSuccess (){
+  const userId = app.userId;
+  const accounts = app.accounts.filter(a => String(a.id) !== userId);
+  app.accounts = accounts;
   clearData(userId);
 
-  var valid = accounts.filter(a => !a.expired);
+  const valid = accounts.filter(a => !a.expired);
   if(valid.length > 0) {
-    switchAccount(el, String(valid[0].id));
+    switchAccount(String(valid[0].id));
   } else {
     clearData();
-    el.set(getInitialState());
+    resetState();
     route('/');
   }
 };
 
-function switchAccount (el, userId) {
-  var accounts = getAccounts();
-  var account = accounts.find(a => String(a.id) === String(userId));
+export function switchAccount (userId) {
+  const account = app.accounts.find(a => String(a.id) === String(userId));
   if(!account) return;
-  accounts.forEach(a => { a.active = a.id === account.id; });
-  saveAccounts(accounts);
-  activateAccount(el, { id: account.id, username: account.username }, { dialogMode: '' });
+  app.accounts = app.accounts.map(a => ({ ...a, active: a.id === account.id }));
+  activateAccount({ id: account.id, username: account.username }, { dialogMode: '' });
 };
 
-function handleExpiredSession (el, userId) {
-  if(!userId || el.state.userId !== userId) return;
+export function handleExpiredSession (userId) {
+  if(!userId || app.userId !== userId) return;
 
-  var accounts = getAccounts().map(a =>
+  const accounts = app.accounts.map(a =>
     String(a.id) === userId ? {...a, expired: true, active: false} : a
   );
-  var remaining = accounts.filter(a => !a.expired);
-  saveAccounts(accounts);
+  const remaining = accounts.filter(a => !a.expired);
+  app.accounts = accounts;
   clearData(userId);
 
   if(remaining.length > 0) {
-    switchAccount(el, String(remaining[0].id));
+    switchAccount(String(remaining[0].id));
   } else {
-    el.set(getInitialState());
+    resetState();
     route('/');
   }
 };
-
-export default { login, logout, switchAccount, handleExpiredSession };

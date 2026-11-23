@@ -1,85 +1,138 @@
-import { h } from 'preact';
-import { mount } from '../../../test/mount';
+import { h } from '../../packages/kyvo/core';
+import { mount, settle } from '../../../test/mount';
 import ScrollViewport from './index';
 
 describe('virtual-scroll', () => {
-  let env;
-  afterEach(() => { if(env) env.cleanup(); env = null; });
+  let env, innerHeightDesc;
+  const ROW = 50;
+  const OVERSCAN = 20; // mirrors the component's internal constant
 
-  function makeItems (n) {
-    return Array.from({ length: n }, (_, i) => ({ id: i, text: `item ${i}` }));
+  beforeEach(() => { innerHeightDesc = Object.getOwnPropertyDescriptor(window, 'innerHeight'); });
+  afterEach(() => {
+    if(env) env.cleanup();
+    env = null;
+    if(innerHeightDesc) Object.defineProperty(window, 'innerHeight', innerHeightDesc);
+    else delete window.innerHeight;
+    window.scrollTo(0, 0);
+  });
+
+  const makeItems = n => Array.from({ length: n }, (_, i) => ({ id: i, text: `item ${i}` }));
+  const renderer = items => items.map(i => h('div', { class: 'row', key: i.id }, i.text));
+  const rows = () => env.host.querySelectorAll('.row');
+  const outer = () => env.host.firstElementChild;
+  const inner = () => outer().querySelector('.fade-down');
+
+  const setInnerHeight = value =>
+    Object.defineProperty(window, 'innerHeight', { configurable: true, get: () => value });
+
+  // Scroll the window so the list's top edge sits `offset` px above the viewport.
+  function scrollListTo (offset) {
+    const top = outer().getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, top + offset);
+    window.dispatchEvent(new Event('scroll'));
   }
 
-  // A small renderer that emits one labeled div per item.
-  const renderer = items => items.map(i => h('div', { class: 'row', 'data-id': i.id }, i.text));
+  const mountList = (n, rowHeight = ROW) =>
+    mount(h(ScrollViewport, { items: makeItems(n), renderer, rowHeight }));
 
-  it('renders the renderer output and reserves outer height for all items', () => {
-    const items = makeItems(5);
-    env = mount(h(ScrollViewport, {
-      items,
-      renderer,
-      rowHeight: 50
-    }));
-
-    // All 5 fit within the initial visible window (internal OVERSCAN buffer
-    // of 20 rows + window height).
-    const rows = env.host.querySelectorAll('.row');
-    expect(rows.length).to.equal(5);
-    expect(rows[0].textContent).to.equal('item 0');
-    expect(rows[4].textContent).to.equal('item 4');
-
-    // Outer container reserves the full virtual height so the page scrolls
-    // as if every row were rendered.
-    const outer = env.host.firstElementChild;
-    expect(outer.style.height).to.equal('250px');
-
-    // Inner container carries the fade-down class for animation hooks.
-    const inner = outer.querySelector('.fade-down');
-    expect(inner).to.exist;
-    expect(inner.style.position).to.equal('relative');
+  it('renders every row when they all fit in the initial window, inside a relative fade-down container', () => {
+    env = mountList(5);
+    expect(rows().length).to.equal(5);
+    expect(rows()[0].textContent).to.equal('item 0');
+    expect(rows()[4].textContent).to.equal('item 4');
+    expect(inner()).to.exist;
+    expect(inner().style.position).to.equal('relative');
   });
 
-  it('reserves height proportional to items.length and rowHeight', () => {
-    env = mount(h(ScrollViewport, {
-      items: makeItems(100),
-      renderer,
-      rowHeight: 83
-    }));
-    expect(env.host.firstElementChild.style.height).to.equal((100 * 83) + 'px');
+  it('reserves outer height proportional to items.length and rowHeight', () => {
+    env = mountList(100, 83);
+    expect(outer().style.height).to.equal((100 * 83) + 'px');
   });
 
-  it('passes through extra props to the outer container', () => {
-    env = mount(h(ScrollViewport, {
-      items: makeItems(2),
-      renderer,
-      rowHeight: 40,
-      class: 'entry-list'
-    }));
-    expect(env.host.querySelector('.entry-list')).to.exist;
+  it('only renders the rows near the viewport (window height + overscan)', async () => {
+    env = mountList(1000);
+    await settle(); // the mount-time measurement writes ctx.state; let it render
+    const expected = ((innerHeight / ROW) | 0) + OVERSCAN + 1;
+    expect(rows().length).to.equal(expected);
+    expect(rows()[0].textContent).to.equal('item 0');
+    expect(inner().style.top).to.equal('0px');
   });
 
-  it('cleans up the same window resize/scroll listeners that were installed on mount', () => {
+  it('moves the window on scroll, aligned down to the overscan chunk', async () => {
+    env = mountList(1000);
+    await settle();
+    const count = rows().length;
+
+    scrollListTo(50 * ROW + 10); // row 50 -> start aligned to 40
+    await settle();
+    expect(rows()[0].textContent).to.equal('item 40');
+    expect(inner().style.top).to.equal(40 * ROW + 'px');
+    expect(rows().length, 'window size unchanged').to.equal(count);
+
+    scrollListTo(59 * ROW + 10); // still inside the 40..59 chunk: no shift
+    await settle();
+    expect(rows()[0].textContent).to.equal('item 40');
+
+    scrollListTo(60 * ROW + 10); // next chunk
+    await settle();
+    expect(rows()[0].textContent).to.equal('item 60');
+    expect(inner().style.top).to.equal(60 * ROW + 'px');
+  });
+
+  it('clamps the offset at 0 when the list is below the top of the viewport', async () => {
+    env = mountList(1000);
+    await settle();
+    window.scrollTo(0, 0);
+    window.dispatchEvent(new Event('scroll'));
+    await settle();
+    expect(rows()[0].textContent).to.equal('item 0');
+    expect(inner().style.top).to.equal('0px');
+  });
+
+  it('grows the window on resize to a taller viewport', async () => {
+    env = mountList(1000);
+    await settle();
+    setInnerHeight(2000);
+    window.dispatchEvent(new Event('resize'));
+    await settle();
+    expect(rows().length).to.equal(2000 / ROW + OVERSCAN + 1);
+  });
+
+  it('adds passive capture scroll/resize listeners on mount and removes the same ones on unmount', () => {
     const addSpy = sinon.spy(window, 'addEventListener');
-    env = mount(h(ScrollViewport, {
-      items: makeItems(3),
-      renderer,
-      rowHeight: 30
-    }));
-
-    const resizeAdd = addSpy.args.find(a => a[0] === 'resize');
-    const scrollAdd = addSpy.args.find(a => a[0] === 'scroll');
+    let resizeAdd, scrollAdd;
+    try {
+      env = mountList(3, 30);
+      resizeAdd = addSpy.args.find(a => a[0] === 'resize');
+      scrollAdd = addSpy.args.find(a => a[0] === 'scroll');
+    } finally { addSpy.restore(); }
     expect(resizeAdd, 'resize listener installed on mount').to.exist;
     expect(scrollAdd, 'scroll listener installed on mount').to.exist;
-    addSpy.restore();
+    expect(resizeAdd[2]).to.deep.equal({ passive: true, capture: true });
+    expect(scrollAdd[2]).to.deep.equal({ passive: true, capture: true });
 
     const removeSpy = sinon.spy(window, 'removeEventListener');
+    try {
+      env.cleanup();
+      env = null;
+    } finally { removeSpy.restore(); }
+
+    // Same handler and same capture flag, or the listener stays attached.
+    const resizeRemove = removeSpy.args.find(a => a[0] === 'resize' && a[1] === resizeAdd[1]);
+    const scrollRemove = removeSpy.args.find(a => a[0] === 'scroll' && a[1] === scrollAdd[1]);
+    expect(resizeRemove, 'resize listener removed').to.exist;
+    expect(scrollRemove, 'scroll listener removed').to.exist;
+    expect(resizeRemove[2]).to.deep.equal({ passive: true, capture: true });
+    expect(scrollRemove[2]).to.deep.equal({ passive: true, capture: true });
+  });
+
+  it('a scroll event after unmount is harmless', async () => {
+    env = mountList(1000);
+    await settle();
     env.cleanup();
     env = null;
-
-    // Same handler reference must be passed to removeEventListener — otherwise
-    // the listener stays attached and leaks across tests / route changes.
-    expect(removeSpy.calledWith('resize', resizeAdd[1])).to.be.true;
-    expect(removeSpy.calledWith('scroll', scrollAdd[1])).to.be.true;
-    removeSpy.restore();
+    window.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('resize'));
+    await settle();
   });
 });

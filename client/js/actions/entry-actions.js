@@ -1,128 +1,127 @@
 import Entry from '../services/entry-service';
-import { findObjectIndexById, isActiveEntryId, sortObjectsByDate } from '../utils';
-import { get, set } from 'idb-keyval';
-import exportAllEntries from '../../js/export-entries';
-import debounce from '../debounce';
+import { findObjectIndexById } from '../utils';
+import { get, set as idbSet } from 'idb-keyval';
+import exportAllEntries from '../export-entries';
+import { app, viewEntries } from '../app-state';
 import { route } from '../../components/router';
-import { fire } from '../../components/unifire';
+import { handleRouteChange } from './global-actions';
 
 let dataFetched = false;
 
+const set = delta => Object.assign(app, delta);
+const isActiveEntryId = id => app.entry?.id === id;
+
+// Rows that just appeared (a new entry, or one that arrived from the server) slide in once.
+// This is transient UI state: it is not stored on the entries, so it is never persisted.
+let freshTimer;
+const markFresh = ids => {
+  clearTimeout(freshTimer);          // a second mark restarts the window instead of being cut short by the first
+  app.fresh = ids;
+  freshTimer = setTimeout(() => { app.fresh = []; }, 450);
+};
+
 function updateIdbEntries (userId, updater) {
   get('entries_' + userId).then((entries = []) => {
-    var updated = updater(entries) || entries;
-    set('entries_' + userId, sortObjectsByDate(updated));
+    const updated = updater(entries) || entries;
+    idbSet('entries_' + userId, updated);
   });
 }
 
-function isStaleUser (el, userId, updater) {
-  if(el.state.userId === userId) return false;
+function isStaleUser (userId, updater) {
+  if(app.userId === userId) return false;
   if(updater) updateIdbEntries(userId, updater);
   return true;
 }
 
-function applyEntryPatch (el, userId, id, patch) {
+// `change(entry)` returns the new entry, or null to remove it. It never mutates; the
+// same transform serves the live store and a stale user's cached copy in IndexedDB.
+const replace = (list, id, change) => list.flatMap(e => e.id === id ? change(e) || [] : e);
+
+function applyEntryPatch (userId, id, change) {
   // userId is optional; pass undefined to skip the stale-user check
   // (e.g. on failure paths where the response userId isn't available).
-  if(userId !== undefined && isStaleUser(el, userId, entries => {
-    var idx = findObjectIndexById(id, entries);
-    if(idx > -1) patch(entries, idx);
-  })) return;
+  if(userId !== undefined && isStaleUser(userId, entries => replace(entries, id, change))) return;
 
-  var entries = el.state.entries;
-  var idx = findObjectIndexById(id, entries);
-  if(idx === -1) return;
-  patch(entries, idx);
-
-  var entry = isActiveEntryId(el, id) && entries[idx]
-    ? {...entries[idx]}
-    : el.state.entry;
-
-  el.set({ entry, entries: entries.slice() });
+  const found = app.entries.find(e => e.id === id);
+  if(!found) return;
+  const next = change(found);
+  set({
+    entry: isActiveEntryId(id) && next ? {...next} : app.entry,
+    entries: app.entries.flatMap(e => e === found ? next || [] : e)
+  });
 }
 
-function boot (el, { entries }){
-  el.set({ entries }, () => {
-    getEntries(el);
-    /**
-     * If the user is trying to view a specific entry,
-     * I need to rerun the route handler once the
-     * entries have been loaded from indexedDB.
-     *
-     * There may be a better way to manage this.
-     * Perhaps I can make entry a computed property
-     * that depends on view and entries. But that
-     * would be wasteful since I only need to check
-     * this on boot.
-     *
-     * I'll think about it, but for now I'm going to
-     * leave this here.
-     */
-    if(el.state.view === '/entry'){
-      fire('handleRouteChange', location.pathname);
-    }
-  });
+export function boot ({ entries }){
+  set({ entries: entries });
+  getEntries();
+  /**
+   * If the user is trying to view a specific entry, the route handler has to
+   * run again once the entries have been loaded from indexedDB.
+   */
+  if(app.view === '/entry') handleRouteChange(location.pathname);
 };
 
-function getEntries (el){
-  if(!el.state.loggedIn) return dataFetched = false;
+export function getEntries (){
+  if(!app.loggedIn) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
-  if(el.state.timestamp){
-    syncEntries(el, el.state.timestamp);
+  if(app.timestamp){
+    syncEntries();
   } else {
-    getAllEntries(el);
+    getAllEntries();
   }
 };
 
-function getAllEntries (el){
+function getAllEntries (){
+  const userId = app.userId;
   Entry.getAll()
-    .then(({ data, userId }) => getAllEntriesSuccess(el, userId, data))
+    .then(data => getAllEntriesSuccess(userId, data))
     .catch(() => {});
 };
 
-function getAllEntriesSuccess (el, userId, { timestamp, entries }){
-  if(isStaleUser(el, userId, idbEntries => idbEntries.concat(entries))) {
+function getAllEntriesSuccess (userId, { timestamp, entries }){
+  if(isStaleUser(userId, idbEntries => idbEntries.concat(entries))) {
     localStorage.setItem('timestamp_' + userId, timestamp);
     return;
   }
-  el.set({
+  set({
     timestamp,
-    entries: el.state.entries.concat(entries)
+    entries: app.entries.concat(entries)
   });
 };
 
 // Send updates to the server
-function syncClientEntries (el){
-  el.state.entries.forEach(entry => {
+function syncClientEntries (){
+  app.entries.forEach(entry => {
     if(entry.needsSync){
-      var func;
+      let func;
 
       if(entry.newEntry)      func = createEntry;
-      else if(entry.deleted)  func = deleteEntry;
+      else if(entry.deleted)  func = resendDelete;
       else                    func = putEntry;
 
-      func(el, { id: entry.id, entry: entry, clientSync: true });
+      func({ id: entry.id, entry: entry, clientSync: true });
     }
   });
 };
 
 // Get updates from the server
-function syncEntries (el){
-  Entry.sync(el.state.timestamp)
-    .then(({ data, userId }) => syncEntriesSuccess(el, userId, data))
+function syncEntries (){
+  const userId = app.userId;
+  Entry.sync(app.timestamp)
+    .then(data => syncEntriesSuccess(userId, data))
     .catch(() => {});
-  syncClientEntries(el);
+  syncClientEntries();
 };
 
-function resetDataFetched () {
+export function resetDataFetched () {
   dataFetched = false;
 };
 
-function syncEntriesSuccess (el, userId, { entries, timestamp }){
-  if(isStaleUser(el, userId, idbEntries => {
+function syncEntriesSuccess (userId, { entries, timestamp }){
+  if(isStaleUser(userId, idbEntries => {
     entries.forEach(entry => {
-      var idx = findObjectIndexById(entry.id, idbEntries);
+      const idx = findObjectIndexById(entry.id, idbEntries);
       if(idx > -1) {
         if(entry.deleted) idbEntries.splice(idx, 1);
         else idbEntries[idx] = entry;
@@ -136,281 +135,190 @@ function syncEntriesSuccess (el, userId, { entries, timestamp }){
   }
 
   if(entries.length === 0){
-    el.set({ timestamp });
+    set({ timestamp });
     return;
   }
 
-  applySyncPatch(el, entries);
-  persistSyncPatch(el, timestamp);
+  set({ timestamp, entries: applySyncPatch(entries) });
 };
 
-function applySyncPatch (el, entries){
-  entries.forEach((entry) => {
-    var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+// Returns a new entries array with the server's changes applied.
+function applySyncPatch (changes){
+  const entries = app.entries.slice(), added = [];
+  changes.forEach(entry => {
+    const entryIndex = findObjectIndexById(entry.id, entries);
     if(entryIndex > -1){
-      if(entry.deleted) { el.state.entries.splice(entryIndex, 1); }
-      else el.state.entries[entryIndex] = entry;
+      if(entry.deleted) entries.splice(entryIndex, 1);
+      else entries[entryIndex] = entry;
     } else {
-      entry.slideIn = true;
-      el.state.entries.unshift(entry);
+      entries.unshift(entry);
+      added.push(entry.id);
     }
   });
+  if(added.length) markFresh(added);
+  return entries;
 };
 
-function persistSyncPatch (el, timestamp){
-  el.set({
-    timestamp,
-    entries: el.state.entries.slice()
-  });
-};
-
-function createEntry (el, { entry, clientSync }){
+export function createEntry ({ entry, clientSync }){
   if(!entry || typeof entry.id !== 'number') return;
   /**
-   * When a user navigates to the new entry page,
-   * I automatically unshift a blank entry onto
-   * the entries array. I had good reasons for
-   * doing this that I don't want to explain here.
-   * Regardless, when we create an entry, we are
-   * really just updating the existing empty entry
-   * then POSTing it to the back end.
+   * When a user navigates to the new entry page, a blank entry is unshifted
+   * onto the entries array. Creating an entry is really updating that blank
+   * entry, then POSTing it to the back end.
    */
-  var entryIndex = findObjectIndexById(entry.id, el.state.entries);
+  const entryIndex = findObjectIndexById(entry.id, app.entries);
   if(entryIndex === -1) return;
 
   const postPending = entry.postPending;
-  entry.postPending = true;
-  el.state.entries[entryIndex] = entry;
+  entry = {...entry, postPending: true};
+  const entries = app.entries.slice();
+  entries[entryIndex] = entry;
 
-  el.set({
-    entry,
-    entries: el.state.entries.slice()
-  });
+  // Only mirror into app.entry when it is the entry on screen (a boot replay
+  // or a late save must not select it).
+  set({ entry: isActiveEntryId(entry.id) ? entry : app.entry, entries: entries });
 
   /**
-   * clientSync overrides postPending here to account
-   * for the edge case where postPending is set and
-   * the user closes the app before the POST call
-   * returns. In the event that the original POST
-   * succeeded, this results in duplicate entries.
-   * In the event that the original POST failed for
-   * whatever reason, results in the behavior you
+   * clientSync overrides postPending to cover the edge case where postPending
+   * is set and the user closes the app before the POST returns. If that POST
+   * succeeded this can duplicate the entry; if it failed, it does what you
    * would expect.
-   *
-   * My original thought was to allow the client
-   * to generate the ID that ends up getting used in
-   * the database as the entry's id. I settled on
-   * this plan to avoid entry id collisions.
-   *
-   * I would like to revisit this at some point. It
-   * makes sense that if an entry has the newEntry,
-   * needsSync, and postPending flags all set to true,
-   * then the front end would call an endpoint to
-   * upsert than POST.
-   *
-   * For now, however, this is why clientSync
-   * overrides postPending.
    */
   if(!clientSync && postPending) return;
 
+  const userId = app.userId;
   Entry.create({ date: entry.date, text: entry.text })
-    .then(({ data, userId }) => createEntrySuccess(el, userId, entry.id, data.id))
-    .catch(() => createEntryFailure(el, entry.id));
+    .then(data => createEntrySuccess(userId, entry.id, data.id))
+    .catch(() => createEntryFailure(entry.id));
 };
 
-/**
- * Because needsSync is a boolean, removing it here
- * can introduce a problem.
- *
- * For example, if I type one character and pause,
- * thereby triggering a POST, that will add the
- * needsSync and postPending flags to the entry. As
- * a result, anything I type while the POST is
- * pending (which would normally trigger adding the
- * needsSync flag to the entry) will be ignored when
- * the POST returns and triggers a removal of the
- * entry's needsSync flag.
- *
- * A potential solution could be to make needsSync
- * an integer so I can increment it when it needs
- * both a POST and a PATCH.
- */
-function createEntrySuccess (el, userId, oldId, id){
-  applyEntryPatch(el, userId, oldId, (entries, i) => {
-    entries[i].id = id;
-    delete entries[i].postPending;
-    delete entries[i].newEntry;
-    delete entries[i].needsSync;
-  });
+function createEntrySuccess (userId, oldId, id){
+  applyEntryPatch(userId, oldId, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id }));
 };
 
-function createEntryFailure (el, oldId){
-  applyEntryPatch(el, undefined, oldId, (entries, i) => { delete entries[i].postPending; });
+function createEntryFailure (oldId){
+  applyEntryPatch(undefined, oldId, ({ postPending, ...rest }) => rest);
 };
 
-function toggleFavorite (el, { id, favorited }){
-  updateEntry(el, {
+export function toggleFavorite ({ id, favorited }){
+  updateEntry({
     entry: { favorited },
     property: 'favorited',
     entryId: id
   });
 };
 
-function updateEntry (el, { entry, property, entryId }){
+export function updateEntry ({ entry, property, entryId }){
   if(!entry || !property || typeof entryId !== 'number') return;
-  var entryIndex = findObjectIndexById(entryId, el.state.entries);
+  const entryIndex = findObjectIndexById(entryId, app.entries);
   if(entryIndex === -1) return;
-  var activeEntry = el.state.entries[entryIndex];
-  var current = activeEntry[property];
-  var next = entry[property];
-  if(current === next) return;
+  const activeEntry = app.entries[entryIndex];
+  if(activeEntry[property] === entry[property]) return;
 
-  activeEntry[property] = entry[property];
-  activeEntry.needsSync = true;
-  el.set({
-    entry: {...activeEntry},
-    entries: el.state.entries.slice()
-  });
+  const next = {...activeEntry, [property]: entry[property], needsSync: true};
+  const entries = app.entries.slice();
+  entries[entryIndex] = next;
+  // Only the entry on screen is mirrored into app.entry (a late debounced save
+  // for an entry the user has navigated away from must not pull it back).
+  set({ entry: isActiveEntryId(entryId) ? {...next} : app.entry, entries: entries });
 
+  const userId = app.userId;
   Entry.update(entryId, entry)
-    .then(({ userId }) => updateEntrySuccess(el, userId, entryId))
+    .then(() => updateEntrySuccess(userId, entryId))
     .catch(() => {});
 };
 
-function updateEntrySuccess (el, userId, id){
-  applyEntryPatch(el, userId, id, (entries, i) => { delete entries[i].needsSync; });
+function updateEntrySuccess (userId, id){
+  applyEntryPatch(userId, id, ({ needsSync, ...rest }) => rest);
 };
 
-function putEntry (el, { entry }){
+function putEntry ({ entry }){
+  const userId = app.userId;
   Entry.update(entry.id, entry)
-    .then(({ userId }) => updateEntrySuccess(el, userId, entry.id))
+    .then(() => updateEntrySuccess(userId, entry.id))
     .catch(() => {});
 };
 
-function showConfirmDeleteEntryModal (el, { entry }){
-  el.set({
-    entry,
-    dialogMode: 'modal:delete'
-  });
+export function showConfirmDeleteEntryModal ({ entry }){
+  set({ entry, dialogMode: 'modal:delete' });
 };
 
-function deleteEntry (el, { id }){
+export function deleteEntry ({ id }){
   if(typeof id !== 'number') return;
 
-  var entryIndex = findObjectIndexById(id, el.state.entries);
+  const entryIndex = findObjectIndexById(id, app.entries);
   if(entryIndex === -1) return;
 
-  el.state.entries[entryIndex].needsSync = true;
-  el.state.entries[entryIndex].deleted = true;
-  el.state.entries[entryIndex].text = '';
+  const entries = app.entries.slice();
+  entries[entryIndex] = {...entries[entryIndex], needsSync: true, deleted: true, text: ''};
 
-  el.set({
-    entry: undefined,
-    entries: el.state.entries.slice(),
-    dialogMode: ''
-  }, () => {
-    if(el.state.view !== '/entries') route('/entries', true);
-  });
+  set({ entry: undefined, entries: entries, dialogMode: '' });
+  if(app.view !== '/entries') route('/entries', true);
 
+  const userId = app.userId;
   Entry.del(id)
-    .then(({ userId }) => deleteEntrySuccess(el, userId, id))
+    .then(() => deleteEntrySuccess(userId, id))
     .catch(() => {});
 };
 
-function deleteEntrySuccess (el, userId, id){
-  applyEntryPatch(el, userId, id, (entries, i) => entries.splice(i, 1));
+function deleteEntrySuccess (userId, id){
+  applyEntryPatch(userId, id, () => null);
 };
 
-function setEntry (el, { id }){
-  if(!id || id === -1 || !el.state.entries.length) return;
-
-  // If writing a new entry, look in state.entries,
-  // otherwise look in state.viewEntries.
-  // This is only necessary because I unshift
-  // new blank entries onto state.entries.
-  var collection = el.state.view === '/new'
-    ? 'entries'
-    : 'viewEntries';
-
-  var entryIndex = findObjectIndexById(parseInt(id), el.state[collection]);
-  var entry = el.state[collection][entryIndex];
-
-  el.set({ entry, entryIndex });
+// Replay of an offline delete: the entry is already marked deleted, so only
+// the request is resent (no navigation, no change to the open entry/dialog).
+function resendDelete ({ id }){
+  const userId = app.userId;
+  Entry.del(id)
+    .then(() => deleteEntrySuccess(userId, id))
+    .catch(() => {});
 };
 
-function newEntry (el){
-  var entry = {
+export function setEntry ({ id }){
+  if(!id || id === -1 || !app.entries.length) return;
+
+  // If writing a new entry, look in app.entries, otherwise look in
+  // app.viewEntries. Only necessary because new blank entries are unshifted
+  // onto app.entries.
+  const collection = app.view === '/new' ? app.entries : viewEntries();
+  const entryIndex = findObjectIndexById(parseInt(id), collection);
+  set({ entry: collection[entryIndex], entryIndex });
+};
+
+export function newEntry (){
+  const entry = {
     id: Date.now(),
     date: new Date().toLocaleDateString('en-CA'),
     text: '',
     needsSync: true,
-    newEntry: true,
-    slideIn: true
+    newEntry: true
   };
 
-  el.set({
-    entry,
-    entries: [entry, ...el.state.entries]
-  }, function(){
-    setEntry(el, { id: entry.id });
-  });
+  set({ entry, entries: [entry, ...app.entries] });
+  markFresh([entry.id]);
+  setEntry({ id: entry.id });
 };
 
-function filterByText (el, query = ''){
-  if(el.state.filterText === query) return;
-  el.set({ filterText: query });
+export function filterByText (query = ''){
+  if(app.filterText === query) return;
+  app.filterText = query;
 };
 
-function toggleSort (el){
-  const sort = el.state.sort;
-  el.set({
-    sort: sort === 'desc' ? 'asc' : 'desc',
-    dialogMode: ''
-  });
+export function toggleSort (){
+  set({ sort: app.sort === 'desc' ? 'asc' : 'desc', dialogMode: '' });
 };
 
-function shiftEntry (el, count){
-  if(el.state.view !== '/entry' || !count || !el.state.entry) return;
-  var entryIndex = findObjectIndexById(parseInt(el.state.entry.id), el.state.viewEntries);
-  let entry = el.state.viewEntries[entryIndex + count];
+export function shiftEntry (count){
+  if(app.view !== '/entry' || !count || !app.entry) return;
+  const entryIndex = findObjectIndexById(parseInt(app.entry.id), viewEntries());
+  const entry = viewEntries()[entryIndex + count];
   if(entry) route('/entry/' + entry.id, true);
 };
 
-function clearFilters (el) {
-  el.set({
-    filter: '',
-    filterText: ''
-  });
+export function clearFilters () {
+  set({ filter: '', filterText: '' });
 };
 
-function removeSlideInProp (el) {
-  const entries = el.state.entries.map(entry => {
-    delete entry.slideIn;
-    return entry;
-  });
-
-  el.set({ entries });
-};
-
-function exportEntries (el) {
-  exportAllEntries(el.state.viewEntries);
-};
-
-export default {
-  boot,
-  getEntries,
-  resetDataFetched,
-  createEntry,
-  updateEntry,
-  showConfirmDeleteEntryModal,
-  deleteEntry,
-  setEntry,
-  newEntry,
-  filterByText,
-  shiftEntry,
-  toggleFavorite,
-  clearFilters,
-  removeSlideInProp: debounce(removeSlideInProp, 50),
-  exportEntries,
-  toggleSort
+export function exportEntries () {
+  exportAllEntries(viewEntries());
 };

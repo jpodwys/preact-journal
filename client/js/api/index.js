@@ -1,8 +1,8 @@
-import { fire } from '../../components/unifire';
-import { getActiveUserId } from '../utils';
+import { handleExpiredSession } from '../actions/user-actions';
+import { app } from '../app-state';
 
 export default (url, config = {}, { skipAuth } = {}) => {
-  var userId = getActiveUserId();
+  var userId = app.userId;
   config.credentials = 'same-origin';
   config.headers = {
     'Content-Type': 'application/json',
@@ -15,9 +15,8 @@ export default (url, config = {}, { skipAuth } = {}) => {
   return fetch(url, config).then(res => {
     if(res.status >= 300) throw res;
     if(res.status !== 204) return res.json();
-  }).then(data => ({ data, userId }))
-  .catch(err => {
-    if(!skipAuth && err.status === 401) fire('handleExpiredSession', userId);
+  }).catch(err => {
+    if(!skipAuth && err.status === 401) handleExpiredSession(userId);
     throw err;
   });
 };

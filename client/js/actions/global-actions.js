@@ -1,63 +1,45 @@
-import { fire } from '../../components/unifire';
+import { app } from '../app-state';
 import { getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
+import { newEntry, setEntry } from './entry-actions';
 
-function linkstate (el, { key, val, cb }) {
-  el.set({ [key]: val }, cb);
+const set = delta => Object.assign(app, delta);
+
+export function toggleDarkMode () {
+  set({ dark: !app.dark, dialogMode: '' });
 };
 
-function toggleDarkMode (el) {
-  el.set({
-    dark: !el.state.dark,
-    dialogMode: ''
-  });
+export function handleRouteChange (url) {
+  const view = getViewFromPathname(url);
+  if(view !== '/' && !app.loggedIn) return route('/', true);
+  if(view !== app.view) app.view = view;
+  handleRoute(view, url);
 };
 
-function handleRouteChange (el, url) {
-  let view = getViewFromPathname(url);
-  if(view !== '/' && !el.state.loggedIn) return route('/', true);
-  if(view !== el.state.view) el.set({ view });
-  handleRoute(el, view, url);
-};
-
-function handleRoute (el, view, url) {
+function handleRoute (view, url) {
   switch(view) {
-    case '/':         handleLoginView(el);    break;
+    case '/':         handleLoginView();    break;
     case '/switch':   break;
     case '/entries':  // Fallthrough
-    case '/search':   handleEntriesView(el);  break;
+    case '/search':   handleEntriesView();  break;
     case '/entry':    // Fallthrough
-    case '/new':      handleEntryView(url);   break;
-    default:          route('/', true);       break;
+    case '/new':      handleEntryView(url); break;
+    default:          route('/', true);     break;
   }
 };
 
-function handleLoginView (el) {
-  if(el.state.loggedIn) route('/entries', true);
+function handleLoginView () {
+  if(app.loggedIn) route('/entries', true);
 };
 
-function handleEntriesView (el) {
-  if(Array.isArray(el.state.entries)){
-    const entry = el.state.entries[0];
-    if(entry && entry.newEntry && !entry.text){
-      el.state.entries.splice(0, 1);
-      el.set({ entries: el.state.entries });
-    }
-  }
+// Leaving a blank, never-written new entry discards it.
+function handleEntriesView () {
+  const kept = app.entries.filter(e => !(e.newEntry && !e.text));
+  if(kept.length < app.entries.length) app.entries = kept;
 };
 
 function handleEntryView (url) {
   const id = url.substr(url.lastIndexOf('/') + 1);
-  if(id === 'new'){
-    fire('newEntry');
-  } else {
-    fire('setEntry', { id });
-  }
-};
-
-
-export default {
-  linkstate,
-  toggleDarkMode,
-  handleRouteChange
+  if(id === 'new') newEntry();
+  else setEntry({ id });
 };

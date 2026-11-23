@@ -1,65 +1,99 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
-import { mount, fireEvent } from '../../../test/mount';
+import { clear as idbClear } from 'idb-keyval';
+import { mount, fireEvent, settle } from '../../../test/mount';
+import { app } from '../../js/app-state';
+import { mockLogin, mockGetAllEntries, lastBody } from '../../../test/api-mocks';
+import Router from '../router';
 import Login from './index';
-import User from '../../js/services/user-service';
-import { mockLogin } from '../../../test/api-mocks';
 
 describe('login', () => {
   let env;
+  const originalPathname = location.pathname;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
+    await idbClear();
     mockLogin();
+    mockGetAllEntries();
+    history.replaceState(null, null, '/');
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     if(env) env.cleanup();
     env = null;
+    await settle();
     fetchMock.restore();
+    localStorage.clear();
+    await idbClear();
+    history.replaceState(null, null, originalPathname);
   });
 
-  it('submits the typed username and password to /api/user/login', () => {
-    env = mount(h(Login, null), {
-      state: { cancelable: false },
-      // Slim login action: routes the form's intent to the real network
-      // helper so fetch-mock can catch it. Full chain lives in user-actions.
-      actions: { login: (el, user) => User.login(user) }
-    });
+  const typeCredentials = (username, password) => {
+    fireEvent.input(env.getByRole('textbox'), username);
+    fireEvent.input(env.host.querySelector('#lpass'), password);
+  };
 
-    fireEvent.input(env.host.querySelector('#luser'), 'alice');
-    fireEvent.input(env.host.querySelector('#lpass'), 'pass1');
-    // fireEvent.click on a submit input dispatches a synthetic click that
-    // doesn't cascade into a form submit (matches RTL semantics). Submit
-    // the form directly to express the user's intent.
+  it('submits the typed username and password to /api/user/login', () => {
+    env = mount(h(Login, { path: '/' }));
+    typeCredentials('alice', 'pass1');
+    // fireEvent.click on a submit input does not cascade into a form submit;
+    // submit the form directly to express the user's intent.
     fireEvent.submit(env.getByRole('form'));
 
     expect(fetchMock.called('/api/user/login')).to.be.true;
-    const opts = fetchMock.lastOptions('/api/user/login');
-    expect(opts.method).to.equal('POST');
-    expect(JSON.parse(opts.body)).to.deep.equal({
-      username: 'alice',
-      password: 'pass1'
-    });
+    expect(fetchMock.lastOptions('/api/user/login').method).to.equal('POST');
+    expect(lastBody('/api/user/login')).to.deep.equal({ username: 'alice', password: 'pass1' });
+  });
+
+  it('a successful login activates the account in the store and routes to /entries', async () => {
+    env = mount(h(Login, { path: '/' }));
+    typeCredentials('alice', 'pass1');
+    fireEvent.submit(env.getByRole('form'));
+    await new Promise(r => setTimeout(r, 50));
+    expect(app.loggedIn).to.be.true;
+    expect(app.userId).to.equal('99');
+    expect(app.username).to.equal('alice');
+    expect(location.pathname).to.equal('/entries');
   });
 
   it('renders the Cancel button only when cancelable is true', () => {
-    env = mount(h(Login, null), { state: { cancelable: false } });
+    env = mount(h(Login, { cancelable: false, path: '/' }));
     expect(env.queryByText('Cancel')).to.be.null;
+    expect(env.host.firstElementChild.classList.contains('fade-up')).to.be.false;
     env.cleanup();
 
-    env = mount(h(Login, null), { state: { cancelable: true } });
+    env = mount(h(Login, { cancelable: true, path: '/switch' }));
     expect(env.getByText('Cancel')).to.exist;
+    expect(env.host.firstElementChild.classList.contains('fade-up')).to.be.true;
   });
 
   it('clicking Cancel routes to /entries', () => {
-    // route() ultimately calls history.pushState (wrapped by Router at
-    // module load to also scrollTo(0, 0)). The spy lands on the wrapper.
-    const pushSpy = sinon.spy(history, 'pushState');
-    env = mount(h(Login, null), { state: { cancelable: true } });
+    env = mount(h(Login, { cancelable: true, path: '/switch' }));
+    const before = history.length;
     fireEvent.click(env.getByText('Cancel'));
-    expect(pushSpy.calledOnce).to.be.true;
-    expect(pushSpy.args[0][2]).to.equal('/entries');
-    pushSpy.restore();
+    expect(location.pathname).to.equal('/entries');
+    expect(history.length, 'pushed, not replaced').to.equal(before + 1);
+  });
+
+  // New: inputs are keyed by path, so switching between "/" and "/switch"
+  // (the same Login component under the Router) starts with empty fields.
+  it('clears typed credentials when the route switches between / and /switch', async () => {
+    env = mount(h(Router, null,
+      h(Login, { path: '/' }),
+      h(Login, { path: '/switch', cancelable: true })
+    ));
+    typeCredentials('alice', 'secret');
+    const firstInput = env.getByRole('textbox');
+
+    history.pushState(null, null, '/switch');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    await settle();
+
+    expect(env.getByText('Cancel'), 'switched to the cancelable login').to.exist;
+    const user = env.getByRole('textbox');
+    expect(user).to.not.equal(firstInput);
+    expect(user.value).to.equal('');
+    expect(env.host.querySelector('#lpass').value).to.equal('');
   });
 });

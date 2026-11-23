@@ -1,26 +1,48 @@
-import { h } from 'preact';
-import { mount, fireEvent } from '../../../test/mount';
-import { fire } from '../unifire';
+import { h } from '../../packages/kyvo/core';
+import fetchMock from 'fetch-mock';
+import { mount, fireEvent, settle } from '../../../test/mount';
+import { mockUpdateEntry, mockCreateEntry, lastBody } from '../../../test/api-mocks';
+import { app } from '../../js/app-state';
+import { handleRouteChange } from '../../js/actions/global-actions';
+import Router from '../router';
 import Entry from './index';
 
 describe('entry', () => {
-  let env;
-  afterEach(() => { if(env) env.cleanup(); env = null; });
+  let env, clock;
+  afterEach(() => {
+    if(env) env.cleanup();
+    env = null;
+    if(clock) clock.restore();
+    clock = null;
+    fetchMock.restore();
+    history.replaceState(null, '', '/');
+  });
 
-  function mountEntry (state = {}, actions = {}) {
+  // Fake only timers: rendering runs on requestAnimationFrame, which must stay real.
+  const fakeTimers = () => { clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }); };
+
+  function mountEntry (state = {}) {
     return mount(h(Entry, null), {
+      // `view` goes first: the app-state watcher reacts to view writes.
       state: Object.assign(
-        { view: '/entry', entry: null, viewEntries: [], entryIndex: -1 },
+        { view: '/entry', loggedIn: true, entry: null, viewEntries: [], entryIndex: -1 },
         state
-      ),
-      actions
+      )
     });
   }
 
+  const $ed = () => env.host.querySelector('#ed');
+  const $et = () => env.host.querySelector('#et');
+  // Browsers edit the existing text node while the user types; do the same so
+  // a re-render that rewrote the node would visibly clobber the typing.
+  const type = (el, text) => {
+    if(el.firstChild && el.firstChild.nodeType === 3) el.firstChild.data = text;
+    else el.textContent = text;
+  };
+
   it('renders a not-found heading when there is no entry', () => {
     env = mountEntry({ entry: null });
-    const heading = env.getByRole('heading');
-    expect(heading.textContent).to.equal("Looks like that doesn't exist!");
+    expect(env.getByRole('heading').textContent).to.equal("Looks like that doesn't exist!");
   });
 
   it('renders the entry date and text in contenteditable elements', () => {
@@ -29,21 +51,21 @@ describe('entry', () => {
       viewEntries: [{ id: 5 }],
       entryIndex: 0
     });
-    const date = env.host.querySelector('#ed');
-    const text = env.host.querySelector('#et');
-    expect(date.textContent.trim()).to.equal('2024-04-04');
-    expect(text.textContent.trim()).to.equal('hello world');
-    expect(date.hasAttribute('contenteditable')).to.be.true;
-    expect(text.hasAttribute('contenteditable')).to.be.true;
+    expect($ed().textContent.trim()).to.equal('2024-04-04');
+    expect($et().textContent.trim()).to.equal('hello world');
+    expect($ed().hasAttribute('contenteditable')).to.be.true;
+    expect($et().getAttribute('contenteditable')).to.equal('plaintext-only');
   });
 
   describe('navigation arrows on /entry', () => {
-    const items = [{ id: 1 }, { id: 2 }, { id: 3 }];
+    const items = [{ id: 1, date: '2024-01-03', text: 'one' }, { id: 2, date: '2024-01-02', text: 'two' }, { id: 3, date: '2024-01-01', text: 'three' }];
 
     it('hides the left arrow at the first entry and shows the right rotated', () => {
       env = mountEntry({ entry: items[0], viewEntries: items, entryIndex: 0 });
       expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.true;
-      expect(env.getByRole('button', { name: 'Next entry' }).classList.contains('hidden')).to.be.false;
+      const next = env.getByRole('button', { name: 'Next entry' });
+      expect(next.classList.contains('hidden')).to.be.false;
+      expect(next.classList.contains('rotate180')).to.be.true;
     });
 
     it('hides the right arrow at the last entry', () => {
@@ -58,160 +80,306 @@ describe('entry', () => {
       expect(env.getByRole('button', { name: 'Next entry' }).classList.contains('hidden')).to.be.false;
     });
 
-    it('fires shiftEntry(-1) when the left arrow is clicked', () => {
-      const shiftEntry = sinon.spy();
-      env = mountEntry(
-        { entry: items[1], viewEntries: items, entryIndex: 1 },
-        { shiftEntry }
-      );
-      fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
-      expect(shiftEntry.calledOnce).to.be.true;
-      expect(shiftEntry.args[0][1]).to.equal(-1);
+    it('clicking the left arrow navigates (replace) to the previous entry', () => {
+      history.replaceState(null, '', '/entry/2');
+      const replaceSpy = sinon.spy(history, 'replaceState');
+      try {
+        env = mountEntry({ entry: items[1], viewEntries: items, entryIndex: 1 });
+        fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
+        expect(replaceSpy.calledOnce).to.be.true;
+        expect(location.pathname).to.equal('/entry/1');
+      } finally {
+        replaceSpy.restore();
+      }
     });
 
-    it('fires shiftEntry(1) when the right arrow is clicked', () => {
-      const shiftEntry = sinon.spy();
-      env = mountEntry(
-        { entry: items[1], viewEntries: items, entryIndex: 1 },
-        { shiftEntry }
-      );
+    it('clicking the right arrow navigates (replace) to the next entry', () => {
+      history.replaceState(null, '', '/entry/2');
+      env = mountEntry({ entry: items[1], viewEntries: items, entryIndex: 1 });
       fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
-      expect(shiftEntry.calledOnce).to.be.true;
-      expect(shiftEntry.args[0][1]).to.equal(1);
+      expect(location.pathname).to.equal('/entry/3');
+    });
+
+    it('clicking through with the real router reseeds date and text from the new entry', async () => {
+      history.replaceState(null, '', '/entry/2');
+      env = mount(
+        h(Router, { onChange: handleRouteChange }, h(Entry, { path: '/entry/:id' })),
+        { state: { view: '/entry', loggedIn: true, entries: items } }
+      );
+      await settle();
+      expect($et().textContent).to.equal('two');
+      expect($ed().textContent).to.equal('2024-01-02');
+
+      fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
+      await settle();
+      expect(location.pathname).to.equal('/entry/3');
+      expect(app.entry.id).to.equal(3);
+      expect($et().textContent).to.equal('three');
+      expect($ed().textContent).to.equal('2024-01-01');
+
+      fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
+      fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
+      await settle();
+      expect($et().textContent).to.equal('one');
+      expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.true;
+    });
+  });
+
+  describe('local copies of date/text', () => {
+    const entry = { id: 5, date: '2024-01-01', text: 'original' };
+
+    it('an unrelated store write never touches text the user is typing', async () => {
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
+      type($et(), 'typed but not saved');
+      type($ed(), '2030-01-01');
+      app.dark = !app.dark;
+      app.filterText = 'x';
+      await settle();
+      expect($et().textContent).to.equal('typed but not saved');
+      expect($ed().textContent).to.equal('2030-01-01');
+      document.body.classList.remove('dark');
+    });
+
+    it('the debounced save writing the entry back does not clobber typing that continued', async () => {
+      fakeTimers();
+      mockUpdateEntry(5);
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
+      const et = $et();
+      type(et, 'hello');
+      fireEvent.input(et);
+      clock.tick(500);
+      // The save wrote { text: 'hello' } into app.entry; the user kept typing
+      // before the next frame rendered it.
+      expect(app.entry.text).to.equal('hello');
+      type(et, 'hello wor');
+      await settle();
+      expect($et()).to.equal(et);
+      expect(et.textContent).to.equal('hello wor');
+    });
+
+    it('a store write of a different entry id reseeds date and text', async () => {
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
+      type($et(), 'stale typing');
+      app.entry = { id: 6, date: '2024-02-02', text: 'other entry' };
+      await settle();
+      expect($et().textContent).to.equal('other entry');
+      expect($ed().textContent).to.equal('2024-02-02');
+    });
+
+    it('a store write of the same entry id with new text does not reseed', async () => {
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
+      app.entry = Object.assign({}, entry, { text: 'changed elsewhere' });
+      await settle();
+      expect($et().textContent).to.equal('original');
     });
   });
 
   describe('on /new', () => {
+    afterEach(() => { if(document.activeElement) document.activeElement.blur(); });
+
     it('does not render the navigation arrows', () => {
       env = mountEntry({
         view: '/new',
-        entry: { id: 'new', date: '', text: '', newEntry: true }
+        entry: { id: 1000, date: '', text: '', newEntry: true }
       });
       expect(env.queryByRole('button', { name: 'Previous entry' })).to.not.exist;
       expect(env.queryByRole('button', { name: 'Next entry' })).to.not.exist;
-      expect(env.host.querySelector('#ed')).to.exist;
-      expect(env.host.querySelector('#et')).to.exist;
+      expect($ed()).to.exist;
+      expect($et()).to.exist;
     });
 
-    it('focuses #et when transitioning from an existing entry to /new', () => {
-      // shouldComponentUpdate gates on entry.id change, so the focus only
-      // fires when both view changes AND the entry id rotates — exactly
-      // what production does (clicking the FAB unshifts a new blank entry).
-      env = mountEntry(
-        {
-          view: '/entry',
-          entry: { id: 5, date: '2024-04-04', text: 'old' },
-          viewEntries: [{ id: 5 }],
-          entryIndex: 0
-        },
-        {
-          setState: (el, delta) => el.set(delta)
-        }
-      );
+    it('focuses #et when mounted directly on /new', () => {
+      env = mountEntry({ view: '/new', entry: { id: 1000, date: '2024-12-25', text: '', newEntry: true } });
+      expect(document.activeElement).to.equal($et());
+    });
 
-      fire('setState', {
+    it('focuses #et when transitioning from an existing entry to /new', async () => {
+      env = mountEntry({
+        view: '/entry',
+        entry: { id: 5, date: '2024-04-04', text: 'old' },
+        viewEntries: [{ id: 5 }],
+        entryIndex: 0
+      });
+      expect(document.activeElement).to.not.equal($et());
+
+      Object.assign(app, {
         view: '/new',
-        entry: { id: 'new', date: '2024-12-25', text: '', newEntry: true },
+        entry: { id: 1000, date: '2024-12-25', text: '', newEntry: true },
         entryIndex: -1
       });
+      await settle();
 
       expect(document.activeElement.id).to.equal('et');
+      expect($ed().textContent).to.equal('2024-12-25');
+    });
+
+    it('does not steal focus back from the date field on later renders', async () => {
+      env = mountEntry({ view: '/new', entry: { id: 1000, date: '2024-12-25', text: '', newEntry: true } });
+      expect(document.activeElement).to.equal($et());
+
+      $ed().focus();
+      type($ed(), '2024-12-26');
+      fireEvent.input($ed());
+      app.dark = !app.dark;
+      await settle();
+      app.filterText = 'y';
+      await settle();
+
+      expect(document.activeElement).to.equal($ed());
+      expect($ed().textContent).to.equal('2024-12-26');
+      document.body.classList.remove('dark');
     });
   });
 
   describe('editing flow (debounced)', () => {
-    let clock;
-    beforeEach(() => { clock = sinon.useFakeTimers(); });
-    afterEach(() => clock.restore());
+    beforeEach(fakeTimers);
 
-    it('fires updateEntry with the new text after the debounce window', () => {
-      const updateEntry = sinon.spy();
+    it('PATCHes the new text after the debounce window and updates the store', async () => {
+      mockUpdateEntry(5);
       const entry = { id: 5, date: '2024-01-01', text: 'original' };
-      env = mountEntry(
-        { entry, viewEntries: [entry], entryIndex: 0 },
-        { updateEntry }
-      );
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
 
-      const text = env.host.querySelector('#et');
-      text.innerText = 'edited text';
-      fireEvent.input(text);
+      type($et(), 'edited text');
+      fireEvent.input($et());
 
-      expect(updateEntry.called).to.be.false;
       clock.tick(499);
-      expect(updateEntry.called).to.be.false;
+      expect(fetchMock.called('/api/entry/5')).to.be.false;
       clock.tick(1);
 
-      expect(updateEntry.calledOnce).to.be.true;
-      expect(updateEntry.args[0][1]).to.deep.equal({
-        entry: { text: 'edited text' },
-        property: 'text',
-        entryId: 5
-      });
+      expect(fetchMock.calls('/api/entry/5').length).to.equal(1);
+      expect(fetchMock.lastOptions('/api/entry/5').method).to.equal('PATCH');
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'edited text' });
+      expect(app.entry).to.include({ id: 5, text: 'edited text', needsSync: true });
+      expect(app.entries[0].text).to.equal('edited text');
+
+      await settle();
+      expect(app.entries[0].needsSync).to.be.undefined;
     });
 
-    it('fires updateEntry with the new date when the date field is edited', () => {
-      const updateEntry = sinon.spy();
+    it('PATCHes the trimmed date when the date field is edited', () => {
+      mockUpdateEntry(7);
       const entry = { id: 7, date: '2024-01-01', text: 'unchanged' };
-      env = mountEntry(
-        { entry, viewEntries: [entry], entryIndex: 0 },
-        { updateEntry }
-      );
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
 
-      const date = env.host.querySelector('#ed');
-      date.innerText = '  2025-12-31  ';
-      fireEvent.input(date);
+      type($ed(), '  2025-12-31  ');
+      fireEvent.input($ed());
       clock.tick(500);
 
-      expect(updateEntry.calledOnce).to.be.true;
-      expect(updateEntry.args[0][1]).to.deep.equal({
-        entry: { date: '2025-12-31' },
-        property: 'date',
-        entryId: 7
-      });
+      expect(fetchMock.calls('/api/entry/7').length).to.equal(1);
+      expect(lastBody('/api/entry/7')).to.deep.equal({ date: '2025-12-31' });
+      expect(app.entries[0].date).to.equal('2025-12-31');
     });
 
-    it('coalesces a burst of edits into a single updateEntry call', () => {
-      const updateEntry = sinon.spy();
+    it('coalesces a burst of edits into a single PATCH of the last text', () => {
+      mockUpdateEntry(5);
       const entry = { id: 5, date: 'd', text: 'a' };
-      env = mountEntry(
-        { entry, viewEntries: [entry], entryIndex: 0 },
-        { updateEntry }
-      );
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
 
-      const text = env.host.querySelector('#et');
-      text.innerText = 'ab';
-      fireEvent.input(text);
+      const et = $et();
+      type(et, 'ab'); fireEvent.input(et);
       clock.tick(200);
-      text.innerText = 'abc';
-      fireEvent.input(text);
+      type(et, 'abc'); fireEvent.input(et);
       clock.tick(200);
-      text.innerText = 'abcd';
-      fireEvent.input(text);
+      type(et, 'abcd'); fireEvent.input(et);
       clock.tick(500);
 
-      expect(updateEntry.calledOnce).to.be.true;
-      expect(updateEntry.args[0][1].entry.text).to.equal('abcd');
+      expect(fetchMock.calls('/api/entry/5').length).to.equal(1);
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'abcd' });
     });
 
-    it('fires createEntry with date and text read from the DOM for a new entry', () => {
-      const createEntry = sinon.spy();
-      env = mountEntry(
-        {
-          view: '/new',
-          entry: { newEntry: true, id: 'new', date: '', text: '' }
-        },
-        { createEntry }
-      );
+    it('POSTs a new entry with date and text read from the DOM, then adopts the server id', async () => {
+      mockCreateEntry({ id: 42 });
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
+      env = mountEntry({ view: '/new', entry, entries: [entry] });
 
-      env.host.querySelector('#ed').innerText = '2024-12-25';
-      env.host.querySelector('#et').innerText = 'first entry';
-      fireEvent.input(env.host.querySelector('#et'));
+      type($ed(), '2024-12-25');
+      type($et(), 'first entry');
+      fireEvent.input($et());
       clock.tick(500);
 
-      expect(createEntry.calledOnce).to.be.true;
-      const payload = createEntry.args[0][1];
-      expect(payload.entry.date).to.equal('2024-12-25');
-      expect(payload.entry.text).to.equal('first entry');
+      expect(fetchMock.calls('/api/entry').length).to.equal(1);
+      expect(fetchMock.lastOptions('/api/entry').method).to.equal('POST');
+      expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'first entry' });
+      expect(app.entry).to.include({ id: 1000, text: 'first entry', postPending: true });
+
+      await settle();
+      expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' });
+      expect(app.entry.id).to.equal(42);
+      expect($et().textContent).to.equal('first entry');
+    });
+
+    it('a pending save runs, and is not lost, when the entry unmounts', () => {
+      mockUpdateEntry(5);
+      const entry = { id: 5, date: '2024-01-01', text: 'original' };
+      env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
+      type($et(), 'edited');
+      fireEvent.input($et());
+      expect(fetchMock.called('/api/entry/5')).to.be.false;   // still debouncing
+      env.cleanup();
+      env = null;
+      expect(fetchMock.calls('/api/entry/5').length).to.equal(1);   // saved on the way out
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'edited' });
+      clock.tick(500);
+      expect(fetchMock.calls('/api/entry/5').length).to.equal(1);   // and only once
+    });
+
+    it('leaving a brand-new entry within the debounce window still creates it (DOM read while attached)', () => {
+      mockCreateEntry({ id: 42 });
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
+      env = mountEntry({ view: '/new', entry, entries: [entry] });
+      type($ed(), '2024-12-25');
+      type($et(), 'typed then left');
+      fireEvent.input($et());
+      env.cleanup();
+      env = null;
+      expect(fetchMock.calls('/api/entry').length).to.equal(1);
+      expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'typed then left' });
+      clock.tick(500);
+      expect(fetchMock.calls('/api/entry').length).to.equal(1);
+    });
+
+    it('typing in a second entry within the window saves both entries, each on its own timer', async () => {
+      mockUpdateEntry(1);
+      mockUpdateEntry(2);
+      const items = [{ id: 1, date: '2024-01-02', text: 'one' }, { id: 2, date: '2024-01-01', text: 'two' }];
+      env = mountEntry({ entry: items[0], entries: items, viewEntries: items, entryIndex: 0 });
+
+      type($et(), 'one edited');
+      fireEvent.input($et());
+      Object.assign(app, { entry: items[1], entryIndex: 1 });
+      await settle();
+      type($et(), 'two edited');
+      fireEvent.input($et());                       // entry 2 gets its own debounce; entry 1's is not replaced
+      expect(fetchMock.called('/api/entry/1')).to.be.false;
+      expect(fetchMock.called('/api/entry/2')).to.be.false;
+      clock.tick(500);
+      expect(fetchMock.calls('/api/entry/1').length).to.equal(1);
+      expect(lastBody('/api/entry/1')).to.deep.equal({ text: 'one edited' });
+      expect(fetchMock.calls('/api/entry/2').length).to.equal(1);
+      expect(lastBody('/api/entry/2')).to.deep.equal({ text: 'two edited' });
+    });
+
+    it('a save still pending when navigating to another entry goes to the entry that was edited', async () => {
+      mockUpdateEntry(1);
+      mockUpdateEntry(2);
+      const items = [{ id: 1, date: '2024-01-02', text: 'one' }, { id: 2, date: '2024-01-01', text: 'two' }];
+      env = mountEntry({ entry: items[0], entries: items, viewEntries: items, entryIndex: 0 });
+
+      type($et(), 'one edited');
+      fireEvent.input($et());
+      Object.assign(app, { entry: items[1], entryIndex: 1 });
+      await settle();
+      expect($et().textContent).to.equal('two');
+      clock.tick(500);
+
+      expect(fetchMock.called('/api/entry/2')).to.be.false;
+      expect(lastBody('/api/entry/1')).to.deep.equal({ text: 'one edited' });
+      expect(app.entries.find(e => e.id === 1).text).to.equal('one edited');
+      expect(app.entries.find(e => e.id === 2).text).to.equal('two');
+      // The late save must not pull the screen back to entry 1.
+      expect(app.entry.id).to.equal(2);
+      await settle();
+      expect($et().textContent).to.equal('two');
     });
   });
 });
