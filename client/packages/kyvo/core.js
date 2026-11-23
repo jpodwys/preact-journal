@@ -92,30 +92,36 @@ const proto = {
 };
 
 // ---------------------------------------------------------------- renderer
+const setStyle = (st, k, v) => (k[0] == '-' ? st.setProperty(k, v == null ? '' : v) : (st[k] = v == null ? '' : v));
 function setAttr(dom, name, value, old, svg) {
   if (name == 'style') {
-    // Reset, then apply: handles string, object, and removed styles uniformly
-    // (all in one task, so there is no intermediate style recalculation).
-    const str = typeof value == 'string';
-    dom.style.cssText = str ? value : '';
-    if (!str) for (const k in value) dom.style[k] = value[k];
+    // A string, a missing style, or a switch between string and object starts from scratch (one cssText write, so no intermediate
+    // style recalculation). Between two objects only the keys that changed are written, and removed keys are cleared.
+    const str = typeof value == 'string', fresh = str || !value || !old || typeof old == 'string';
+    if (fresh) dom.style.cssText = str ? value : '';
+    else for (const k in old) if (!(k in value)) setStyle(dom.style, k, '');
+    if (!str && value) for (const k in value) if (fresh || value[k] !== old[k]) setStyle(dom.style, k, value[k]);
   } else if (name[0] == 'o' && name[1] == 'n') {
     const e = name.slice(2).toLowerCase();
+    // One stable listener per event name; the current handler lives in a table, so a new inline function on every render is a
+    // property write, not a removeEventListener + addEventListener.
     const l = dom._l || (dom._l = {});
-    if (old) dom.removeEventListener(e, l[e]);
-    if (value) dom.addEventListener(e, l[e] = value);
+    if (!(e in l)) dom.addEventListener(e, ev => l[e] && l[e](ev));
+    l[e] = value;
   } else if (name != 'children' && name != 'key' && name != 'ref') {
     // Property when the element has one (value, checked, disabled, href, ...), else attribute.
     const gone = value == null || value === false;
-    if (!svg && name in dom) dom[name] = gone ? '' : value;
+    if (!svg && name in dom && name != 'list' && name != 'form') dom[name] = gone ? '' : value;
     else if (!gone) dom.setAttribute(name, value === true ? '' : value);
     if (gone) dom.removeAttribute(name);
   }
 }
 
-function diffAttrs(dom, next, prev, svg) {
-  for (const k in prev) if (!(k in next)) setAttr(dom, k, null, prev[k], svg);
-  for (const k in next) if (next[k] !== prev[k]) setAttr(dom, k, next[k], prev[k], svg);
+// `value` and `checked` are applied after the children exist (a select needs its options) and after type/min/max (a range clamps).
+const late = k => +(k == 'value' || k == 'checked');
+function diffAttrs(dom, next, prev, svg, pass = 0) {
+  for (const k in prev) if (!(k in next) && late(k) == pass) setAttr(dom, k, null, prev[k], svg);
+  for (const k in next) if (next[k] !== prev[k] && late(k) == pass) setAttr(dom, k, next[k], prev[k], svg);
 }
 
 const rootDom = i => i._c ? rootDom(i._c) : i._dom;
@@ -144,6 +150,7 @@ function createDom(vnode, svg) {
     i._kids.push(k);
     dom.appendChild(rootDom(k));
   });
+  diffAttrs(dom, vnode.props, {}, s, 1);
   return i;
 }
 
@@ -199,6 +206,7 @@ function diffInternal(i, vnode, parent, before, svg) {
       if (o !== n) { if (o) o(null); if (n) refQueue.push(() => n(i._dom)); }
       diffAttrs(i._dom, vnode.props, old.props, s);
       diffChildren(i, vnode.props.children, s);
+      diffAttrs(i._dom, vnode.props, old.props, s, 1);
     }
     return i;
   }
@@ -209,20 +217,29 @@ function diffInternal(i, vnode, parent, before, svg) {
 }
 
 function diffChildren(i, kids, svg) {
-  const dom = i._dom, old = new Map(i._kids.map(o => [o._k, o])), next = [];
-  let prev;
+  const dom = i._dom, was = i._kids, next = [];
+  let prev, map, used;
   kids.forEach((v, j) => {
     const k = keyOf(v, j), before = prev ? prev.nextSibling : dom.firstChild;
-    const r = diffInternal(old.get(k), v, dom, before, svg), d = rootDom(r);
-    old.delete(k);
+    // Match by position first (the common case: nothing moved). The key map is built only on the first mismatch, and `used` holds
+    // the old children already taken, so a key can never match twice. Nothing is written onto the old nodes, so a render that
+    // throws midway cannot leave stale marks behind.
+    let o = was[j];
+    if (!(o && o._k === k && !(used && used.has(o)))) {   // not a positional hit: look the key up (map built on first need)
+      if (map || o) { map || (map = new Map(was.map(x => [x._k, x])), used = new Set(was.slice(0, j))); o = map.get(k); if (used.has(o)) o = 0; }
+      else o = 0;                                          // appending past the old end with no reorder: nothing to match
+    }
+    if (used && o) used.add(o);
+    const r = diffInternal(o, v, dom, before, svg), d = rootDom(r), at = prev ? prev.nextSibling : dom.firstChild;
     r._k = k;
-    // Only reposition nodes still attached here: `d` may have been replaced by the
-    // user (contenteditable) and `before` by the child's own re-render.
-    if (d !== before && d.parentNode === dom && (!before || before.parentNode === dom)) dom.insertBefore(d, before);
+    // Reposition only nodes still attached here (`d` may have been replaced by the user (contenteditable), and `at` by the child's
+    // own re-render). `at` is read after the child is diffed, so a node diffInternal just inserted in place is not inserted again.
+    // moveBefore keeps focus, selection and CSS animations that a remove + insert would reset.
+    if (d !== at && d.parentNode === dom && (!at || at.parentNode === dom)) dom.moveBefore ? dom.moveBefore(d, at) : dom.insertBefore(d, at);
     next.push(r);
     prev = d;
   });
-  for (const o of old.values()) remove(o, dom);
+  was.forEach((o, q) => (used ? !used.has(o) : q >= kids.length) && remove(o, dom));
   i._kids = next;
 }
 

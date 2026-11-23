@@ -1,6 +1,6 @@
 # kyvo
 
-A tiny UI framework (about 1.6 KB brotli) built on one idea: **brute force**. Any write to a store
+A tiny UI framework (about 1.8 KB brotli) built on one idea: **brute force**. Any write to a store
 schedules one re-render of the whole tree from the root on the next animation frame, and a small keyed
 vdom diff keeps that cheap. There are no subscriptions, no hooks, no dependency arrays, no context, and no
 per-component scheduling, because nothing needs to know *what* changed.
@@ -407,6 +407,11 @@ is not part of the repo; its row is kept as a baseline.
 (Against the Preact 8 build that was actually deployed, the served page was 12,041 B, so the real saving was 2,087 B, 17.3%.)
 Still one inlined `index.html` (single script, no `src`). With `mangleProps /^_/` (an experiment, not what ships)
 the three are 12,065 / 10,631 / ~9,910. Performance: the journal app re-renders in about 0.5 ms with 20,000 entries (VirtualScroll caps the rows).
+
+Since then the renderer took the ideas in `PREACT11-IDEAS.md` (handler table, per-key style diff, positional child matching,
+`moveBefore`, `value`/`checked` after children, `list`/`form` as attributes): `core.js` went from 1,447 to 1,660 B brotli
+(core + helpers 1,583 to 1,805 B; `node test/size.js`), in return for a faster idle render of large trees and fixes for
+`<select value>`, range inputs, CSS custom properties and `<input list>`.
 
 ### Real bugs the port found (several exist in the original app too)
 

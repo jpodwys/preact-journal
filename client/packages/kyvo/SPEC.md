@@ -132,6 +132,18 @@ null/false children as comment placeholders, prop removal between renders. A ren
 throws must not leave the framework wedged (mounts must still drain on the next render)
 and must drop that render's half-queued mounts.
 
+Details of the renderer (each is covered by `test/renderer.spec.js`; the reasoning and measurements are in `PREACT11-IDEAS.md`):
+- **Handlers.** One listener per event name per element, installed once; the current handler lives in a table on the element. A
+  new inline function on every render is a property write, not a remove + add. A handler set to `null` is a no-op.
+- **Style objects** are diffed per key (changed keys written, removed keys cleared); a string, a missing style, or a switch
+  between string and object starts from scratch. `--custom-properties` go through `setProperty`.
+- **Children** match their previous child by position first and by key on the first mismatch; no key map is built for a list
+  that did not reorder. A node that was just inserted in place is not inserted again. Repositioning uses `moveBefore` when the
+  browser has it (focus, selection and CSS animations survive), else `insertBefore`.
+- **`value` and `checked` are applied after the children** (and after the other attributes), so a `<select value>` finds its
+  options and a range input has its `min`/`max`.
+- **`list` and `form`** are set as attributes (their DOM properties are read-only).
+
 ## Helpers (userland, take `ctx`)
 - `listen(ctx, target, event, fn, opts?)`: adds the listener on mount, removes it on unmount
   (`opts` goes to both calls).
