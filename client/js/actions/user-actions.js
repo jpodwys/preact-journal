@@ -1,4 +1,4 @@
-import { get } from 'idb-keyval';
+import { get } from '../idb';
 import { clearData } from '../utils';
 import User from '../services/user-service';
 import { app, resetState } from '../app-state';
@@ -44,20 +44,23 @@ export function logout (){
     .then(() => logoutSuccess());
 };
 
+// After an account is removed or expires: switch to the first usable account, or start over at the sign-in route.
+function switchToNext (accounts, wipe){
+  const next = accounts.find(a => !a.expired);
+  if(next) switchAccount(String(next.id));
+  else {
+    if(wipe) clearData();
+    resetState();
+    route('/');
+  }
+};
+
 function logoutSuccess (){
   const userId = app.userId;
   const accounts = app.accounts.filter(a => String(a.id) !== userId);
   app.accounts = accounts;
   clearData(userId);
-
-  const valid = accounts.filter(a => !a.expired);
-  if(valid.length > 0) {
-    switchAccount(String(valid[0].id));
-  } else {
-    clearData();
-    resetState();
-    route('/');
-  }
+  switchToNext(accounts, 1);
 };
 
 export function switchAccount (userId) {
@@ -73,14 +76,7 @@ export function handleExpiredSession (userId) {
   const accounts = app.accounts.map(a =>
     String(a.id) === userId ? {...a, expired: true, active: false} : a
   );
-  const remaining = accounts.filter(a => !a.expired);
   app.accounts = accounts;
   clearData(userId);
-
-  if(remaining.length > 0) {
-    switchAccount(String(remaining[0].id));
-  } else {
-    resetState();
-    route('/');
-  }
+  switchToNext(accounts);
 };

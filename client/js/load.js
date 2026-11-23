@@ -1,4 +1,4 @@
-import { get } from 'idb-keyval';
+import { get } from './idb';
 import { app } from './app-state';
 import { boot } from './actions/entry-actions';
 

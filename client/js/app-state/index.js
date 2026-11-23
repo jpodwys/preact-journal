@@ -1,4 +1,4 @@
-import { set as idbSet } from 'idb-keyval';
+import { set as idbSet } from '../idb';
 import { store, watch } from '../../packages/kyvo/core';
 import { getViewFromPathname, applyFilters, clearData } from '../utils';
 

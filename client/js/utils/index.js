@@ -1,4 +1,4 @@
-import { clear, del } from 'idb-keyval';
+import { clear, del } from '../idb';
 
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
@@ -14,19 +14,10 @@ function sortObjectsByDate (list, sort = 'desc') {
 function filterObjectsByText (query, list) {
   if(!query) return list;
   query = query.toLowerCase();
-  return list.reduce((accumulator, obj) => {
-    var index = obj.text.toLowerCase().indexOf(query);
-    if(~index){
-      obj = {...obj};
-      index = Math.max(0, index - 40);
-      var ellipses = index ? '...' : '';
-      obj.previewText = ellipses + obj.text.substr(index);
-      accumulator.push(obj);
-    } else if(~obj.date.indexOf(query)) {
-      accumulator.push(obj);
-    }
-    return accumulator;
-  }, []);
+  return list.flatMap(obj => {
+    const i = obj.text.toLowerCase().indexOf(query), start = Math.max(0, i - 40);
+    return i < 0 ? obj.date.includes(query) ? obj : [] : { ...obj, previewText: (start ? '...' : '') + obj.text.substr(start) };
+  });
 };
 
 function applyFilters (view, query, filter, sort, list) {

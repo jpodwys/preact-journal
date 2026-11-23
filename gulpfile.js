@@ -31,6 +31,7 @@ function scripts() {
     jsxFactory: 'h',
     jsxFragment: 'Fragment',
     loader: { '.js': 'jsx' },
+    mangleProps: /^_/, // kyvo's internal fields (_dom, _kids, ...) become short names
     define: { __DEV__: 'false' }, // strips kyvo's dev-only checks from the production bundle
     target: browserslist('last 2 versions, not dead, not ie > 0')
       .filter(b => ['chrome', 'firefox', 'safari', 'edge', 'opera'].some(name => b.startsWith(name)))
@@ -73,7 +74,7 @@ function clean() {
 
 function compress() {
   return gulp.src('dist/bundle.js')
-    .pipe(gulpTerser())
+    .pipe(gulpTerser({ ecma: 2020, toplevel: true, compress: { passes: 3 } }))
     .pipe(gulp.dest('./dist'));
 }
 

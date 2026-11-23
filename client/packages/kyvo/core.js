@@ -27,7 +27,7 @@ function flush() {
     }
     if (!w) chain = 0;
   }
-  if (root) render(root[0], root[1]);
+  root && render(...root);
 }
 
 // ---------------------------------------------------------------- store

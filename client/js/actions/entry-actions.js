@@ -1,6 +1,6 @@
 import Entry from '../services/entry-service';
 import { findObjectIndexById } from '../utils';
-import { get, set as idbSet } from 'idb-keyval';
+import { get, set as idbSet } from '../idb';
 import exportAllEntries from '../export-entries';
 import { app, viewEntries } from '../app-state';
 import { route } from '../../components/router';
@@ -19,6 +19,13 @@ const markFresh = ids => {
   app.fresh = ids;
   freshTimer = setTimeout(() => { app.fresh = []; }, 450);
 };
+
+// Run `ok(userId, data)` when `request` resolves, with the user who made the request; a failure is ignored.
+const send = (request, ok) => {
+  const userId = app.userId;
+  request.then(data => ok(userId, data)).catch(() => {});
+};
+const dropSync = ({ needsSync, ...rest }) => rest;
 
 function updateIdbEntries (userId, updater) {
   get('entries_' + userId).then((entries = []) => {
@@ -68,15 +75,8 @@ export function getEntries (){
   if(app.timestamp){
     syncEntries();
   } else {
-    getAllEntries();
+    send(Entry.getAll(), getAllEntriesSuccess);
   }
-};
-
-function getAllEntries (){
-  const userId = app.userId;
-  Entry.getAll()
-    .then(data => getAllEntriesSuccess(userId, data))
-    .catch(() => {});
 };
 
 function getAllEntriesSuccess (userId, { timestamp, entries }){
@@ -107,10 +107,7 @@ function syncClientEntries (){
 
 // Get updates from the server
 function syncEntries (){
-  const userId = app.userId;
-  Entry.sync(app.timestamp)
-    .then(data => syncEntriesSuccess(userId, data))
-    .catch(() => {});
+  send(Entry.sync(app.timestamp), syncEntriesSuccess);
   syncClientEntries();
 };
 
@@ -188,16 +185,8 @@ export function createEntry ({ entry, clientSync }){
 
   const userId = app.userId;
   Entry.create({ date: entry.date, text: entry.text })
-    .then(data => createEntrySuccess(userId, entry.id, data.id))
-    .catch(() => createEntryFailure(entry.id));
-};
-
-function createEntrySuccess (userId, oldId, id){
-  applyEntryPatch(userId, oldId, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id }));
-};
-
-function createEntryFailure (oldId){
-  applyEntryPatch(undefined, oldId, ({ postPending, ...rest }) => rest);
+    .then(data => applyEntryPatch(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id })))
+    .catch(() => applyEntryPatch(undefined, entry.id, ({ postPending, ...rest }) => rest));
 };
 
 export function toggleFavorite ({ id, favorited }){
@@ -222,22 +211,10 @@ export function updateEntry ({ entry, property, entryId }){
   // for an entry the user has navigated away from must not pull it back).
   set({ entry: isActiveEntryId(entryId) ? {...next} : app.entry, entries: entries });
 
-  const userId = app.userId;
-  Entry.update(entryId, entry)
-    .then(() => updateEntrySuccess(userId, entryId))
-    .catch(() => {});
+  send(Entry.update(entryId, entry), userId => applyEntryPatch(userId, entryId, dropSync));
 };
 
-function updateEntrySuccess (userId, id){
-  applyEntryPatch(userId, id, ({ needsSync, ...rest }) => rest);
-};
-
-function putEntry ({ entry }){
-  const userId = app.userId;
-  Entry.update(entry.id, entry)
-    .then(() => updateEntrySuccess(userId, entry.id))
-    .catch(() => {});
-};
+const putEntry = ({ entry }) => send(Entry.update(entry.id, entry), userId => applyEntryPatch(userId, entry.id, dropSync));
 
 export function showConfirmDeleteEntryModal ({ entry }){
   set({ entry, dialogMode: 'modal:delete' });
@@ -255,23 +232,13 @@ export function deleteEntry ({ id }){
   set({ entry: undefined, entries: entries, dialogMode: '' });
   if(app.view !== '/entries') route('/entries', true);
 
-  const userId = app.userId;
-  Entry.del(id)
-    .then(() => deleteEntrySuccess(userId, id))
-    .catch(() => {});
-};
-
-function deleteEntrySuccess (userId, id){
-  applyEntryPatch(userId, id, () => null);
+  resendDelete({ id });
 };
 
 // Replay of an offline delete: the entry is already marked deleted, so only
 // the request is resent (no navigation, no change to the open entry/dialog).
 function resendDelete ({ id }){
-  const userId = app.userId;
-  Entry.del(id)
-    .then(() => deleteEntrySuccess(userId, id))
-    .catch(() => {});
+  send(Entry.del(id), userId => applyEntryPatch(userId, id, () => null));
 };
 
 export function setEntry ({ id }){
