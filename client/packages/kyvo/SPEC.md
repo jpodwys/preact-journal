@@ -137,9 +137,9 @@ Details of the renderer (each is covered by `test/renderer.spec.js`; the reasoni
   new inline function on every render is a property write, not a remove + add. A handler set to `null` is a no-op.
 - **Style objects** are diffed per key (changed keys written, removed keys cleared); a string, a missing style, or a switch
   between string and object starts from scratch. `--custom-properties` go through `setProperty`.
-- **Children** match their previous child by position first and by key on the first mismatch; no key map is built for a list
-  that did not reorder. A node that was just inserted in place is not inserted again. Repositioning uses `moveBefore` when the
-  browser has it (focus, selection and CSS animations survive), else `insertBefore`.
+- **Children** match their previous child by key (an unkeyed child's key is its position). A node that was just inserted in place is
+  not inserted again. Repositioning uses `moveBefore` when the browser has it (focus, selection and CSS animations survive), else
+  `insertBefore`. Dev builds throw on a duplicate key among one element's children (it would otherwise render an extra node).
 - **`value` and `checked` are applied after the children** (and after the other attributes), so a `<select value>` finds its
   options and a range input has its `min`/`max`.
 - **`list` and `form`** are set as attributes (their DOM properties are read-only).

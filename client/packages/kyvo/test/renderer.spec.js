@@ -1,9 +1,9 @@
 const { expect } = window.chai; // karma-chai global: a mangled bundle must not rewrite chai itself
 import { h, render } from '../core.js';
-import { mount, frame } from './core.spec.js';
+import { mount, frame, devOnly } from './core.spec.js';
 
-// Behaviours adopted from reading Preact 11's renderer (see PREACT11-IDEAS.md): handler table, per-key style diff, positional child
-// matching, moveBefore, value/checked after children, list/form as attributes.
+// Behaviours adopted from reading Preact 11's renderer (see PREACT11-IDEAS.md): handler table, per-key style diff, moveBefore,
+// value/checked after children, list/form as attributes. (Lazy positional child matching was tried and removed: +102 B for a 10-15% gain.)
 
 // Counts the DOM calls a render makes on `el`.
 const spy = (el, names) => {
@@ -148,11 +148,10 @@ describe('matching children by position and key', () => {
     expect(nodes(host)).to.deep.equal([b, a, c]);
   });
 
-  it('duplicate keys render every child without throwing', () => {
-    const host = mount(li([1, 1, 2]));
-    expect(text(host)).to.equal('1,1,2');
-    render(li([2, 1, 1]), host);
-    expect(text(host)).to.equal('2,1,1');
+  devOnly('dev: duplicate keys throw and name the key, on mount and on update', () => {
+    expect(() => mount(li([1, 1, 2]))).to.throw(/duplicate key "1"/);
+    const host = mount(li([1, 2]));
+    expect(() => render(li([2, 1, 1]), host)).to.throw(/duplicate key "1"/);
   });
 
   it('keyed and unkeyed children mixed through reorders, inserts and removals', () => {

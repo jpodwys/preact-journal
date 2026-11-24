@@ -408,10 +408,10 @@ is not part of the repo; its row is kept as a baseline.
 Still one inlined `index.html` (single script, no `src`). With `mangleProps /^_/` (an experiment, not what ships)
 the three are 12,065 / 10,631 / ~9,910. Performance: the journal app re-renders in about 0.5 ms with 20,000 entries (VirtualScroll caps the rows).
 
-Since then the renderer took the ideas in `PREACT11-IDEAS.md` (handler table, per-key style diff, positional child matching,
-`moveBefore`, `value`/`checked` after children, `list`/`form` as attributes): `core.js` went from 1,447 to 1,660 B brotli
-(core + helpers 1,583 to 1,805 B; `node test/size.js`), in return for a faster idle render of large trees and fixes for
-`<select value>`, range inputs, CSS custom properties and `<input list>`.
+Since then the renderer took the ideas in `PREACT11-IDEAS.md` (handler table, per-key style diff, `moveBefore`, `value`/`checked`
+after children, `list`/`form` as attributes): fixes for `<select value>`, range inputs, CSS custom properties, `<input list>` and
+focus on a moved row. (Lazy positional child matching was adopted, measured at a 10-15% gain on large plain lists, and removed
+again: +102 B for something virtualization and `memo` already cover.) Sizes are in `node test/size.js`.
 
 ### Real bugs the port found (several exist in the original app too)
 

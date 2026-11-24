@@ -1,9 +1,8 @@
 # Ideas from Preact 11's diff for kyvo's vdom
 
-Status: **ideas 1, 2, 3, 4a, 5 and 7 are applied to `core.js`** (24 new tests in `test/renderer.spec.js`; 145 tests pass in dev, 135 in the
-prod and mangled builds, where 10 dev-only tests are skipped by design). **Not applied:** idea 4b (longest increasing subsequence,
-+149 B, only for reorder-heavy lists) and idea 6 (rejected). Resulting size: `core.js` 1,447 → 1,660 B brotli (core + helpers
-1,583 → 1,805 B) by `node test/size.js`; the dashboard bundles grew 224 to 232 B. Every number below was measured on a copy of
+Status: **ideas 1, 2, 4a, 5 and 7 are applied to `core.js`. Idea 3 (lazy matching) was applied, measured, and then removed** (see its section) (24 new tests in `test/renderer.spec.js`; 145 tests pass in dev, 134 in the
+prod and mangled builds, where 11 dev-only tests are skipped by design). **Not applied:** idea 4b (longest increasing subsequence,
++149 B, only for reorder-heavy lists) and idea 6 (rejected). Resulting size after the lazy matching was removed: `core.js` 1,580 B brotli (core + helpers 1,713 B) by `node test/size.js`. Every number below was measured on a copy of
 kyvo's real `core.js`, one change at a time, with kyvo's own 121-test suite (as it was then) run against every variant. All 121
 passed for every variant.
 
@@ -24,7 +23,7 @@ Method and caveats:
 | # | Idea | Cost (brotli) | What it buys | Verdict |
 |---|---|---:|---|---|
 | 1 | Handlers in a per-element table behind one stable listener | **+1 B** | 2,000 `addEventListener` + 2,000 `removeEventListener` per idle render of 1,000 rows → **0 / 0** | adopt |
-| 3 | No `Map` per element per render (positional match first, map built lazily) | +102 B | 12,000-component idle render **13.4 → about 8 ms (−35 to −40%)**; also removes a redundant `insertBefore` for every newly created node | adopt |
+| 3 | No `Map` per element per render (positional match first, map built lazily) | +102 B | 12,000-component idle render **13.4 → about 8 ms (−35 to −40%)**; also removes a redundant `insertBefore` for every newly created node | ~~adopt~~ **removed later** (see section 3) |
 | 4a | `moveBefore` for repositioning (feature-detected) | about 0 B | a focused input in a moved row **keeps focus** (false → true); also preserves CSS animations, selection, iframes | adopt |
 | 5 | Apply `value` / `checked` after the children | +38 B | `<select value="b">` shows **b** (was a); `<input type=range value=150 max=200>` shows **150** (was 100) | adopt (correctness) |
 | 7 | `list` and `form` go through `setAttribute` | +8 B | `<input list="dl">` actually sets `list` (was silently dropped) | adopt (correctness) |
@@ -66,7 +65,12 @@ Risks: the proxy stays attached after a handler is set to `null` (it becomes a n
 element (use `e.currentTarget`; arrow functions never used it). Tests to add: a handler swapped across renders is called once with the
 latest function; a handler set to `null` stops being called; no add/remove calls when only the function identity changes.
 
-### 3. Lazy matching instead of a `Map` per element (adopt)
+### 3. Lazy matching instead of a `Map` per element (adopted, then removed)
+
+**Update:** removed again after the js-framework-benchmark run. It bought a 10-15% gain on large *plain* (unmemoized) lists and nothing with `memo`, at 4x
+CPU slowdown, or with a virtualized list (about 60 rows), for +102 B. It also did not help the benchmark's swap and remove cases, whose cost is the
+cursor moving every row after the change. The cursor recomputation (`at`, read after the child is diffed) and `moveBefore` stay. Back to a `Map`
+per element, plus a dev-only duplicate-key check. The rest of this section is the history.
 kyvo builds `new Map(i._kids.map(...))` for **every element's children on every render**, including elements whose children never
 reorder. Preact 11 instead looks for the old child at the expected position first and only searches on a mismatch (it adds a "skew"
 so a single insertion or removal does not make everything mismatch).

@@ -144,6 +144,7 @@ function createDom(vnode, svg) {
   const i = { _dom: dom, _vnode: vnode, _kids: [] };
   diffAttrs(dom, vnode.props, {}, s);
   if (vnode.props.ref) refQueue.push(() => vnode.props.ref(dom));
+  if (typeof __DEV__ === 'undefined' || __DEV__) checkKeys(vnode.props.children);
   vnode.props.children.forEach((c, j) => {
     const k = createDom(c, s);
     k._k = keyOf(c, j);
@@ -216,21 +217,24 @@ function diffInternal(i, vnode, parent, before, svg) {
   return fresh;
 }
 
+// Dev only: two children with one key cannot both be matched to a previous node, so the second would be created fresh every render.
+function checkKeys(kids) {
+  const seen = new Set();
+  kids.forEach((v, j) => {
+    const k = keyOf(v, j);
+    if (seen.has(k)) throw new Error(`duplicate key "${String(k)}" among one element's children; keys must be unique`);
+    seen.add(k);
+  });
+}
+
 function diffChildren(i, kids, svg) {
-  const dom = i._dom, was = i._kids, next = [];
-  let prev, map, used;
+  if (typeof __DEV__ === 'undefined' || __DEV__) checkKeys(kids);
+  const dom = i._dom, old = new Map(i._kids.map(o => [o._k, o])), next = [];
+  let prev;
   kids.forEach((v, j) => {
     const k = keyOf(v, j), before = prev ? prev.nextSibling : dom.firstChild;
-    // Match by position first (the common case: nothing moved). The key map is built only on the first mismatch, and `used` holds
-    // the old children already taken, so a key can never match twice. Nothing is written onto the old nodes, so a render that
-    // throws midway cannot leave stale marks behind.
-    let o = was[j];
-    if (!(o && o._k === k && !(used && used.has(o)))) {   // not a positional hit: look the key up (map built on first need)
-      if (map || o) { map || (map = new Map(was.map(x => [x._k, x])), used = new Set(was.slice(0, j))); o = map.get(k); if (used.has(o)) o = 0; }
-      else o = 0;                                          // appending past the old end with no reorder: nothing to match
-    }
-    if (used && o) used.add(o);
-    const r = diffInternal(o, v, dom, before, svg), d = rootDom(r), at = prev ? prev.nextSibling : dom.firstChild;
+    const r = diffInternal(old.get(k), v, dom, before, svg), d = rootDom(r), at = prev ? prev.nextSibling : dom.firstChild;
+    old.delete(k);
     r._k = k;
     // Reposition only nodes still attached here (`d` may have been replaced by the user (contenteditable), and `at` by the child's
     // own re-render). `at` is read after the child is diffed, so a node diffInternal just inserted in place is not inserted again.
@@ -239,7 +243,7 @@ function diffChildren(i, kids, svg) {
     next.push(r);
     prev = d;
   });
-  was.forEach((o, q) => (used ? !used.has(o) : q >= kids.length) && remove(o, dom));
+  for (const o of old.values()) remove(o, dom);
   i._kids = next;
 }
 
