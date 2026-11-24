@@ -28,7 +28,7 @@ example see the journal app in `client/`, and for a second, different app see `e
 ## Contents
 
 [Setup](#setup) · [Mental model](#mental-model) · [API](#api) · [Patterns](#patterns) · [Rules and footguns](#rules-and-footguns) ·
-[Dev vs production](#dev-vs-production) · [Types](#types) · [Testing](#testing) · [Not included](#not-included) · [Repository, tests and results](#repository-tests-and-results)
+[Dev vs production](#dev-vs-production) · [Types](#types) · [Testing](#testing) · [Not included](#not-included) · [Render optimization ideas](#render-optimization-ideas-we-tried) · [Repository, tests and results](#repository-tests-and-results)
 
 ## Setup
 
@@ -63,7 +63,7 @@ Leave `__DEV__` undefined while developing and tests run with all dev checks on.
 Consequences worth internalizing: reads need no subscription (any component can read any store by importing it);
 writes are synchronous but rendering never is (a write does not change the DOM until the next frame); and
 renders are cheap because the diff touches only what changed, but they are not free (see
-[`memo`](MEMO.md) for the escape hatch you can add).
+[`memo`](MEMO.md) for the escape hatch you can add, and [Render optimization ideas](#render-optimization-ideas-we-tried) for the rest).
 
 ## API
 
@@ -364,8 +364,33 @@ Mount into a detached `div`, drive it with real events, and assert on the DOM, t
 On purpose, in the spirit of "ignore problems we don't have": fragments and array returns, portals, context, suspense/hydration,
 error boundaries, synthetic events, `className`/`htmlFor` aliases, object refs, deep reactivity, read tracking,
 effect dependency arrays, an unsubscribe for `watch`, an exported `update()`, and attributes that are read-only DOM properties (`list`,
-`form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back. There is no
+`form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back, and
+[RENDER-IDEAS.md](RENDER-IDEAS.md) records the other render optimizations we built or considered. There is no
 server rendering story.
+
+## Render optimization ideas we tried
+
+None of these is in `core.js`; [RENDER-IDEAS.md](RENDER-IDEAS.md) has the full data, the patches, and how to re-implement each one that was built.
+They only matter once an app renders thousands of elements at once (about 1,000 plain rows on a fast desktop, about 300 on a phone-speed CPU).
+Virtualize first (about 60 rows), then `memo` the rows.
+
+| Idea | Status | Size | What it bought | Risk |
+|---|---|---:|---|---|
+| Hand-written `memo(C)` | built, removed; recipe in [MEMO.md](MEMO.md) | about +100 B | 1.0 to 4.7x on big lists of pure rows | stale UI if the component reads a store or `ctx.state` |
+| **Automatic memo** (record store reads, skip when props and reads are unchanged) | **built and measured, not adopted** | +232 B | matches hand memo with no app changes | stale UI if a component reads a non-prop, non-store value |
+| Component-level re-render for `ctx.state` | built and measured, not adopted | +110 B | 1 of 1,000 stateful rows: 4.4 to 0.1 ms; scroll work 4.3 to 1.5 ms | other components no longer refreshed by a local write |
+| Subscription tracking | **never built as one thing** (its two halves are the two rows above) | est. +300 to 450 B | O(changed) per update | unsubscribe, ordering, read-tracking hazard |
+| Kyvo rewritten on signals | prototype and journal port, not adopted | framework +20% | 2 to 3x less main-thread time on big stable grids | silent staleness without thunks |
+| Selector memo, build-time auto memo | designed only | est. +130 to 170 B | | missing selector entries; conservative analysis |
+
+**Automatic memo, the data.** Journalize: 388 of 388 unit tests pass (dev build), 383 of 386 prod (the 3 failures count calls of a probe component).
+kyvo's own suite: 130 of 134 prod, and all 4 failures assert brute-force re-running. Benchmark (js-framework-benchmark, median ms, geometric mean over
+9 operations): plain 49.5, hand memo 37.1, auto 39.1; no regression on create or replace. Dashboard, 12,000 tiles, work per frame: plain 38.7 ms
+(36 fps), hand memo 24.1 ms (50 fps), auto 19.7 ms (52 fps); at 4x slowdown 168.8, 100.7 and 82.9 ms. The journal gains nothing from any of
+them (its root render is about 0.5 ms).
+
+**To bring automatic memo back,** apply the patch in [RENDER-IDEAS.md](RENDER-IDEAS.md#how-to-put-it-back) to `core.js`, mark the components that
+read non-store data `Component.fresh = 1`, and change the handful of tests that assert brute-force re-running (the same section lists them).
 
 ## Repository, tests and results
 

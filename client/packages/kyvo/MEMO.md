@@ -1,5 +1,8 @@
 # Adding `memo` to this app (if you ever want it)
 
+> Looking for memo without writing it by hand? An automatic version (record store reads, skip when props and reads are unchanged) was built and
+> measured; see [RENDER-IDEAS.md](RENDER-IDEAS.md). The other render optimizations we tried or considered are there too.
+
 `memo` was built and measured, then removed because this app does not need it. This file is
 the complete recipe to put it back: three small edits to the framework, one edit to the app, the tests to
 add, and how to tell whether you need it at all. The steps below were applied to this tree, the suite was
