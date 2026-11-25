@@ -308,6 +308,44 @@ describe('entry', () => {
       expect($et().textContent).to.equal('first entry');
     });
 
+    it('keeps the same editor element, caret and typing when the first save swaps the client id for the server id', async () => {
+      mockCreateEntry({ id: 42 });
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
+      env = mountEntry({ view: '/new', entry, entries: [entry] });
+      const et = $et();
+
+      type($ed(), '2024-12-25');
+      type(et, 'first entry');
+      fireEvent.input(et);
+      clock.tick(500);                                   // the POST goes out
+
+      // The user keeps typing while it is in flight, with the caret after "first entry and".
+      type(et, 'first entry and more');
+      const range = document.createRange();
+      range.setStart(et.firstChild, 'first entry and'.length);
+      range.collapse(true);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      await settle();                                    // the response arrives: id 1000 becomes 42
+      expect(app.entry.id).to.equal(42);
+      expect($et(), 'the editor was not rebuilt').to.equal(et);
+      expect($et().textContent, 'what was typed meanwhile survives').to.equal('first entry and more');
+      expect(selection.anchorNode, 'the caret is still in the same text node').to.equal(et.firstChild);
+      expect(selection.anchorOffset, 'and at the same place').to.equal('first entry and'.length);
+    });
+
+    it('rebuilds the editor when the user moves to a different entry', async () => {
+      const a = { id: 1, date: '2024-01-01', text: 'a' }, b = { id: 2, date: '2024-01-02', text: 'b' };
+      env = mountEntry({ view: '/entry', entry: a, entries: [a, b], viewEntries: [a, b], entryIndex: 0 });
+      const first = $et();
+      app.entry = b;
+      await settle();
+      expect($et()).to.not.equal(first);
+      expect($et().textContent).to.equal('b');
+    });
+
     it('a pending save runs, and is not lost, when the entry unmounts', () => {
       mockUpdateEntry(5);
       const entry = { id: 5, date: '2024-01-01', text: 'original' };

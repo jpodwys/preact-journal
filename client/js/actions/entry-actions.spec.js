@@ -1,6 +1,7 @@
 import fetchMock from 'fetch-mock';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
 import { app, viewEntries } from '../app-state';
+import { handleRouteChange } from './global-actions';
 import {
   boot,
   getEntries,
@@ -898,20 +899,35 @@ describe('entryActions', () => {
     const fake = () => { clock = sinon.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }); };
     afterEach(() => { if(clock) clock.restore(); clock = null; });
 
-    it('newEntry marks only the new entry fresh, then clears it after 450ms', () => {
+    it('newEntry marks only the new entry fresh; the mark waits for the list, then clears 450ms after the list shows it', () => {
       fake();
       seed({ view: '/new', entries: [{ id: 0, date: '2000-01-01', text: 'old' }] });
       newEntry();
       expect(app.fresh).to.deep.equal([app.entry.id]);
+      clock.tick(60000);                     // however long the user spends writing, the row has not been on screen yet
+      expect(app.fresh).to.deep.equal([app.entry.id]);
+      handleRouteChange('/entries');         // back on the list
       clock.tick(449);
       expect(app.fresh.length).to.equal(1);
       clock.tick(1);
       expect(app.fresh).to.deep.equal([]);
     });
 
+    it('the first save swaps the client id for the server id and the mark follows it', async () => {
+      mockCreateEntry({ id: 777 });
+      seed({ view: '/new', entries: [] });
+      newEntry();
+      const clientId = app.entry.id;
+      expect(app.fresh).to.deep.equal([clientId]);
+      createEntry({ entry: { ...app.entry, text: 'hello' } });
+      await settleNetwork();
+      expect(app.entries[0].id).to.equal(777);
+      expect(app.fresh).to.deep.equal([777]);
+    });
+
     it('a second mark restarts the window: the first timer must not clear the second batch early', () => {
       fake();
-      seed({ view: '/new', entries: [] });
+      seed({ view: '/entries', entries: [] });
       newEntry();
       clock.tick(300);
       app.entry = undefined;
@@ -927,7 +943,7 @@ describe('entryActions', () => {
         entries: [ { id: 0, deleted: 1 }, { id: 1, date: '2018-01-01', text: 'updated' }, { id: 2, date: '2017-01-01', text: 'new a' }, { id: 3, date: '2016-01-01', text: 'new b' } ],
         timestamp: 4321
       });
-      seed({ timestamp: 1234, entries: [ { id: 0, date: '2019-01-01', text: 'x' }, { id: 1, date: '2015-01-01', text: 'y' } ] });
+      seed({ view: '/entries', timestamp: 1234, entries: [ { id: 0, date: '2019-01-01', text: 'x' }, { id: 1, date: '2015-01-01', text: 'y' } ] });
       getEntries();
       await settleNetwork();
       expect(app.fresh).to.deep.equal([2, 3]);

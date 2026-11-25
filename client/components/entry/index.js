@@ -35,9 +35,11 @@ export default (props, ctx) => {
   const upsert = debounced(ctx, slowUpsert, 500, entry ? String(entry.id) : '');
   // Local copy of the text: seeded when the entry changes and otherwise left
   // alone, so re-renders never touch what the user is typing.
-  const s = ctx.state({ id: undefined, date: '', text: '' });
+  const s = ctx.state({ ident: undefined, date: '', text: '' });
   if(!entry) return <h2 class="center-text fade-up">Looks like that doesn't exist!</h2>
-  if(s.id !== entry.id) Object.assign(s, { id: entry.id, date: entry.date, text: entry.text });
+  // /new is one entry per visit: its first save swaps the client id for the server id, and that must not rebuild the editor (caret, typing).
+  const ident = view === '/new' ? 'new' : entry.id;
+  if(s.ident !== ident) Object.assign(s, { ident, date: entry.date, text: entry.text });
 
   return (
     <div class="fade-up">
@@ -76,7 +78,7 @@ export default (props, ctx) => {
         class="entry-text"
         onInput={e => upsert(e, entry)}
         ref={focusIfNew}
-        key={'entry-' + entry.id}>
+        key={'entry-' + s.ident}>
         {s.text}
       </div>
     </div>

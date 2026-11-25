@@ -62,12 +62,24 @@ export const viewEntries = () => {
   return view;
 };
 
+// Rows that just appeared slide in once: the mark is cleared 450 ms after it is set AND a list is showing. A new entry is marked on /new,
+// long before the user is back on the list; a second mark restarts the window.
+let freshTimer;
+const settleFresh = () => {
+  clearTimeout(freshTimer);
+  if (app.fresh.length && (app.view === '/entries' || app.view === '/search')) freshTimer = setTimeout(() => { app.fresh = []; }, 450);
+};
+
 // Computed state plus persistence, in one place so no action can forget either.
 watch(app, (key, next, prev) => {
   switch (key) {
     case 'view':
       app.dialogMode = '';
       if (prev === '/search' && next === '/entries') Object.assign(app, { filter: '', filterText: '' });
+      settleFresh();
+      break;
+    case 'fresh':
+      settleFresh();
       break;
     case 'accounts':
       if (!resetting) localStorage.setItem('accounts', JSON.stringify(next));

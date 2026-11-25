@@ -13,12 +13,8 @@ const isActiveEntryId = id => app.entry?.id === id;
 
 // Rows that just appeared (a new entry, or one that arrived from the server) slide in once.
 // This is transient UI state: it is not stored on the entries, so it is never persisted.
-let freshTimer;
-const markFresh = ids => {
-  clearTimeout(freshTimer);          // a second mark restarts the window instead of being cut short by the first
-  app.fresh = ids;
-  freshTimer = setTimeout(() => { app.fresh = []; }, 450);
-};
+// The mark is cleared by app-state once a list has had the rows on screen for the animation.
+const markFresh = ids => { app.fresh = ids; };
 
 // Run `ok(userId, data)` when `request` resolves, with the user who made the request; a failure is ignored.
 const send = (request, ok) => {
@@ -185,7 +181,10 @@ export function createEntry ({ entry, clientSync }){
 
   const userId = app.userId;
   Entry.create({ date: entry.date, text: entry.text })
-    .then(data => applyEntryPatch(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id })))
+    .then(data => {
+      if(app.fresh.includes(entry.id)) app.fresh = app.fresh.map(f => f === entry.id ? data.id : f);   // the slide-in mark follows the id
+      applyEntryPatch(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id }));
+    })
     .catch(() => applyEntryPatch(undefined, entry.id, ({ postPending, ...rest }) => rest));
 };
 

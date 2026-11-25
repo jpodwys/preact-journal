@@ -104,6 +104,38 @@ describe('App — integration journeys', () => {
       });
     });
 
+    describe('a new entry slides in on the list', () => {
+      it('plays the slide-in when you return to the list, however long you were writing, then settles', async () => {
+        mockGetAllEntries({ entries: [] });
+        mockCreateEntry({ id: 12345 });
+        await bootApp();
+
+        fireEvent.click(env.host.querySelector('a[href="/entry/new"]'));
+        await settle();
+        const et = env.host.querySelector('#et');
+        et.innerText = 'first entry';
+        fireEvent.input(et);
+        await settle();
+        await tickDebounce();                         // longer than the 450 ms animation window
+        await settle();
+        await flush();
+        await settle();
+
+        await new Promise(r => {
+          window.addEventListener('popstate', () => r(), { once: true });
+          history.back();
+        });
+        await flush();
+        await settle();
+
+        const preview = () => env.queryByText('first entry').closest('.entry-preview');
+        expect(preview().classList.contains('fade-right'), 'slides in on return').to.be.true;
+        await flush(600);
+        await settle();
+        expect(preview().classList.contains('fade-right'), 'and the class is removed afterwards').to.be.false;
+      });
+    });
+
     describe('offline — write half', () => {
       it('persists the queued entry to IDB with needsSync after the POST fails', async () => {
         mockEntryApiOffline();
