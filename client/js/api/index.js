@@ -1,7 +1,7 @@
 import { handleExpiredSession } from '../actions/user-actions';
 import { app } from '../app-state';
 
-export default (url, config = {}, { skipAuth } = {}) => {
+export default (url, config = {}) => {
   var userId = app.userId;
   config.credentials = 'same-origin';
   config.headers = {
@@ -16,7 +16,7 @@ export default (url, config = {}, { skipAuth } = {}) => {
     if(res.status >= 300) throw res;
     if(res.status !== 204) return res.json();
   }).catch(err => {
-    if(!skipAuth && err.status === 401) handleExpiredSession(userId);
+    if(err.status === 401) handleExpiredSession(userId);
     throw err;
   });
 };

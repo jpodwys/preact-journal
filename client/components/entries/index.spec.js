@@ -43,6 +43,19 @@ describe('entries', () => {
     expect(env.host.querySelector('.highlight').textContent).to.equal('mid');
   });
 
+  it('animates only the rows whose id is in app.fresh, and drops the class when it is cleared', async () => {
+    env = mountEntries({
+      viewEntries: [{ id: 1, date: '2024-01-01', text: 'first' }, { id: 2, date: '2024-01-02', text: 'second' }],
+      fresh: [2]
+    });
+    const row = text => env.getByText(text).closest('.entry-preview');
+    expect(row('second').classList.contains('fade-right')).to.be.true;
+    expect(row('first').classList.contains('fade-right')).to.be.false;
+    app.fresh = [];
+    await settle();
+    expect(row('second').classList.contains('fade-right')).to.be.false;
+  });
+
   it('re-renders from the store: entries appearing replace the zero-state', async () => {
     env = mountEntries();
     app.entries = [{ id: 3, date: '2024-03-03', text: 'arrived' }];

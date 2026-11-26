@@ -29,8 +29,7 @@ export const initialState = () => {
     sort: 'desc',
     filter: '',
     filterText: '',
-    entryIndex: -1,
-    entry: undefined,
+    entryId: undefined,
     dialogMode: '',
     fresh: [],
     view: getViewFromPathname(location.pathname),
@@ -40,6 +39,7 @@ export const initialState = () => {
 };
 
 export const app = store(initialState());
+export const set = delta => Object.assign(app, delta);
 
 // Back to a freshly computed initial state (logout, expired session, tests).
 // A reset must not persist: assigning the blank `entries` would overwrite the
@@ -62,13 +62,17 @@ export const viewEntries = () => {
   return view;
 };
 
+// The entry on screen is stored as an id only. It is looked up in `entries`, not in the list being shown, so it stays
+// put when an edit or unfavoriting makes it drop out of a search or the favorites filter. Its position is the one in the
+// list being shown (the arrows step through that; a new entry is only in `entries`).
+export const selected = () => [
+  app.entries.find(e => e.id === app.entryId && !e.deleted),
+  (app.view === '/new' ? app.entries : viewEntries()).findIndex(e => e.id === app.entryId)
+];
+
 // Rows that just appeared slide in once: the mark is cleared 450 ms after it is set AND a list is showing. A new entry is marked on /new,
 // long before the user is back on the list; a second mark restarts the window.
 let freshTimer;
-const settleFresh = () => {
-  clearTimeout(freshTimer);
-  if (app.fresh.length && (app.view === '/entries' || app.view === '/search')) freshTimer = setTimeout(() => { app.fresh = []; }, 450);
-};
 
 // Computed state plus persistence, in one place so no action can forget either.
 watch(app, (key, next, prev) => {
@@ -76,10 +80,10 @@ watch(app, (key, next, prev) => {
     case 'view':
       app.dialogMode = '';
       if (prev === '/search' && next === '/entries') Object.assign(app, { filter: '', filterText: '' });
-      settleFresh();
-      break;
+      // falls through: a list coming into view starts the window
     case 'fresh':
-      settleFresh();
+      clearTimeout(freshTimer);
+      if (app.fresh.length && (app.view === '/entries' || app.view === '/search')) freshTimer = setTimeout(() => { app.fresh = []; }, 450);
       break;
     case 'accounts':
       if (!resetting) localStorage.setItem('accounts', JSON.stringify(next));

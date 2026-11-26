@@ -128,6 +128,11 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
       assert.equal(post.path, '/api/entry');
       assert.equal(post.body.text, 'brand new entry');
       assert.ok(s.api.some(a => a.method === 'GET' && a.path === '/api/entries/sync/1000'), 'boot synced from stored timestamp');
+      // Back on the list, the new row slides in once: it carries fade-right while the browser animates it, and the mark
+      // is cleared again after the animation window.
+      await s.evaluate(`history.back()`);
+      await s.waitFor(`location.pathname === '/entries' && !!document.querySelector('.entry-preview.fade-right')`, { label: 'new row slides in' });
+      await s.waitFor(`!document.querySelector('.fade-right')`, { label: 'slide-in mark cleared', timeout: 5000 });
       await sleep(300);
       assert.deepEqual(s.unmocked, [], 'no unmocked API calls');
       assertClean(s);
@@ -141,14 +146,22 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
       // sw.js is registered by client/js/index.js; wait for activation.
       const scope = await s.evaluate(`navigator.serviceWorker.ready.then(r => r.scope)`);
       assert.equal(scope, server.origin + '/');
+      // The worker's install re-fetches '/' right after the page loaded it. The ETag makes that second fetch a
+      // conditional request answered 304, so the page is not downloaded twice on a first visit.
+      await s.waitFor(`caches.open('preact-journal').then(c => c.keys()).then(k => k.length >= 2)`, { label: 'install precache done' });
+      const shell = server.requests.filter(r => r.method === 'GET' && r.path === '/').map(r => r.status);
+      assert.deepEqual(shell, [200, 304], 'first visit: the page once (200), the install-time fetch revalidated (304): ' + shell);
+      // Installability: Chrome needs a manifest icon whose purpose includes "any" (>= 144 px). A maskable-only
+      // manifest parses fine but reports manifest-missing-suitable-icon, and the browser offers no install.
+      const { installabilityErrors } = await s.page.send('Page.getInstallabilityErrors');
+      assert.deepEqual(installabilityErrors, [], 'page is installable: ' + JSON.stringify(installabilityErrors));
       // Second-load control rule: the first page load is NOT controlled (sw.js has no
       // clients.claim()), so reload once and require a controller.
       assert.equal(await s.evaluate(`!!navigator.serviceWorker.controller`), false, 'first load is uncontrolled (expected)');
       await s.reload();
       await s.waitFor(`!!navigator.serviceWorker.controller`, { label: 'page controlled after reload' });
-      // sw.js install does `cache.addAll([...])` without returning the promise, so
-      // "ready" does not guarantee the cache is filled yet; poll for it.
-      await s.waitFor(`caches.open('preact-journal').then(c => c.keys()).then(k => { const p = k.map(r => new URL(r.url).pathname); return p.includes('/') && p.includes('/version') ? p : false; })`, { label: 'SW cache filled' });
+      // Poll for the precache: the controlled render below depends on it.
+      await s.waitFor(`caches.open('preact-journal').then(c => c.keys()).then(k => { const p = k.map(r => new URL(r.url).pathname); return p.includes('/') && p.includes('/manifest.json') ? p : false; })`, { label: 'SW cache filled' });
 
       await seed(s, ENTRIES);
       await s.reload();

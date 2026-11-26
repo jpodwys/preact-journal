@@ -105,7 +105,7 @@ function setAttr(dom, name, value, old, svg) {
     const e = name.slice(2).toLowerCase();
     // One stable listener per event name; the current handler lives in a table, so a new inline function on every render is a
     // property write, not a removeEventListener + addEventListener.
-    const l = dom._l || (dom._l = {});
+    const l = dom._l ||= {};
     if (!(e in l)) dom.addEventListener(e, ev => l[e] && l[e](ev));
     l[e] = value;
   } else if (name != 'children' && name != 'key' && name != 'ref') {

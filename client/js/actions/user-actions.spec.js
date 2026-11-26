@@ -1,6 +1,6 @@
 import fetchMock from 'fetch-mock';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { app } from '../app-state';
+import { app, selected } from '../app-state';
 import { login, logout, switchAccount, handleExpiredSession } from './user-actions';
 import {
   mockGetAllEntries,
@@ -35,8 +35,8 @@ describe('userActions', () => {
       expect(app.userId).to.equal('1');
       expect(app.username).to.equal('bogus');
       expect(app.entries.map(e => e.id)).to.deep.equal([7]);
-      expect(app.entry).to.be.undefined;
-      expect(app.entryIndex).to.equal(-1);
+      expect(selected()[0]).to.be.undefined;
+      expect(selected()[1]).to.equal(-1);
       expect(app.filter).to.equal('');
       expect(app.filterText).to.equal('');
       // what the old `.set` callback did: fetch entries and route

@@ -4,20 +4,7 @@ const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
 function sortObjectsByDate (list, sort = 'desc') {
   if(!list) return [];
-  return list.sort((a, b) =>
-    sort === 'desc'
-      ? (a.date < b.date) - (a.date > b.date)
-      : (a.date > b.date) - (a.date < b.date)
-  );
-};
-
-function filterObjectsByText (query, list) {
-  if(!query) return list;
-  query = query.toLowerCase();
-  return list.flatMap(obj => {
-    const i = obj.text.toLowerCase().indexOf(query), start = Math.max(0, i - 40);
-    return i < 0 ? obj.date.includes(query) ? obj : [] : { ...obj, previewText: (start ? '...' : '') + obj.text.substr(start) };
-  });
+  return list.sort((a, b) => ((a.date < b.date) - (a.date > b.date)) * (sort === 'desc' ? 1 : -1));
 };
 
 function applyFilters (view, query, filter, sort, list) {
@@ -25,7 +12,12 @@ function applyFilters (view, query, filter, sort, list) {
   list = list.filter(entry => !entry.deleted);
   if(filter === 'favorites') list = list.filter(entry => entry.favorited);
   list = sortObjectsByDate(list, sort);
-  return filterObjectsByText(query, list);
+  if(!query) return list;
+  query = query.toLowerCase();
+  return list.flatMap(obj => {
+    const i = obj.text.toLowerCase().indexOf(query), start = Math.max(0, i - 40);
+    return i < 0 ? obj.date.includes(query) ? obj : [] : { ...obj, previewText: (start ? '...' : '') + obj.text.substr(start) };
+  });
 };
 
 function getViewFromPathname (href) {

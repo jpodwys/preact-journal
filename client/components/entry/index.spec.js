@@ -2,7 +2,7 @@ import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { mount, fireEvent, settle } from '../../../test/mount';
 import { mockUpdateEntry, mockCreateEntry, lastBody } from '../../../test/api-mocks';
-import { app } from '../../js/app-state';
+import { app, selected } from '../../js/app-state';
 import { handleRouteChange } from '../../js/actions/global-actions';
 import Router from '../router';
 import Entry from './index';
@@ -113,7 +113,7 @@ describe('entry', () => {
       fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
       await settle();
       expect(location.pathname).to.equal('/entry/3');
-      expect(app.entry.id).to.equal(3);
+      expect(selected()[0].id).to.equal(3);
       expect($et().textContent).to.equal('three');
       expect($ed().textContent).to.equal('2024-01-01');
 
@@ -148,9 +148,9 @@ describe('entry', () => {
       type(et, 'hello');
       fireEvent.input(et);
       clock.tick(500);
-      // The save wrote { text: 'hello' } into app.entry; the user kept typing
+      // The save wrote { text: 'hello' } into selected()[0]; the user kept typing
       // before the next frame rendered it.
-      expect(app.entry.text).to.equal('hello');
+      expect(selected()[0].text).to.equal('hello');
       type(et, 'hello wor');
       await settle();
       expect($et()).to.equal(et);
@@ -160,7 +160,7 @@ describe('entry', () => {
     it('a store write of a different entry id reseeds date and text', async () => {
       env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
       type($et(), 'stale typing');
-      app.entry = { id: 6, date: '2024-02-02', text: 'other entry' };
+      Object.assign(app, { entries: [{ id: 6, date: '2024-02-02', text: 'other entry' }], entryId: 6 });
       await settle();
       expect($et().textContent).to.equal('other entry');
       expect($ed().textContent).to.equal('2024-02-02');
@@ -168,7 +168,7 @@ describe('entry', () => {
 
     it('a store write of the same entry id with new text does not reseed', async () => {
       env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
-      app.entry = Object.assign({}, entry, { text: 'changed elsewhere' });
+      app.entries = [Object.assign({}, entry, { text: 'changed elsewhere' })];
       await settle();
       expect($et().textContent).to.equal('original');
     });
@@ -202,11 +202,8 @@ describe('entry', () => {
       });
       expect(document.activeElement).to.not.equal($et());
 
-      Object.assign(app, {
-        view: '/new',
-        entry: { id: 1000, date: '2024-12-25', text: '', newEntry: true },
-        entryIndex: -1
-      });
+      const blank = { id: 1000, date: '2024-12-25', text: '', newEntry: true };
+      Object.assign(app, { view: '/new', entries: [blank, ...app.entries], entryId: 1000 });
       await settle();
 
       expect(document.activeElement.id).to.equal('et');
@@ -249,7 +246,7 @@ describe('entry', () => {
       expect(fetchMock.calls('/api/entry/5').length).to.equal(1);
       expect(fetchMock.lastOptions('/api/entry/5').method).to.equal('PATCH');
       expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'edited text' });
-      expect(app.entry).to.include({ id: 5, text: 'edited text', needsSync: true });
+      expect(selected()[0]).to.include({ id: 5, text: 'edited text', needsSync: true });
       expect(app.entries[0].text).to.equal('edited text');
 
       await settle();
@@ -300,11 +297,11 @@ describe('entry', () => {
       expect(fetchMock.calls('/api/entry').length).to.equal(1);
       expect(fetchMock.lastOptions('/api/entry').method).to.equal('POST');
       expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'first entry' });
-      expect(app.entry).to.include({ id: 1000, text: 'first entry', postPending: true });
+      expect(selected()[0]).to.include({ id: 1000, text: 'first entry', postPending: true });
 
       await settle();
       expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' });
-      expect(app.entry.id).to.equal(42);
+      expect(selected()[0].id).to.equal(42);
       expect($et().textContent).to.equal('first entry');
     });
 
@@ -329,7 +326,7 @@ describe('entry', () => {
       selection.addRange(range);
 
       await settle();                                    // the response arrives: id 1000 becomes 42
-      expect(app.entry.id).to.equal(42);
+      expect(selected()[0].id).to.equal(42);
       expect($et(), 'the editor was not rebuilt').to.equal(et);
       expect($et().textContent, 'what was typed meanwhile survives').to.equal('first entry and more');
       expect(selection.anchorNode, 'the caret is still in the same text node').to.equal(et.firstChild);
@@ -340,7 +337,7 @@ describe('entry', () => {
       const a = { id: 1, date: '2024-01-01', text: 'a' }, b = { id: 2, date: '2024-01-02', text: 'b' };
       env = mountEntry({ view: '/entry', entry: a, entries: [a, b], viewEntries: [a, b], entryIndex: 0 });
       const first = $et();
-      app.entry = b;
+      app.entryId = b.id;
       await settle();
       expect($et()).to.not.equal(first);
       expect($et().textContent).to.equal('b');
@@ -384,7 +381,7 @@ describe('entry', () => {
 
       type($et(), 'one edited');
       fireEvent.input($et());
-      Object.assign(app, { entry: items[1], entryIndex: 1 });
+      app.entryId = items[1].id;
       await settle();
       type($et(), 'two edited');
       fireEvent.input($et());                       // entry 2 gets its own debounce; entry 1's is not replaced
@@ -405,7 +402,7 @@ describe('entry', () => {
 
       type($et(), 'one edited');
       fireEvent.input($et());
-      Object.assign(app, { entry: items[1], entryIndex: 1 });
+      app.entryId = items[1].id;
       await settle();
       expect($et().textContent).to.equal('two');
       clock.tick(500);
@@ -415,7 +412,7 @@ describe('entry', () => {
       expect(app.entries.find(e => e.id === 1).text).to.equal('one edited');
       expect(app.entries.find(e => e.id === 2).text).to.equal('two');
       // The late save must not pull the screen back to entry 1.
-      expect(app.entry.id).to.equal(2);
+      expect(selected()[0].id).to.equal(2);
       await settle();
       expect($et().textContent).to.equal('two');
     });

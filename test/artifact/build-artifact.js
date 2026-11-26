@@ -62,9 +62,11 @@ function build () {
     process.stderr.write(r.stdout + r.stderr);
     throw new Error('gulp build failed (exit ' + r.status + ')');
   }
-  for(const f of ['index.html', 'sw.js', 'csp-hash.json', 'version.json', 'manifest.json', 'styles.css']) {
+  for(const f of ['index.html', 'sw.js', 'csp-hash.json', 'manifest.json', 'styles.css']) {
     if(!fs.existsSync(path.join(DIST, f))) throw new Error('artifact is missing dist/' + f);
   }
+  // sw.js must differ on every deploy (the browser installs updates by byte-comparing it): the build stamps a timestamp into it.
+  if(!/const VERSION="\d{13}"/.test(fs.readFileSync(path.join(DIST, 'sw.js'), 'utf8'))) throw new Error('dist/sw.js was not stamped with a build version');
   return { ms, clientSrc, log: r.stdout };
 }
 

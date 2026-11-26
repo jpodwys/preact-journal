@@ -1,16 +1,15 @@
 import fetchMock from 'fetch-mock';
 import { get as idbGet, set as idbSet } from 'idb-keyval';
-import { app, viewEntries } from '../app-state';
+import { app, viewEntries, selected } from '../app-state';
 import { handleRouteChange } from './global-actions';
 import {
-  boot,
+  loadAccount,
   getEntries,
   resetDataFetched,
   createEntry,
   updateEntry,
   showConfirmDeleteEntryModal,
   deleteEntry,
-  setEntry,
   newEntry,
   filterByText,
   shiftEntry,
@@ -44,38 +43,35 @@ describe('entryActions', () => {
   // active account when the request went out) no longer matches the store.
   const switchToOtherUser = () => { app.userId = '2'; };
 
-  describe('boot', () => {
+  describe('loadAccount', () => {
 
-    it('should set entries as given; the view (not the store) puts them newest first', () => {
+    it('should set entries as stored; the view (not the store) puts them newest first', async () => {
       mockGetAllEntries();
-      const entries = [
+      await idbSet('entries_1', [
         { id: 1, date: '2017-01-01', text: 'a' },
         { id: 2, date: '2018-01-01', text: 'b' }
-      ];
-      boot({ entries });
+      ]);
+      await loadAccount('1');
       expect(ids(app.entries)).to.deep.equal([1, 2]);
       expect(ids(viewEntries())).to.deep.equal([2, 1]);
     });
 
     it('should fetch entries from the server after setting the cached ones', async () => {
       mockGetAllEntries({ entries: [{ id: 3, date: '2019-01-01', text: 'c' }], timestamp: 9 });
-      boot({ entries: [{ id: 1, date: '2017-01-01', text: 'a' }] });
+      await idbSet('entries_1', [{ id: 1, date: '2017-01-01', text: 'a' }]);
+      await loadAccount('1');
       await settleNetwork();
       expect(ids(app.entries)).to.have.members([1, 3]);
       expect(ids(viewEntries())).to.deep.equal([3, 1]);
       expect(app.timestamp).to.equal(9);
     });
 
-    it('should re-run the route handler when booting on /entry/:id', () => {
+    it('should write the extra state in the same update as the entries', async () => {
       mockGetAllEntries();
-      history.replaceState(null, null, '/entry/2');
-      seed({ view: '/entry' });
-      boot({ entries: [
-        { id: 1, date: '2017-01-01', text: 'a' },
-        { id: 2, date: '2018-01-01', text: 'b' }
-      ] });
-      expect(app.entry.id).to.equal(2);
-      expect(app.entryIndex).to.equal(0);
+      await idbSet('entries_1', [{ id: 1, date: '2017-01-01', text: 'a' }]);
+      await loadAccount('1', { filter: 'favorites' });
+      expect(app.filter).to.equal('favorites');
+      expect(ids(app.entries)).to.deep.equal([1]);
     });
 
   });
@@ -272,13 +268,13 @@ describe('entryActions', () => {
       ] });
       getEntries();
       expect(location.pathname).to.equal('/entry/1');
-      expect(app.entry).to.equal(open);
+      expect(selected()[0]).to.equal(open);
       expect(app.dialogMode).to.equal('menu');
 
       await settleNetwork();
       expect(fetchMock.called('/api/entry/2')).to.be.true;
       expect(ids(app.entries)).to.deep.equal([1]);
-      expect(app.entry).to.equal(open);
+      expect(selected()[0]).to.equal(open);
     });
 
     it('should replay a pending create without selecting it', async () => {
@@ -290,11 +286,11 @@ describe('entryActions', () => {
         { id: 0, date: '2017-01-01', text: 'offline', newEntry: true, needsSync: true }
       ] });
       getEntries();
-      expect(app.entry).to.equal(open);
+      expect(selected()[0]).to.equal(open);
       expect(app.entries[1].postPending).to.be.true;
 
       await settleNetwork();
-      expect(app.entry).to.equal(open);
+      expect(selected()[0]).to.equal(open);
       expect(ids(app.entries)).to.deep.equal([1, 3]);
     });
 
@@ -320,12 +316,12 @@ describe('entryActions', () => {
 
     it('should do nothing when entry is missing, or entry.id is missing or is not a number, or the provided id is not found', async () => {
       mockCreateEntry();
-      const before = { entry: app.entry, entries: app.entries };
+      const before = { entry: selected()[0], entries: app.entries };
       createEntry({});
       createEntry({ entry: {} });
       createEntry({ entry: { id: '0' } });
       createEntry({ entry: { id: 1 } });
-      expect(app.entry).to.equal(before.entry);
+      expect(selected()[0]).to.equal(before.entry);
       expect(app.entries).to.equal(before.entries);
       await settleNetwork();
       expect(fetchMock.called()).to.be.false;
@@ -336,7 +332,7 @@ describe('entryActions', () => {
       const pending = { ...blank(), text: 'more', postPending: true };
       createEntry({ entry: pending });
 
-      expect(app.entry).to.deep.equal(pending);
+      expect(selected()[0]).to.deep.equal(pending);
       expect(app.entries[0].postPending).to.be.true;
       expect(app.entries[0].text).to.equal('more');
       await settleNetwork();
@@ -349,7 +345,7 @@ describe('entryActions', () => {
       const entry = { ...blank(), text: 'hello' };
       createEntry({ entry });
 
-      expect(app.entry.postPending).to.be.true;
+      expect(selected()[0].postPending).to.be.true;
       expect(app.entries[0].postPending).to.be.true;
       expect(app.entries[0].text).to.equal('hello');
       // new: the caller's object is never mutated (the original set postPending on it)
@@ -357,10 +353,10 @@ describe('entryActions', () => {
 
       await settleNetwork();
       expect(lastBody('/api/entry')).to.deep.equal({ date: '2018-01-01', text: 'hello' });
-      expect(app.entry.id).to.equal(1);
-      expect(app.entry.postPending).to.be.undefined;
-      expect(app.entry.newEntry).to.be.undefined;
-      expect(app.entry.needsSync).to.be.undefined;
+      expect(selected()[0].id).to.equal(1);
+      expect(selected()[0].postPending).to.be.undefined;
+      expect(selected()[0].newEntry).to.be.undefined;
+      expect(selected()[0].needsSync).to.be.undefined;
       expect(app.entries[0].id).to.equal(1);
       expect(app.entries[0].postPending).to.be.undefined;
       expect(app.entries[0].newEntry).to.be.undefined;
@@ -373,15 +369,15 @@ describe('entryActions', () => {
       seed({ entry: pending });
       createEntry({ entry: pending, clientSync: true });
 
-      expect(app.entry.postPending).to.be.true;
+      expect(selected()[0].postPending).to.be.true;
       expect(app.entries[0].postPending).to.be.true;
 
       await settleNetwork();
       expect(fetchMock.called('/api/entry')).to.be.true;
-      expect(app.entry.id).to.equal(1);
-      expect(app.entry.postPending).to.be.undefined;
-      expect(app.entry.newEntry).to.be.undefined;
-      expect(app.entry.needsSync).to.be.undefined;
+      expect(selected()[0].id).to.equal(1);
+      expect(selected()[0].postPending).to.be.undefined;
+      expect(selected()[0].newEntry).to.be.undefined;
+      expect(selected()[0].needsSync).to.be.undefined;
       expect(app.entries[0].id).to.equal(1);
       expect(app.entries[0].postPending).to.be.undefined;
       expect(app.entries[0].newEntry).to.be.undefined;
@@ -394,24 +390,24 @@ describe('entryActions', () => {
       expect(app.entries[0].postPending).to.be.true;
 
       await settleNetwork();
-      expect(app.entry.id).to.equal(0);
-      expect(app.entry.postPending).to.be.undefined;
-      expect(app.entry.newEntry).to.be.true;
-      expect(app.entry.needsSync).to.be.true;
+      expect(selected()[0].id).to.equal(0);
+      expect(selected()[0].postPending).to.be.undefined;
+      expect(selected()[0].newEntry).to.be.true;
+      expect(selected()[0].needsSync).to.be.true;
       expect(app.entries[0].id).to.equal(0);
       expect(app.entries[0].postPending).to.be.undefined;
       expect(app.entries[0].newEntry).to.be.true;
       expect(app.entries[0].needsSync).to.be.true;
     });
 
-    it('should leave a non-active entry\'s app.entry alone when the POST succeeds', async () => {
+    it('should leave a non-active entry\'s selected()[0] alone when the POST succeeds', async () => {
       mockCreateEntry({ id: 1 });
       const other = { id: 50, date: '2010-01-01', text: 'other' };
       seed({ entry: other, entries: [blank(), other] });
       createEntry({ entry: blank(), clientSync: true });
       seed({ entry: other }); // user navigated elsewhere meanwhile
       await settleNetwork();
-      expect(app.entry).to.equal(other);
+      expect(selected()[0]).to.equal(other);
       expect(ids(app.entries)).to.deep.equal([1, 50]);
     });
 
@@ -462,7 +458,7 @@ describe('entryActions', () => {
     it('should do nothing when there was no change', async () => {
       mockUpdateEntry(0);
       const before = app.entries;
-      updateEntry({ entry: { date: app.entry.date }, property: 'date', entryId: 0 });
+      updateEntry({ entry: { date: selected()[0].date }, property: 'date', entryId: 0 });
       expect(app.entries).to.equal(before);
       await settleNetwork();
       expect(fetchMock.called()).to.be.false;
@@ -472,15 +468,15 @@ describe('entryActions', () => {
       mockUpdateEntry(0);
       updateEntry({ entry: { date: '2017-01-01' }, property: 'date', entryId: 0 });
 
-      expect(app.entry.date).to.equal('2017-01-01');
-      expect(app.entry.needsSync).to.be.true;
+      expect(selected()[0].date).to.equal('2017-01-01');
+      expect(selected()[0].needsSync).to.be.true;
       expect(app.entries[0].date).to.equal('2017-01-01');
       expect(app.entries[0].needsSync).to.be.true;
 
       await settleNetwork();
       expect(lastBody('/api/entry/0')).to.deep.equal({ date: '2017-01-01' });
-      expect(app.entry.date).to.equal('2017-01-01');
-      expect(app.entry.needsSync).to.be.undefined;
+      expect(selected()[0].date).to.equal('2017-01-01');
+      expect(selected()[0].needsSync).to.be.undefined;
       expect(app.entries[0].date).to.equal('2017-01-01');
       expect(app.entries[0].needsSync).to.be.undefined;
     });
@@ -489,15 +485,15 @@ describe('entryActions', () => {
       mockUpdateEntry(0);
       updateEntry({ entry: { text: 'b' }, property: 'text', entryId: 0 });
 
-      expect(app.entry.text).to.equal('b');
-      expect(app.entry.needsSync).to.be.true;
+      expect(selected()[0].text).to.equal('b');
+      expect(selected()[0].needsSync).to.be.true;
       expect(app.entries[0].text).to.equal('b');
       expect(app.entries[0].needsSync).to.be.true;
 
       await settleNetwork();
       expect(lastBody('/api/entry/0')).to.deep.equal({ text: 'b' });
-      expect(app.entry.text).to.equal('b');
-      expect(app.entry.needsSync).to.be.undefined;
+      expect(selected()[0].text).to.equal('b');
+      expect(selected()[0].needsSync).to.be.undefined;
       expect(app.entries[0].text).to.equal('b');
       expect(app.entries[0].needsSync).to.be.undefined;
     });
@@ -506,11 +502,11 @@ describe('entryActions', () => {
       mockUpdateEntry(0, { httpStatus: 500 });
       updateEntry({ entry: { text: 'b' }, property: 'text', entryId: 0 });
 
-      expect(app.entry.text).to.equal('b');
+      expect(selected()[0].text).to.equal('b');
       expect(app.entries[0].needsSync).to.be.true;
 
       await settleNetwork();
-      expect(app.entry.needsSync).to.be.true;
+      expect(selected()[0].needsSync).to.be.true;
       expect(app.entries[0].needsSync).to.be.true;
     });
 
@@ -548,10 +544,11 @@ describe('entryActions', () => {
 
   describe('showConfirmDeleteEntryModal', () => {
 
-    it('should set entry and dialogMode', () => {
+    it('should select the entry and set dialogMode', () => {
       const entry = { id: 4 };
+      seed({ entries: [entry] });
       showConfirmDeleteEntryModal({ entry });
-      expect(app.entry).to.equal(entry);
+      expect(selected()[0]).to.equal(entry);
       expect(app.dialogMode).to.equal('modal:delete');
     });
 
@@ -576,14 +573,14 @@ describe('entryActions', () => {
       const before = app.entries;
       deleteEntry({ id: 1 });
       expect(app.entries).to.equal(before);
-      expect(app.entry.id).to.equal(0);
+      expect(selected()[0].id).to.equal(0);
     });
 
     it('should clear entry, mark the entry deleted, route to /entries, and remove the entry when the network call succeeds', async () => {
       mockDeleteEntry(0);
       deleteEntry({ id: 0 });
 
-      expect(app.entry).to.be.undefined;
+      expect(selected()[0]).to.be.undefined;
       expect(app.dialogMode).to.equal('');
       expect(app.entries[0].needsSync).to.be.true;
       expect(app.entries[0].deleted).to.be.true;
@@ -613,7 +610,7 @@ describe('entryActions', () => {
       mockDeleteEntry(0, { httpStatus: 500 });
       deleteEntry({ id: 0 });
 
-      expect(app.entry).to.be.undefined;
+      expect(selected()[0]).to.be.undefined;
       expect(app.entries[0].deleted).to.be.true;
 
       await settleNetwork();
@@ -651,32 +648,36 @@ describe('entryActions', () => {
 
   });
 
-  describe('setEntry', () => {
+  describe('selected (the entry on screen is stored as an id)', () => {
 
-    it('should do nothing when there is no id, id is -1, or there are no entries', () => {
-      setEntry({ id: '1' }); // no entries yet
-      expect(app.entry).to.be.undefined;
+    it('should find nothing for an id that is not in the list, and the entry once it arrives', () => {
+      app.entryId = 1;   // a deep link before the entries are loaded
+      expect(selected()).to.deep.equal([undefined, -1]);
 
       seed({ entries: [{ id: 1, date: '2020-01-01', text: 'a' }] });
-      setEntry({});
-      setEntry({ id: -1 });
-      expect(app.entry).to.be.undefined;
-      expect(app.entryIndex).to.equal(-1);
+      expect(selected()[0]).to.equal(app.entries[0]);
+      expect(selected()[1]).to.equal(0);
     });
 
-    // A deleted entry is in app.entries but not in the view, which tells the two lists apart.
-    it('should find an entry in app.entries when view is /new (even one the view hides)', () => {
+    // The two lists order differently (the view is sorted by date), which tells them apart.
+    it('should index an entry in app.entries when view is /new', () => {
       seed({
         view: '/new',
-        entries: [ { id: 0, date: '2020-01-03', text: '', deleted: true }, { id: 1, date: '2020-01-02', text: '' } ]
+        entries: [ { id: 1, date: '2020-01-02', text: '' }, { id: 0, date: '2020-01-03', text: '' } ]
       });
-      expect(viewEntries().map(e => e.id)).to.deep.equal([1]);
-      setEntry({ id: '0' });
-      expect(app.entry).to.equal(app.entries[0]);
-      expect(app.entryIndex).to.equal(0);
+      expect(viewEntries().map(e => e.id)).to.deep.equal([0, 1]);
+      app.entryId = 0;
+      expect(selected()[0]).to.equal(app.entries[1]);
+      expect(selected()[1]).to.equal(1);
     });
 
-    it('should find an entry in viewEntries() when view is not /new (indexes are the view\'s)', () => {
+    it('should not select a deleted entry', () => {
+      seed({ view: '/entry', entries: [{ id: 0, date: '2020-01-03', text: '', deleted: true }] });
+      app.entryId = 0;
+      expect(selected()[0]).to.be.undefined;
+    });
+
+    it('should index an entry in viewEntries() when view is not /new (indexes are the view\'s)', () => {
       seed({
         view: '/entries',
         entries: [
@@ -685,9 +686,9 @@ describe('entryActions', () => {
           { id: 2, date: '2020-01-01', text: '' }
         ]
       });
-      setEntry({ id: '2' });
-      expect(app.entry).to.equal(viewEntries()[1]);
-      expect(app.entryIndex).to.equal(1);    // index 1 in the view, index 2 in app.entries
+      app.entryId = 2;
+      expect(selected()[0]).to.equal(viewEntries()[1]);
+      expect(selected()[1]).to.equal(1);    // index 1 in the view, index 2 in app.entries
     });
 
   });
@@ -699,7 +700,7 @@ describe('entryActions', () => {
       const start = Date.now();
 
       newEntry();
-      const entry = app.entry;
+      const entry = selected()[0];
       expect(entry.text).to.equal('');
       expect(entry.needsSync).to.be.true;
       expect(entry.newEntry).to.be.true;
@@ -710,7 +711,7 @@ describe('entryActions', () => {
       expect(app.entries[0]).to.equal(entry);
       expect(app.entries[1].id).to.equal(0);
       // what the old `.set` callback did
-      expect(app.entryIndex).to.equal(0);
+      expect(selected()[1]).to.equal(0);
     });
 
   });
@@ -803,22 +804,45 @@ describe('entryActions', () => {
 
       toggleFavorite({ id: 0, favorited: true });
 
-      expect(app.entry.favorited).to.be.true;
-      expect(app.entry.needsSync).to.be.true;
-      expect(app.entry.id).to.equal(0);
+      expect(selected()[0].favorited).to.be.true;
+      expect(selected()[0].needsSync).to.be.true;
+      expect(selected()[0].id).to.equal(0);
       expect(app.entries[0].favorited).to.be.true;
       await settleNetwork();
       expect(lastBody('/api/entry/0')).to.deep.equal({ favorited: true });
     });
 
+    // The entry on screen is looked up by id in entries, not in the filtered list, so leaving the list cannot unmount it.
+    it('keeps the entry on screen when unfavoriting it drops it out of the favorites filter', () => {
+      const entry = { id: 0, date: '2020-01-01', text: 'a', favorited: true };
+      seed({ view: '/entry', filter: 'favorites', entry, entries: [entry] });
+      expect(viewEntries().length).to.equal(1);
+
+      toggleFavorite({ id: 0, favorited: false });
+
+      expect(viewEntries().length).to.equal(0);
+      expect(selected()[0]).to.include({ id: 0, favorited: false });
+    });
+
+    it('keeps the entry on screen when an edit stops it matching the search text', () => {
+      const entry = { id: 0, date: '2020-01-01', text: 'beach day' };
+      seed({ view: '/entry', filterText: 'beach', entry, entries: [entry] });
+      expect(viewEntries().length).to.equal(1);
+
+      updateEntry({ entry: { text: 'mountain day' }, property: 'text', entryId: 0 });
+
+      expect(viewEntries().length).to.equal(0);
+      expect(selected()[0].text).to.equal('mountain day');
+    });
+
     // Changed: the original always copied the updated entry into state.entry;
     // now only the entry on screen is mirrored (favoriting from the list, or a
     // late save for an entry the user left, must not select it).
-    it('leaves app.entry alone when favoriting an entry that is not the active one', () => {
+    it('leaves selected()[0] alone when favoriting an entry that is not the active one', () => {
       const other = { id: 5, date: '2019-01-01', text: 'b' };
       seed({ entry: other, entries: [{ id: 0, date: '2020-01-01', text: 'a', favorited: false }, other] });
       toggleFavorite({ id: 0, favorited: true });
-      expect(app.entry).to.equal(other);
+      expect(selected()[0]).to.equal(other);
       expect(app.entries[0].favorited).to.be.true;
       expect(app.entries[0].needsSync).to.be.true;
     });
@@ -828,7 +852,7 @@ describe('entryActions', () => {
       const before = app.entries;
       toggleFavorite({ id: 99, favorited: true });
       expect(app.entries).to.equal(before);
-      expect(app.entry).to.be.undefined;
+      expect(selected()[0]).to.be.undefined;
     });
   });
 
@@ -903,9 +927,9 @@ describe('entryActions', () => {
       fake();
       seed({ view: '/new', entries: [{ id: 0, date: '2000-01-01', text: 'old' }] });
       newEntry();
-      expect(app.fresh).to.deep.equal([app.entry.id]);
+      expect(app.fresh).to.deep.equal([selected()[0].id]);
       clock.tick(60000);                     // however long the user spends writing, the row has not been on screen yet
-      expect(app.fresh).to.deep.equal([app.entry.id]);
+      expect(app.fresh).to.deep.equal([selected()[0].id]);
       handleRouteChange('/entries');         // back on the list
       clock.tick(449);
       expect(app.fresh.length).to.equal(1);
@@ -917,9 +941,9 @@ describe('entryActions', () => {
       mockCreateEntry({ id: 777 });
       seed({ view: '/new', entries: [] });
       newEntry();
-      const clientId = app.entry.id;
+      const clientId = selected()[0].id;
       expect(app.fresh).to.deep.equal([clientId]);
-      createEntry({ entry: { ...app.entry, text: 'hello' } });
+      createEntry({ entry: { ...selected()[0], text: 'hello' } });
       await settleNetwork();
       expect(app.entries[0].id).to.equal(777);
       expect(app.fresh).to.deep.equal([777]);
@@ -930,7 +954,7 @@ describe('entryActions', () => {
       seed({ view: '/entries', entries: [] });
       newEntry();
       clock.tick(300);
-      app.entry = undefined;
+      app.entryId = undefined;
       newEntry();
       clock.tick(300);                       // 600ms after the first mark, 300 after the second
       expect(app.fresh.length, 'second batch still animating').to.equal(1);

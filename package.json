@@ -16,11 +16,12 @@
     "test:prod": "node test/build-prod-tests.js && karma start test/karma.prod.conf.js --single-run",
     "test:boot": "BOOT_SCENARIO=in karma start test/karma.boot.conf.js --single-run && BOOT_SCENARIO=out karma start test/karma.boot.conf.js --single-run",
     "test:boot-prod": "node test/run-boot-prod.js",
+    "test:server": "node --test test/server/precompressed-static.spec.js",
     "test:artifact": "node test/run-artifact.js",
     "test:kyvo": "cd client/packages/kyvo/test && node build.js && karma start karma.conf.js && PROD=1 node build.js && karma start karma.conf.js && PROD=1 MANGLE=1 node build.js && karma start karma.conf.js",
     "test:examples": "cd client/packages/kyvo/examples/tasks && node build.js test && karma start karma.conf.js && PROD=1 node build.js test && karma start karma.conf.js",
     "test:types": "node client/packages/kyvo/types-test/run.js",
-    "test:all": "npm test && npm run test:prod && npm run test:boot && npm run test:boot-prod && npm run test:artifact && npm run test:kyvo && npm run test:examples"
+    "test:all": "npm test && npm run test:prod && npm run test:boot && npm run test:boot-prod && npm run test:server && npm run test:artifact && npm run test:kyvo && npm run test:examples"
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.28.6",

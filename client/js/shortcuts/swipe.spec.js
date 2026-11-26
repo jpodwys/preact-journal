@@ -47,7 +47,7 @@ describe('shortcuts: swipe', () => {
     resetState();
     history.replaceState(null, '', '/entry/2');
     Object.assign(app, { view: '/entry', entries });
-    app.entry = viewEntries()[1];
+    app.entryId = viewEntries()[1].id;
     // Control the clock the swipe duration is measured with.
     now = 1e6;
     sinon.stub(Date, 'now').callsFake(() => now);

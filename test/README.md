@@ -10,6 +10,7 @@ server or reads `.env`. `npm run test:all` runs all of it.
 | `npm run test:prod` | The same specs, minified with the shipped esbuild options (`__DEV__` false). |
 | `npm run test:boot` | The real entry point boots, logged in and logged out. |
 | `npm run test:boot-prod` | The same, from the minified entry. |
+| `npm run test:server` | `server/middleware/precompressed-static.js` on a real express app: content-hash ETags, `no-cache`, 304 handling, fall-through. Lives in `test/server/`. |
 | `npm run test:artifact` | The real `gulp build` output, served with the real CSP header and service worker. |
 | `npm run test:kyvo` | The framework's own specs (dev, minified, mangled). Lives in `client/packages/kyvo/test/`. |
 | `npm run test:examples` | The example app on kyvo (`client/packages/kyvo/examples/tasks`). |
@@ -82,7 +83,7 @@ and with the origin server stopped and CDP offline the shell and a deep link ren
 
 ## Not covered
 
-The real server and its cookies and sessions, the real `/api` behavior (all mocked at the network layer), gzip and HSTS headers,
+The real server as a whole (only the precompressed-static middleware has its own spec, `test/server/`; the catch-all route and `express.static` headers are checked by hand), its cookies and sessions, the real `/api` behavior (all mocked at the network layer), gzip and HSTS headers,
 visual/layout/CSS correctness (assertions are DOM text and roles; no screenshots), real touch gestures, any browser other than
 Chrome and any real device, performance (sizes and timings are reported, never asserted), and the service worker's
 update-on-new-version path.

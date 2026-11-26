@@ -19,7 +19,7 @@ const K = Symbol();
 const run = s => { const a = s.a; s.a = 0; if (a) s.f(...a); };
 
 export function debounced(ctx, fn, ms, key = '') {
-  const m = ctx[K] || (ctx[K] = {});
+  const m = ctx[K] ||= {};
   const s = m[key] || (m[key] = { g: (...a) => { s.a = a; clearTimeout(s.t); s.t = setTimeout(() => run(s), ms); } });
   s.f = fn;
   ctx.mount(() => () => { for (const k in m) { clearTimeout(m[k].t); run(m[k]); } });

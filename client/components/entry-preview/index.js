@@ -1,33 +1,19 @@
 import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { app } from '../../js/app-state';
 import { showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const getEntryText = (entry, filterText) => {
-  if(!entry.previewText){
-    return (
-      <div class="second-row">
-        {entry.text}
-      </div>
-    );
-  } else {
-    const preview = entry.previewText;
-    const text = entry.previewText.toLowerCase();
-    const query = filterText.toLowerCase();
-    const start = text.indexOf(query);
-    return (
-      <div class="second-row">
-        {preview.substr(0, start)}
-        <span class="highlight">{preview.substr(start, filterText.length)}</span>
-        {preview.substr(start + query.length)}
-      </div>
-    );
-  }
+  const { previewText: p, text } = entry, start = p && p.toLowerCase().indexOf(filterText.toLowerCase());
+  return (
+    <div class="second-row">
+      {p ? [p.substr(0, start), <span class="highlight">{p.substr(start, filterText.length)}</span>, p.substr(start + filterText.length)] : text}
+    </div>
+  );
 };
 
-export default ({ entry, filterText }) => {
+export default ({ entry, filterText, fresh }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-  const fadeRight = app.fresh.includes(entry.id) ? 'fade-right' : '';
+  const fadeRight = fresh ? 'fade-right' : '';
 
   return (
     <div class={`entry-preview ${fadeRight}`}>

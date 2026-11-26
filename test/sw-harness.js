@@ -31,7 +31,8 @@ export function createSwHarness () {
   };
 
   const fetchResponses = new Map();
-  const fetchSpy = sinon.spy((url) => {
+  const fetchSpy = sinon.spy((reqOrUrl) => {
+    const url = typeof reqOrUrl === 'string' ? reqOrUrl : reqOrUrl.url;
     if(!fetchResponses.has(url)){
       return Promise.reject(new Error('No fetch mock configured for ' + url));
     }
@@ -71,13 +72,4 @@ export function createSwHarness () {
       };
     }
   };
-}
-
-// update()'s inner `cache.match('/version').then(...)` chain isn't returned
-// from the outer .then, so awaiting waitUntil's promise can resolve before
-// the cache.put calls land. Drain a few ticks to let the chain settle.
-export async function flush (ticks = 6) {
-  for(let i = 0; i < ticks; i++){
-    await new Promise(r => setTimeout(r, 0));
-  }
 }

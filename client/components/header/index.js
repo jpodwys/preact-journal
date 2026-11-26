@@ -1,18 +1,13 @@
 import { h } from '../../packages/kyvo/core';
 import { debounced } from '../../packages/kyvo/helpers';
 import Icon from '../icon';
-import { app, viewEntries } from '../../js/app-state';
+import { app, viewEntries, selected } from '../../js/app-state';
 import { filterByText, clearFilters, showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const cancelAndBlur = e => {
 	e.preventDefault();
 	e.currentTarget.elements.fi.blur();
 }
-
-const getBackHref = (view, filter, filterText) => {
-	if(view === '/search') return '/entries';
-	return filter || filterText ? '/search' : '/entries';
-};
 
 const onBack = e => {
 	if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
@@ -21,14 +16,10 @@ const onBack = e => {
 	history.back();
 };
 
-const focusSearchInput = () => {
-	setTimeout(() => document.getElementById('fi').focus(), 200);
-};
-
 
 export default (props, ctx) => {
 	const search = debounced(ctx, e => filterByText(e.target.value), 100);
-	const { view, loggedIn, entry, filter, filterText } = app;
+	const { view, loggedIn, filter, filterText } = app, [entry] = selected();
 	if(!loggedIn || view === '/switch') return;
 	const entryCount = viewEntries().length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
@@ -45,7 +36,7 @@ export default (props, ctx) => {
 					}
 
 					{(view === '/search' || isEntry) &&
-						<a href={getBackHref(view, filter, filterText)} onclick={onBack} aria-label="Back">
+						<a href={view !== '/search' && (filter || filterText) ? '/search' : '/entries'} onclick={onBack} aria-label="Back">
 							<Icon icon="back" key="header-back" class="fade-up"/>
 						</a>
 					}
@@ -76,7 +67,7 @@ export default (props, ctx) => {
 				<div class="nav-set">
 					{view === '/entries' &&
 						<a href="/search" aria-label="Search">
-							<Icon icon="search" onclick={focusSearchInput} key="header-search" class="fade-down"/>
+							<Icon icon="search" onclick={() => setTimeout(() => document.getElementById('fi').focus(), 200)} key="header-search" class="fade-down"/>
 						</a>
 					}
 					{entry && !entry.newEntry && isEntry &&

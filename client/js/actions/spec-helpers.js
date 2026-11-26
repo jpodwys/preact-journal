@@ -45,8 +45,10 @@ export async function resetAll ({ accounts } = {}) {
 
 // Writes go through the real store (and its watchers). viewEntries is
 // computed from the others, so it is assigned last to make a seed stick.
+// `entry` is accepted as shorthand for its id, and must be in the entries (or viewEntries) seeded.
 export function seed (state) {
-  const { viewEntries, ...rest } = state;
+  const { viewEntries, entry, entryIndex, ...rest } = state;
+  if('entry' in state) rest.entryId = entry && entry.id;   // the entry on screen is stored as its id; the entry and its index are derived
   Object.assign(app, rest);
   if(viewEntries && !rest.entries) app.entries = viewEntries;   // viewEntries() is derived from entries
 }

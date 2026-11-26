@@ -26,9 +26,17 @@ export function mount (vnode, { state = {} } = {}) {
   resetState();
   // viewEntries() is derived from entries/view/filter/sort, so a spec that lists the rows to
   // show gives them as `entries` (unless it also gives entries).
-  const { viewEntries, ...rest } = state;
+  const { viewEntries, entry, entryIndex, ...rest } = state;
+  let list = rest.entries || viewEntries;
+  // The entry on screen is stored as its id, and found in the list. `entry` is shorthand for that: it goes into the
+  // list in place of the row with its id, or first when the list has none. (`entryIndex` is derived, so it is ignored.)
+  if(entry) {
+    list = list || [];
+    list = list.some(e => e.id === entry.id) ? list.map(e => e.id === entry.id ? entry : e) : [entry, ...list];
+  }
+  if('entry' in state) rest.entryId = entry ? entry.id : undefined;
+  if(list) rest.entries = list;
   Object.assign(app, rest);
-  if(viewEntries && !rest.entries) app.entries = viewEntries;
   const host = document.createElement('div');
   document.body.appendChild(host);
   const m = { vnode, host };

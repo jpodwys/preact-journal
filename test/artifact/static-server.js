@@ -2,16 +2,17 @@
 // (app.js + server/routes.js + server/middleware/{csp,precompressed-static}.js):
 //   - serves built files from dist/ ; brotli .br variant when the client sends
 //     `Accept-Encoding: br` and the file is html/js/css/json/svg/txt (as precompressed-static does)
-//   - GET /version -> {version} from the artifact's own dist/version.json
 //   - /api/* -> 404 (the browser-side interception answers these, never the server)
 //   - SPA catch-all -> index.html with the CSP header built from the ARTIFACT'S
 //     dist/csp-hash.json, exactly as server/middleware/csp.js does
-//   - Cache-Control: catch-all `public, max-age=2592000` (30d), static files `public, max-age=0`
+//   - Cache-Control: html `no-cache` plus a strong content-hash ETag answered with 304 (as precompressed-static.js does), icons
+//     (.png/.webp/.ico) `public, max-age=2592000` (30d), other static files `public, max-age=0`
 // NOT replicated: shrink-ray gzip, force-ssl/HSTS, cookies/JWT, helmet-style extras.
 // Deliberate difference: the real express.static would serve `/` -> index.html
 // WITHOUT a CSP when the client lacks `br`; here index.html always carries the CSP
 // (browsers always send br in production over https, so that is the shipped behaviour).
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const http = require('http');
 
@@ -62,16 +63,26 @@ function createServer (distDir, opts = {}) {
   const root = path.resolve(distDir);
   const hashes = opts.hashes || JSON.parse(fs.readFileSync(path.join(root, 'csp-hash.json'), 'utf8')).hashes || [];
   const csp = buildCsp(hashes);
-  const version = JSON.parse(fs.readFileSync(path.join(root, 'version.json'), 'utf8')).version;
   const requests = [];
 
-  function send (req, res, file, ext, extra = {}) {
+  function send (req, res, file, ext, extra = {}, rec = {}) {
     const accept = req.headers['accept-encoding'] || '';
     let src = file, enc = null;
     if(COMPRESSIBLE.has(ext) && /\bbr\b/.test(accept) && fs.existsSync(file + '.br')) { src = file + '.br'; enc = 'br'; }
     const headers = { 'Content-Type': TYPES[ext] || 'application/octet-stream', 'Content-Length': fs.statSync(src).size, ...extra };
     if(enc) { headers['Content-Encoding'] = 'br'; headers['Vary'] = 'Accept-Encoding'; }
-    if(ext === '.html') headers['Content-Security-Policy'] = csp;
+    if(ext === '.html') {
+      headers['Content-Security-Policy'] = csp;
+      headers['Cache-Control'] = 'no-cache';
+      headers['ETag'] = '"' + crypto.createHash('sha1').update(fs.readFileSync(src)).digest('base64url') + '"';
+      const sent = (req.headers['if-none-match'] || '').split(',').map(t => t.trim().replace(/^W\//, ''));
+      if(sent.includes(headers['ETag'])) {
+        rec.status = 304;
+        res.writeHead(304, { ETag: headers['ETag'], 'Cache-Control': 'no-cache', ...(enc ? { Vary: 'Accept-Encoding' } : {}) });
+        return res.end();
+      }
+    }
+    rec.status = 200;
     res.writeHead(200, headers);
     if(req.method === 'HEAD') return res.end();
     fs.createReadStream(src).pipe(res);
@@ -79,22 +90,18 @@ function createServer (distDir, opts = {}) {
 
   const server = http.createServer((req, res) => {
     const u = new URL(req.url, 'http://x');
-    requests.push({ method: req.method, path: u.pathname, acceptEncoding: req.headers['accept-encoding'] || '' });
+    const rec = { method: req.method, path: u.pathname, acceptEncoding: req.headers['accept-encoding'] || '' };
+    requests.push(rec);
     if(req.method !== 'GET' && req.method !== 'HEAD') { res.writeHead(404); return res.end(); }
-    if(u.pathname === '/version') {
-      const body = JSON.stringify({ version });
-      res.writeHead(200, { 'Content-Type': TYPES['.json'], 'Content-Length': Buffer.byteLength(body) });
-      return res.end(body);
-    }
     if(u.pathname.startsWith('/api/')) { res.writeHead(404); return res.end('Not Found'); }
     const rel = decodeURIComponent(u.pathname);
     const abs = path.resolve(root, '.' + rel);
     const ext = path.extname(abs).toLowerCase();
     if(rel !== '/' && abs.startsWith(root + path.sep) && fs.existsSync(abs) && fs.statSync(abs).isFile()) {
-      return send(req, res, abs, ext, { 'Cache-Control': 'public, max-age=0' });
+      return send(req, res, abs, ext, { 'Cache-Control': /\.(png|webp|ico)$/.test(abs) ? 'public, max-age=2592000' : 'public, max-age=0' }, rec);
     }
     // SPA catch-all (including '/')
-    send(req, res, path.join(root, 'index.html'), '.html', { 'Cache-Control': 'public, max-age=2592000' });
+    send(req, res, path.join(root, 'index.html'), '.html', {}, rec);
   });
 
   return new Promise(resolve => {

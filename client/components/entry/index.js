@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import { debounced } from '../../packages/kyvo/helpers';
 import Icon from '../icon';
-import { app, viewEntries } from '../../js/app-state';
+import { app, viewEntries, selected } from '../../js/app-state';
 import { createEntry, updateEntry, shiftEntry } from '../../js/actions/entry-actions';
 
 // A module-level (stable) ref runs only when the element is created, which is
@@ -29,7 +29,7 @@ const slowUpsert = (e, entry) => {
 };
 
 export default (props, ctx) => {
-  const { view, entry, entryIndex } = app;
+  const { view } = app, [entry, index] = selected();
   // One debounce per entry id: switching entries never replaces another entry's pending save,
   // and leaving the screen runs whatever is pending (debounced never drops a call).
   const upsert = debounced(ctx, slowUpsert, 500, entry ? String(entry.id) : '');
@@ -49,7 +49,7 @@ export default (props, ctx) => {
             icon="left"
             key={entry.id + '-left'}
             onclick={() => shiftEntry(-1)}
-            class={entryIndex > 0 ? 'dark-fill' : 'hidden'}
+            class={index > 0 ? 'dark-fill' : 'hidden'}
             role="button"
             aria-label="Previous entry"/>
         }
@@ -67,7 +67,7 @@ export default (props, ctx) => {
             icon="left"
             key={entry.id + '-right'}
             onclick={() => shiftEntry(1)}
-            class={entryIndex < (viewEntries().length - 1) ? 'dark-fill rotate180' : 'hidden'}
+            class={index < (viewEntries().length - 1) ? 'dark-fill rotate180' : 'hidden'}
             role="button"
             aria-label="Next entry"/>
         }

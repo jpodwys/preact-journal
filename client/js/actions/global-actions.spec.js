@@ -1,5 +1,5 @@
 import fetchMock from 'fetch-mock';
-import { app } from '../app-state';
+import { app, selected } from '../app-state';
 import { toggleDarkMode, handleRouteChange } from './global-actions';
 import { resetAll, seed, preserveLocation, ACCOUNT_1 } from './spec-helpers';
 
@@ -117,8 +117,8 @@ describe('globalActions', () => {
       expect(app.view).to.equal('/new');
       expect(app.entries.length).to.equal(2);
       expect(app.entries[0].newEntry).to.be.true;
-      expect(app.entry).to.equal(app.entries[0]);
-      expect(app.entryIndex).to.equal(0);
+      expect(selected()[0]).to.equal(app.entries[0]);
+      expect(selected()[1]).to.equal(0);
     });
 
     it('should not redirect on /switch while logged in', async () => {
@@ -141,8 +141,8 @@ describe('globalActions', () => {
       ];
       handleRouteChange('/entry/10');
       expect(app.view).to.equal('/entry');
-      expect(app.entry.id).to.equal(10);
-      expect(app.entryIndex).to.equal(1);
+      expect(selected()[0].id).to.equal(10);
+      expect(selected()[1]).to.equal(1);
     });
 
   });

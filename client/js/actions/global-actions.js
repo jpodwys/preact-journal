@@ -1,9 +1,8 @@
-import { app } from '../app-state';
+import { app, set } from '../app-state';
 import { getViewFromPathname } from '../utils';
 import { route } from '../../components/router';
-import { newEntry, setEntry } from './entry-actions';
+import { newEntry } from './entry-actions';
 
-const set = delta => Object.assign(app, delta);
 
 export function toggleDarkMode () {
   set({ dark: !app.dark, dialogMode: '' });
@@ -18,18 +17,14 @@ export function handleRouteChange (url) {
 
 function handleRoute (view, url) {
   switch(view) {
-    case '/':         handleLoginView();    break;
+    case '/':         if(app.loggedIn) route('/entries', true); break;
     case '/switch':   break;
     case '/entries':  // Fallthrough
     case '/search':   handleEntriesView();  break;
     case '/entry':    // Fallthrough
-    case '/new':      handleEntryView(url); break;
+    case '/new':      { const id = url.substr(url.lastIndexOf('/') + 1); if(id === 'new') newEntry(); else app.entryId = parseInt(id); } break;
     default:          route('/', true);     break;
   }
-};
-
-function handleLoginView () {
-  if(app.loggedIn) route('/entries', true);
 };
 
 // Leaving a blank, never-written new entry discards it.
@@ -38,8 +33,4 @@ function handleEntriesView () {
   if(kept.length < app.entries.length) app.entries = kept;
 };
 
-function handleEntryView (url) {
-  const id = url.substr(url.lastIndexOf('/') + 1);
-  if(id === 'new') newEntry();
-  else setEntry({ id });
-};
+

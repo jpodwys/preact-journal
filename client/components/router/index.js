@@ -30,11 +30,6 @@ const clickListener = e => {
   }
 };
 
-const popstateListener = () => {
-  notify(location.pathname);
-  nav.n++;
-};
-
 const route = (url, replace) => {
   notify(url);
   history[replace ? 'replaceState' : 'pushState'](null, null, url);
@@ -49,7 +44,7 @@ const matches = (path, url) => {
 
 function Router(props, ctx) {
   listen(ctx, document, 'click', clickListener);
-  listen(ctx, window, 'popstate', popstateListener);
+  listen(ctx, window, 'popstate', () => { notify(location.pathname); nav.n++; });
   ctx.mount(() => {
     LIVE = props;
     notify(location.pathname);

@@ -41,14 +41,8 @@ function scripts() {
 
 function sw() {
   return gulp.src('client/js/sw.js')
-    .pipe(replace('let version;', 'let version = ' + Date.now() + ';'))
+    .pipe(replace("const VERSION = '';", "const VERSION = '" + Date.now() + "';"))
     .pipe(gulpTerser())
-    .pipe(gulp.dest('./dist'));
-}
-
-function version() {
-  return gulp.src('client/js/version.json')
-    .pipe(replace('""', '"' + Date.now() + '"'))
     .pipe(gulp.dest('./dist'));
 }
 
@@ -64,7 +58,7 @@ function manifest() {
 
 function styles() {
   return gulp.src('client/css/styles.css')
-    .pipe(cleanCSS())
+    .pipe(cleanCSS({ level: 2 }))
     .pipe(gulp.dest('./dist'));
 }
 
@@ -72,9 +66,11 @@ function clean() {
   return del(['./dist']);
 }
 
+// `unsafe` and `unsafe_arrows` trade correctness guarantees for ~25 B brotli. If the minified
+// bundle misbehaves while dev/unit tests pass, remove them first. See README "Build notes".
 function compress() {
   return gulp.src('dist/bundle.js')
-    .pipe(gulpTerser({ ecma: 2020, toplevel: true, compress: { passes: 3 } }))
+    .pipe(gulpTerser({ ecma: 2020, toplevel: true, compress: { passes: 3, unsafe: true, unsafe_arrows: true } }))
     .pipe(gulp.dest('./dist'));
 }
 
@@ -124,7 +120,7 @@ function precompress(cb) {
 function build(cb) {
   return gulp.series(
     clean,
-    gulp.parallel(scripts, sw, version, manifest, images),
+    gulp.parallel(scripts, sw, manifest, images),
     gulp.parallel(styles, compress),
     inline,
     cspHash,

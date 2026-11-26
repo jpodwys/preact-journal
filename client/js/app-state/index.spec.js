@@ -1,7 +1,8 @@
 import fetchMock from 'fetch-mock';
 import { get, set, clear, keys } from 'idb-keyval';
-import { app, initialState, resetState, viewEntries } from './index';
+import { app, initialState, resetState, viewEntries, selected } from './index';
 import { loadEntries } from '../load';
+import { handleRouteChange } from '../actions/global-actions';
 import { resetDataFetched } from '../actions/entry-actions';
 import { saveAccounts } from '../../../test/accounts';
 import { devOnly } from '../../../test/mount';
@@ -49,8 +50,7 @@ describe('appState', () => {
         sort: 'desc',
         filter: '',
         filterText: '',
-        entryIndex: -1,
-        entry: undefined,
+        entryId: undefined,
         dialogMode: '',
         fresh: [],
         view: '/',
@@ -130,8 +130,8 @@ describe('appState', () => {
   describe('resetState()', () => {
     it('should reset the store to a freshly computed initial state', () => {
       Object.assign(app, {
-        sort: 'asc', filter: 'favorites', filterText: 'x', entryIndex: 3,
-        entry: { id: 1 }, entries: [{ id: 1, date: '2024-01-01', text: 'x' }], dialogMode: 'menu'
+        sort: 'asc', filter: 'favorites', filterText: 'x',
+        entryId: 1, entries: [{ id: 1, date: '2024-01-01', text: 'x' }], dialogMode: 'menu'
       });
       saveAccounts([{ id: 42, username: 'testuser', active: true }]);
       resetState();
@@ -212,7 +212,7 @@ describe('appState', () => {
     it('should not recompute on unrelated writes', () => {
       app.entries = entries;
       const before = viewEntries();
-      app.entryIndex = 1;
+      app.entryId = 1;
       app.dialogMode = 'menu';
       expect(viewEntries()).to.equal(before);   // memoized: the very same array
     });
@@ -388,6 +388,24 @@ describe('appState', () => {
       expect(app.entries).to.deep.equal([]);
       // boot ran: with no timestamp it fetches everything from the server
       expect(fetchMock.called('/api/entries')).to.be.true;
+    });
+
+    it('resolves a deep link to an entry once the cached entries are in', async () => {
+      const here = location.pathname;
+      try {
+        saveAccounts([{ id: 42, username: 'test', active: true }]);
+        await set('entries_42', [{ id: 1, date: '2017-01-01', text: 'a' }, { id: 2, date: '2018-01-01', text: 'b' }]);
+        history.replaceState(null, null, '/entry/2');
+        resetState();
+        handleRouteChange('/entry/2');   // the router does this on load, before the entries are in
+        expect(selected()[0]).to.be.undefined;
+        await loadEntries();
+        expect(app.view).to.equal('/entry');
+        expect(selected()[0].id).to.equal(2);
+        expect(selected()[1]).to.equal(0);
+      } finally {
+        history.replaceState(null, null, here);
+      }
     });
 
     it('does not boot when no account is active', async () => {

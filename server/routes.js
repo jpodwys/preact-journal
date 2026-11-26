@@ -4,8 +4,7 @@ var Sequelize = require('sequelize'),
   user = require('./middleware/userMW')(db, Sequelize),
   userHandlers = require('./middleware/user-handlers'),
   entry = require('./middleware/entryMW')(db, Sequelize),
-  applyCsp = require('./middleware/csp'),
-  version = require('../dist/version.json').version;
+  applyCsp = require('./middleware/csp');
 
 var loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -35,15 +34,14 @@ module.exports = app => {
   // app.get('/user-count', user.getUserCount);
   // app.get('/entry-count', entry.getEntryCount);
 
-  /* App version so ServiceWorker knows whether to refresh assets */
-  app.get('/version', (req, res) => res.send({ version }));
-
   /* 404 for unmatched API routes */
   app.all('/api/*', (req, res) => res.sendStatus(404));
 
   /* Catch-all view route */
   app.get('/*', (req, res) => {
     applyCsp(res);
-    res.sendFile('index.html', { root: './dist', maxAge: '30d' });
+    // Always revalidated (ETag, answered 304 when unchanged), like the precompressed copy of this same page.
+    // A max-age here would leave a client that cannot take brotli on a stale page for that long.
+    res.sendFile('index.html', { root: './dist', headers: { 'Cache-Control': 'no-cache' } });
   });
 }

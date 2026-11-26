@@ -2,7 +2,7 @@ import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { mount, fireEvent, settle } from '../../../test/mount';
 import { mockUpdateEntry, lastBody } from '../../../test/api-mocks';
-import { app } from '../../js/app-state';
+import { app, selected } from '../../js/app-state';
 import Header from './index';
 
 describe('header', () => {
@@ -131,7 +131,7 @@ describe('header', () => {
       env = mountHeader({ loggedIn: true, view: '/entry', entry, entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
       expect(app.dialogMode).to.equal('modal:delete');
-      expect(app.entry.id).to.equal(1);
+      expect(selected()[0].id).to.equal(1);
     });
 
     it('clicking the favorite icon unfavorites the entry and PATCHes the server', async () => {
@@ -139,7 +139,7 @@ describe('header', () => {
       env = mountHeader({ loggedIn: true, view: '/entry', entry, entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
 
-      expect(app.entry.favorited).to.equal(false);
+      expect(selected()[0].favorited).to.equal(false);
       expect(app.entries[0].favorited).to.equal(false);
       expect(fetchMock.called('/api/entry/1')).to.be.true;
       expect(lastBody('/api/entry/1')).to.deep.equal({ favorited: false });

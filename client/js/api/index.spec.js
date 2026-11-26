@@ -105,15 +105,6 @@ describe('api', () => {
     expect(location.pathname).to.equal('/entries');
   });
 
-  it('should not expire the session when skipAuth is true', async () => {
-    const accounts = [{ id: 42, username: 'test', active: true }];
-    activate(accounts);
-    await api('api-401', {}, { skipAuth: true }).catch(() => {});
-    expect(getAccounts()).to.deep.equal(accounts);
-    expect(app.loggedIn).to.be.true;
-    expect(location.pathname).to.equal('/entries');
-  });
-
   it('should re-throw the error after handling 401', async () => {
     activate([{ id: 42, username: 'test', active: true }]);
     const err = await api('api-401').then(() => null, e => e);

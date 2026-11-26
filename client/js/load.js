@@ -1,9 +1,9 @@
-import { get } from './idb';
 import { app } from './app-state';
-import { boot } from './actions/entry-actions';
+import { loadAccount } from './actions/entry-actions';
 
-// Reads the active user's cached entries from IndexedDB, then boots the action layer.
+// Boot: load the active account's cached entries, then fetch what the server has.
+// A deep link to an entry needs nothing more: the entry on screen is an id, and it resolves once the entries are in.
 export const loadEntries = () =>
   app.loggedIn
-    ? get('entries_' + app.userId).then((entries = []) => boot({ entries })).catch(() => {})
+    ? loadAccount(app.userId).catch(() => {})
     : Promise.resolve();

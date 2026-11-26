@@ -1,46 +1,25 @@
-import { get } from '../idb';
 import { clearData } from '../utils';
-import User from '../services/user-service';
+import xhr from '../api';
 import { app, resetState } from '../app-state';
 import { route } from '../../components/router';
-import { getEntries, resetDataFetched } from './entry-actions';
+import { loadAccount } from './entry-actions';
 
-const set = delta => Object.assign(app, delta);
 
 export function login (user){
-  User.login(user)
-    .then(loginSuccess);
+  xhr('/api/user/login', { method: 'POST', body: user })
+    .then(({ id, username }) => {
+      app.accounts = [...app.accounts.filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
+      activateAccount({ id, username }, { loggedIn: true });
+    });
 };
 
 function activateAccount ({ id, username }, extra) {
-  resetDataFetched();
-
-  get('entries_' + id).then((entries = []) => {
-    const timestamp = localStorage.getItem('timestamp_' + id) || undefined;
-
-    set({
-      userId: String(id),
-      username,
-      entries,
-      timestamp,
-      entry: undefined,
-      entryIndex: -1,
-      filter: '',
-      filterText: '',
-      ...extra
-    });
-    getEntries();
-    route('/entries', true);
-  });
+  loadAccount(id, { userId: String(id), username, entryId: undefined, filter: '', filterText: '', ...extra })
+    .then(() => route('/entries', true));
 }
 
-function loginSuccess ({ id, username }){
-  app.accounts = [...app.accounts.filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
-  activateAccount({ id, username }, { loggedIn: true });
-};
-
 export function logout (){
-  User.logout()
+  xhr('/api/user/logout', { method: 'POST' })
     .then(() => logoutSuccess());
 };
 

@@ -1,22 +1,12 @@
 import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { app } from '../../js/app-state';
+import { app, selected } from '../../js/app-state';
 import { route } from '../router';
 import { toggleDarkMode } from '../../js/actions/global-actions';
 import { deleteEntry, toggleSort, exportEntries } from '../../js/actions/entry-actions';
 import { logout, switchAccount } from '../../js/actions/user-actions';
 
 const closeDialog = () => { app.dialogMode = ''; };
-
-const onLogout = () => {
-  closeDialog();
-  setTimeout(() => { app.dialogMode = 'modal:logout'; });
-};
-
-const onAdd = () => {
-  closeDialog();
-  route('/switch');
-};
 
 const onSwitch = (userId) => {
   var other = app.accounts.find(a => String(a.id) !== String(userId));
@@ -26,8 +16,9 @@ const onSwitch = (userId) => {
 };
 
 export default () => {
-  const { dialogMode, dark, entry, view, sort, userId, username, accounts } = app;
+  const { dialogMode, dark, view, sort, userId, username, accounts } = app;
   if(!dialogMode) return;
+  const [entry] = selected();
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
@@ -57,12 +48,12 @@ export default () => {
               <Icon icon="people"/>
               <span>Switch</span>
             </li>
-          : <li onclick={onAdd}>
+          : <li onclick={() => { closeDialog(); route('/switch'); }}>
               <Icon icon="person-add"/>
               <span>Add</span>
             </li>
         }
-        <li onclick={onLogout}>
+        <li onclick={() => { closeDialog(); setTimeout(() => { app.dialogMode = 'modal:logout'; }); }}>
           <Icon icon="logout"/>
           <span>Logout</span>
         </li>

@@ -41,7 +41,7 @@ describe('shortcuts: arrow', () => {
   function viewEntry(id) {
     history.replaceState(null, '', '/entry/' + id);
     Object.assign(app, { view: '/entry', entries });
-    app.entry = viewEntries().find(e => e.id === id);
+    app.entryId = id;
   }
 
   // Installed the way App does it: a component calls shortcuts(ctx); unmounting removes the listeners.

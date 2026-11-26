@@ -43,10 +43,10 @@ re-run, so anything else it depends on silently goes stale:
 - It must not take `children` (new vnodes every render, so equality could never hold).
 - It should not depend on anything else that changes outside props (module variables, `Date.now()`, DOM reads).
 
-In this app `EntryPreview` is the one good candidate: it takes `entry` and `filterText` and reads nothing else
-(the share icon checks `navigator.share`, which never changes; the `slideIn` timer in its body only needs to run when
-its `entry` changes, and clearing `slideIn` replaces the entry object, so it does). Header, Entry, DialogWrapper,
-Search, Entries and Router all read the store, so they must NOT be memoized.
+In this app `EntryPreview` is the one good candidate: it takes `entry`, `filterText` and `fresh` and reads nothing else
+(the share icon checks `navigator.share`, which never changes; `fresh` is the slide-in flag, which `Entries`, the store-aware
+parent, computes from `app.fresh` and passes down). Header, Entry, DialogWrapper, Search, Entries and Router all read the
+store, so they must NOT be memoized.
 
 ## The three framework edits
 
@@ -108,8 +108,8 @@ import EntryPreview from '../entry-preview';
 
 const Row = memo(EntryPreview);
 
-const renderer = filterText => items =>
-  items.map(entry => <Row entry={entry} filterText={filterText}/>);
+const renderer = (filterText, fresh) => items =>
+  items.map(entry => <Row entry={entry} filterText={filterText} fresh={fresh.includes(entry.id)}/>);
 ```
 
 Rows stay keyed by `entry.id` inside `EntryPreview`'s own markup as before; the wrapper itself gets the `key`

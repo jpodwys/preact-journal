@@ -457,5 +457,5 @@ again: +102 B for something virtualization and `memo` already cover.) Sizes are 
   (the same journey fails on the code from before the audit).
 - A failed login shows the user nothing and leaves an unhandled promise rejection (pre-existing). The 401 worry is not reachable
   today: the server answers a bad password with 400 and rate limiting with 429, and only authenticated routes return 401; but
-  login passes no `skipAuth`, so a future 401 there would expire the active account.
+  no request opts out of 401 handling (the unused `skipAuth` option was removed), so a future 401 from login would expire the active account.
 - Not run: the app test layers against a mangled bundle; any manual click-through on a real device.

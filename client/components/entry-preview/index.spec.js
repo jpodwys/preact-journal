@@ -15,8 +15,8 @@ describe('entry-preview', () => {
     localStorage.clear();
   });
 
-  function mountPreview (entry, filterText = '', state = {}) {
-    return mount(h(EntryPreview, { entry, filterText }), { state });
+  function mountPreview (entry, filterText = '', props = {}, state = {}) {
+    return mount(h(EntryPreview, { entry, filterText, ...props }), { state });
   }
 
   describe('rendering', () => {
@@ -60,26 +60,22 @@ describe('entry-preview', () => {
   describe('slide-in animation', () => {
     const entry = { id: 1, date: '2024-01-01', text: 'incoming' };
 
-    it('applies fade-right to a row whose id is in app.fresh', () => {
-      env = mountPreview(entry, '', { entries: [entry], fresh: [1] });
+    it('applies fade-right when the list says the row is fresh', () => {
+      env = mountPreview(entry, '', { fresh: true });
       expect(env.host.querySelector('.fade-right'), 'fade-right class applied').to.exist;
     });
 
     it('does not animate a row that is not fresh', () => {
-      env = mountPreview(entry, '', { entries: [entry], fresh: [2] });
+      env = mountPreview(entry, '', { fresh: false });
       expect(env.host.querySelector('.fade-right')).to.not.exist;
-    });
-
-    it('drops the class when fresh is cleared', async () => {
-      env = mountPreview(entry, '', { entries: [entry], fresh: [1] });
-      app.fresh = [];
-      await settle();
+      env.cleanup();
+      env = mountPreview(entry);                                  // no prop at all
       expect(env.host.querySelector('.fade-right')).to.not.exist;
     });
 
     it('ignores a legacy slideIn flag left on a stored entry', () => {
       const legacy = { ...entry, slideIn: true };
-      env = mountPreview(legacy, '', { entries: [legacy], fresh: [] });
+      env = mountPreview(legacy);
       expect(env.host.querySelector('.fade-right')).to.not.exist;
     });
   });
@@ -116,13 +112,13 @@ describe('entry-preview', () => {
       env = mountPreview(entry);
       fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
       expect(app.dialogMode).to.equal('modal:delete');
-      expect(app.entry).to.equal(entry);
+      expect(app.entryId).to.equal(9);
     });
 
     it('toggles favorited in the store and PATCHes the inverted value when the favorite icon is clicked', async () => {
       mockUpdateEntry(9);
       const entry = { id: 9, date: 'd', text: 't', favorited: true };
-      env = mountPreview(entry, '', { entries: [entry] });
+      env = mountPreview(entry, '', {}, { entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
       expect(app.entries[0].favorited).to.be.false;
       expect(lastBody('/api/entry/9')).to.deep.equal({ favorited: false });

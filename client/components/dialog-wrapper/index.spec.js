@@ -3,7 +3,7 @@ import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
 import { mount, fireEvent, settle } from '../../../test/mount';
 import { mockGetAllEntries, mockDeleteEntry, mockLogout } from '../../../test/api-mocks';
-import { app } from '../../js/app-state';
+import { app, selected } from '../../js/app-state';
 import { resetDataFetched } from '../../js/actions/entry-actions';
 import DialogWrapper from './index';
 
@@ -290,7 +290,7 @@ describe('dialog-wrapper', () => {
 
       expect(fetchMock.called('/api/entry/5')).to.be.true;
       expect(fetchMock.lastOptions('/api/entry/5').method).to.equal('DELETE');
-      expect(app.entry).to.be.undefined;
+      expect(selected()[0]).to.be.undefined;
       expect(app.entries[0]).to.include({ id: 5, deleted: true, needsSync: true });
       expect(location.pathname).to.equal('/entries');
       expect(env.queryByText('Delete this entry?')).to.be.null;
