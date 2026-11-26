@@ -10,14 +10,14 @@ export function toggleDarkMode () {
 
 export function handleRouteChange (url) {
   const view = getViewFromPathname(url);
-  if(view !== '/' && !app.loggedIn) return route('/', true);
+  if(view !== '/' && !app.userId) return route('/', true);
   if(view !== app.view) app.view = view;
   handleRoute(view, url);
 };
 
 function handleRoute (view, url) {
   switch(view) {
-    case '/':         if(app.loggedIn) route('/entries', true); break;
+    case '/':         if(app.userId) route('/entries', true); break;
     case '/switch':   break;
     case '/entries':  // Fallthrough
     case '/search':   handleEntriesView();  break;

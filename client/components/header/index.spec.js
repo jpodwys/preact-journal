@@ -18,7 +18,7 @@ describe('header', () => {
   }
 
   const SEARCH_VIEW_DEFAULTS = {
-    loggedIn: true,
+    userId: '1',
     view: '/search',
     viewEntries: [],
     filter: '',
@@ -27,18 +27,18 @@ describe('header', () => {
 
   describe('hidden', () => {
     it('renders nothing when not logged in', () => {
-      env = mountHeader({ loggedIn: false, view: '/entries' });
+      env = mountHeader({ userId: '', view: '/entries' });
       expect(env.queryByRole('banner')).to.not.exist;
     });
 
     it('renders nothing on /switch even when logged in', () => {
-      env = mountHeader({ loggedIn: true, view: '/switch' });
+      env = mountHeader({ userId: '1', view: '/switch' });
       expect(env.queryByRole('banner')).to.not.exist;
     });
 
     it('appears once the store says the user is logged in', async () => {
-      env = mountHeader({ loggedIn: false, view: '/entries' });
-      app.loggedIn = true;
+      env = mountHeader({ userId: '', view: '/entries' });
+      app.userId = '1';
       await settle();
       expect(env.getByRole('banner')).to.exist;
     });
@@ -47,7 +47,7 @@ describe('header', () => {
   describe('on /entries', () => {
     it('shows the entry count, the search link, and the FAB add button', () => {
       env = mountHeader({
-        loggedIn: true,
+        userId: '1',
         view: '/entries',
         viewEntries: [{}, {}, {}]
       });
@@ -59,12 +59,12 @@ describe('header', () => {
     });
 
     it('does not show a back link', () => {
-      env = mountHeader({ loggedIn: true, view: '/entries', viewEntries: [] });
+      env = mountHeader({ userId: '1', view: '/entries', viewEntries: [] });
       expect(env.queryByRole('link', { name: 'Back' })).to.not.exist;
     });
 
     it('updates the count when entries are written to the store', async () => {
-      env = mountHeader({ loggedIn: true, view: '/entries' });
+      env = mountHeader({ userId: '1', view: '/entries' });
       expect(env.getByText('0 Entries')).to.exist;
       // viewEntries is computed by the app-state watcher from entries.
       app.entries = [{ id: 1, date: '2024-01-02', text: 'a' }, { id: 2, date: '2024-01-01', text: 'b' }];
@@ -73,7 +73,7 @@ describe('header', () => {
     });
 
     it('clicking the menu icon opens the menu dialog', () => {
-      env = mountHeader({ loggedIn: true, view: '/entries' });
+      env = mountHeader({ userId: '1', view: '/entries' });
       fireEvent.click(env.getByRole('button', { name: 'Menu' }));
       expect(app.dialogMode).to.equal('menu');
     });
@@ -82,7 +82,7 @@ describe('header', () => {
   describe('on /search', () => {
     it('renders the search form with input, count and clear control', () => {
       env = mountHeader({
-        loggedIn: true,
+        userId: '1',
         view: '/search',
         entries: [{ id: 1, date: '2024-01-01', text: 'foo one' }, { id: 2, date: '2024-01-02', text: 'foo two' }],
         filter: '',
@@ -111,7 +111,7 @@ describe('header', () => {
     const entry = { id: 1, text: 'hello', date: '2024-01-01', favorited: true };
 
     it('shows back, delete and a filled favorite icon, and no FAB', () => {
-      env = mountHeader({ loggedIn: true, view: '/entry', entry });
+      env = mountHeader({ userId: '1', view: '/entry', entry });
       expect(env.getByRole('link', { name: 'Back' })).to.exist;
       expect(env.getByRole('button', { name: 'Delete entry' })).to.exist;
       expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-filled');
@@ -120,7 +120,7 @@ describe('header', () => {
 
     it('shows star-empty when the entry is not favorited', () => {
       env = mountHeader({
-        loggedIn: true,
+        userId: '1',
         view: '/entry',
         entry: Object.assign({}, entry, { favorited: false })
       });
@@ -128,7 +128,7 @@ describe('header', () => {
     });
 
     it('clicking delete opens the delete-confirm modal for this entry', () => {
-      env = mountHeader({ loggedIn: true, view: '/entry', entry, entries: [entry] });
+      env = mountHeader({ userId: '1', view: '/entry', entry, entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
       expect(app.dialogMode).to.equal('modal:delete');
       expect(selected()[0].id).to.equal(1);
@@ -136,7 +136,7 @@ describe('header', () => {
 
     it('clicking the favorite icon unfavorites the entry and PATCHes the server', async () => {
       mockUpdateEntry(1);
-      env = mountHeader({ loggedIn: true, view: '/entry', entry, entries: [entry] });
+      env = mountHeader({ userId: '1', view: '/entry', entry, entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
 
       expect(selected()[0].favorited).to.equal(false);
@@ -152,7 +152,7 @@ describe('header', () => {
   describe('on /new with a brand-new entry', () => {
     it('does not show delete or favorite icons', () => {
       env = mountHeader({
-        loggedIn: true,
+        userId: '1',
         view: '/new',
         entry: { newEntry: true }
       });
@@ -166,29 +166,29 @@ describe('header', () => {
     const baseEntry = { id: 1, text: 'hello', date: '2024-01-01' };
 
     it('back link href is /entries on /entry with no filter or search text', () => {
-      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+      env = mountHeader({ userId: '1', view: '/entry', entry: baseEntry });
       expect(env.getByRole('link', { name: 'Back' }).getAttribute('href')).to.equal('/entries');
     });
 
     it('back link href is /search when filter is active on /entry', () => {
-      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry, filter: 'favorites' });
+      env = mountHeader({ userId: '1', view: '/entry', entry: baseEntry, filter: 'favorites' });
       expect(env.getByRole('link', { name: 'Back' }).getAttribute('href')).to.equal('/search');
     });
 
     it('back link href is /search when filterText is set on /entry', () => {
-      env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry, filterText: 'beach' });
+      env = mountHeader({ userId: '1', view: '/entry', entry: baseEntry, filterText: 'beach' });
       expect(env.getByRole('link', { name: 'Back' }).getAttribute('href')).to.equal('/search');
     });
 
     it('back link href is always /entries on /search regardless of filter', () => {
-      env = mountHeader({ loggedIn: true, view: '/search', filter: 'favorites', filterText: 'x' });
+      env = mountHeader({ userId: '1', view: '/search', filter: 'favorites', filterText: 'x' });
       expect(env.getByRole('link', { name: 'Back' }).getAttribute('href')).to.equal('/entries');
     });
 
     it('plain click calls history.back() and preventsDefault on the navigation', () => {
       const backStub = sinon.stub(history, 'back');
       try {
-        env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+        env = mountHeader({ userId: '1', view: '/entry', entry: baseEntry });
         const event = fireEvent.click(env.getByRole('link', { name: 'Back' }));
         expect(backStub.calledOnce).to.be.true;
         expect(event.defaultPrevented).to.be.true;
@@ -200,7 +200,7 @@ describe('header', () => {
     it('cmd/ctrl-click does not preventDefault, letting the browser open a new tab', () => {
       const backStub = sinon.stub(history, 'back');
       try {
-        env = mountHeader({ loggedIn: true, view: '/entry', entry: baseEntry });
+        env = mountHeader({ userId: '1', view: '/entry', entry: baseEntry });
         const link = env.getByRole('link', { name: 'Back' });
         const event = new MouseEvent('click', { bubbles: true, cancelable: true, button: 0, metaKey: true });
         // Stop the real navigation at the host so the test page stays put,
@@ -225,7 +225,7 @@ describe('header', () => {
       // navigator.share is read-only in some browsers; define instead of assign.
       Object.defineProperty(navigator, 'share', { configurable: true, value: shareSpy });
       try {
-        env = mountHeader({ loggedIn: true, view: '/entry', entry });
+        env = mountHeader({ userId: '1', view: '/entry', entry });
         const shareIcon = env.getByRole('button', { name: 'Share entry' });
         fireEvent.click(shareIcon);
         expect(shareSpy.calledOnce).to.be.true;
@@ -240,7 +240,7 @@ describe('header', () => {
       const original = Object.getOwnPropertyDescriptor(navigator, 'share');
       Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
       try {
-        env = mountHeader({ loggedIn: true, view: '/entry', entry });
+        env = mountHeader({ userId: '1', view: '/entry', entry });
         expect(env.queryByRole('button', { name: 'Share entry' })).to.not.exist;
       } finally {
         if(original) Object.defineProperty(navigator, 'share', original);

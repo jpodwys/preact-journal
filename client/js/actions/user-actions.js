@@ -9,12 +9,12 @@ export function login (user){
   xhr('/api/user/login', { method: 'POST', body: user })
     .then(({ id, username }) => {
       app.accounts = [...app.accounts.filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
-      activateAccount({ id, username }, { loggedIn: true });
+      activateAccount(id);
     });
 };
 
-function activateAccount ({ id, username }, extra) {
-  loadAccount(id, { userId: String(id), username, entryId: undefined, filter: '', filterText: '', ...extra })
+function activateAccount (id, extra) {
+  loadAccount(id, { userId: String(id), entryId: undefined, filter: '', filterText: '', ...extra })
     .then(() => route('/entries', true));
 }
 
@@ -46,7 +46,7 @@ export function switchAccount (userId) {
   const account = app.accounts.find(a => String(a.id) === String(userId));
   if(!account) return;
   app.accounts = app.accounts.map(a => ({ ...a, active: a.id === account.id }));
-  activateAccount({ id: account.id, username: account.username }, { dialogMode: '' });
+  activateAccount(account.id, { dialogMode: '' });
 };
 
 export function handleExpiredSession (userId) {

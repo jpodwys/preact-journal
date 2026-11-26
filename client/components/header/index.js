@@ -19,8 +19,8 @@ const onBack = e => {
 
 export default (props, ctx) => {
 	const search = debounced(ctx, e => filterByText(e.target.value), 100);
-	const { view, loggedIn, filter, filterText } = app, [entry] = selected();
-	if(!loggedIn || view === '/switch') return;
+	const { view, userId, filter, filterText } = app, [entry] = selected();
+	if(!userId || view === '/switch') return;
 	const entryCount = viewEntries().length;
 	const filterIcon = filter === '' ? 'star-empty' : 'star-filled';
 	const filterTo = filter === '' ? 'favorites' : '';

@@ -29,11 +29,11 @@ describe('userActions', () => {
       mockGetAllEntries({ entries: [], timestamp: 1 });
 
       login(USER);
-      await eventually(() => expect(app.loggedIn).to.be.true);
+      await eventually(() => expect(app.userId).to.be.ok);
 
       expect(lastBody('/api/user/login')).to.deep.equal(USER);
       expect(app.userId).to.equal('1');
-      expect(app.username).to.equal('bogus');
+      expect(app.accounts.find(a => a.active).username).to.equal('bogus');
       expect(app.entries.map(e => e.id)).to.deep.equal([7]);
       expect(selected()[0]).to.be.undefined;
       expect(selected()[1]).to.equal(-1);
@@ -72,7 +72,7 @@ describe('userActions', () => {
         mockLogin({ httpStatus: 400 });
         login(USER);
         await settleNetwork();
-        expect(app.loggedIn).to.be.false;
+        expect(app.userId).to.equal('');
         expect(app.userId).to.equal('');
         expect(localStorage.getItem('accounts')).to.be.null;
       } finally {
@@ -97,7 +97,7 @@ describe('userActions', () => {
 
       expect(localStorage.getItem('bogus')).to.be.null;
       expect(localStorage.getItem('accounts')).to.be.null;
-      expect(app.loggedIn).to.be.false;
+      expect(app.userId).to.equal('');
       expect(app.userId).to.equal('');
       expect(app.entries).to.deep.equal([]);
       expect(location.pathname).to.equal('/');
@@ -114,7 +114,7 @@ describe('userActions', () => {
         logout();
         await settleNetwork();
         expect(localStorage.getItem('bogus')).to.equal('value');
-        expect(app.loggedIn).to.be.true;
+        expect(app.userId).to.be.ok;
         expect(app.userId).to.equal('99');
       } finally {
         await tick(10);
@@ -138,8 +138,8 @@ describe('userActions', () => {
       expect(remaining.length).to.equal(1);
       expect(remaining[0].id).to.equal(50);
       expect(remaining[0].active).to.be.true;
-      expect(app.username).to.equal('other');
-      expect(app.loggedIn).to.be.true;
+      expect(app.accounts.find(a => a.active).username).to.equal('other');
+      expect(app.userId).to.be.ok;
       expect(localStorage.getItem('timestamp_99')).to.be.null;
       expect(location.pathname).to.equal('/entries');
     });
@@ -164,7 +164,7 @@ describe('userActions', () => {
       const updated = getAccountsFromStorage();
       expect(updated.find(a => a.id === 2).active).to.be.true;
       expect(updated.find(a => a.id === 1).active).to.be.false;
-      expect(app.username).to.equal('other');
+      expect(app.accounts.find(a => a.active).username).to.equal('other');
       expect(app.dialogMode).to.equal('');
       expect(app.entries.map(e => e.id)).to.deep.equal([22]);
       // the account's stored timestamp was loaded, so getEntries syncs from it
@@ -231,7 +231,7 @@ describe('userActions', () => {
       expect(expired.expired).to.be.true;
       expect(expired.active).to.be.false;
       expect(updated.find(a => a.id === 2).active).to.be.true;
-      expect(app.username).to.equal('valid-user');
+      expect(app.accounts.find(a => a.active).username).to.equal('valid-user');
       expect(localStorage.getItem('timestamp_1')).to.be.null;
       expect(await idbGet('entries_1')).to.be.undefined;
     });
@@ -242,7 +242,7 @@ describe('userActions', () => {
 
       handleExpiredSession('1');
 
-      expect(app.loggedIn).to.be.false;
+      expect(app.userId).to.equal('');
       expect(app.userId).to.equal('');
       expect(app.entries).to.deep.equal([]);
       expect(location.pathname).to.equal('/');

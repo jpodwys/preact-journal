@@ -17,14 +17,11 @@ const loadAccounts = () => {
 export const initialState = () => {
   const accounts = loadAccounts();
   const active = accounts.find(a => a.active);
-  const loggedIn = !!active;
   const userId = active ? String(active.id) : '';
-  if (!loggedIn && accounts.length === 0) clearData();
+  if (!userId && accounts.length === 0) clearData();
   return {
     accounts,
-    loggedIn,
     userId,
-    username: active ? active.username : '',
     entries: [],
     sort: 'desc',
     filter: '',

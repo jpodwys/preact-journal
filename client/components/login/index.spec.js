@@ -51,9 +51,9 @@ describe('login', () => {
     typeCredentials('alice', 'pass1');
     fireEvent.submit(env.getByRole('form'));
     await new Promise(r => setTimeout(r, 50));
-    expect(app.loggedIn).to.be.true;
+    expect(app.userId).to.be.ok;
     expect(app.userId).to.equal('99');
-    expect(app.username).to.equal('alice');
+    expect(app.accounts.find(a => a.active).username).to.equal('alice');
     expect(location.pathname).to.equal('/entries');
   });
 

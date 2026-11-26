@@ -16,7 +16,7 @@ const onSwitch = (userId) => {
 };
 
 export default () => {
-  const { dialogMode, dark, view, sort, userId, username, accounts } = app;
+  const { dialogMode, dark, view, sort, userId, accounts } = app;
   if(!dialogMode) return;
   const [entry] = selected();
 
@@ -26,7 +26,7 @@ export default () => {
     var notOnEntry = view !== '/entry' && view !== '/new';
     markup = (
       <ul class={`menu ${dark ? '' : 'dark-fill'}`}>
-        <li class="menu-username">{username}</li>
+        <li class="menu-username">{accounts.find(a => a.active)?.username}</li>
         <li onclick={toggleDarkMode}>
           <Icon icon={dark ? 'sun' : 'moon'}/>
           <span>{dark ? 'Light' : 'Dark'}</span>

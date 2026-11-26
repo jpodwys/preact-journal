@@ -25,7 +25,7 @@ describe('entry', () => {
     return mount(h(Entry, null), {
       // `view` goes first: the app-state watcher reacts to view writes.
       state: Object.assign(
-        { view: '/entry', loggedIn: true, entry: null, viewEntries: [], entryIndex: -1 },
+        { view: '/entry', userId: '1', entry: null, viewEntries: [], entryIndex: -1 },
         state
       )
     });
@@ -104,7 +104,7 @@ describe('entry', () => {
       history.replaceState(null, '', '/entry/2');
       env = mount(
         h(Router, { onChange: handleRouteChange }, h(Entry, { path: '/entry/:id' })),
-        { state: { view: '/entry', loggedIn: true, entries: items } }
+        { state: { view: '/entry', userId: '1', entries: items } }
       );
       await settle();
       expect($et().textContent).to.equal('two');

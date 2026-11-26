@@ -20,35 +20,27 @@ const send = (request, ok) => {
 const patch = (id, body) => xhr('/api/entry/' + id, { method: 'PATCH', body });
 const dropSync = ({ needsSync, ...rest }) => rest;
 
-function updateIdbEntries (userId, updater) {
-  get('entries_' + userId).then((entries = []) => {
-    const updated = updater(entries) || entries;
-    idbSet('entries_' + userId, updated);
-  });
+// Every server response lands here: `change(entries)` is applied to the user's entries, and `timestamp` (when given) is
+// recorded. For the active user that is the live store; for a user who has since been switched away from it is their cached
+// copy in IndexedDB. One transform serves both, so the two cannot drift apart. It never mutates.
+function apply (userId, change, timestamp){
+  if(userId === app.userId) {
+    if(timestamp) app.timestamp = timestamp;
+    app.entries = change(app.entries);
+  } else {
+    if(timestamp) localStorage.setItem('timestamp_' + userId, timestamp);
+    get('entries_' + userId).then((entries = []) => idbSet('entries_' + userId, change(entries)));
+  }
 }
 
-function isStaleUser (userId, updater) {
-  if(app.userId === userId) return false;
-  if(updater) updateIdbEntries(userId, updater);
-  return true;
-}
+// `change(entry)` returns the new entry, or null to remove it. An entry that is no longer there leaves the list as it was.
+const patchEntry = (userId, id, change) => apply(userId, entries => findObjectIndexById(id, entries) < 0 ? entries : entries.flatMap(e => e.id === id ? change(e) || [] : e));
 
-// `change(entry)` returns the new entry, or null to remove it. It never mutates; the
-// same transform serves the live store and a stale user's cached copy in IndexedDB.
-
-function applyEntryPatch (userId, id, change) {
-  // userId is optional; pass undefined to skip the stale-user check
-  // (e.g. on failure paths where the response userId isn't available).
-  if(userId !== undefined && isStaleUser(userId, entries => entries.flatMap(e => e.id === id ? change(e) || [] : e))) return;
-
-  const found = app.entries.find(e => e.id === id);
-  if(!found) return;
-  const next = change(found);
-  set({
-    entryId: app.entryId === id && next ? next.id : app.entryId,   // a new entry on screen follows its id from the client's to the server's
-    entries: app.entries.flatMap(e => e === found ? next || [] : e)
-  });
-}
+// The server's changes applied to a list: updates replace, deletions remove, anything new goes first.
+const merge = (list, changes) => changes.reduce((entries, c) => {
+  const i = findObjectIndexById(c.id, entries);
+  return i > -1 ? entries.flatMap((e, j) => j === i ? c.deleted ? [] : c : e) : c.deleted ? entries : [c, ...entries];
+}, list);
 
 // Reads an account's cached entries and timestamp into the store, then fetches what the server has. `extra` goes first: it carries the new userId, which the persistence watcher
 // must see before `entries` so the old account's cache is not overwritten.
@@ -62,7 +54,7 @@ export function loadAccount (id, extra){
 };
 
 export function getEntries (){
-  if(!app.loggedIn) return dataFetched = false;
+  if(!app.userId) return dataFetched = false;
   if(dataFetched) return;
   dataFetched = true;
   if(app.timestamp){
@@ -73,14 +65,7 @@ export function getEntries (){
 };
 
 function getAllEntriesSuccess (userId, { timestamp, entries }){
-  if(isStaleUser(userId, idbEntries => idbEntries.concat(entries))) {
-    localStorage.setItem('timestamp_' + userId, timestamp);
-    return;
-  }
-  set({
-    timestamp,
-    entries: app.entries.concat(entries)
-  });
+  apply(userId, list => list.concat(entries), timestamp);
 };
 
 // Send updates to the server
@@ -103,39 +88,10 @@ export function resetDataFetched () {
 };
 
 function syncEntriesSuccess (userId, { entries, timestamp }){
-  if(isStaleUser(userId, idbEntries => {
-    entries.forEach(entry => {
-      const idx = findObjectIndexById(entry.id, idbEntries);
-      if(idx > -1) {
-        if(entry.deleted) idbEntries.splice(idx, 1);
-        else idbEntries[idx] = entry;
-      } else if(!entry.deleted) {
-        idbEntries.push(entry);
-      }
-    });
-  })) {
-    localStorage.setItem('timestamp_' + userId, timestamp);
-    return;
-  }
-
-  set(entries.length ? { timestamp, entries: applySyncPatch(entries) } : { timestamp });
-};
-
-// Returns a new entries array with the server's changes applied.
-function applySyncPatch (changes){
-  const entries = app.entries.slice(), added = [];
-  changes.forEach(entry => {
-    const entryIndex = findObjectIndexById(entry.id, entries);
-    if(entryIndex > -1){
-      if(entry.deleted) entries.splice(entryIndex, 1);
-      else entries[entryIndex] = entry;
-    } else {
-      entries.unshift(entry);
-      added.push(entry.id);
-    }
-  });
-  if(added.length) app.fresh = added;
-  return entries;
+  // Entries that are new to this device slide in once.
+  const added = entries.filter(c => !c.deleted && !app.entries.some(e => e.id === c.id)).map(c => c.id);
+  if(added.length && userId === app.userId) app.fresh = added;
+  apply(userId, list => entries.length ? merge(list, entries) : list, timestamp);
 };
 
 export function createEntry ({ entry, clientSync }){
@@ -145,15 +101,10 @@ export function createEntry ({ entry, clientSync }){
    * onto the entries array. Creating an entry is really updating that blank
    * entry, then POSTing it to the back end.
    */
-  const entryIndex = findObjectIndexById(entry.id, app.entries);
-  if(entryIndex === -1) return;
+  if(findObjectIndexById(entry.id, app.entries) < 0) return;
 
-  const postPending = entry.postPending;
-  entry = {...entry, postPending: true};
-  const entries = app.entries.slice();
-  entries[entryIndex] = entry;
-
-  app.entries = entries;
+  const postPending = entry.postPending, userId = app.userId;
+  patchEntry(userId, entry.id, () => ({...entry, postPending: true}));
 
   /**
    * clientSync overrides postPending to cover the edge case where postPending
@@ -163,13 +114,14 @@ export function createEntry ({ entry, clientSync }){
    */
   if(!clientSync && postPending) return;
 
-  const userId = app.userId;
   xhr('/api/entry', { method: 'POST', body: { date: entry.date, text: entry.text } })
     .then(data => {
-      if(app.fresh.includes(entry.id)) app.fresh = app.fresh.map(f => f === entry.id ? data.id : f);   // the slide-in mark follows the id
-      applyEntryPatch(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id }));
+      // The slide-in mark and the entry on screen follow the id from the client's to the server's.
+      const swap = id => id === entry.id ? data.id : id;
+      if(userId === app.userId) set({ fresh: app.fresh.map(swap), entryId: swap(app.entryId) });
+      patchEntry(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id }));
     })
-    .catch(() => applyEntryPatch(undefined, entry.id, ({ postPending, ...rest }) => rest));
+    .catch(() => patchEntry(userId, entry.id, ({ postPending, ...rest }) => rest));
 };
 
 export function toggleFavorite ({ id, favorited }){
@@ -182,20 +134,15 @@ export function toggleFavorite ({ id, favorited }){
 
 export function updateEntry ({ entry, property, entryId }){
   if(!entry || !property || typeof entryId !== 'number') return;
-  const entryIndex = findObjectIndexById(entryId, app.entries);
-  if(entryIndex === -1) return;
-  const activeEntry = app.entries[entryIndex];
-  if(activeEntry[property] === entry[property]) return;
+  const current = app.entries.find(e => e.id === entryId);
+  if(!current || current[property] === entry[property]) return;
 
-  const next = {...activeEntry, [property]: entry[property], needsSync: true};
-  const entries = app.entries.slice();
-  entries[entryIndex] = next;
-  app.entries = entries;
+  patchEntry(app.userId, entryId, e => ({...e, [property]: entry[property], needsSync: true}));
 
-  send(patch(entryId, entry), userId => applyEntryPatch(userId, entryId, dropSync));
+  send(patch(entryId, entry), userId => patchEntry(userId, entryId, dropSync));
 };
 
-const putEntry = ({ entry }) => send(patch(entry.id, entry), userId => applyEntryPatch(userId, entry.id, dropSync));
+const putEntry = ({ entry }) => send(patch(entry.id, entry), userId => patchEntry(userId, entry.id, dropSync));
 
 export function showConfirmDeleteEntryModal ({ entry }){
   set({ entryId: entry?.id, dialogMode: 'modal:delete' });
@@ -204,13 +151,10 @@ export function showConfirmDeleteEntryModal ({ entry }){
 export function deleteEntry ({ id }){
   if(typeof id !== 'number') return;
 
-  const entryIndex = findObjectIndexById(id, app.entries);
-  if(entryIndex === -1) return;
+  if(findObjectIndexById(id, app.entries) < 0) return;
 
-  const entries = app.entries.slice();
-  entries[entryIndex] = {...entries[entryIndex], needsSync: true, deleted: true, text: ''};
-
-  set({ entryId: undefined, entries, dialogMode: '' });
+  patchEntry(app.userId, id, e => ({...e, needsSync: true, deleted: true, text: ''}));
+  set({ entryId: undefined, dialogMode: '' });
   if(app.view !== '/entries') route('/entries', true);
 
   resendDelete({ id });
@@ -219,7 +163,7 @@ export function deleteEntry ({ id }){
 // Replay of an offline delete: the entry is already marked deleted, so only
 // the request is resent (no navigation, no change to the open entry/dialog).
 function resendDelete ({ id }){
-  send(xhr('/api/entry/' + id, { method: 'DELETE' }), userId => applyEntryPatch(userId, id, () => null));
+  send(xhr('/api/entry/' + id, { method: 'DELETE' }), userId => patchEntry(userId, id, () => null));
 };
 
 export function newEntry (){

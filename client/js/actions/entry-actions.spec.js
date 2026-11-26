@@ -115,9 +115,9 @@ describe('entryActions', () => {
       getEntries();
       await settleNetwork();
       app.timestamp = undefined;
-      app.loggedIn = false;
+      app.userId = '';
       getEntries();
-      app.loggedIn = true;
+      app.userId = '1';
       getEntries();
       await settleNetwork();
       expect(fetchMock.calls('/api/entries').length).to.equal(2);

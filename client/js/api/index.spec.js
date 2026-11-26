@@ -77,12 +77,12 @@ describe('api', () => {
 
   it('should expire the active account and log out on a 401 when no other account remains', async () => {
     activate([{ id: 42, username: 'test', active: true }]);
-    expect(app.loggedIn).to.be.true;
+    expect(app.userId).to.be.ok;
 
     await api('api-401').catch(() => {});
 
     expect(getAccounts()).to.deep.equal([{ id: 42, username: 'test', active: false, expired: true }]);
-    expect(app.loggedIn).to.be.false;
+    expect(app.userId).to.equal('');
     expect(app.userId).to.equal('');
     expect(location.pathname).to.equal('/');
   });
@@ -101,7 +101,7 @@ describe('api', () => {
     expect(accounts.find(a => a.id === 42)).to.include({ expired: true, active: false });
     expect(accounts.find(a => a.id === 7).active).to.be.true;
     expect(app.userId).to.equal('7');
-    expect(app.username).to.equal('other');
+    expect(app.accounts.find(a => a.active).username).to.equal('other');
     expect(location.pathname).to.equal('/entries');
   });
 
@@ -117,7 +117,7 @@ describe('api', () => {
     const err = await api('api-500').then(() => null, e => e);
     expect(err.status).to.equal(500);
     expect(getAccounts()).to.deep.equal(accounts);
-    expect(app.loggedIn).to.be.true;
+    expect(app.userId).to.be.ok;
   });
 
   it('should do nothing on a 401 when no active account exists (empty userId)', async () => {

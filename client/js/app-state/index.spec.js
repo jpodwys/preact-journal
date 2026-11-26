@@ -43,9 +43,7 @@ describe('appState', () => {
       expect(await get('bogus')).to.be.undefined;
       expect(state).to.deep.equal({
         accounts: [],
-        loggedIn: false,
         userId: '',
-        username: '',
         entries: [],
         sort: 'desc',
         filter: '',
@@ -69,9 +67,7 @@ describe('appState', () => {
       localStorage.setItem('dark', 'true');
       const state = initialState();
 
-      expect(state.loggedIn).to.be.true;
       expect(state.userId).to.equal('42');
-      expect(state.username).to.equal('testuser');
       expect(state.timestamp).to.equal('1234');
       expect(state.dark).to.be.true;
     });
@@ -85,7 +81,6 @@ describe('appState', () => {
       saveAccounts([{ id: 42, username: 'testuser', active: false, expired: true }]);
       localStorage.setItem('bogus', 'hi');
       const state = initialState();
-      expect(state.loggedIn).to.be.false;
       expect(state.userId).to.equal('');
       expect(localStorage.getItem('bogus')).to.equal('hi');
     });
@@ -97,14 +92,14 @@ describe('appState', () => {
         { id: 3, username: 'cy', active: false }
       ]));
       const state = initialState();
-      expect(state).to.include({ loggedIn: true, userId: '2', username: 'bob' });
+      expect(state).to.include({ userId: '2' });
     });
 
     it('should treat a list whose only account is expired as logged out, without clearing storage', () => {
       localStorage.setItem('accounts', JSON.stringify([{ id: 1, username: 'old', active: false, expired: true }]));
       localStorage.setItem('dark', 'true');
       const state = initialState();
-      expect(state).to.include({ loggedIn: false, userId: '', username: '' });
+      expect(state).to.include({ userId: '' });
       expect(localStorage.getItem('dark')).to.equal('true');   // the "no accounts" wipe did not run
     });
 

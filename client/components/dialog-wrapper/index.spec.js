@@ -34,12 +34,10 @@ describe('dialog-wrapper', () => {
       // `view` goes first: writing a new view resets dialogMode (app-state watcher).
       state: Object.assign({
         view: '/entries',
-        loggedIn: true,
         dialogMode: 'menu',
         dark: false,
         sort: 'desc',
-        userId: '1',
-        username: 'testuser'
+        userId: '1'
       }, state)
     });
   }
@@ -65,11 +63,11 @@ describe('dialog-wrapper', () => {
       expect(env.getByRole('list').firstElementChild.textContent).to.equal('testuser');
     });
 
-    it('renders the correct username when state.username changes', async () => {
+    it('renders the correct username when the active account changes', async () => {
       setAccounts([{ id: 1, username: 'alice', active: true }]);
-      env = mountDialog({ state: { username: 'alice' } });
+      env = mountDialog();
       expect(env.getByRole('list').firstElementChild.textContent).to.equal('alice');
-      app.username = 'bob';
+      app.accounts = [{ id: 1, username: 'bob', active: true }];
       await settle();
       expect(env.getByRole('list').firstElementChild.textContent).to.equal('bob');
     });
@@ -130,7 +128,7 @@ describe('dialog-wrapper', () => {
       await new Promise(r => setTimeout(r, 50));
       await settle();
       expect(app.userId).to.equal('2');
-      expect(app.username).to.equal('other');
+      expect(app.accounts.find(a => a.active).username).to.equal('other');
       expect(location.pathname).to.equal('/entries');
       expect(fetchMock.called('/api/entries')).to.be.true;
     });
@@ -324,7 +322,7 @@ describe('dialog-wrapper', () => {
       await new Promise(r => setTimeout(r, 20));
       await settle();
       expect(getAccounts()).to.deep.equal([]);
-      expect(app.loggedIn).to.be.false;
+      expect(app.userId).to.equal('');
       expect(location.pathname).to.equal('/');
       expect(env.queryByText('Logout?')).to.be.null;
     });
