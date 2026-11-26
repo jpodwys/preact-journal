@@ -1,6 +1,6 @@
 const { expect } = window.chai; // karma-chai global: a mangled bundle must not rewrite chai itself
 import { h, render } from '../core.js';
-import { listen, debounced } from '../helpers.js';
+import { listen, debounced, lazy } from '../helpers.js';
 import { mount, frame } from './core.spec.js';
 
 const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -201,5 +201,133 @@ describe('debounced(): unmounting', () => {
     const C = (p, ctx) => { trigger = debounced(ctx, () => {}, 20); return <p />; };
     mount(<C />);
     expect(Object.keys(trigger)).to.deep.equal([]);
+  });
+});
+
+describe('lazy()', () => {
+  // A load that a spec settles by hand, and counts.
+  const deferred = () => { const d = { calls: 0 }; d.load = () => { d.calls++; return new Promise((res, rej) => { d.res = res; d.rej = rej; }); }; return d; };
+  const Page = ({ id, children }) => <section data-id={id}>{children}</section>;
+
+  it('renders Loading, then the loaded component with the same props and children', async () => {
+    const d = deferred();
+    const L = lazy(d.load, () => <p>loading</p>);
+    const host = mount(<L id="7"><b>kid</b></L>);
+    expect(host.textContent).to.equal('loading');
+    d.res({ default: Page });
+    await frame();
+    expect(host.querySelector('section').dataset.id).to.equal('7');
+    expect(host.querySelector('section b').textContent).to.equal('kid');
+  });
+
+  it('takes the component itself as well as a module with a default export', async () => {
+    const host = mount(<div />);
+    const L = lazy(() => Promise.resolve(Page));
+    render(<L id="1" />, host);
+    await frame();
+    expect(host.querySelector('section')).to.exist;
+  });
+
+  it('renders nothing while loading when there is no Loading component', () => {
+    const d = deferred();
+    const L = lazy(d.load);
+    const host = mount(<L />);
+    expect(host.textContent).to.equal('');
+  });
+
+  it('loads once however many instances there are, and wakes every one of them', async () => {
+    const d = deferred();
+    const L = lazy(d.load, () => <p>loading</p>);
+    const host = mount(<div><L id="a" /><L id="b" /></div>);
+    d.res({ default: Page });
+    await frame();
+    expect(d.calls).to.equal(1);
+    expect(host.querySelectorAll('section').length).to.equal(2);
+  });
+
+  it('renders a later instance straight away, with no Loading frame', async () => {
+    const L = lazy(() => Promise.resolve({ default: Page }), () => <p>loading</p>);
+    mount(<L id="1" />);
+    await frame();
+    const host = mount(<L id="2" />);
+    expect(host.querySelector('section').dataset.id).to.equal('2');
+    expect(host.textContent).to.not.include('loading');
+  });
+
+  it('passes updated props through on a re-render', async () => {
+    const L = lazy(() => Promise.resolve({ default: Page }));
+    const host = mount(<L id="1" />);
+    await frame();
+    render(<L id="2" />, host);
+    expect(host.querySelector('section').dataset.id).to.equal('2');
+  });
+
+  it('a keyed instance remounts the loaded component without loading again', async () => {
+    let n = 0;
+    const L = lazy(() => { n++; return Promise.resolve({ default: Page }); });
+    const host = mount(<L key="a" id="1" />);
+    await frame();
+    render(<L key="b" id="2" />, host);
+    expect(host.querySelector('section').dataset.id).to.equal('2');
+    expect(n).to.equal(1);
+  });
+
+  it('shows Failed with the error, and does not try again by itself', async () => {
+    const d = deferred();
+    const boom = new Error('offline');
+    let seen;
+    const L = lazy(d.load, null, p => { seen = p; return <p role="alert">failed</p>; });
+    const host = mount(<L />);
+    d.rej(boom);
+    await frame();
+    expect(host.querySelector('[role=alert]')).to.exist;
+    expect(seen.error).to.equal(boom);
+    render(<L />, host);                 // more renders, still one attempt
+    await frame();
+    expect(d.calls).to.equal(1);
+  });
+
+  it('retry() loads again and then renders the component', async () => {
+    let fail = true, calls = 0, retry;
+    const L = lazy(() => { calls++; return fail ? Promise.reject(new Error('x')) : Promise.resolve({ default: Page }); },
+      () => <p>loading</p>, p => { retry = p.retry; return <p role="alert">failed</p>; });
+    const host = mount(<L id="9" />);
+    await frame();
+    expect(host.querySelector('[role=alert]')).to.exist;
+    fail = false;
+    retry();
+    await frame();
+    expect(calls).to.equal(2);
+    expect(host.querySelector('section').dataset.id).to.equal('9');
+  });
+
+  it('treats a load that throws synchronously as a failure', async () => {
+    const L = lazy(() => { throw new Error('sync'); }, null, () => <p role="alert">failed</p>);
+    const host = mount(<L />);
+    await frame();
+    expect(host.querySelector('[role=alert]')).to.exist;
+  });
+
+  it('preload() starts the load before any render and returns the promise', async () => {
+    const d = deferred();
+    const L = lazy(d.load, () => <p>loading</p>);
+    const p = L.preload();
+    expect(d.calls).to.equal(1);
+    d.res({ default: Page });
+    await p;
+    const host = mount(<L id="3" />);
+    expect(host.querySelector('section').dataset.id).to.equal('3');
+    expect(d.calls).to.equal(1);
+  });
+
+  it('an instance unmounted before the load settles does not break the others', async () => {
+    const d = deferred();
+    const L = lazy(d.load, () => <p>loading</p>);
+    const gone = mount(<L id="gone" />);
+    const kept = mount(<L id="kept" />);
+    render(null, gone);
+    d.res({ default: Page });
+    await frame();
+    expect(kept.querySelector('section').dataset.id).to.equal('kept');
   });
 });

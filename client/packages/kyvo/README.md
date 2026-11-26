@@ -196,6 +196,21 @@ child matches by position. Give list items stable keys.
 Adds `fn` as a listener on mount and removes it on unmount (`opts` goes to both calls, e.g. `{ passive: true, capture: true }`).
 Call it unconditionally at the top of the body. `fn` is the first render's closure: read `props.x`.
 
+### `lazy(load, Loading?, Failed?)` (helpers)
+
+A component whose code is fetched the first time it renders. `load` returns a promise of the component, or of a module whose
+default export it is, so a route's page is one line, and the bundler (esbuild `splitting: true`) turns the `import()` into its own file:
+
+```jsx
+const Stats = lazy(() => import('./pages/stats.js'), Loading, Failed);   // Loading and Failed are ordinary components
+<Stats range="week" />                                                    // same props and children as the real page
+```
+
+It loads once however many instances there are. While loading it renders `Loading` (nothing if you pass none). If the load fails
+it renders `Failed` with `{ error, retry }`; `retry()` tries again, and a failure is never retried on its own. `Stats.preload()`
+starts the load early (on hover, say) and returns the promise. The type of a lazy component is exactly the type of the one it loads.
+Costs about 160 B brotli in a bundle that uses it, nothing in one that does not.
+
 ### `debounced(ctx, fn, ms, key?)` (helpers)
 
 Returns a stable trigger that debounces calls to the **latest** `fn`, passing it the most recent call's arguments.
@@ -257,6 +272,18 @@ After an `await`, read the store again; never use a value captured before it.
 **Derived data** is a function of the store (`const visible = () => app.entries.filter(...)`) computed in the
 component. If it is expensive and read in many places, memoize the function on its inputs (the journal app's `viewEntries()` does) rather than storing
 the result in a field: a stored derived field can be assigned, and then it is silently wrong until an input next changes.
+
+**Code splitting** needs two things kyvo already has and one it deliberately leaves to the app.
+
+- *Routes.* A router picks a component; it does not care whether that component is `lazy()`. Wrap each route's page in `lazy(() => import(...))`
+  and the router is unchanged. See `examples/splitting/`.
+- *State.* There is no store registry to register a lazily loaded feature with: a `store()` is just an object, and a write to any store schedules
+  the one whole-tree render. So a feature's code creates its own store when it loads, and components read it. Two things are left to the app:
+  hydrate the store when it is created (a `watch` attached later misses earlier writes), and give "sign out" a way to reach slices
+  whose code never loaded in this session (their saved data is still in storage). The example's `slice()` does both in about ten lines.
+- *Build.* One esbuild call with `splitting: true`, `format: 'esm'` and an `outdir`. `mangleProps` and `define: { __DEV__ }` stay consistent across chunks only
+  because they come from that one build. Splitting is not free: every chunk is a request, a chunk imported by the entry adds a second round trip
+  (use `<link rel="modulepreload">` for it), and an offline-capable app has to precache its chunks.
 
 **Contenteditable and uncontrolled DOM**: keep a local `ctx.state` copy seeded when the item's id changes and render
 that, so re-renders never touch the text the user is typing; key the editable element by the item's id.
@@ -364,7 +391,7 @@ Mount into a detached `div`, drive it with real events, and assert on the DOM, t
 On purpose, in the spirit of "ignore problems we don't have": fragments and array returns, portals, context, suspense/hydration,
 error boundaries, synthetic events, `className`/`htmlFor` aliases, object refs, deep reactivity, read tracking,
 effect dependency arrays, an unsubscribe for `watch`, an exported `update()`, and attributes that are read-only DOM properties (`list`,
-`form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back, and
+`form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back (and [OPT-IN-FEATURES.md](OPT-IN-FEATURES.md) is a design for core-level features, `memo` among them, that would cost nothing unless an app turns them on), and
 [RENDER-IDEAS.md](RENDER-IDEAS.md) records the other render optimizations we built or considered. There is no
 server rendering story.
 
@@ -398,11 +425,12 @@ read non-store data `Component.fresh = 1`, and change the handful of tests that 
 - `test/`: 121 framework specs (including a seeded keyed-diff fuzz) plus the build, karma config and size script that run them.
 - `types-test/`: the type tests (`positive.tsx`, `negative.tsx`, an editor-behavior check and a seeded-mistakes run over the journal app).
 - `examples/tasks/`: a second, different app on kyvo (26 specs).
+- `examples/splitting/`: route-based code splitting with `lazy()`, lazily loaded store slices, and a real-browser check of which files are fetched (14 + 12 specs, plus a break-it-on-purpose check).
 - The journal app in `client/` is the main consumer, with the app's own test infrastructure in `test/` at the repo root.
 
 ### Run
 
-From the repo root: `npm run test:kyvo` (the framework's specs in dev, minified and mangled modes), `npm run test:examples`, `npm run test:types`
+From the repo root: `npm run test:kyvo` (the framework's specs in dev, minified and mangled modes), `npm run test:examples` (both examples; `npm run test:splitting` for just the code-splitting one), `npm run test:types`
 (set `TS_PATH` to a TypeScript >= 5.1 install; the repo does not depend on one), and `npm test` / `npm run test:all` for the app's five layers.
 Framework size: `node client/packages/kyvo/test/size.js`.
 

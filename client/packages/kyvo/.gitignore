@@ -4,3 +4,5 @@ types-test/.real-app/
 types-test/scratch-editor.tsx
 examples/tasks/dist/
 examples/tasks/test/bundle.spec.js
+examples/splitting/dist/
+examples/splitting/test/bundle.spec.js

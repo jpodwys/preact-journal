@@ -44,7 +44,7 @@ const MISTAKES = [
   ['mutate the store in place (app.entries.push)', /entry-actions.*'push' does not exist on type 'readonly/],
   ['typo in a ctx method (ctx.statee)', /virtual-scroll.*'statee' does not exist on type 'Ctx'/],
   ['unitless numeric style (top: 40)', /virtual-scroll.*'number' is not assignable to type 'string'/],
-  ['misspelled store field (loggedInn)', /header.*'loggedInn' does not exist/],
+  ['misspelled store field (userIdd)', /header.*'userIdd' does not exist/],
   ['wrong event name (listen window "resizee")', /virtual-scroll.*No overload matches/],
   ['misspelled local-state field (s.txt)', /entry\/index.*'txt' does not exist/],
   ['ctx.mount arrow returning a timer id', /router.*'number' is not assignable to type 'void \| \(\(\) => void\)'/],

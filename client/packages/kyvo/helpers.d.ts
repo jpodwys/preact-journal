@@ -1,5 +1,5 @@
 // Hand-written types for helpers.js. See core.d.ts.
-import type { Ctx } from './core';
+import type { Ctx, Component } from './core';
 
 type Opts = boolean | AddEventListenerOptions;
 
@@ -15,3 +15,17 @@ export function listen<T extends EventTarget>(ctx: Ctx, target: T, event: T exte
  * a pending call is never lost: it runs once if the component unmounts.
  */
 export function debounced<A extends any[]>(ctx: Ctx, fn: (...args: A) => void, ms: number, key?: string): (...args: A) => void;
+
+/** What `lazy` hands its `Failed` component. */
+export interface LazyFailure { error: unknown; retry(): void }
+
+/**
+ * A component whose code loads on first render: `lazy(() => import('./stats.js'))`. Loads once, shows `Loading` meanwhile
+ * (nothing if omitted) and `Failed` if the load rejects (`retry()` tries again). `preload()` starts the load early.
+ * It has exactly the props of the component it loads.
+ */
+export function lazy<C extends Component<any>>(
+  load: () => Promise<C | { default: C }>,
+  Loading?: Component<{}> | null,
+  Failed?: Component<LazyFailure> | null
+): C & { preload(): Promise<void> };

@@ -1,6 +1,6 @@
 // Everything here is valid usage and must compile with NO errors.
 import { h, render, store, watch, Ctx, Component, WithChildren, Child, VNode } from '../core';
-import { listen, debounced } from '../helpers';
+import { listen, debounced, lazy, LazyFailure } from '../helpers';
 
 interface Entry { id: number; text: string; tags: string[]; favorited?: boolean }
 
@@ -82,3 +82,20 @@ void [first, Plain, el];
 const emptyStart = store({ entry: undefined as Entry | undefined, list: [] as Entry[] });
 emptyStart.entry = { id: 1, text: 'a', tags: [] };
 emptyStart.entry = undefined;
+
+// ---- lazy ----
+// A module with a default export (what `import()` gives), and the component itself; P is inferred or given.
+const Later = lazy(() => Promise.resolve({ default: Plain }));
+const Direct = lazy(() => Promise.resolve(Stateful));
+const Fancy = lazy(
+  () => Promise.resolve({ default: List }),
+  () => <p>loading</p>,
+  ({ error, retry }: LazyFailure) => { void error; return <button onclick={retry}>again</button>; }
+);
+Later.preload().then(() => {});
+const lazyUse = (
+  <div>
+    <Later label="x" n={2} /><Direct id={1} /><Fancy items={[]}><b>kids</b>{'more'}</Fancy>
+  </div>
+);
+void lazyUse;

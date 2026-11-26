@@ -154,6 +154,13 @@ Details of the renderer (each is covered by `test/renderer.spec.js`; the reasoni
   causes a render by itself). Each `key` (a second use in one component needs one; a changing key such as an
   id works too) has its own timer and pending call. **A pending call is never lost:** on unmount it runs once,
   immediately, with the latest arguments. There is no public flush or cancel.
+- `lazy(load, Loading?, Failed?)`: returns a component whose code arrives on first render. `load` returns a promise of the
+  component or of a module whose default export it is (`() => import('./stats.js')`; the bundler cuts the `import()` into its own
+  file). The load runs once, however many instances there are. While it runs the component renders `Loading` (nothing if
+  omitted); if it rejects (or `load` throws) it renders `Failed` with `{ error, retry }`, and `retry()` loads again. Once loaded it
+  renders the real component with the same props and children. Each instance writes to its own `ctx.state` when the load
+  settles, because a write is what schedules a render. `L.preload()` starts the load early and returns its promise.
+  The first instance's `ctx.mount` is what subscribes it to the load, so `lazy` follows the same rule as any `ctx.mount`.
 
 ## Actions (convention, no framework support)
 Plain module functions that import stores and services. Anything with logic (fetching, syncing,

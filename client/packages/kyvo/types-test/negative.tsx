@@ -1,7 +1,7 @@
 // Each line marked @ts-expect-error MUST be a type error. If one compiles, tsc reports "Unused
 // '@ts-expect-error' directive", so this file fails when a type stops catching its mistake.
 import { h, store, watch, Ctx, Component, WithChildren } from '../core';
-import { listen, debounced } from '../helpers';
+import { listen, debounced, lazy } from '../helpers';
 
 interface Entry { id: number; text: string; tags: string[] }
 const app = store({ view: '/entries', dark: false, entries: [] as Entry[], user: null as { name: string } | null });
@@ -124,3 +124,16 @@ void [ReturnsArray, ReturnsTrue, ReturnsObject];
 const emptyUnannotated = store({ entry: undefined });
 // @ts-expect-error `entry` was inferred as undefined
 emptyUnannotated.entry = { id: 1 };
+
+// ---- lazy ----
+const Typed = lazy(() => Promise.resolve({ default: ({ id }: { id: number }) => <p>{id}</p> }));
+// @ts-expect-error a prop the loaded component does not take
+<Typed name="x" />;
+// @ts-expect-error a required prop is missing
+<Typed />;
+// @ts-expect-error the loader must produce a component
+lazy(() => Promise.resolve(42));
+// @ts-expect-error the loader must return a promise
+lazy(() => ({ default: () => null }));
+// @ts-expect-error Failed receives { error, retry }, not an arbitrary shape
+lazy(() => Promise.resolve({ default: () => null }), null, ({ nope }: { nope: string }) => <p>{nope}</p>);

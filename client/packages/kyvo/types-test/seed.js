@@ -21,13 +21,13 @@ module.exports = Object.assign(function seed(dir) {
     fs.writeFileSync(p, s.replace(from, to));
   };
   // 1. mutate the store in place instead of replacing the value (the #1 rule of the framework)
-  edit('js/actions/entry-actions.js', "set({ entry, entries: [entry, ...app.entries] });", "app.entries.push(entry); set({ entry });");
+  edit('js/actions/entry-actions.js', "set({ entryId: entry.id, entries: [entry, ...app.entries] });", "app.entries.push(entry); set({ entryId: entry.id });");
   // 2. typo in a ctx method
   edit('components/virtual-scroll/index.js', "const s = ctx.state({ offset: 0, height: 0 });", "const s = ctx.statee({ offset: 0, height: 0 });");
   // 3. unitless numeric style (the browser silently ignores it)
   edit('components/virtual-scroll/index.js', "top: start*rowHeight + 'px'", "top: start*rowHeight");
   // 4. misspelled store field read
-  edit('components/header/index.js', "const { view, loggedIn, entry, filter, filterText } = app;", "const { view, loggedInn, entry, filter, filterText } = app;");
+  edit('components/header/index.js', "const { view, userId, filter, filterText } = app,", "const { view, userIdd, filter, filterText } = app,");
   // 5. wrong event name
   edit('components/virtual-scroll/index.js', "listen(ctx, window, 'resize', resized, EVENT_OPTS);", "listen(ctx, window, 'resizee', resized, EVENT_OPTS);");
   // 6. misspelled local-state field
