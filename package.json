@@ -23,7 +23,7 @@
     "body-parser": "^1.18.3",
     "browserslist": "^4.28.1",
     "compression": "^1.7.4",
-    "cookie-parser": "1.4.1",
+    "cookie-parser": "1.4.7",
     "del": "^3.0.0",
     "dotenv": "1.2.0",
     "esbuild": "^0.24.2",
