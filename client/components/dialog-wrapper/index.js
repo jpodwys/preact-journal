@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
 import { app, selected } from '../../js/app-state';
-import { route } from '../router';
+import { route } from '../../js/route';
 import { toggleDarkMode } from '../../js/actions/global-actions';
 import { deleteEntry, toggleSort, exportEntries } from '../../js/actions/entry-actions';
 import { logout, switchAccount } from '../../js/actions/user-actions';

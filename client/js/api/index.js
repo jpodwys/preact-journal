@@ -1,5 +1,8 @@
-import { handleExpiredSession } from '../actions/user-actions';
 import { app } from '../app-state';
+
+// Called with the id of the user whose request was answered 401.
+let unauthorized = () => {};
+export const onUnauthorized = fn => { unauthorized = fn; };
 
 export default (url, config = {}) => {
   var userId = app.userId;
@@ -16,7 +19,7 @@ export default (url, config = {}) => {
     if(res.status >= 300) throw res;
     if(res.status !== 204) return res.json();
   }).catch(err => {
-    if(err.status === 401) handleExpiredSession(userId);
+    if(err.status === 401) unauthorized(userId);
     throw err;
   });
 };

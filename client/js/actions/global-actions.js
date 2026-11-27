@@ -1,6 +1,6 @@
 import { app, set } from '../app-state';
 import { getViewFromPathname } from '../utils';
-import { route } from '../../components/router';
+import { route } from '../route';
 import { newEntry } from './entry-actions';
 
 

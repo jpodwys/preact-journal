@@ -1,7 +1,7 @@
 import { clearData } from '../utils';
-import xhr from '../api';
+import xhr, { onUnauthorized } from '../api';
 import { app, resetState } from '../app-state';
-import { route } from '../../components/router';
+import { route } from '../route';
 import { loadAccount } from './entry-actions';
 
 
@@ -59,3 +59,6 @@ export function handleExpiredSession (userId) {
   clearData(userId);
   switchToNext(accounts);
 };
+
+// api cannot import this module (this module imports api), so it is handed the handler.
+onUnauthorized(handleExpiredSession);

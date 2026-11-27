@@ -3,7 +3,7 @@ import { findObjectIndexById } from '../utils';
 import { get, set as idbSet } from '../idb';
 import exportAllEntries from '../export-entries';
 import { app, viewEntries, set, selected, releaseSaves } from '../app-state';
-import { route } from '../../components/router';
+import { route } from '../route';
 
 let dataFetched = false;
 
