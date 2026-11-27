@@ -69,7 +69,7 @@ module.exports = function(Entry, sequelize){
     });
   }
 
-  self.updateEntry = function(entryId, data, deviceId){
+  self.updateEntry = function(entryId, data, deviceId, ownerId){
     var safeData = {
       updatedAt: date.getUtcZeroTimestamp(),
       deviceId: deviceId
@@ -79,11 +79,11 @@ module.exports = function(Entry, sequelize){
     if(data.favorited !== undefined) safeData.favorited = data.favorited;
 
     return Entry.update(safeData, {
-      where: {id: entryId}
+      where: { id: entryId, ownerId: ownerId }
     });
   }
 
-  self.deleteEntry = function(entryId, deviceId){
+  self.deleteEntry = function(entryId, deviceId, ownerId){
     var data = {
       text: '',
       deleted: 1,
@@ -93,7 +93,7 @@ module.exports = function(Entry, sequelize){
     };
 
     return Entry.update(data, {
-      where: { id: entryId }
+      where: { id: entryId, ownerId: ownerId }
     });
   }
 
