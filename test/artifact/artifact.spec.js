@@ -139,6 +139,83 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
     }, { entries: [], syncEntries: [] });
   });
 
+  // Regression: the router handled /entry/new before the cached entries had been read from IndexedDB, so saving the blank
+  // new entry replaced the whole cache, offline edits that had not reached the server included.
+  test('4. a page load on /entry/new keeps the entries cached on the device', { timeout: 60000 }, async () => {
+    await withApp(async (s, server, apiState) => {
+      const UNSENT = { id: 7, date: '2024-01-03', text: 'offline edit not sent yet', needsSync: true };
+      const cached = () => s.evaluate(`new Promise(res => { const r = indexedDB.open('keyval-store'); r.onsuccess = () => {
+        const q = r.result.transaction('keyval').objectStore('keyval').get('entries_99'); q.onsuccess = () => { r.result.close(); res((q.result || []).map(e => e.id)); }; }; })`);
+      const assertKept = async when => {
+        await s.waitFor(`!!document.getElementById('et')`, { label: 'new entry view, ' + when });
+        await sleep(500);   // give a wrong write time to happen: nothing on screen signals it
+        const ids = await cached();
+        for(const id of [5, 6, 7]) assert.ok(ids.includes(id), `entry ${id} is still cached after ${when}: ${JSON.stringify(ids)}`);
+      };
+      await s.goto('/');
+      await s.waitFor(`document.body.innerText.includes('Login')`, { label: 'first load' });
+      await seed(s, [...ENTRIES, UNSENT]);
+
+      apiState.offline = true;                          // nothing can be refetched or re-sent
+      await s.goto('/entry/new');
+      await assertKept('a page load, offline');
+      await s.reload();
+      await assertKept('a reload, offline');
+
+      apiState.offline = false;
+      await s.goto('/entry/new');
+      await s.waitFor(`!!document.getElementById('et')`, { label: 'new entry view, online' });
+      await s.typeInto('#et', 'written after a page load');
+      // Wait for THIS request: the earlier page loads have already sent POSTs, and the editor saves 500 ms after typing.
+      const created = () => s.api.some(a => a.method === 'POST' && a.body.text === 'written after a page load');
+      const t0 = Date.now();
+      while(!created() && Date.now() - t0 < 5000) await sleep(50);
+      assert.ok(created(), 'what was typed right after the page load is saved: ' + fmt(s.api));
+      await assertKept('a page load and writing an entry');
+      await s.goto('/entries');
+      await s.waitFor(`['original entry text', 'second entry text', 'offline edit not sent yet', 'written after a page load'].every(t => document.body.innerText.includes(t))`, { label: 'all entries listed' });
+    });
+  });
+
+  // The same bug from the other side: the app renders without waiting for the cache, so it has to be safe to use meanwhile.
+  test('5. the app is usable while the cache read is pending, and a failed read leaves the cache alone', { timeout: 60000 }, async () => {
+    await withApp(async (s) => {
+      const cached = () => s.evaluate(`new Promise(res => { const r = indexedDB.open('keyval-store'); r.addEventListener('success', () => {
+        const q = r.result.transaction('keyval').objectStore('keyval').get('entries_99'); q.addEventListener('success', () => { r.result.close(); res((q.result || []).map(e => e.id)); }); }); })`);
+      // Replaces the handler the app gives indexedDB.open: delayed until __release(), or never called at all.
+      const gate = body => s.page.send('Page.addScriptToEvaluateOnNewDocument', { source: `{
+        const d = Object.getOwnPropertyDescriptor(IDBRequest.prototype, 'onsuccess');
+        Object.defineProperty(IDBOpenDBRequest.prototype, 'onsuccess', { configurable: true, set(fn) { ${body} } });
+      }` });
+      await s.goto('/');
+      await s.waitFor(`document.body.innerText.includes('Login')`, { label: 'first load' });
+      await seed(s, ENTRIES);
+
+      let script = await gate(`d.set.call(this, e => { window.__release = () => fn.call(this, e); });`);
+      await s.goto('/entry/new');
+      await s.waitFor(`!!document.getElementById('et') && !!window.__release`, { label: 'editor on screen while the read is pending' });
+      await s.typeInto('#et', 'typed before the cache arrived');
+      await sleep(800);   // past the editor's save delay: nothing on screen signals that it ran
+      await s.evaluate('__release()');
+      const t0 = Date.now();
+      while((await cached()).length < 3 && Date.now() - t0 < 5000) await sleep(50);
+      const ids = await cached();
+      assert.ok(ids.includes(5) && ids.includes(6) && ids.length === 3, 'cached entries plus the new one: ' + JSON.stringify(ids));
+      assert.deepEqual(s.api.filter(a => a.method === 'POST').map(a => a.body.text), ['typed before the cache arrived'], 'sent once, and never as an empty entry');
+      assert.equal(await s.evaluate(`document.getElementById('et').innerText`), 'typed before the cache arrived', 'the editor kept its text');
+      await s.page.send('Page.removeScriptToEvaluateOnNewDocument', script);
+
+      await s.goto('/entries');   // a page without the gate: the one above still has the patched IndexedDB
+      await s.waitFor(`!!document.querySelector('a[href="/entry/5"]')`, { label: 'clean page' });
+      await seed(s, ENTRIES);
+      script = await gate('');   // the app's read never answers
+      await s.goto('/entry/new');
+      await s.waitFor(`!!document.getElementById('et')`, { label: 'renders with a read that never answers' });
+      await sleep(300);
+      assert.deepEqual(await cached(), [5, 6], 'nothing was saved over the unread cache');
+    });
+  });
+
   test('3. real service worker: registers, controls on 2nd load, shell renders offline from SW cache', { timeout: 90000 }, async () => {
     await withApp(async (s, server, apiState) => {
       await s.goto('/');

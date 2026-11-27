@@ -38,12 +38,18 @@ export const initialState = () => {
 export const app = store(initialState());
 export const set = delta => Object.assign(app, delta);
 
+// A logged-in app starts with saving held. Until the cached entries have been read, the list in memory is not the whole
+// list, and saving it would overwrite the cache (/entry/new adds an entry that early). loadAccount releases the hold.
+let holding = app.userId;
+export const releaseSaves = () => { holding = 0; };
+
 // Back to a freshly computed initial state (logout, expired session, tests).
 // A reset must not persist: assigning the blank `entries` would overwrite the
 // user's cached entries in IndexedDB.
 let resetting;
 export const resetState = () => {
   resetting = 1;
+  holding = 0;
   try { Object.assign(app, initialState()); } finally { resetting = 0; }
 };
 
@@ -86,7 +92,7 @@ watch(app, (key, next, prev) => {
       if (!resetting) localStorage.setItem('accounts', JSON.stringify(next));
       break;
     case 'entries':
-      if (app.userId && !resetting) idbSet('entries_' + app.userId, next);
+      if (app.userId && !resetting && !holding) idbSet('entries_' + app.userId, next);
       break;
     case 'dark':
       localStorage.setItem('dark', !!next);

@@ -2,7 +2,7 @@ import xhr from '../api';
 import { findObjectIndexById } from '../utils';
 import { get, set as idbSet } from '../idb';
 import exportAllEntries from '../export-entries';
-import { app, viewEntries, set, selected } from '../app-state';
+import { app, viewEntries, set, selected, releaseSaves } from '../app-state';
 import { route } from '../../components/router';
 
 let dataFetched = false;
@@ -44,12 +44,17 @@ const merge = (list, changes) => changes.reduce((entries, c) => {
 
 // Reads an account's cached entries and timestamp into the store, then fetches what the server has. `extra` goes first: it carries the new userId, which the persistence watcher
 // must see before `entries` so the old account's cache is not overwritten.
-// Boot (js/load) and every login/switch go through here.
+// Boot (js/load) and every login/switch go through here. Only boot passes no `extra`: the app is already on screen then, so
+// whatever was added during the read is kept alongside the cached entries. A switch replaces the list instead. Saving is
+// held from startup until here (see app-state); if the read fails it stays held, which leaves the cache untouched.
 export function loadAccount (id, extra){
   dataFetched = false;
-  return get('entries_' + id).then((entries = []) => {
-    set({ ...extra, entries, timestamp: localStorage.getItem('timestamp_' + id) || undefined });
-    getEntries();
+  return get('entries_' + id).then((cached = []) => {
+    const added = extra ? [] : app.entries;
+    releaseSaves();
+    set({ ...extra, entries: cached, timestamp: localStorage.getItem('timestamp_' + id) || undefined });
+    getEntries();   // re-sends what the cache holds unsent; what was added just now is already looking after itself
+    if(added.length) app.entries = [...added, ...app.entries];
   });
 };
 

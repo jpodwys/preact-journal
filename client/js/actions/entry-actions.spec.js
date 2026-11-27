@@ -66,6 +66,24 @@ describe('entryActions', () => {
       expect(app.timestamp).to.equal(9);
     });
 
+    it('at boot (no extra) should keep what was added while the read was in flight', async () => {
+      mockGetAllEntries();
+      await idbSet('entries_1', [{ id: 1, date: '2017-01-01', text: 'cached' }]);
+      const loading = loadAccount('1');
+      app.entries = [{ id: 9, date: '2018-01-01', text: 'added during the read' }];
+      await loading;
+      expect(ids(app.entries)).to.deep.equal([9, 1]);
+    });
+
+    it('on a switch (with extra) should replace the list, not add to it', async () => {
+      mockGetAllEntries();
+      await idbSet('entries_1', [{ id: 1, date: '2017-01-01', text: 'cached' }]);
+      app.userId = '2';
+      app.entries = [{ id: 9, date: '2018-01-01', text: 'the previous account' }];
+      await loadAccount('1', { userId: '1' });
+      expect(ids(app.entries)).to.deep.equal([1]);
+    });
+
     it('should write the extra state in the same update as the entries', async () => {
       mockGetAllEntries();
       await idbSet('entries_1', [{ id: 1, date: '2017-01-01', text: 'a' }]);
