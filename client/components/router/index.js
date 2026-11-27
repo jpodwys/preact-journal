@@ -1,6 +1,21 @@
-import { h } from '../../packages/kyvo/core';
+import { h, store } from '../../packages/kyvo/core';
 import { listen } from '../../packages/kyvo/helpers';
-import { route, nav, notify, onRoute } from '../../js/route';
+
+// Make sure new pages are always scrolled to the top
+// while history entries maintain their scroll position.
+const { pushState } = history;
+history.pushState = (a, b, url) => {
+  pushState.call(history, a, b, url);
+  scrollTo(0, 0);
+};
+
+// `location` IS the router state: the Router renders from location.pathname, so there is
+// nothing to keep in sync. This store exists only so that a navigation re-renders the app.
+const nav = store({ n: 0 });
+
+// There is one Router; this is its live props (for onChange).
+let LIVE;
+const notify = url => LIVE && LIVE.onChange && LIVE.onChange(url);
 
 const clickListener = e => {
   if(e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.button !== 0) return;
@@ -15,6 +30,12 @@ const clickListener = e => {
   }
 };
 
+const route = (url, replace) => {
+  notify(url);
+  history[replace ? 'replaceState' : 'pushState'](null, null, url);
+  nav.n++;
+};
+
 const matches = (path, url) => {
   if(path === url) return true;
   const p = path.split('/'), u = url.split('/');
@@ -24,11 +45,10 @@ const matches = (path, url) => {
 function Router(props, ctx) {
   listen(ctx, document, 'click', clickListener);
   listen(ctx, window, 'popstate', () => { notify(location.pathname); nav.n++; });
-  // There is one Router. `props` is its live object, so onChange is read at call time.
   ctx.mount(() => {
-    onRoute(url => props.onChange && props.onChange(url));
+    LIVE = props;
     notify(location.pathname);
-    return () => onRoute();
+    return () => { LIVE = undefined; };
   });
   return props.children.find(c => matches(c.props.path, location.pathname));
 }

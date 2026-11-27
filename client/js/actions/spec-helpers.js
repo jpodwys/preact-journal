@@ -2,7 +2,7 @@
 import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
 import { app, resetState } from '../app-state';
-import { resetSync } from '../sync';
+import { resetDataFetched } from './entry-actions';
 
 import { networkIdle } from '../../../test/wait';
 
@@ -20,7 +20,7 @@ export async function resetAll ({ accounts } = {}) {
   fetchMock.restore();
   localStorage.clear();
   await idbClear();
-  resetSync();
+  resetDataFetched();
   if(accounts) localStorage.setItem('accounts', JSON.stringify(accounts));
   resetState();
 }

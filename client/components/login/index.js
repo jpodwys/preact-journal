@@ -1,6 +1,6 @@
 import { h } from '../../packages/kyvo/core';
 import { login } from '../../js/actions/user-actions';
-import { route } from '../../js/route';
+import { route } from '../router';
 
 const onLogin = e => {
   e.preventDefault();

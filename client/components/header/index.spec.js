@@ -140,7 +140,7 @@ describe('header', () => {
       expect(selected()[0].favorited).to.equal(false);
       expect(app.entries[0].favorited).to.equal(false);
       expect(fetchMock.called('/api/entry/1')).to.be.true;
-      expect(lastBody('/api/entry/1')).to.include({ favorited: false });
+      expect(lastBody('/api/entry/1')).to.deep.equal({ favorited: false });
 
       await waitFor(() => expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-empty'));
     });

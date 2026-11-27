@@ -118,10 +118,10 @@ describe('entry-preview', () => {
     it('toggles favorited in the store and PATCHes the inverted value when the favorite icon is clicked', async () => {
       mockUpdateEntry(9);
       const entry = { id: 9, date: 'd', text: 't', favorited: true };
-      env = mountPreview(entry, '', {}, { userId: '1', entries: [entry] });
+      env = mountPreview(entry, '', {}, { entries: [entry] });
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
       expect(app.entries[0].favorited).to.be.false;
-      expect(lastBody('/api/entry/9')).to.include({ favorited: false });
+      expect(lastBody('/api/entry/9')).to.deep.equal({ favorited: false });
       await networkIdle(); // let the response land before the next test
     });
   });

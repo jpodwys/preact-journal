@@ -3,7 +3,7 @@ import { get, set, clear, keys } from 'idb-keyval';
 import { app, initialState, resetState, viewEntries, selected } from './index';
 import { loadEntries } from '../load';
 import { handleRouteChange } from '../actions/global-actions';
-import { resetSync } from '../sync';
+import { resetDataFetched } from '../actions/entry-actions';
 import { saveAccounts } from '../../../test/accounts';
 import { devOnly } from '../../../test/mount';
 import { mockGetAllEntries } from '../../../test/api-mocks';
@@ -352,13 +352,13 @@ describe('appState', () => {
     beforeEach(() => {
       fetchMock.restore();
       mockGetAllEntries({ entries: [] });
-      resetSync();
+      resetDataFetched();
     });
 
     afterEach(async () => {
       await fetchMock.flush();
       fetchMock.restore();
-      resetSync();
+      resetDataFetched();
     });
 
     it('loads the entries stored in IDB for the active account into the store', async () => {

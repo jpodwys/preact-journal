@@ -1,9 +1,7 @@
 import { app, set } from '../app-state';
 import { getViewFromPathname } from '../utils';
-import { route } from '../route';
+import { route } from '../../components/router';
 import { newEntry } from './entry-actions';
-import { isSending } from '../sync';
-import { isNew } from '../sync/record';
 
 
 export function toggleDarkMode () {
@@ -29,9 +27,9 @@ function handleRoute (view, url) {
   }
 };
 
-// Leaving a blank, never-written new entry discards it. One whose create is still out is kept: the server is getting it.
+// Leaving a blank, never-written new entry discards it.
 function handleEntriesView () {
-  const kept = app.entries.filter(e => !(isNew(e) && !e.text && !isSending(e.id)));
+  const kept = app.entries.filter(e => !(e.newEntry && !e.text));
   if(kept.length < app.entries.length) app.entries = kept;
 };
 

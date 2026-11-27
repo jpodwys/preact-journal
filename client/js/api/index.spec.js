@@ -1,9 +1,8 @@
 import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
 import api from './index';
-import '../actions/user-actions';   // registers the 401 handler
 import { app, resetState } from '../app-state';
-import { resetSync } from '../sync';
+import { resetDataFetched } from '../actions/entry-actions';
 import { getAccounts, saveAccounts } from '../../../test/accounts';
 import { mockGetAllEntries } from '../../../test/api-mocks';
 
@@ -27,7 +26,7 @@ describe('api', () => {
     fetchMock.get('api-500', 500);
     localStorage.clear();
     await idbClear();
-    resetSync();
+    resetDataFetched();
     resetState();
     history.replaceState(null, '', '/entries');
   });

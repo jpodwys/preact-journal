@@ -243,12 +243,11 @@ describe('entry', () => {
 
       expect(fetchMock.calls('/api/entry/5').length).to.equal(1);
       expect(fetchMock.lastOptions('/api/entry/5').method).to.equal('PATCH');
-      expect(lastBody('/api/entry/5')).to.include({ text: 'edited text' });
-      expect(selected()[0]).to.include({ id: 5, text: 'edited text' });
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'edited text' });
+      expect(selected()[0]).to.include({ id: 5, text: 'edited text', needsSync: true });
       expect(app.entries[0].text).to.equal('edited text');
 
-      expect(app.entries[0].needsSync).to.be.ok;
-      await waitFor(() => expect(app.entries[0]).to.not.have.property('needsSync'));
+      await waitFor(() => expect(app.entries[0].needsSync).to.be.undefined);
     });
 
     it('PATCHes the trimmed date when the date field is edited', () => {
@@ -261,7 +260,7 @@ describe('entry', () => {
       clock.tick(500);
 
       expect(fetchMock.calls('/api/entry/7').length).to.equal(1);
-      expect(lastBody('/api/entry/7')).to.include({ date: '2025-12-31' });
+      expect(lastBody('/api/entry/7')).to.deep.equal({ date: '2025-12-31' });
       expect(app.entries[0].date).to.equal('2025-12-31');
     });
 
@@ -279,16 +278,15 @@ describe('entry', () => {
       clock.tick(500);
 
       expect(fetchMock.calls('/api/entry/5').length).to.equal(1);
-      expect(lastBody('/api/entry/5')).to.include({ text: 'abcd' });
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'abcd' });
     });
 
-    it('POSTs a new entry, keeping its id and remembering the server id', async () => {
+    it('POSTs a new entry with date and text read from the DOM, then adopts the server id', async () => {
       mockCreateEntry({ id: 42 });
-      const entry = { id: 1000, date: '', text: '', newEntry: true };
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
       env = mountEntry({ view: '/new', entry, entries: [entry] });
 
       type($ed(), '2024-12-25');
-      fireEvent.input($ed());
       type($et(), 'first entry');
       fireEvent.input($et());
       clock.tick(500);
@@ -296,22 +294,21 @@ describe('entry', () => {
       expect(fetchMock.calls('/api/entry').length).to.equal(1);
       expect(fetchMock.lastOptions('/api/entry').method).to.equal('POST');
       expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'first entry' });
-      expect(selected()[0]).to.include({ id: 1000, text: 'first entry', newEntry: true });
+      expect(selected()[0]).to.include({ id: 1000, text: 'first entry', postPending: true });
 
-      await waitFor(() => expect(app.entries[0]).to.deep.equal({ id: 1000, sid: 42, date: '2024-12-25', text: 'first entry' }));
-      await nextRender();
-      expect(selected()[0].id).to.equal(1000);
+      await waitFor(() => expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' }));
+      await nextRender();                                // the editor must survive rendering the new id
+      expect(selected()[0].id).to.equal(42);
       expect($et().textContent).to.equal('first entry');
     });
 
-    it('keeps the same editor element, caret and typing when the first save returns', async () => {
+    it('keeps the same editor element, caret and typing when the first save swaps the client id for the server id', async () => {
       mockCreateEntry({ id: 42 });
-      const entry = { id: 1000, date: '', text: '', newEntry: true };
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
       env = mountEntry({ view: '/new', entry, entries: [entry] });
       const et = $et();
 
       type($ed(), '2024-12-25');
-      fireEvent.input($ed());
       type(et, 'first entry');
       fireEvent.input(et);
       clock.tick(500);                                   // the POST goes out
@@ -325,8 +322,8 @@ describe('entry', () => {
       selection.removeAllRanges();
       selection.addRange(range);
 
-      // The response arrives. Then render it, which must leave the editor alone.
-      await waitFor(() => expect(selected()[0].sid).to.equal(42));
+      // The response arrives: id 1000 becomes 42. Then render it, which must leave the editor alone.
+      await waitFor(() => expect(selected()[0].id).to.equal(42));
       await nextRender();
       expect($et(), 'the editor was not rebuilt').to.equal(et);
       expect($et().textContent, 'what was typed meanwhile survives').to.equal('first entry and more');
@@ -353,17 +350,16 @@ describe('entry', () => {
       env.cleanup();
       env = null;
       expect(fetchMock.calls('/api/entry/5').length).to.equal(1);   // saved on the way out
-      expect(lastBody('/api/entry/5')).to.include({ text: 'edited' });
+      expect(lastBody('/api/entry/5')).to.deep.equal({ text: 'edited' });
       clock.tick(500);
       expect(fetchMock.calls('/api/entry/5').length).to.equal(1);   // and only once
     });
 
-    it('leaving a brand-new entry within the debounce window still creates it', () => {
+    it('leaving a brand-new entry within the debounce window still creates it (DOM read while attached)', () => {
       mockCreateEntry({ id: 42 });
-      const entry = { id: 1000, date: '', text: '', newEntry: true };
+      const entry = { id: 1000, date: '', text: '', newEntry: true, needsSync: true };
       env = mountEntry({ view: '/new', entry, entries: [entry] });
       type($ed(), '2024-12-25');
-      fireEvent.input($ed());
       type($et(), 'typed then left');
       fireEvent.input($et());
       env.cleanup();
@@ -374,7 +370,7 @@ describe('entry', () => {
       expect(fetchMock.calls('/api/entry').length).to.equal(1);
     });
 
-    it('typing in a second entry within the window saves both entries', async () => {
+    it('typing in a second entry within the window saves both entries, each on its own timer', async () => {
       mockUpdateEntry(1);
       mockUpdateEntry(2);
       const items = [{ id: 1, date: '2024-01-02', text: 'one' }, { id: 2, date: '2024-01-01', text: 'two' }];
@@ -385,14 +381,14 @@ describe('entry', () => {
       app.entryId = items[1].id;
       await waitFor(() => expect($et().textContent).to.equal('two'));
       type($et(), 'two edited');
-      fireEvent.input($et());
+      fireEvent.input($et());                       // entry 2 gets its own debounce; entry 1's is not replaced
       expect(fetchMock.called('/api/entry/1')).to.be.false;
       expect(fetchMock.called('/api/entry/2')).to.be.false;
       clock.tick(500);
       expect(fetchMock.calls('/api/entry/1').length).to.equal(1);
-      expect(lastBody('/api/entry/1')).to.include({ text: 'one edited' });
-      await waitFor(() => expect(fetchMock.calls('/api/entry/2').length).to.equal(1));   // one request at a time
-      expect(lastBody('/api/entry/2')).to.include({ text: 'two edited' });
+      expect(lastBody('/api/entry/1')).to.deep.equal({ text: 'one edited' });
+      expect(fetchMock.calls('/api/entry/2').length).to.equal(1);
+      expect(lastBody('/api/entry/2')).to.deep.equal({ text: 'two edited' });
     });
 
     it('a save still pending when navigating to another entry goes to the entry that was edited', async () => {
@@ -408,7 +404,7 @@ describe('entry', () => {
       clock.tick(500);
 
       expect(fetchMock.called('/api/entry/2')).to.be.false;
-      expect(lastBody('/api/entry/1')).to.include({ text: 'one edited' });
+      expect(lastBody('/api/entry/1')).to.deep.equal({ text: 'one edited' });
       expect(app.entries.find(e => e.id === 1).text).to.equal('one edited');
       expect(app.entries.find(e => e.id === 2).text).to.equal('two');
       // The late save must not pull the screen back to entry 1.
