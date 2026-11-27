@@ -189,9 +189,10 @@ export function filterByText (query = ''){
   app.filterText = query;
 };
 
-export function toggleSort (){
-  set({ sort: app.sort === 'desc' ? 'asc' : 'desc', dialogMode: '' });
-};
+// sort order is switched off
+// export function toggleSort (){
+//   set({ sort: app.sort === 'desc' ? 'asc' : 'desc', dialogMode: '' });
+// };
 
 export function shiftEntry (count){
   const [current, i] = selected();

@@ -36,7 +36,7 @@ describe('dialog-wrapper', () => {
         view: '/entries',
         dialogMode: 'menu',
         dark: false,
-        sort: 'desc',
+        // sort: 'desc',   // sort order is switched off
         userId: '1'
       }, state)
     });
@@ -169,7 +169,7 @@ describe('dialog-wrapper', () => {
     });
   });
 
-  describe('menu: sort toggle', () => {
+  describe.skip('menu: sort toggle', () => {   // sort order is switched off
     it('shows "Oldest" when sort is desc; clicking flips sort to asc and closes the menu', async () => {
       env = mountDialog({ state: { sort: 'desc' } });
       expect(env.queryByText('Latest')).to.be.null;

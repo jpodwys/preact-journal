@@ -65,7 +65,8 @@ describe('App scheduling (one rAF render per tick)', () => {
   });
 
   it('several writes in one tick (plus their watcher writes) produce a single render', async () => {
-    app.sort = 'asc';
+    // app.sort = 'asc';   // sort order is switched off
+    app.filter = 'favorites';
     app.filterText = 'entry';
     app.dark = true;
     app.dialogMode = 'menu';
@@ -74,11 +75,11 @@ describe('App scheduling (one rAF render per tick)', () => {
     await nextRender();
     expect(renders, 'one coalesced render').to.equal(1);
     expect(env.getByText('Light'), 'menu rendered with dark on').to.exist;
-    expect(env.getByText('Latest'), 'menu rendered with asc sort').to.exist;
+    // expect(env.getByText('Latest'), 'menu rendered with asc sort').to.exist;   // sort order is switched off
   });
 
   it('an unchanged write schedules nothing', async () => {
-    app.sort = app.sort;
+    app.filter = app.filter;
     app.dialogMode = '';
     await nextRender();
     expect(renders).to.equal(0);

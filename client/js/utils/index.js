@@ -2,16 +2,17 @@ import { clear, del } from '../idb';
 
 const findObjectIndexById = (id, list) => list.findIndex(obj => obj.id === id);
 
-function sortObjectsByDate (list, sort = 'desc') {
+// Newest first. The oldest-first choice is switched off: sort order is switched off
+function sortObjectsByDate (list /* , sort = 'desc' */) {
   if(!list) return [];
-  return list.sort((a, b) => ((a.date < b.date) - (a.date > b.date)) * (sort === 'desc' ? 1 : -1));
+  return list.sort((a, b) => (a.date < b.date) - (a.date > b.date) /* ) * (sort === 'desc' ? 1 : -1 */);
 };
 
-function applyFilters (view, query, filter, sort, list) {
+function applyFilters (view, query, filter, /* sort, */ list) {
   if(view === '/search' && !query && !filter) return [];
   list = list.filter(entry => !entry.deleted);
   if(filter === 'favorites') list = list.filter(entry => entry.favorited);
-  list = sortObjectsByDate(list, sort);
+  list = sortObjectsByDate(list /* , sort */);
   if(!query) return list;
   query = query.toLowerCase();
   return list.flatMap(obj => {

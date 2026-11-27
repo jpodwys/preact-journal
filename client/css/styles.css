@@ -115,17 +115,21 @@ svg {
   transform: rotate(45deg);
 }
 
+/* sort order is switched off
 .rotate90 {
   transform: rotate(90deg);
 }
+*/
 
 .rotate180 {
   transform: rotate(180deg);
 }
 
+/* sort order is switched off
 .rotate270 {
   transform: rotate(270deg);
 }
+*/
 
 /* Login */
 

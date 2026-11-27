@@ -23,7 +23,7 @@ export const initialState = () => {
     accounts,
     userId,
     entries: [],
-    sort: 'desc',
+    // sort: 'desc',   // sort order is switched off
     filter: '',
     filterText: '',
     entryId: undefined,
@@ -56,7 +56,7 @@ export const resetState = () => {
 // Derived, not stored: there is no field to assign. Memoized on its inputs.
 let inputs = [], view;
 export const viewEntries = () => {
-  const now = [app.view, app.filterText, app.filter, app.sort, app.entries];
+  const now = [app.view, app.filterText, app.filter, /* app.sort, */ app.entries];
   if (now.some((v, i) => v !== inputs[i])) {
     view = applyFilters(...now);
     if (typeof __DEV__ === 'undefined' || __DEV__) Object.freeze(view);

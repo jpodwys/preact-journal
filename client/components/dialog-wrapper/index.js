@@ -3,7 +3,7 @@ import Icon from '../icon';
 import { app, selected } from '../../js/app-state';
 import { route } from '../../js/route';
 import { toggleDarkMode } from '../../js/actions/global-actions';
-import { deleteEntry, toggleSort /* , exportEntries */ } from '../../js/actions/entry-actions';
+import { deleteEntry /* , toggleSort, exportEntries */ } from '../../js/actions/entry-actions';
 import { logout, switchAccount } from '../../js/actions/user-actions';
 
 const closeDialog = () => { app.dialogMode = ''; };
@@ -16,7 +16,7 @@ const onSwitch = (userId) => {
 };
 
 export default () => {
-  const { dialogMode, dark, view, sort, userId, accounts } = app;
+  const { dialogMode, dark, view, /* sort, */ userId, accounts } = app;
   if(!dialogMode) return;
   const [entry] = selected();
 
@@ -31,12 +31,15 @@ export default () => {
           <Icon icon={dark ? 'sun' : 'moon'}/>
           <span>{dark ? 'Light' : 'Dark'}</span>
         </li>
+        {/* Sort order is switched off to save download size: the list is always newest first. To restore it, search for
+          "sort order is switched off" and "toggleSort", and uncomment the code and specs (the CSS has rotate90/270).
         {notOnEntry &&
           <li onclick={toggleSort}>
             <Icon icon="back" class={sort === 'desc' ? 'rotate90' : 'rotate270'}/>
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
         }
+        */}
         {/* Export is switched off to save download size (about 190 B). client/js/export-entries is kept.
           To restore it, uncomment this, its import above, the action in entry-actions, the `download` icon and the specs.
         {notOnEntry &&

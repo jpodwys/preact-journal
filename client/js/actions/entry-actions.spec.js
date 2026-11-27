@@ -14,7 +14,7 @@ import {
   filterByText,
   shiftEntry,
   toggleFavorite,
-  toggleSort,
+  // toggleSort,   // sort order is switched off
   clearFilters,
   // exportEntries   // export is switched off
 } from './entry-actions';
@@ -874,7 +874,7 @@ describe('entryActions', () => {
     });
   });
 
-  describe('toggleSort', () => {
+  describe.skip('toggleSort', () => {   // sort order is switched off
     it('flips desc to asc and clears dialogMode', () => {
       seed({ sort: 'desc', dialogMode: 'menu' });
       toggleSort();
