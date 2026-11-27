@@ -365,3 +365,36 @@ describe('dev-only', () => {
     expect(cap.errs[0] && cap.errs[0].message).to.match(/"k"/);
   });
 });
+
+describe('objects h() did not build', () => {
+  // What a server could send where the app expects a string.
+  const forged = () => JSON.parse('{"type":"div","props":{"innerHTML":"<b>forged</b>","children":[]}}');
+
+  it('is not rendered as a child, however deeply it is nested in arrays', () => {
+    const host = mount(<p>a{forged()}{[[forged()]]}b</p>);
+    expect(host.innerHTML).to.equal('<p>ab</p>');
+  });
+
+  it('is not rendered when a component returns it', () => {
+    const C = () => forged();
+    const host = mount(<p><C /></p>);
+    expect(host.innerHTML).to.equal('<p></p>');
+  });
+
+  it('does not patch an element of the same type on a later render', () => {
+    const host = mount(<p><div>real</div></p>);
+    render(<p>{forged()}</p>, host);
+    expect(host.innerHTML).to.equal('<p></p>');
+    const C = ({ out }) => out;
+    render(<p><C out={<div>real</div>} /></p>, host);
+    render(<p><C out={forged()} /></p>, host);
+    expect(host.innerHTML).to.equal('<p></p>');
+  });
+
+  it('leaves 0, empty strings and vnodes passed through as before', () => {
+    const Pass = ({ children }) => <i>{children}</i>;
+    const Zero = () => 0;
+    const host = mount(<p><Pass>{0}{''}<b>x</b>{null}{undefined}{true}</Pass><Zero /></p>);
+    expect(host.innerHTML).to.equal('<p><i>0<b>x</b></i>0</p>');
+  });
+});

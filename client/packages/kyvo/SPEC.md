@@ -17,6 +17,9 @@ import { listen, debounced } from './helpers.js'   // userland, tree-shakeable
 ### `h(type, props, ...children)`
 Hyperscript / JSX factory. Returns `{ type, props: { ...props, children }, key }`.
 `children` is flattened; `null`, `undefined`, `true`, `false` are dropped (`0` and `''` are kept).
+So is any object `h()` did not build: a vnode carries a private symbol, so parsed JSON shaped like a vnode is never
+rendered, whether it is passed as a child or returned by a component. Spreading untrusted data into **props** is not
+guarded (`innerHTML` is assigned like any other property).
 
 ### `render(vnode, hostElement)`
 Diffs `vnode` into `hostElement` (first call mounts, later calls diff). It also records

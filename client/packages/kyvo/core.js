@@ -4,9 +4,13 @@
 // Dev-only code is guarded inline by `typeof __DEV__ === 'undefined' || __DEV__`
 // so a build that defines __DEV__ as false drops it.
 
+// Marks what h() built. No other object is ever rendered as an element: data (parsed JSON, say) that turns up where text
+// was expected cannot carry this symbol, so it cannot become markup. h() checks children; run() checks what a component returns.
+const V = Symbol();
+
 export function h(type, props, ...children) {
   props = props || {};
-  return { type, props: { ...props, children: children.flat(Infinity).filter(c => c != null && c !== !!c) }, key: props.key };
+  return { [V]: 1, type, props: { ...props, children: children.flat(Infinity).filter(c => typeof c == 'object' ? c && c[V] : c != null && c !== !!c) }, key: props.key };
 }
 
 // ---------------------------------------------------------------- scheduling
@@ -156,7 +160,7 @@ function createDom(vnode, svg) {
 }
 
 // Runs a component function; props are one live object per instance. A null/false
-// result becomes an empty text node.
+// result (or an object h() did not build) becomes an empty text node.
 function run(i) {
   const p = i._props, next = i._vnode.props;
   for (const k in p) if (!(k in next)) delete p[k];
@@ -166,7 +170,7 @@ function run(i) {
   i._r = 1;
   try { out = i._vnode.type(p, i); } finally { i._r = 0; }
   if (!i._ok) { i._ok = 1; i._n0 = i._n; }
-  return out || out === 0 ? out : '';
+  return (typeof out == 'object' ? out && out[V] : out || out === 0) ? out : '';
 }
 
 function unmount(i) {
