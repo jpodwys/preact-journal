@@ -33,7 +33,7 @@ module.exports = Object.assign(function seed(dir) {
   // 6. misspelled local-state field
   edit('components/entry/index.js', "{s.text}\n      </div>", "{s.txt}\n      </div>");
   // 7. ctx.mount whose arrow accidentally returns a timer id instead of a cleanup function
-  edit('components/router/index.js', "ctx.mount(() => {\n    LIVE = props;", "ctx.mount(() => setInterval(() => {}, 1000)); ctx.mount(() => {\n    LIVE = props;");
+  edit('components/router/index.js', "ctx.mount(() => {\n    onRoute(", "ctx.mount(() => setInterval(() => {}, 1000)); ctx.mount(() => {\n    onRoute(");
   // 8. wrong value type written to the store
   edit('js/actions/global-actions.js', "set({ dark: !app.dark, dialogMode: '' });", "set({ dark: 'toggle', dialogMode: '' });");
 }, { annotate: module.exports.annotate });

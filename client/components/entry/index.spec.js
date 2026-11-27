@@ -4,6 +4,7 @@ import { mount, fireEvent, waitFor, nextRender } from '../../../test/mount';
 import { mockUpdateEntry, mockCreateEntry, lastBody } from '../../../test/api-mocks';
 import { app, selected } from '../../js/app-state';
 import { handleRouteChange } from '../../js/actions/global-actions';
+import { createEntry } from '../../js/actions/entry-actions';
 import Router from '../router';
 import Entry from './index';
 
@@ -125,6 +126,44 @@ describe('entry', () => {
     });
   });
 
+  describe('the date heading across a switch of entry', () => {
+    const open = entries => {
+      history.replaceState(null, '', '/entry/1');
+      mockUpdateEntry(1);
+      env = mount(
+        h(Router, { onChange: handleRouteChange }, h(Entry, { path: '/entry/:id' })),
+        { state: { view: '/entry', userId: '1', entries } }
+      );
+      return waitFor(() => expect($ed().textContent).to.equal(entries[0].date));
+    };
+    const next = () => fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
+
+    it('saves a pending date edit to the entry it was typed in, not the date of the entry moved to', async () => {
+      await open([{ id: 1, date: '2021-05-05', text: 'one' }, { id: 2, date: '2020-01-01', text: 'two' }]);
+      type($ed(), '2021-05-06');
+      fireEvent.input($ed());
+      next();                       // before the debounce fires
+      await waitFor(() => expect($et().textContent).to.equal('two'));
+      await waitFor(() => expect(app.entries.map(e => e.date)).to.deep.equal(['2021-05-06', '2020-01-01']), { timeout: 1500 });
+    });
+
+    it('shows the new entry\'s date when both entries had the same one and it was edited', async () => {
+      await open([{ id: 1, date: '2020-01-01', text: 'one' }, { id: 2, date: '2020-01-01', text: 'two' }]);
+      type($ed(), 'edited');
+      next();
+      await waitFor(() => expect($et().textContent).to.equal('two'));
+      expect($ed().textContent).to.equal('2020-01-01');
+    });
+
+    it('shows the new entry\'s date after the heading\'s text node was replaced', async () => {
+      await open([{ id: 1, date: '2021-05-05', text: 'one' }, { id: 2, date: '2020-01-01', text: 'two' }]);
+      $ed().textContent = 'retyped';   // selecting all and typing replaces the node
+      next();
+      await waitFor(() => expect($et().textContent).to.equal('two'));
+      expect($ed().textContent).to.equal('2020-01-01');
+    });
+  });
+
   describe('local copies of date/text', () => {
     const entry = { id: 5, date: '2024-01-01', text: 'original' };
 
@@ -226,6 +265,61 @@ describe('entry', () => {
     });
   });
 
+  // A new entry's id changes from the client's to the server's when its POST returns, possibly mid-sentence.
+  describe('saves that straddle the server giving a new entry its id', () => {
+    const fresh = extra => Object.assign({ id: 1000, date: '2024-12-25', text: '', newEntry: true, needsSync: true }, extra);
+    // A POST that answers only when told to.
+    const heldPost = () => {
+      let answer;
+      fetchMock.post('/api/entry', new Promise(r => { answer = r; }));
+      return id => answer({ id });
+    };
+    const enter = (el, text) => { type(el, text); fireEvent.input(el); };
+    const sent = id => waitFor(() => expect(lastBody('/api/entry/' + id)).to.deep.equal({ text: 'Hello world' }), { timeout: 1500 });
+
+    it('keeps what was typed on /new just before the response arrived', async () => {
+      const answer = heldPost();
+      mockUpdateEntry(77);
+      env = mountEntry({ view: '/new', entry: fresh() });
+      enter($et(), 'Hello');
+      await waitFor(() => expect(fetchMock.calls('/api/entry').length).to.equal(1), { timeout: 1500 });
+      enter($et(), 'Hello world');
+      answer(77);
+      await waitFor(() => expect(selected()[0].id).to.equal(77));
+      await sent(77);
+      expect(selected()[0].text).to.equal('Hello world');
+    });
+
+    it('keeps the editor, and what is being typed, when an unsynced entry that is open gets its id', async () => {
+      const answer = heldPost();
+      mockUpdateEntry(77);
+      const entry = fresh({ text: 'Hello' });
+      env = mountEntry({ entry });
+      const et = $et();
+      createEntry({ entry, clientSync: true });   // the replay of an offline create
+      enter(et, 'Hello world');
+      answer(77);
+      await waitFor(() => expect(selected()[0].id).to.equal(77));
+      await nextRender();
+      expect($et()).to.equal(et);
+      expect(et.textContent).to.equal('Hello world');
+      await sent(77);
+      expect(selected()[0].text).to.equal('Hello world');
+    });
+
+    it('saves an unsynced entry\'s own text when the user moves on before the debounce fires', async () => {
+      mockCreateEntry({ id: 77 });
+      const other = { id: 2, date: '2020-01-01', text: 'neighbour' };
+      env = mountEntry({ entry: fresh({ text: 'Hello' }), entries: [fresh({ text: 'Hello' }), other] });
+      enter($et(), 'Hello world');
+      app.entryId = other.id;
+      await waitFor(() => expect($et().textContent).to.equal('neighbour'));
+      await waitFor(() => expect(fetchMock.calls('/api/entry').length).to.equal(1), { timeout: 1500 });
+      expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'Hello world' });
+      await waitFor(() => expect(app.entries.find(e => e.id === 77).text).to.equal('Hello world'));
+    });
+  });
+
   describe('editing flow (debounced)', () => {
     beforeEach(fakeTimers);
 
@@ -296,7 +390,7 @@ describe('entry', () => {
       expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'first entry' });
       expect(selected()[0]).to.include({ id: 1000, text: 'first entry', postPending: true });
 
-      await waitFor(() => expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' }));
+      await waitFor(() => expect(app.entries[0]).to.deep.equal({ id: 42, clientId: 1000, date: '2024-12-25', text: 'first entry' }));
       await nextRender();                                // the editor must survive rendering the new id
       expect(selected()[0].id).to.equal(42);
       expect($et().textContent).to.equal('first entry');

@@ -8,39 +8,32 @@ import { createEntry, updateEntry, shiftEntry } from '../../js/actions/entry-act
 // exactly when a new entry should take focus (the element is keyed by entry id).
 const focusIfNew = el => { if(el && app.view === '/new') el.focus(); };
 
-// `entry` is the one rendered when the input happened, not app.entry at fire
-// time: a save still pending after navigating to another entry must not write
-// the edited text into the entry now on screen.
-const slowUpsert = (e, entry) => {
-  if(entry.newEntry){
-    createEntry({ entry: {
-      ...entry,
-      date: document.getElementById('ed').innerText,
-      text: document.getElementById('et').innerText
-    }});
-  } else {
-    const property = e.target.id === 'ed' ? 'date' : 'text';
-    updateEntry({
-      entry: { [property]: e.target.innerText.trim() },
-      property,
-      entryId: entry.id
-    });
-  }
+// Everything is read when the input happens, not when the save runs: by then the screen may show another entry (so
+// not the DOM), and a new entry may have its server id (so the entry itself is looked up again).
+const slowUpsert = ({ entry, property, date, text }) => {
+  const current = app.entries.find(e => e.id === entry.id || e.clientId === entry.id);
+  if(!current || current.deleted) return;
+  if(current.newEntry) return createEntry({ entry: { ...current, date, text } });
+  // If it was new when typed, its POST has returned since, and may have carried neither field as it is now.
+  const values = { date: date.trim(), text: text.trim() };
+  (entry.newEntry ? ['date', 'text'] : [property]).forEach(p => updateEntry({ entry: { [p]: values[p] }, property: p, entryId: current.id }));
 };
+
+const read = id => document.getElementById(id).innerText;
 
 export default (props, ctx) => {
   const { view } = app, [entry, index] = selected();
-  // One debounce per entry id: switching entries never replaces another entry's pending save,
-  // and leaving the screen runs whatever is pending (debounced never drops a call).
-  const upsert = debounced(ctx, slowUpsert, 500, entry ? String(entry.id) : '');
   // Local copy of the text: seeded when the entry changes and otherwise left
   // alone, so re-renders never touch what the user is typing.
-  const s = ctx.state({ ident: undefined, date: '', text: '' });
+  const s = ctx.state({ id: 0, date: '', text: '' });
+  // `s.id` is the id the editor was built for. A new entry getting its server id is not a change of entry: the id
+  // stays, so the editor (caret, typing) is not rebuilt.
+  if(entry && s.id !== entry.id && s.id !== entry.clientId) Object.assign(s, { id: entry.id, date: entry.date, text: entry.text });
+  // One debounce per entry: switching entries never replaces another entry's pending save,
+  // and leaving the screen runs whatever is pending (debounced never drops a call).
+  const upsert = debounced(ctx, slowUpsert, 500, String(s.id));
+  const onInput = e => upsert({ entry, property: e.target.id === 'ed' ? 'date' : 'text', date: read('ed'), text: read('et') });
   if(!entry) return <h2 class="center-text fade-up">Looks like that doesn't exist!</h2>
-  // /new is one entry per visit: its first save swaps the client id for the server id, and that must not rebuild the editor (caret, typing).
-  const ident = view === '/new' ? 'new' : entry.id;
-  if(s.ident !== ident) Object.assign(s, { ident, date: entry.date, text: entry.text });
-
   return (
     <div class="fade-up">
       <div class="entry-header nav-set dark-fill">
@@ -54,10 +47,13 @@ export default (props, ctx) => {
             aria-label="Previous entry"/>
         }
         <div class="entry-date-wrapper">
+          {/* Keyed like the text below: another entry gets a new element, so what was typed in (or done to) the old
+            one never shows for it. */}
           <h1
             id="ed"
+            key={'date-' + s.id}
             contenteditable
-            onInput={e => upsert(e, entry)}
+            onInput={onInput}
             class="entry-date center-text">
             {s.date}
           </h1>
@@ -76,9 +72,9 @@ export default (props, ctx) => {
         id="et"
         contenteditable="plaintext-only"
         class="entry-text"
-        onInput={e => upsert(e, entry)}
+        onInput={onInput}
         ref={focusIfNew}
-        key={'entry-' + s.ident}>
+        key={'entry-' + s.id}>
         {s.text}
       </div>
     </div>

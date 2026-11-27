@@ -124,7 +124,8 @@ export function createEntry ({ entry, clientSync }){
       // The slide-in mark and the entry on screen follow the id from the client's to the server's.
       const swap = id => id === entry.id ? data.id : id;
       if(userId === app.userId) set({ fresh: app.fresh.map(swap), entryId: swap(app.entryId) });
-      patchEntry(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id }));
+      // `clientId` is for whatever still holds the old id: a save waiting to run, and the open editor.
+      patchEntry(userId, entry.id, ({ postPending, newEntry, needsSync, ...rest }) => ({ ...rest, id: data.id, clientId: entry.id }));
     })
     .catch(() => patchEntry(userId, entry.id, ({ postPending, ...rest }) => rest));
 };

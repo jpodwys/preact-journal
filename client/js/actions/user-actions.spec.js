@@ -104,6 +104,25 @@ describe('userActions', () => {
       await eventually(async () => expect(await idbGet('entries_99')).to.be.undefined);
     });
 
+    it('keeps an account another tab added, and its unsent entries', async () => {
+      await resetAll({ accounts: [{ id: 99, username: 'current', active: true }] });
+      const unsent = [{ id: 1000, date: '2020-01-01', text: 'unsent', newEntry: true, needsSync: true }];
+      // What a second tab leaves behind; this tab's store has not heard of it.
+      localStorage.setItem('accounts', JSON.stringify([{ id: 99, username: 'current', active: false }, { id: 5, username: 'other', active: true }]));
+      localStorage.setItem('timestamp_5', '1');
+      await idbSet('entries_5', unsent);
+      mockLogout();
+      mockSyncEntries();
+      fetchMock.post('/api/entry', 503);
+
+      logout();
+      await eventually(() => expect(app.userId).to.equal('5'));
+      await settleNetwork();
+
+      expect(getAccountsFromStorage().map(a => a.id)).to.deep.equal([5]);
+      expect((await idbGet('entries_5')).map(e => e.text)).to.deep.equal(['unsent']);
+    });
+
     it('should not clear localStorage or state when logout fails', async () => {
       await resetAll({ accounts: [{ id: 99, username: 'current', active: true }] });
       localStorage.setItem('bogus', 'value');

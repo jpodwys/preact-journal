@@ -1,6 +1,6 @@
 import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { app, selected } from '../../js/app-state';
+import { app, selected, loadAccounts } from '../../js/app-state';
 import { route } from '../../js/route';
 import { toggleDarkMode } from '../../js/actions/global-actions';
 import { deleteEntry /* , toggleSort, exportEntries */ } from '../../js/actions/entry-actions';
@@ -9,7 +9,7 @@ import { logout, switchAccount } from '../../js/actions/user-actions';
 const closeDialog = () => { app.dialogMode = ''; };
 
 const onSwitch = (userId) => {
-  var other = app.accounts.find(a => String(a.id) !== String(userId));
+  var other = loadAccounts().find(a => String(a.id) !== String(userId));
   if(!other) return;
   closeDialog();
   switchAccount(String(other.id));
@@ -22,7 +22,7 @@ export default () => {
 
   let markup, mode = dialogMode;
   if(dialogMode === 'menu'){
-    var hasOtherAccount = accounts.some(a => String(a.id) !== String(userId));
+    var hasOtherAccount = loadAccounts().some(a => String(a.id) !== String(userId));
     var notOnEntry = view !== '/entry' && view !== '/new';
     markup = (
       <ul class={`menu ${dark ? '' : 'dark-fill'}`}>

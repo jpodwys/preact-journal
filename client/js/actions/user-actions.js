@@ -1,6 +1,6 @@
 import { clearData } from '../utils';
 import xhr, { onUnauthorized } from '../api';
-import { app, resetState } from '../app-state';
+import { app, resetState, loadAccounts } from '../app-state';
 import { route } from '../route';
 import { loadAccount } from './entry-actions';
 
@@ -8,7 +8,7 @@ import { loadAccount } from './entry-actions';
 export function login (user){
   xhr('/api/user/login', { method: 'POST', body: user })
     .then(({ id, username }) => {
-      app.accounts = [...app.accounts.filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
+      app.accounts = [...loadAccounts().filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
       activateAccount(id);
     });
 };
@@ -36,23 +36,23 @@ function switchToNext (accounts, wipe){
 
 function logoutSuccess (){
   const userId = app.userId;
-  const accounts = app.accounts.filter(a => String(a.id) !== userId);
+  const accounts = loadAccounts().filter(a => String(a.id) !== userId);
   app.accounts = accounts;
   clearData(userId);
   switchToNext(accounts, 1);
 };
 
 export function switchAccount (userId) {
-  const account = app.accounts.find(a => String(a.id) === String(userId));
+  const accounts = loadAccounts(), account = accounts.find(a => String(a.id) === String(userId));
   if(!account) return;
-  app.accounts = app.accounts.map(a => ({ ...a, active: a.id === account.id }));
+  app.accounts = accounts.map(a => ({ ...a, active: a.id === account.id }));
   activateAccount(account.id, { dialogMode: '' });
 };
 
 export function handleExpiredSession (userId) {
   if(!userId || app.userId !== userId) return;
 
-  const accounts = app.accounts.map(a =>
+  const accounts = loadAccounts().map(a =>
     String(a.id) === userId ? {...a, expired: true, active: false} : a
   );
   app.accounts = accounts;

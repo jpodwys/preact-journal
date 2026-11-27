@@ -131,6 +131,14 @@ describe('dialog-wrapper', () => {
       expect(fetchMock.called('/api/entries')).to.be.true;
     });
 
+    it('switches to the account that exists now when another tab has replaced the one this tab knew', async () => {
+      mockGetAllEntries({ entries: [] });
+      env = mountDialog();
+      setAccounts([{ id: 1, username: 'testuser', active: false }, { id: 3, username: 'newer', active: true }]);
+      fireEvent.click(env.getByText('Switch'));
+      await waitFor(() => expect(app.userId).to.equal('3'));
+    });
+
     it('switches to the correct account regardless of stored order', async () => {
       mockGetAllEntries({ entries: [] });
       setAccounts([

@@ -5,8 +5,9 @@ import { getViewFromPathname, applyFilters, clearData } from '../utils';
 // The one global store. Components import `app` and read it during render; any
 // write re-renders the app on the next frame. Replace values, never mutate them
 // in place (dev builds freeze assigned values so a mutation throws).
-// The 'accounts' localStorage key is read here, once, and written by the watcher below, once.
-const loadAccounts = () => {
+// The 'accounts' localStorage key is written by the watcher below only. It is read at startup, and again before any
+// change to it: another tab may have changed it since, and writing this tab's copy back would lose its accounts.
+export const loadAccounts = () => {
   try {
     return JSON.parse(localStorage.getItem('accounts')) || [];
   } catch(e) {
