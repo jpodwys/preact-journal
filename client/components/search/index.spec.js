@@ -34,12 +34,12 @@ describe('search', () => {
       expect(env.queryByText('Favorites')).to.be.null;
     });
 
-    it('sets filter=favorites in the store when Favorites is clicked (and re-renders to the zero-state)', () => {
+    it('sets filter=favorites in the store when Favorites is clicked (and re-renders to the zero-state)', async () => {
       env = mountSearch();
       fireEvent.click(env.getByText('Favorites'));
       expect(app.filter).to.equal('favorites');
       // No entries are favorited, so the filtered view is empty.
-      expect(env.getByText("It's empty in here!")).to.exist;
+      await env.findByText("It's empty in here!");
     });
 
     it('sets filterText to today\'s month-day slice when "On this day" is clicked', () => {

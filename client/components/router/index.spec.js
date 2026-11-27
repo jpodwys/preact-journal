@@ -1,5 +1,5 @@
 import { h, render } from '../../packages/kyvo/core';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, nextRender } from '../../../test/mount';
 import Router, { route } from './index';
 
 // Black-box: mount a Router with path-tagged children, drive the URL via
@@ -26,6 +26,13 @@ describe('Router', () => {
       h(Entries, { path: '/entries' }),
       h(Entry, { path: '/entry/:id' })
     ));
+  }
+
+  // mount() resets the store, which leaves a frame scheduled; it would render a navigation made straight away even if
+  // the Router asked for no render at all. Tests of "navigating re-renders" let that frame go by first.
+  async function mountSettled (path, extraProps) {
+    env = mountRouter(path, extraProps);
+    await nextRender();
   }
 
   describe('path matching', () => {
@@ -64,26 +71,23 @@ describe('Router', () => {
 
   describe('route(url, replace)', () => {
     it('swaps the rendered child (on the next frame) and pushes a history entry', async () => {
-      env = mountRouter('/');
+      await mountSettled('/');
       const before = history.length;
 
       route('/entries');
       expect(location.pathname).to.equal('/entries');
       expect(history.length).to.equal(before + 1);
-      await settle();
-
-      expect(env.queryByText('ENTRIES-ROUTE')).to.exist;
+      await env.findByText('ENTRIES-ROUTE');
       expect(env.queryByText('HOME-ROUTE')).to.be.null;
     });
 
     it('replaces the current history entry when replace is true', async () => {
-      env = mountRouter('/');
+      await mountSettled('/');
       const before = history.length;
       route('/entry/5', true);
       expect(location.pathname).to.equal('/entry/5');
       expect(history.length).to.equal(before);
-      await settle();
-      expect(env.queryByText('ENTRY-ROUTE')).to.exist;
+      await env.findByText('ENTRY-ROUTE');
     });
 
     it('scrolls to the top on push', () => {
@@ -137,7 +141,7 @@ describe('Router', () => {
   it('renders from location.pathname, so a remounted Router needs no saved state', async () => {
     env = mountRouter('/');
     route('/entries');
-    await settle();
+    await env.findByText('ENTRIES-ROUTE');
     env.cleanup();
     history.replaceState(null, null, '/entry/1');
     env = mount(h(Router, null,
@@ -151,15 +155,13 @@ describe('Router', () => {
   describe('popstate', () => {
     it('renders the child for the new location and calls onChange', async () => {
       const onChange = sinon.spy();
-      env = mountRouter('/', { onChange });
+      await mountSettled('/', { onChange });
       onChange.resetHistory();
 
       history.pushState(null, null, '/entry/9');
       window.dispatchEvent(new PopStateEvent('popstate'));
       expect(onChange.calledOnceWith('/entry/9')).to.be.true;
-      await settle();
-
-      expect(env.queryByText('ENTRY-ROUTE')).to.exist;
+      await env.findByText('ENTRY-ROUTE');
       expect(env.queryByText('HOME-ROUTE')).to.be.null;
     });
   });
@@ -187,7 +189,7 @@ describe('Router', () => {
     };
 
     it('routes internal /-prefixed links and walks up to the enclosing <a>', async () => {
-      env = mountRouter('/');
+      await mountSettled('/');
       const inner = document.createElement('span');
       inner.textContent = 'go';
       addLink({ href: '/entries' }, inner);
@@ -196,8 +198,7 @@ describe('Router', () => {
 
       expect(routerPrevented).to.be.true;
       expect(location.pathname).to.equal('/entries');
-      await settle();
-      expect(env.queryByText('ENTRIES-ROUTE')).to.exist;
+      await env.findByText('ENTRIES-ROUTE');
       expect(env.queryByText('HOME-ROUTE')).to.be.null;
     });
 
@@ -250,7 +251,7 @@ describe('Router', () => {
   });
 
   describe('listener cleanup', () => {
-    it('stops intercepting clicks and handling popstate after it unmounts', async () => {
+    it('stops intercepting clicks and handling popstate after it unmounts', () => {
       const onChange = sinon.spy();
       env = mountRouter('/', { onChange });
       onChange.resetHistory();

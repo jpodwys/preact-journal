@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { clear as idbClear, get as idbGet, set as idbSet } from 'idb-keyval';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, within, fireEvent, waitFor, networkIdle } from '../../../test/mount';
 import App from './index';
 import { resetDataFetched } from '../../js/actions/entry-actions';
 import { loadEntries } from '../../js/load';
@@ -18,11 +18,14 @@ import {
   lastBody
 } from '../../../test/api-mocks';
 
-const flush = (ms = 50) => new Promise(r => setTimeout(r, ms));
-// 500ms matches the entry component's debounce (client/components/entry/index.js
-// `upsert = debounce(this.slowUpsert, 500)`); the extra 60ms lets the post-
-// debounce promise chain (action → network → handler) settle before assertions.
-const tickDebounce = () => flush(560);
+// Was a request with this method sent to any URL?
+const sent = method => fetchMock.calls().some(([, options]) => options && options.method === method);
+
+// Resolves once history.back() has landed.
+const goBack = () => new Promise(r => {
+  window.addEventListener('popstate', () => r(), { once: true });
+  history.back();
+});
 
 describe('App — integration journeys', () => {
   let env;
@@ -51,10 +54,10 @@ describe('App — integration journeys', () => {
   async function bootApp () {
     env = mount(h(App, null));
     // The entry point loads the user's cached entries from IndexedDB after the
-    // first render; do the same, then let it settle.
+    // first render; do the same, then wait for the boot requests to finish so no
+    // late response lands in the middle of what the test does next.
     await loadEntries();
-    await flush();
-    await settle();
+    await networkIdle();
   }
 
   // Seed an entry (or list) into the active user's IDB store and set the
@@ -66,6 +69,24 @@ describe('App — integration journeys', () => {
   }
   const seedEntry = (entry) => seedEntries([entry]);
 
+  // ---- what the user does ----
+  const click = async (selector) => fireEvent.click(await env.findBySelector(selector));
+  const clickText = async (text) => fireEvent.click(await env.findByText(text));
+  const clickButton = async (name) => fireEvent.click(await env.findByRole('button', { name }));
+  // The list rows have "Delete entry" and "Toggle favorite" buttons too: this is the one in the page header, which
+  // only has them on an entry view.
+  async function clickHeaderButton (name) {
+    const banner = env.getByRole('banner');
+    const button = await within(banner).findByRole('button', { name });
+    fireEvent.click(button);
+  }
+  // Type into the entry editor (the app must be on, or on its way to, an entry view).
+  async function typeEntry (text) {
+    const et = await env.findBySelector('#et');
+    et.innerText = text;
+    fireEvent.input(et);
+  }
+
   describe('write new entry', () => {
     describe('online', () => {
       it('writes a new entry and shows it on /entries after navigating back', async () => {
@@ -73,33 +94,16 @@ describe('App — integration journeys', () => {
         mockCreateEntry({ id: 12345 });
         await bootApp();
 
-        const fab = env.host.querySelector('a[href="/entry/new"]');
-        expect(fab, 'FAB rendered on /entries').to.exist;
-        fireEvent.click(fab);
-        await settle();
+        await click('a[href="/entry/new"]');
+        await typeEntry('first entry');
 
-        const et = env.host.querySelector('#et');
-        expect(et, 'should land on /new').to.exist;
-
-        et.innerText = 'first entry';
-        fireEvent.input(et);
-        await settle();
-        await tickDebounce();
-        await settle();
-        await flush(); // POST resolves → createEntrySuccess clears flags
-        await settle();
-
-        expect(fetchMock.called('/api/entry', 'POST'), 'POST fired').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry', 'POST'), 'POST fired').to.be.true);
         expect(lastBody('/api/entry').text).to.equal('first entry');
+        await networkIdle(); // the response gives the entry its server id
 
-        await new Promise(r => {
-          window.addEventListener('popstate', () => r(), { once: true });
-          history.back();
-        });
-        await flush();
-        await settle();
-
-        expect(env.queryByText('first entry'), 'entry visible on list').to.exist;
+        await goBack();
+        // The editor also holds this text, so look for it in a list row.
+        await waitFor(() => expect(env.getByText('first entry').closest('.entry-preview'), 'entry visible on list').to.exist);
         expect(env.queryByText("It's empty in here!")).to.be.null;
       });
     });
@@ -110,29 +114,16 @@ describe('App — integration journeys', () => {
         mockCreateEntry({ id: 12345 });
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/new"]'));
-        await settle();
-        const et = env.host.querySelector('#et');
-        et.innerText = 'first entry';
-        fireEvent.input(et);
-        await settle();
-        await tickDebounce();                         // longer than the 450 ms animation window
-        await settle();
-        await flush();
-        await settle();
+        await click('a[href="/entry/new"]');
+        await typeEntry('first entry');
+        // The POST goes out after the 500ms debounce, which is longer than the 450ms animation window.
+        await waitFor(() => expect(fetchMock.called('/api/entry', 'POST')).to.be.true);
+        await networkIdle();
 
-        await new Promise(r => {
-          window.addEventListener('popstate', () => r(), { once: true });
-          history.back();
-        });
-        await flush();
-        await settle();
-
-        const preview = () => env.queryByText('first entry').closest('.entry-preview');
-        expect(preview().classList.contains('fade-right'), 'slides in on return').to.be.true;
-        await flush(600);
-        await settle();
-        expect(preview().classList.contains('fade-right'), 'and the class is removed afterwards').to.be.false;
+        await goBack();
+        const preview = () => env.getByText('first entry').closest('.entry-preview');
+        await waitFor(() => expect(preview().classList.contains('fade-right'), 'slides in on return').to.be.true);
+        await waitFor(() => expect(preview().classList.contains('fade-right'), 'and the class is removed afterwards').to.be.false);
       });
     });
 
@@ -141,16 +132,10 @@ describe('App — integration journeys', () => {
         mockEntryApiOffline();
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/new"]'));
-        await settle();
-        const et = env.host.querySelector('#et');
-        et.innerText = 'offline entry';
-        fireEvent.input(et);
-        await settle();
-        await tickDebounce();
-        await settle();
-        await flush();
-        await settle();
+        await click('a[href="/entry/new"]');
+        await typeEntry('offline entry');
+        await waitFor(() => expect(sent('POST'), 'POST attempted').to.be.true);
+        await networkIdle(); // let it fail
 
         const stored = await idbGet('entries_99');
         expect(stored).to.be.an('array');
@@ -178,10 +163,8 @@ describe('App — integration journeys', () => {
         mockCreateEntry({ id: 99999 });
 
         await bootApp();
-        await flush();
-        await settle();
 
-        expect(fetchMock.called('/api/entry', 'POST'), 'queued POST replayed').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry', 'POST'), 'queued POST replayed').to.be.true);
         const body = lastBody('/api/entry');
         expect(body.text).to.equal('queued offline');
         expect(body.date).to.equal('2024-01-01');
@@ -199,23 +182,10 @@ describe('App — integration journeys', () => {
         mockUpdateEntry(5);
         await bootApp();
 
-        const row = env.host.querySelector('a[href="/entry/5"]');
-        expect(row, 'list row rendered').to.exist;
-        fireEvent.click(row);
-        await settle();
+        await click('a[href="/entry/5"]');
+        await typeEntry('edited online');
 
-        const et = env.host.querySelector('#et');
-        expect(et, 'on entry view').to.exist;
-
-        et.innerText = 'edited online';
-        fireEvent.input(et);
-        await settle();
-        await tickDebounce();
-        await settle();
-        await flush();
-        await settle();
-
-        expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired').to.be.true);
         expect(lastBody('/api/entry/5').text).to.equal('edited online');
       });
 
@@ -225,20 +195,13 @@ describe('App — integration journeys', () => {
         mockUpdateEntry(5);
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
-        const et = env.host.querySelector('#et');
-        et.innerText = 'edited then left';
-        fireEvent.input(et);
-        // Go back at once, far inside the 500ms debounce.
-        await new Promise(r => {
-          window.addEventListener('popstate', () => r(), { once: true });
-          history.back();
-        });
-        await flush();
-        await settle();
+        await click('a[href="/entry/5"]');
+        await typeEntry('edited then left');
+        await goBack();                          // at once, far inside the 500ms debounce
+        await env.findBySelector('a[href="/entry/5"]');
 
-        expect(env.queryByText('first'), 'back on the list').to.be.null;
+        expect(env.host.querySelector('#et'), 'back on the list').to.not.exist;
+        // Deliberately not waited for: leaving the screen must already have sent it.
         expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired on the way out').to.be.true;
         expect(lastBody('/api/entry/5').text).to.equal('edited then left');
       });
@@ -250,16 +213,10 @@ describe('App — integration journeys', () => {
         mockEntryApiOffline();
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
-        const et = env.host.querySelector('#et');
-        et.innerText = 'edited offline';
-        fireEvent.input(et);
-        await settle();
-        await tickDebounce();
-        await settle();
-        await flush();
-        await settle();
+        await click('a[href="/entry/5"]');
+        await typeEntry('edited offline');
+        await waitFor(() => expect(sent('PATCH'), 'PATCH attempted').to.be.true);
+        await networkIdle(); // let it fail
 
         const stored = await idbGet('entries_99');
         expect(stored.length).to.equal(1);
@@ -281,10 +238,8 @@ describe('App — integration journeys', () => {
         mockUpdateEntry(5);
 
         await bootApp();
-        await flush();
-        await settle();
 
-        expect(fetchMock.called('/api/entry/5', 'PATCH'), 'queued PATCH replayed').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry/5', 'PATCH'), 'queued PATCH replayed').to.be.true);
         expect(lastBody('/api/entry/5').text).to.equal('edited offline');
       });
     });
@@ -300,20 +255,13 @@ describe('App — integration journeys', () => {
         mockDeleteEntry(5);
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
-        const deleteIcon = env.getByRole('button', { name: 'Delete entry' });
-        expect(deleteIcon, 'delete icon on entry view').to.exist;
-        fireEvent.click(deleteIcon);
-        await settle();
+        await click('a[href="/entry/5"]');
+        await clickHeaderButton('Delete entry');
+        await env.findByText('Delete this entry?'); // the confirm modal
+        await clickText('Delete');
 
-        expect(env.queryByText('Delete this entry?'), 'confirm modal opened').to.exist;
-        fireEvent.click(env.getByText('Delete'));
-        await settle();
-        await flush();
-        await settle();
-
-        expect(fetchMock.called('/api/entry/5', 'DELETE'), 'DELETE fired').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry/5', 'DELETE'), 'DELETE fired').to.be.true);
+        await env.findByText("It's empty in here!"); // back on the list
         expect(env.queryByText('will be gone'), 'row gone from list').to.be.null;
       });
     });
@@ -324,14 +272,12 @@ describe('App — integration journeys', () => {
         mockEntryApiOffline();
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
-        fireEvent.click(env.getByRole('button', { name: 'Delete entry' }));
-        await settle();
-        fireEvent.click(env.getByText('Delete'));
-        await settle();
-        await flush();
-        await settle();
+        await click('a[href="/entry/5"]');
+        await clickHeaderButton('Delete entry');
+        await env.findByText('Delete this entry?');
+        await clickText('Delete');
+        await waitFor(() => expect(sent('DELETE'), 'DELETE attempted').to.be.true);
+        await networkIdle(); // let it fail
 
         const stored = await idbGet('entries_99');
         // Splice only happens on DELETE success; offline keeps the row with
@@ -354,10 +300,8 @@ describe('App — integration journeys', () => {
         mockDeleteEntry(5);
 
         await bootApp();
-        await flush();
-        await settle();
 
-        expect(fetchMock.called('/api/entry/5', 'DELETE'), 'queued DELETE replayed').to.be.true;
+        await waitFor(() => expect(fetchMock.called('/api/entry/5', 'DELETE'), 'queued DELETE replayed').to.be.true);
       });
     });
   });
@@ -372,19 +316,12 @@ describe('App — integration journeys', () => {
         mockUpdateEntry(5);
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
+        await click('a[href="/entry/5"]');
+        await clickHeaderButton('Toggle favorite');
 
-        const star = env.getByRole('button', { name: 'Toggle favorite' });
-        expect(star, 'empty star on entry view').to.exist;
-        fireEvent.click(star);
-        await settle();
-        await flush();
-        await settle();
-
+        await waitFor(() => expect(within(env.getByRole('banner')).getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon'), 'star is now filled').to.equal('star-filled'));
         expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired').to.be.true;
         expect(lastBody('/api/entry/5')).to.deep.equal({ favorited: true });
-        expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon'), 'star is now filled').to.equal('star-filled');
       });
     });
 
@@ -394,12 +331,10 @@ describe('App — integration journeys', () => {
         mockEntryApiOffline();
         await bootApp();
 
-        fireEvent.click(env.host.querySelector('a[href="/entry/5"]'));
-        await settle();
-        fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
-        await settle();
-        await flush();
-        await settle();
+        await click('a[href="/entry/5"]');
+        await clickHeaderButton('Toggle favorite');
+        await waitFor(() => expect(sent('PATCH'), 'PATCH attempted').to.be.true);
+        await networkIdle(); // let it fail
 
         const stored = await idbGet('entries_99');
         expect(stored[0].favorited).to.be.true;
@@ -418,12 +353,10 @@ describe('App — integration journeys', () => {
         mockUpdateEntry(5);
 
         await bootApp();
-        await flush();
-        await settle();
+        await waitFor(() => expect(fetchMock.called('/api/entry/5', 'PATCH'), 'queued PATCH replayed').to.be.true);
 
         // syncClientEntries routes a non-new, non-deleted needsSync entry
         // through putEntry, which PATCHes the whole entry as the body.
-        expect(fetchMock.called('/api/entry/5', 'PATCH'), 'queued PATCH replayed').to.be.true;
         expect(lastBody('/api/entry/5').favorited).to.be.true;
       });
     });
@@ -438,23 +371,17 @@ describe('App — integration journeys', () => {
       mockSyncEntries();
       await bootApp();
 
-      expect(env.host.querySelectorAll('.entry-preview').length).to.equal(2);
+      await waitFor(() => expect(env.host.querySelectorAll('.entry-preview').length).to.equal(2));
 
-      fireEvent.click(env.host.querySelector('a[href="/search"]'));
-      await settle();
+      await click('a[href="/search"]');
 
       // /search with no filter shows the Favorites / On this day menu.
-      expect(env.queryByText('Favorites')).to.exist;
+      await env.findByText('Favorites');
       expect(env.host.querySelectorAll('.entry-preview').length).to.equal(0);
 
-      const input = env.host.querySelector('#fi');
-      fireEvent.input(input, 'beach');
-      await settle();
-      await flush(160); // header debounce is 100ms
-      await settle();
+      fireEvent.input(await env.findBySelector('#fi'), 'beach');
 
-      const previews = env.host.querySelectorAll('.entry-preview');
-      expect(previews.length).to.equal(1);
+      await waitFor(() => expect(env.host.querySelectorAll('.entry-preview').length).to.equal(1));
       expect(env.host.querySelector('a[href="/entry/1"]'), 'beach entry visible').to.exist;
     });
   });
@@ -475,20 +402,14 @@ describe('App — integration journeys', () => {
 
       await bootApp();
 
-      expect(env.queryByText('Login'), 'login form rendered').to.exist;
+      await env.findByText('Login');
 
       fireEvent.input(env.host.querySelector('#luser'), 'alice');
-      await settle();
       fireEvent.input(env.host.querySelector('#lpass'), 'pass1');
-      await settle();
       fireEvent.submit(env.getByRole('form'));
-      await settle();
-      // login → loginSuccess → activateAccount → IDB get → setState
-      // → getEntries → GET /api/entries. Two flushes cover the chain.
-      await flush();
-      await settle();
-      await flush();
-      await settle();
+
+      // login → loginSuccess → activateAccount → IDB get → getEntries → render
+      await env.findBySelector('a[href="/entry/11"]');
 
       expect(fetchMock.called('/api/user/login', 'POST')).to.be.true;
 
@@ -496,8 +417,6 @@ describe('App — integration journeys', () => {
       expect(accounts).to.have.length(1);
       expect(accounts[0].id).to.equal(99);
       expect(accounts[0].active).to.be.true;
-
-      expect(env.host.querySelector('a[href="/entry/11"]'), 'list row rendered after login').to.exist;
     });
   });
 
@@ -517,19 +436,11 @@ describe('App — integration journeys', () => {
 
       await bootApp();
 
-      expect(env.host.querySelector('a[href="/entry/11"]'), 'alice entry visible').to.exist;
-
+      await env.findBySelector('a[href="/entry/11"]'); // alice's entry
       fireEvent.click(env.getByRole('button', { name: 'Menu' }));
-      await settle();
-      fireEvent.click(env.getByText('Switch'));
-      await settle();
-      // activateAccount → IDB get → setState → getEntries → GET → success
-      await flush();
-      await settle();
-      await flush();
-      await settle();
+      await clickText('Switch');
 
-      expect(env.host.querySelector('a[href="/entry/22"]'), 'bob entry visible').to.exist;
+      await env.findBySelector('a[href="/entry/22"]'); // bob's entry
       expect(env.host.querySelector('a[href="/entry/11"]'), 'alice entry gone').to.not.exist;
 
       const accounts = JSON.parse(localStorage.getItem('accounts'));
@@ -541,16 +452,11 @@ describe('App — integration journeys', () => {
   describe('logout', () => {
     const storedAccounts = () => JSON.parse(localStorage.getItem('accounts') || '[]');
     const logOut = async () => {
-      fireEvent.click(env.getByRole('button', { name: 'Menu' }));
-      await settle();
-      fireEvent.click(env.getByText('Logout'));            // closes the menu, then opens the confirm dialog
-      await flush();
-      await settle();
+      await clickButton('Menu');
+      await clickText('Logout');            // closes the menu, then opens the confirm dialog
+      // The menu's "Logout" is on screen until the next frame, so wait for the dialog itself.
+      await env.findByText('Logout?');
       fireEvent.click(env.getByRole('button', { name: 'Logout' }));
-      await flush();
-      await settle();
-      await flush();
-      await settle();
     };
 
     it('logging out the only account lands on the login page and forgets the account', async () => {
@@ -560,8 +466,8 @@ describe('App — integration journeys', () => {
 
       await logOut();
 
+      await env.findByText('Login');
       expect(fetchMock.called('/api/user/logout', 'POST'), 'logout POST fired').to.be.true;
-      expect(env.queryByText('Login'), 'login form rendered').to.exist;
       expect(location.pathname).to.equal('/');
       expect(storedAccounts()).to.have.length(0);
     });
@@ -577,11 +483,11 @@ describe('App — integration journeys', () => {
       mockGetAllEntries({ entries: [] });
       mockLogout();
       await bootApp();
-      expect(env.host.querySelector('a[href="/entry/11"]'), 'alice entry visible').to.exist;
+      await env.findBySelector('a[href="/entry/11"]'); // alice's entry
 
       await logOut();
 
-      expect(env.host.querySelector('a[href="/entry/22"]'), 'bob entry visible').to.exist;
+      await env.findBySelector('a[href="/entry/22"]'); // bob's entry
       expect(env.host.querySelector('a[href="/entry/11"]'), 'alice entry gone').to.not.exist;
       const accounts = storedAccounts();
       expect(accounts.map(a => a.id)).to.deep.equal([2]);
@@ -596,10 +502,8 @@ describe('App — integration journeys', () => {
       await seedEntry({ id: 5, date: '2024-01-01', text: 'kept locally' });
       mockSyncEntries({ httpStatus: 401 });
       await bootApp();
-      await flush();
-      await settle();
 
-      expect(env.queryByText('Login'), 'login form rendered').to.exist;
+      await env.findByText('Login');
       expect(location.pathname).to.equal('/');
       const accounts = storedAccounts();
       expect(accounts).to.have.length(1);
@@ -617,12 +521,8 @@ describe('App — integration journeys', () => {
       localStorage.setItem('timestamp_1', '1000');
       mockSyncEntries({ httpStatus: 401 });
       await bootApp();
-      await flush();
-      await settle();
-      await flush();
-      await settle();
 
-      expect(env.host.querySelector('a[href="/entry/22"]'), 'bob entry visible').to.exist;
+      await env.findBySelector('a[href="/entry/22"]'); // bob's entry
       const accounts = storedAccounts();
       expect(accounts.find(a => a.id === 1)).to.include({ expired: true, active: false });
       expect(accounts.find(a => a.id === 2).active).to.be.true;

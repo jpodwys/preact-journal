@@ -1,5 +1,5 @@
 import { h } from '../../packages/kyvo/core';
-import { mount, settle } from '../../../test/mount';
+import { mount, waitFor, nextRender } from '../../../test/mount';
 import ScrollViewport from './index';
 
 describe('virtual-scroll', () => {
@@ -35,6 +35,10 @@ describe('virtual-scroll', () => {
   const mountList = (n, rowHeight = ROW) =>
     mount(h(ScrollViewport, { items: makeItems(n), renderer, rowHeight }));
 
+  // The first render does not know the viewport height yet; the mount-time measurement renders the real window.
+  const measured = () => waitFor(() => expect(rows().length).to.equal(((innerHeight / ROW) | 0) + OVERSCAN + 1));
+  const firstRowIs = text => waitFor(() => expect(rows()[0].textContent).to.equal(text));
+
   it('renders every row when they all fit in the initial window, inside a relative fade-down container', () => {
     env = mountList(5);
     expect(rows().length).to.equal(5);
@@ -51,51 +55,46 @@ describe('virtual-scroll', () => {
 
   it('only renders the rows near the viewport (window height + overscan)', async () => {
     env = mountList(1000);
-    await settle(); // the mount-time measurement writes ctx.state; let it render
-    const expected = ((innerHeight / ROW) | 0) + OVERSCAN + 1;
-    expect(rows().length).to.equal(expected);
+    await measured();
     expect(rows()[0].textContent).to.equal('item 0');
     expect(inner().style.top).to.equal('0px');
   });
 
   it('moves the window on scroll, aligned down to the overscan chunk', async () => {
     env = mountList(1000);
-    await settle();
+    await measured();
     const count = rows().length;
 
     scrollListTo(50 * ROW + 10); // row 50 -> start aligned to 40
-    await settle();
-    expect(rows()[0].textContent).to.equal('item 40');
+    await firstRowIs('item 40');
     expect(inner().style.top).to.equal(40 * ROW + 'px');
     expect(rows().length, 'window size unchanged').to.equal(count);
 
     scrollListTo(59 * ROW + 10); // still inside the 40..59 chunk: no shift
-    await settle();
+    await nextRender();
     expect(rows()[0].textContent).to.equal('item 40');
 
     scrollListTo(60 * ROW + 10); // next chunk
-    await settle();
-    expect(rows()[0].textContent).to.equal('item 60');
+    await firstRowIs('item 60');
     expect(inner().style.top).to.equal(60 * ROW + 'px');
   });
 
   it('clamps the offset at 0 when the list is below the top of the viewport', async () => {
     env = mountList(1000);
-    await settle();
+    await measured();
     window.scrollTo(0, 0);
     window.dispatchEvent(new Event('scroll'));
-    await settle();
+    await nextRender();
     expect(rows()[0].textContent).to.equal('item 0');
     expect(inner().style.top).to.equal('0px');
   });
 
   it('grows the window on resize to a taller viewport', async () => {
     env = mountList(1000);
-    await settle();
+    await measured();
     setInnerHeight(2000);
     window.dispatchEvent(new Event('resize'));
-    await settle();
-    expect(rows().length).to.equal(2000 / ROW + OVERSCAN + 1);
+    await waitFor(() => expect(rows().length).to.equal(2000 / ROW + OVERSCAN + 1));
   });
 
   it('adds passive capture scroll/resize listeners on mount and removes the same ones on unmount', () => {
@@ -128,11 +127,11 @@ describe('virtual-scroll', () => {
 
   it('a scroll event after unmount is harmless', async () => {
     env = mountList(1000);
-    await settle();
+    await measured();
     env.cleanup();
     env = null;
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('resize'));
-    await settle();
+    await nextRender();
   });
 });

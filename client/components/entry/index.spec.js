@@ -1,6 +1,6 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, waitFor, nextRender } from '../../../test/mount';
 import { mockUpdateEntry, mockCreateEntry, lastBody } from '../../../test/api-mocks';
 import { app, selected } from '../../js/app-state';
 import { handleRouteChange } from '../../js/actions/global-actions';
@@ -106,21 +106,21 @@ describe('entry', () => {
         h(Router, { onChange: handleRouteChange }, h(Entry, { path: '/entry/:id' })),
         { state: { view: '/entry', userId: '1', entries: items } }
       );
-      await settle();
-      expect($et().textContent).to.equal('two');
-      expect($ed().textContent).to.equal('2024-01-02');
+      const shows = (text, date) => waitFor(() => {
+        expect($et().textContent).to.equal(text);
+        expect($ed().textContent).to.equal(date);
+      });
+      await shows('two', '2024-01-02');
 
       fireEvent.click(env.getByRole('button', { name: 'Next entry' }));
-      await settle();
       expect(location.pathname).to.equal('/entry/3');
       expect(selected()[0].id).to.equal(3);
-      expect($et().textContent).to.equal('three');
-      expect($ed().textContent).to.equal('2024-01-01');
+      await shows('three', '2024-01-01');
 
       fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
+      await shows('two', '2024-01-02');
       fireEvent.click(env.getByRole('button', { name: 'Previous entry' }));
-      await settle();
-      expect($et().textContent).to.equal('one');
+      await shows('one', '2024-01-03');
       expect(env.getByRole('button', { name: 'Previous entry' }).classList.contains('hidden')).to.be.true;
     });
   });
@@ -134,7 +134,7 @@ describe('entry', () => {
       type($ed(), '2030-01-01');
       app.dark = !app.dark;
       app.filterText = 'x';
-      await settle();
+      await nextRender();
       expect($et().textContent).to.equal('typed but not saved');
       expect($ed().textContent).to.equal('2030-01-01');
       document.body.classList.remove('dark');
@@ -152,7 +152,7 @@ describe('entry', () => {
       // before the next frame rendered it.
       expect(selected()[0].text).to.equal('hello');
       type(et, 'hello wor');
-      await settle();
+      await nextRender();
       expect($et()).to.equal(et);
       expect(et.textContent).to.equal('hello wor');
     });
@@ -161,15 +161,14 @@ describe('entry', () => {
       env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
       type($et(), 'stale typing');
       Object.assign(app, { entries: [{ id: 6, date: '2024-02-02', text: 'other entry' }], entryId: 6 });
-      await settle();
-      expect($et().textContent).to.equal('other entry');
+      await waitFor(() => expect($et().textContent).to.equal('other entry'));
       expect($ed().textContent).to.equal('2024-02-02');
     });
 
     it('a store write of the same entry id with new text does not reseed', async () => {
       env = mountEntry({ entry, entries: [entry], viewEntries: [entry], entryIndex: 0 });
       app.entries = [Object.assign({}, entry, { text: 'changed elsewhere' })];
-      await settle();
+      await nextRender();
       expect($et().textContent).to.equal('original');
     });
   });
@@ -204,9 +203,8 @@ describe('entry', () => {
 
       const blank = { id: 1000, date: '2024-12-25', text: '', newEntry: true };
       Object.assign(app, { view: '/new', entries: [blank, ...app.entries], entryId: 1000 });
-      await settle();
+      await waitFor(() => expect(document.activeElement.id).to.equal('et'));
 
-      expect(document.activeElement.id).to.equal('et');
       expect($ed().textContent).to.equal('2024-12-25');
     });
 
@@ -218,9 +216,9 @@ describe('entry', () => {
       type($ed(), '2024-12-26');
       fireEvent.input($ed());
       app.dark = !app.dark;
-      await settle();
+      await nextRender();
       app.filterText = 'y';
-      await settle();
+      await nextRender();
 
       expect(document.activeElement).to.equal($ed());
       expect($ed().textContent).to.equal('2024-12-26');
@@ -249,8 +247,7 @@ describe('entry', () => {
       expect(selected()[0]).to.include({ id: 5, text: 'edited text', needsSync: true });
       expect(app.entries[0].text).to.equal('edited text');
 
-      await settle();
-      expect(app.entries[0].needsSync).to.be.undefined;
+      await waitFor(() => expect(app.entries[0].needsSync).to.be.undefined);
     });
 
     it('PATCHes the trimmed date when the date field is edited', () => {
@@ -299,8 +296,8 @@ describe('entry', () => {
       expect(lastBody('/api/entry')).to.deep.equal({ date: '2024-12-25', text: 'first entry' });
       expect(selected()[0]).to.include({ id: 1000, text: 'first entry', postPending: true });
 
-      await settle();
-      expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' });
+      await waitFor(() => expect(app.entries[0]).to.deep.equal({ id: 42, date: '2024-12-25', text: 'first entry' }));
+      await nextRender();                                // the editor must survive rendering the new id
       expect(selected()[0].id).to.equal(42);
       expect($et().textContent).to.equal('first entry');
     });
@@ -325,8 +322,9 @@ describe('entry', () => {
       selection.removeAllRanges();
       selection.addRange(range);
 
-      await settle();                                    // the response arrives: id 1000 becomes 42
-      expect(selected()[0].id).to.equal(42);
+      // The response arrives: id 1000 becomes 42. Then render it, which must leave the editor alone.
+      await waitFor(() => expect(selected()[0].id).to.equal(42));
+      await nextRender();
       expect($et(), 'the editor was not rebuilt').to.equal(et);
       expect($et().textContent, 'what was typed meanwhile survives').to.equal('first entry and more');
       expect(selection.anchorNode, 'the caret is still in the same text node').to.equal(et.firstChild);
@@ -338,9 +336,8 @@ describe('entry', () => {
       env = mountEntry({ view: '/entry', entry: a, entries: [a, b], viewEntries: [a, b], entryIndex: 0 });
       const first = $et();
       app.entryId = b.id;
-      await settle();
+      await waitFor(() => expect($et().textContent).to.equal('b'));
       expect($et()).to.not.equal(first);
-      expect($et().textContent).to.equal('b');
     });
 
     it('a pending save runs, and is not lost, when the entry unmounts', () => {
@@ -382,7 +379,7 @@ describe('entry', () => {
       type($et(), 'one edited');
       fireEvent.input($et());
       app.entryId = items[1].id;
-      await settle();
+      await waitFor(() => expect($et().textContent).to.equal('two'));
       type($et(), 'two edited');
       fireEvent.input($et());                       // entry 2 gets its own debounce; entry 1's is not replaced
       expect(fetchMock.called('/api/entry/1')).to.be.false;
@@ -403,8 +400,7 @@ describe('entry', () => {
       type($et(), 'one edited');
       fireEvent.input($et());
       app.entryId = items[1].id;
-      await settle();
-      expect($et().textContent).to.equal('two');
+      await waitFor(() => expect($et().textContent).to.equal('two'));
       clock.tick(500);
 
       expect(fetchMock.called('/api/entry/2')).to.be.false;
@@ -413,7 +409,7 @@ describe('entry', () => {
       expect(app.entries.find(e => e.id === 2).text).to.equal('two');
       // The late save must not pull the screen back to entry 1.
       expect(selected()[0].id).to.equal(2);
-      await settle();
+      await nextRender();
       expect($et().textContent).to.equal('two');
     });
   });

@@ -21,14 +21,54 @@ server or reads `.env`. `npm run test:all` runs all of it.
     npm test                                  # SPECS=components/entry,js/utils npm test  runs a subset (paths under client/)
 
 `test/mount.js` is the harness: `mount(vnode, { state })` resets the store (it is a module singleton), merges `state`
-over a fresh initial state and mounts into a detached `div`. kyvo renders only on `requestAnimationFrame`, so there is no
-synchronous mode. Instead, `fireEvent` (real events) re-renders every mounted root synchronously afterwards (`render()` is
-synchronous), so a spec can assert right after a click; timers, promises and direct store writes need `await settle()`
-(a microtask plus two frames). A spec that asserts a dev-only behavior (the deep freeze, the misuse errors, the render-loop
-guard) uses `devOnly(...)`, which skips itself in the minified bundles where `__DEV__` is false. The 20 journeys in
-`client/components/app/index.spec.js` drive the whole app (entry create, edit, delete and favorite, each online and
-offline write and replay; search; login; logout; expired session; account switch). The framework's specs under
-`client/packages/` are excluded from this suite (they have their own runner).
+over a fresh initial state and mounts into a detached `div`. `fireEvent` dispatches real events. A spec that asserts a
+dev-only behavior (the deep freeze, the misuse errors, the render-loop guard) uses `devOnly(...)`, which skips itself in
+the minified bundles where `__DEV__` is false. The journeys in `client/components/app/index.spec.js` drive the whole app
+(entry create, edit, delete and favorite, each online and offline write and replay; search; login; logout; expired
+session; account switch). The framework's specs under `client/packages/` are excluded from this suite (they have their
+own runner).
+
+### Waiting
+
+`mount()` renders synchronously, so the first assertions can use `getBy*` / `queryBy*`. Anything that follows an event,
+a store write or a response shows up later, so wait for it. The specs should not care how or when the app renders.
+
+Every single-element query throws when more than one element matches (`find*` keeps retrying until one does). To say
+which one you mean, search inside an element:
+
+    const banner = env.getByRole('banner');
+    const deleteButton = await within(banner).findByRole('button', { name: 'Delete entry' });
+    fireEvent.click(deleteButton);
+
+| To wait for | Use |
+|---|---|
+| an element to appear | `env.findByText`, `env.findByRole`, `env.findBySelector` |
+| an element to go away | `waitForElementToBeRemoved(() => env.queryByText(...))` (fails if it was never there) |
+| anything else (an attribute, the store, a fetch call, IndexedDB, the URL) | `waitFor(() => expect(...))`; the callback may be async |
+| every request to have finished | `networkIdle()` |
+| nothing: you are asserting that something did **not** change | `nextRender()`, then assert |
+
+`find*` and `waitFor` retry every 10ms for up to 1s, on real timers even when a spec fakes `setTimeout`.
+
+Polling returns as soon as it passes, which is wrong in these cases:
+
+- **The element is already there.** List rows have their own "Delete entry" and "Toggle favorite" buttons, so right
+  after clicking a row, an unscoped query can find a row's button (with one row, it is the only match). Look inside the
+  `banner`, as above. The editor also holds the entry's text, so look for a list row by `.entry-preview`.
+- **The state is already true.** An offline write sets `needsSync` before its request fails. To assert what is true
+  after the failure, wait for the request, then `networkIdle()`.
+- **Absence.** `waitFor(() => expect(x).to.be.null)` passes if `x` has not appeared *yet*. Wait for something that
+  proves the screen has moved on, then assert the absence.
+- **No change.** "The editor was not rebuilt" passes before the render that might rebuild it. Wait for the cause, then
+  `nextRender()`.
+- **Promptness.** "Leaving the entry saves at once" must assert without waiting, or the 500ms debounce would satisfy it.
+
+`mount()` resets the store, which leaves one frame scheduled. A test proving that something *causes* a re-render calls
+`await nextRender()` after mounting, or that leftover frame will do the rendering for it.
+
+`nextRender()` is the only helper that knows about rendering (a microtask plus two frames). `app/scheduling.spec.js` is
+about the renderer and uses it throughout. kyvo's scheduler re-renders only the root rendered last, so a spec keeps one
+mounted at a time.
 
 Chrome silently drops `history.replaceState`/`pushState` after about 200 calls in 10 seconds, so the karma configs launch
 Chrome with `--disable-ipc-flooding-protection`.

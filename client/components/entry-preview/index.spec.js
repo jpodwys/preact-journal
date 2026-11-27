@@ -1,6 +1,6 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, networkIdle } from '../../../test/mount';
 import { app } from '../../js/app-state';
 import { mockUpdateEntry, lastBody } from '../../../test/api-mocks';
 import EntryPreview from './index';
@@ -122,7 +122,7 @@ describe('entry-preview', () => {
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorite' }));
       expect(app.entries[0].favorited).to.be.false;
       expect(lastBody('/api/entry/9')).to.deep.equal({ favorited: false });
-      await settle();
+      await networkIdle(); // let the response land before the next test
     });
   });
 });

@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, waitFor, networkIdle } from '../../../test/mount';
 import { app } from '../../js/app-state';
 import { mockLogin, mockGetAllEntries, lastBody } from '../../../test/api-mocks';
 import Router from '../router';
@@ -22,7 +22,7 @@ describe('login', () => {
   afterEach(async () => {
     if(env) env.cleanup();
     env = null;
-    await settle();
+    await networkIdle();
     fetchMock.restore();
     localStorage.clear();
     await idbClear();
@@ -50,11 +50,9 @@ describe('login', () => {
     env = mount(h(Login, { path: '/' }));
     typeCredentials('alice', 'pass1');
     fireEvent.submit(env.getByRole('form'));
-    await new Promise(r => setTimeout(r, 50));
-    expect(app.userId).to.be.ok;
+    await waitFor(() => expect(location.pathname).to.equal('/entries'));
     expect(app.userId).to.equal('99');
     expect(app.accounts.find(a => a.active).username).to.equal('alice');
-    expect(location.pathname).to.equal('/entries');
   });
 
   it('renders the Cancel button only when cancelable is true', () => {
@@ -88,9 +86,8 @@ describe('login', () => {
 
     history.pushState(null, null, '/switch');
     window.dispatchEvent(new PopStateEvent('popstate'));
-    await settle();
+    await env.findByText('Cancel'); // switched to the cancelable login
 
-    expect(env.getByText('Cancel'), 'switched to the cancelable login').to.exist;
     const user = env.getByRole('textbox');
     expect(user).to.not.equal(firstInput);
     expect(user.value).to.equal('');

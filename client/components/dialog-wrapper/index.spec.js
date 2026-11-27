@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, waitFor, waitForElementToBeRemoved } from '../../../test/mount';
 import { mockGetAllEntries, mockDeleteEntry, mockLogout } from '../../../test/api-mocks';
 import { app, selected } from '../../js/app-state';
 import { resetDataFetched } from '../../js/actions/entry-actions';
@@ -52,8 +52,7 @@ describe('dialog-wrapper', () => {
   it('opens when dialogMode is written to the store', async () => {
     env = mountDialog({ state: { dialogMode: '' } });
     app.dialogMode = 'menu';
-    await settle();
-    expect(env.getByRole('list')).to.exist;
+    await env.findByRole('list');
   });
 
   describe('menu username', () => {
@@ -68,8 +67,7 @@ describe('dialog-wrapper', () => {
       env = mountDialog();
       expect(env.getByRole('list').firstElementChild.textContent).to.equal('alice');
       app.accounts = [{ id: 1, username: 'bob', active: true }];
-      await settle();
-      expect(env.getByRole('list').firstElementChild.textContent).to.equal('bob');
+      await waitFor(() => expect(env.getByRole('list').firstElementChild.textContent).to.equal('bob'));
     });
   });
 
@@ -91,14 +89,14 @@ describe('dialog-wrapper', () => {
       expect(env.queryByText('Switch')).to.be.null;
     });
 
-    it('closes the menu and routes to /switch when Add is clicked', () => {
+    it('closes the menu and routes to /switch when Add is clicked', async () => {
       env = mountDialog();
       fireEvent.click(env.getByText('Add'));
-      expect(env.queryByText('Add')).to.be.null;
       expect(app.dialogMode).to.not.be.ok;
       expect(pushSpy.calledOnce).to.be.true;
       expect(pushSpy.args[0][2]).to.equal('/switch');
       expect(location.pathname).to.equal('/switch');
+      await waitForElementToBeRemoved(() => env.queryByText('Add'));
     });
   });
 
@@ -121,13 +119,13 @@ describe('dialog-wrapper', () => {
       mockGetAllEntries({ entries: [] });
       env = mountDialog();
       fireEvent.click(env.getByText('Switch'));
-      expect(env.queryByText('Switch')).to.be.null;
+      // The click itself closes the menu (loading the other account would also close it, but only later)...
+      expect(app.dialogMode).to.equal('');
       // The account flip is persisted synchronously...
       expect(getAccounts().find(a => a.active).id).to.equal(2);
+      await waitForElementToBeRemoved(() => env.queryByText('Switch'));
       // ...and the store follows once the account's cached entries load.
-      await new Promise(r => setTimeout(r, 50));
-      await settle();
-      expect(app.userId).to.equal('2');
+      await waitFor(() => expect(app.userId).to.equal('2'));
       expect(app.accounts.find(a => a.active).username).to.equal('other');
       expect(location.pathname).to.equal('/entries');
       expect(fetchMock.called('/api/entries')).to.be.true;
@@ -142,43 +140,42 @@ describe('dialog-wrapper', () => {
       env = mountDialog();
       fireEvent.click(env.getByText('Switch'));
       expect(getAccounts().find(a => a.active).id).to.equal(5);
-      await new Promise(r => setTimeout(r, 50));
-      expect(app.userId).to.equal('5');
+      await waitFor(() => expect(app.userId).to.equal('5'));
     });
   });
 
   describe('overlay', () => {
-    it('closes the menu when the overlay is clicked', () => {
+    it('closes the menu when the overlay is clicked', async () => {
       env = mountDialog();
       fireEvent.click(env.host.querySelector('.modal-overlay'));
-      expect(env.queryByRole('list')).to.not.exist;
+      await waitForElementToBeRemoved(() => env.queryByRole('list'));
       expect(env.queryByText('Logout')).to.be.null;
     });
 
-    it('closes the delete-confirm modal when the overlay is clicked', () => {
+    it('closes the delete-confirm modal when the overlay is clicked', async () => {
       env = mountDialog({
         state: { dialogMode: 'modal:delete', entry: { id: 1, date: 'd', text: 't' } }
       });
       fireEvent.click(env.host.querySelector('.modal-overlay'));
-      expect(env.queryByText('Delete this entry?')).to.be.null;
+      await waitForElementToBeRemoved(() => env.queryByText('Delete this entry?'));
       expect(env.host.querySelector('.modal-dialog')).to.not.exist;
     });
 
-    it('closes the logout-confirm modal when the overlay is clicked', () => {
+    it('closes the logout-confirm modal when the overlay is clicked', async () => {
       env = mountDialog({ state: { dialogMode: 'modal:logout' } });
       fireEvent.click(env.host.querySelector('.modal-overlay'));
-      expect(env.queryByText('Logout?')).to.be.null;
+      await waitForElementToBeRemoved(() => env.queryByText('Logout?'));
       expect(env.host.querySelector('.modal-dialog')).to.not.exist;
     });
   });
 
   describe('menu: sort toggle', () => {
-    it('shows "Oldest" when sort is desc; clicking flips sort to asc and closes the menu', () => {
+    it('shows "Oldest" when sort is desc; clicking flips sort to asc and closes the menu', async () => {
       env = mountDialog({ state: { sort: 'desc' } });
       expect(env.queryByText('Latest')).to.be.null;
       fireEvent.click(env.getByText('Oldest'));
       expect(app.sort).to.equal('asc');
-      expect(env.queryByRole('list')).to.not.exist;
+      await waitForElementToBeRemoved(() => env.queryByRole('list'));
     });
 
     it('shows "Latest" when sort is asc; clicking flips sort to desc', () => {
@@ -204,7 +201,7 @@ describe('dialog-wrapper', () => {
   describe('menu: dark mode toggle', () => {
     afterEach(() => document.body.classList.remove('dark'));
 
-    it('shows "Dark" with the moon icon when dark is false; clicking turns dark mode on', () => {
+    it('shows "Dark" with the moon icon when dark is false; clicking turns dark mode on', async () => {
       env = mountDialog({ state: { dark: false } });
       const row = env.getByText('Dark').parentElement;
       expect(row.querySelector('svg[icon="moon"]')).to.exist;
@@ -212,7 +209,7 @@ describe('dialog-wrapper', () => {
       expect(app.dark).to.be.true;
       expect(localStorage.getItem('dark')).to.equal('true');
       expect(document.body.classList.contains('dark')).to.be.true;
-      expect(env.queryByRole('list')).to.not.exist;
+      await waitForElementToBeRemoved(() => env.queryByRole('list'));
     });
 
     it('shows "Light" with the sun icon when dark is true', () => {
@@ -236,10 +233,10 @@ describe('dialog-wrapper', () => {
       env = mountDialog({ state: { viewEntries: [{ id: 1, date: '2024-01-01', text: 'hello' }] } });
       fireEvent.click(env.getByText('Export'));
       expect(createObjectURL.calledOnce).to.be.true;
+      expect(app.dialogMode).to.not.be.ok;
+      await waitForElementToBeRemoved(() => env.queryByRole('list'));
       const text = await createObjectURL.args[0][0].text();
       expect(text).to.equal('2024-01-01\r\n\r\nhello\r\n\r\n\r\n');
-      expect(app.dialogMode).to.not.be.ok;
-      expect(env.queryByRole('list')).to.not.exist;
     });
 
     it('hides Export on /entry', () => {
@@ -270,11 +267,11 @@ describe('dialog-wrapper', () => {
       expect(env.host.querySelector('.modal-dialog')).to.not.exist;
     });
 
-    it('Cancel clears dialogMode and the modal disappears', () => {
+    it('Cancel clears dialogMode and the modal disappears', async () => {
       env = mountDialog({ state: { dialogMode: 'modal:delete', entry } });
       fireEvent.click(env.getByText('Cancel'));
       expect(app.dialogMode).to.not.be.ok;
-      expect(env.queryByText('Delete this entry?')).to.be.null;
+      await waitForElementToBeRemoved(() => env.queryByText('Delete this entry?'));
     });
 
     it('Delete removes the entry, routes to /entries and sends DELETE for that id', async () => {
@@ -291,10 +288,9 @@ describe('dialog-wrapper', () => {
       expect(selected()[0]).to.be.undefined;
       expect(app.entries[0]).to.include({ id: 5, deleted: true, needsSync: true });
       expect(location.pathname).to.equal('/entries');
-      expect(env.queryByText('Delete this entry?')).to.be.null;
 
-      await new Promise(r => setTimeout(r, 20));
-      expect(app.entries).to.deep.equal([]);
+      await waitForElementToBeRemoved(() => env.queryByText('Delete this entry?'));
+      await waitFor(() => expect(app.entries).to.deep.equal([]));
     });
   });
 
@@ -306,10 +302,10 @@ describe('dialog-wrapper', () => {
       expect(env.getByText('Cancel')).to.exist;
     });
 
-    it('Cancel hides the logout modal', () => {
+    it('Cancel hides the logout modal', async () => {
       env = mountDialog({ state: { dialogMode: 'modal:logout' } });
       fireEvent.click(env.getByText('Cancel'));
-      expect(env.queryByText('Logout?')).to.be.null;
+      await waitForElementToBeRemoved(() => env.queryByText('Logout?'));
     });
 
     it('confirming Logout posts to the server, then logs the user out and routes to /', async () => {
@@ -319,12 +315,12 @@ describe('dialog-wrapper', () => {
       fireEvent.click(env.getByText('Logout'));
       expect(fetchMock.called('/api/user/logout')).to.be.true;
 
-      await new Promise(r => setTimeout(r, 20));
-      await settle();
-      expect(getAccounts()).to.deep.equal([]);
-      expect(app.userId).to.equal('');
-      expect(location.pathname).to.equal('/');
-      expect(env.queryByText('Logout?')).to.be.null;
+      await waitForElementToBeRemoved(() => env.queryByText('Logout?'));
+      await waitFor(() => {
+        expect(getAccounts()).to.deep.equal([]);
+        expect(app.userId).to.equal('');
+        expect(location.pathname).to.equal('/');
+      });
     });
   });
 
@@ -337,14 +333,14 @@ describe('dialog-wrapper', () => {
       env = mountDialog();
       fireEvent.click(env.getByText('Logout'));
 
-      // Synchronously: dialogMode cleared, menu gone, modal not yet open.
-      expect(env.queryByText('testuser')).to.be.null;
+      // Before the next tick: dialogMode cleared, menu gone, modal not yet open.
+      expect(app.dialogMode).to.equal('');
+      await waitForElementToBeRemoved(() => env.queryByRole('list'));
       expect(env.queryByText('Logout?')).to.be.null;
 
       clock.tick(0);
       expect(app.dialogMode).to.equal('modal:logout');
-      await settle();
-      expect(env.getByText('Logout?')).to.exist;
+      await env.findByText('Logout?');
     });
   });
 });

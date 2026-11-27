@@ -1,7 +1,7 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
 import { clear as idbClear } from 'idb-keyval';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, nextRender } from '../../../test/mount';
 import { app, viewEntries } from '../../js/app-state';
 import { saveAccounts } from '../../../test/accounts';
 import { resetDataFetched } from '../../js/actions/entry-actions';
@@ -12,6 +12,8 @@ import App from './index';
 // requestAnimationFrame render of the whole tree. Proven here against the
 // real <App>, with a counting probe rendered beside it in the same root
 // (every component re-runs on every render, so the probe counts renders).
+// This is the one spec that is about the rendering machinery, so it waits with
+// nextRender() and asserts what has and has not rendered at each point.
 describe('App scheduling (one rAF render per tick)', () => {
   let env, renders;
   const Probe = () => { renders++; return h('i', null); };
@@ -30,14 +32,14 @@ describe('App scheduling (one rAF render per tick)', () => {
     history.replaceState(null, null, '/entries');
     renders = 0;
     env = mount(h('div', null, h(App, null), h(Probe, null)), { state: { entries } });
-    await settle(); // let mount-time writes (router onChange, measurements) render
+    await nextRender(); // let mount-time writes (router onChange, measurements) render
     renders = 0;
   });
 
   afterEach(async () => {
     env.cleanup();
     env = null;
-    await settle();
+    await nextRender();
     fetchMock.restore();
     localStorage.clear();
     await idbClear();
@@ -45,7 +47,7 @@ describe('App scheduling (one rAF render per tick)', () => {
     document.body.classList.remove('dark');
   });
 
-  it('a store write does not touch the DOM synchronously; it lands after settle()', async () => {
+  it('a store write does not touch the DOM synchronously; it lands on the next frame', async () => {
     expect(env.getByText('first entry')).to.exist;
     app.entries = [{ id: 3, date: '2024-01-03', text: 'third entry' }];
     expect(viewEntries().length, 'watchers ran synchronously').to.equal(1);
@@ -56,7 +58,7 @@ describe('App scheduling (one rAF render per tick)', () => {
     await Promise.resolve();
     expect(env.queryByText('third entry'), 'not on a microtask either: only on a frame').to.be.null;
 
-    await settle();
+    await nextRender();
     expect(env.getByText('third entry')).to.exist;
     expect(env.queryByText('first entry')).to.be.null;
     expect(renders).to.equal(1);
@@ -69,7 +71,7 @@ describe('App scheduling (one rAF render per tick)', () => {
     app.dialogMode = 'menu';
     expect(renders).to.equal(0);
 
-    await settle();
+    await nextRender();
     expect(renders, 'one coalesced render').to.equal(1);
     expect(env.getByText('Light'), 'menu rendered with dark on').to.exist;
     expect(env.getByText('Latest'), 'menu rendered with asc sort').to.exist;
@@ -78,25 +80,24 @@ describe('App scheduling (one rAF render per tick)', () => {
   it('an unchanged write schedules nothing', async () => {
     app.sort = app.sort;
     app.dialogMode = '';
-    await settle();
+    await nextRender();
     expect(renders).to.equal(0);
   });
 
-  it('a click through fireEvent is reflected right after the harness flush, then nothing more renders', async () => {
+  it('a click renders nothing synchronously, then exactly once on the next frame', async () => {
     fireEvent.click(env.getByRole('button', { name: 'Menu' }));
     expect(app.dialogMode).to.equal('menu');
-    expect(env.getByText('Logout'), 'rendered by the harness flush').to.exist;
-    const afterClick = renders;
+    expect(env.queryByText('Logout'), 'not rendered by the event itself').to.be.null;
+    await nextRender();
+    expect(env.getByText('Logout')).to.exist;
+    expect(renders).to.equal(1);
 
     fireEvent.click(env.getByText('Dark'));
     expect(app.dark).to.be.true;
     expect(document.body.classList.contains('dark')).to.be.true;
-    expect(env.queryByText('Logout'), 'toggleDarkMode closed the menu').to.be.null;
 
-    // The second click's harness flush, then the one rAF scheduled by those
-    // writes (it still runs, against a tree that already matches the store).
-    await settle();
-    expect(renders - afterClick).to.equal(2);
-    expect(env.queryByText('Logout')).to.be.null;
+    await nextRender();
+    expect(renders, 'both writes of the click coalesced').to.equal(2);
+    expect(env.queryByText('Logout'), 'toggleDarkMode closed the menu').to.be.null;
   });
 });

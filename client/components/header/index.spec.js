@@ -1,6 +1,6 @@
 import { h } from '../../packages/kyvo/core';
 import fetchMock from 'fetch-mock';
-import { mount, fireEvent, settle } from '../../../test/mount';
+import { mount, fireEvent, waitFor } from '../../../test/mount';
 import { mockUpdateEntry, lastBody } from '../../../test/api-mocks';
 import { app, selected } from '../../js/app-state';
 import Header from './index';
@@ -39,8 +39,7 @@ describe('header', () => {
     it('appears once the store says the user is logged in', async () => {
       env = mountHeader({ userId: '', view: '/entries' });
       app.userId = '1';
-      await settle();
-      expect(env.getByRole('banner')).to.exist;
+      await env.findByRole('banner');
     });
   });
 
@@ -68,8 +67,7 @@ describe('header', () => {
       expect(env.getByText('0 Entries')).to.exist;
       // viewEntries is computed by the app-state watcher from entries.
       app.entries = [{ id: 1, date: '2024-01-02', text: 'a' }, { id: 2, date: '2024-01-01', text: 'b' }];
-      await settle();
-      expect(env.getByText('2 Entries')).to.exist;
+      await env.findByText('2 Entries');
     });
 
     it('clicking the menu icon opens the menu dialog', () => {
@@ -144,8 +142,7 @@ describe('header', () => {
       expect(fetchMock.called('/api/entry/1')).to.be.true;
       expect(lastBody('/api/entry/1')).to.deep.equal({ favorited: false });
 
-      await settle();
-      expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-empty');
+      await waitFor(() => expect(env.getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon')).to.equal('star-empty'));
     });
   });
 
@@ -297,26 +294,27 @@ describe('header', () => {
       expect(env.host.querySelector('.search-entry-count').textContent).to.equal('0');
       fireEvent.input(env.host.querySelector('#fi'), 'beach');
       clock.tick(100);
-      await settle();
-      expect(env.host.querySelector('.search-entry-count').textContent).to.equal('1');
+      await waitFor(() => expect(env.host.querySelector('.search-entry-count').textContent).to.equal('1'));
       // The input keeps what the user typed (its vnode value now matches it).
       expect(env.host.querySelector('#fi').value).to.equal('beach');
     });
 
-    it('clicking the clear icon clears filter and filterText', () => {
+    it('clicking the clear icon clears filter and filterText', async () => {
       env = mountHeader(searchState({ filter: 'favorites', filterText: 'beach' }));
       fireEvent.click(env.getByRole('button', { name: 'Clear filters' }));
       expect(app.filter).to.equal('');
       expect(app.filterText).to.equal('');
-      expect(env.host.querySelector('#fi').value).to.equal('');
-      expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-empty');
+      await waitFor(() => {
+        expect(env.host.querySelector('#fi').value).to.equal('');
+        expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-empty');
+      });
     });
 
-    it('clicking the empty-star icon turns the favorites filter on', () => {
+    it('clicking the empty-star icon turns the favorites filter on', async () => {
       env = mountHeader(searchState({ filter: '' }));
       fireEvent.click(env.getByRole('button', { name: 'Toggle favorites filter' }));
       expect(app.filter).to.equal('favorites');
-      expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-filled');
+      await waitFor(() => expect(env.getByRole('button', { name: 'Toggle favorites filter' }).getAttribute('icon')).to.equal('star-filled'));
     });
 
     it('clicking the filled-star icon turns the favorites filter off', () => {

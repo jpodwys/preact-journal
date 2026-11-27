@@ -4,27 +4,9 @@ import { clear as idbClear } from 'idb-keyval';
 import { app, resetState } from '../app-state';
 import { resetDataFetched } from './entry-actions';
 
-export const tick = (ms = 0) => new Promise(r => setTimeout(r, ms));
+import { networkIdle } from '../../../test/wait';
 
-// Wait for every in-flight fetch-mock response (and its .json()) plus the
-// action's .then/.catch handlers that run after it.
-export async function settleNetwork () {
-  await fetchMock.flush(true);
-  await tick(10);
-}
-
-// Retry an (async) assertion until it passes; for effects nothing awaits,
-// like the unawaited idb-keyval writes in the stale-user paths.
-export async function eventually (fn, timeout = 1000) {
-  const start = Date.now();
-  for(;;) {
-    try { return await fn(); }
-    catch(e) {
-      if(Date.now() - start > timeout) throw e;
-      await tick(10);
-    }
-  }
-}
+export { sleep as tick, networkIdle as settleNetwork, waitFor as eventually } from '../../../test/wait';
 
 export const ACCOUNT_1 = { id: 1, username: 'test', active: true };
 
@@ -34,7 +16,7 @@ export const ACCOUNT_1 = { id: 1, username: 'test', active: true };
 export async function resetAll ({ accounts } = {}) {
   // Let the previous test's in-flight responses land first, so a late
   // handler cannot write into this test's fresh state.
-  await settleNetwork();
+  await networkIdle();
   fetchMock.restore();
   localStorage.clear();
   await idbClear();

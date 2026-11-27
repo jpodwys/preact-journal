@@ -1,5 +1,5 @@
 import { h } from '../../packages/kyvo/core';
-import { mount, settle } from '../../../test/mount';
+import { mount, waitFor } from '../../../test/mount';
 import { app } from '../../js/app-state';
 import Entries from './index';
 
@@ -52,15 +52,13 @@ describe('entries', () => {
     expect(row('second').classList.contains('fade-right')).to.be.true;
     expect(row('first').classList.contains('fade-right')).to.be.false;
     app.fresh = [];
-    await settle();
-    expect(row('second').classList.contains('fade-right')).to.be.false;
+    await waitFor(() => expect(row('second').classList.contains('fade-right')).to.be.false);
   });
 
   it('re-renders from the store: entries appearing replace the zero-state', async () => {
     env = mountEntries();
     app.entries = [{ id: 3, date: '2024-03-03', text: 'arrived' }];
-    await settle();
+    await env.findByText('arrived');
     expect(env.queryByText("It's empty in here!")).to.be.null;
-    expect(env.getByText('arrived')).to.exist;
   });
 });

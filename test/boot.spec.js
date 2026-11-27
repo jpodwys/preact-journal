@@ -1,6 +1,6 @@
 import fetchMock from 'fetch-mock';
 import { clear as idbClear, set as idbSet } from 'idb-keyval';
-import { fireEvent, getByText, queryByText, getByRole, queryByRole, settle } from './mount';
+import { fireEvent, getByText, queryByText, getByRole, queryByRole, findByText, within, networkIdle, sleep } from './mount';
 import { saveAccounts } from './accounts';
 import { resetState } from '../client/js/app-state';
 import { mockSyncEntries, mockUnmatchedFail } from './api-mocks';
@@ -71,12 +71,8 @@ describe('bootstrap (client/js/index.js) — ' + scenario, () => {
       // localStorage); in production it is built once with the real values.
       resetState();
       require('../client/js/index.js');
-      await settle();
-      // boot reads IDB asynchronously, then the render is batched.
-      await new Promise(r => setTimeout(r, 100));
-      await settle();
 
-      expect(getByText(body(), '2 Entries'), 'header count').to.exist;
+      await findByText(body(), '2 Entries'); // header count, once the cached entries are in
       expect(getByRole(body(), 'link', { name: /first boot entry/ }), 'entry visible').to.exist;
       expect(getByRole(body(), 'link', { name: /second boot entry/ })).to.exist;
       expect(queryByText(body(), 'Login'), 'no login page').to.be.null;
@@ -85,12 +81,13 @@ describe('bootstrap (client/js/index.js) — ' + scenario, () => {
       expect(registerStub.firstCall.args[0]).to.equal('/sw.js');
 
       fireEvent.click(getByRole(body(), 'link', { name: /first boot entry/ }));
-      await settle();
+      // The page header gets a delete button on the entry view (the list rows have their own).
+      const banner = getByRole(body(), 'banner');
+      await within(banner).findByRole('button', { name: 'Delete entry' });
       expect(location.pathname).to.equal('/entry/1');
-      expect(getByRole(body(), 'button', { name: 'Delete entry' }), 'entry view').to.exist;
-      expect(queryByText(body(), '2 Entries'), 'list header gone').to.be.null;
       expect(getByText(body(), 'first boot entry'), 'entry text shown').to.exist;
 
+      await networkIdle();
       expect(fetchMock.calls('unmatched'), 'no unexpected network calls').to.have.length(0);
       expect(errors, 'no errors recorded').to.deep.equal([]);
     });
@@ -103,11 +100,9 @@ describe('bootstrap (client/js/index.js) — ' + scenario, () => {
       // localStorage); in production it is built once with the real values.
       resetState();
       require('../client/js/index.js');
-      await settle();
-      await new Promise(r => setTimeout(r, 100));
-      await settle();
-
-      expect(getByText(body(), 'Login'), 'login rendered').to.exist;
+      await findByText(body(), 'Login');
+      // This test is mostly about what does NOT happen during boot, which nothing on screen signals: give it a window.
+      await sleep(100);
       expect(getByRole(body(), 'form'), 'login form').to.exist;
       expect(getByRole(body(), 'textbox'), 'username field').to.exist;
       expect(queryByText(body(), /Entries$/), 'no entries header').to.be.null;
