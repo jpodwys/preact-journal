@@ -18,6 +18,9 @@ var express = require('express'),
   PORT = process.env.PORT || 3000;
 
 app.disable('x-powered-by');
+// Heroku's router is the one proxy in front of the app. It appends the client's address to X-Forwarded-For, so trusting
+// exactly one hop makes req.ip the client (what the login limiter counts) and ignores anything the client put there.
+app.set('trust proxy', 1);
 app.use(forceSsl);
 app.use(strictTransportSecurity);
 app.use(precompressedStatic('dist'));

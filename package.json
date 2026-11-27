@@ -12,7 +12,8 @@
     "build": "gulp build",
     "serve": "gulp serve",
     "go": "npm run build && npm run serve",
-    "test": "karma start test/karma.conf.js --single-run"
+    "test": "karma start test/karma.conf.js --single-run",
+    "test:server": "node --test test/server/entry-bl.spec.js"
   },
   "dependencies": {
     "@babel/plugin-transform-react-jsx": "^7.28.6",
