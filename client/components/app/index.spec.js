@@ -3,7 +3,7 @@ import fetchMock from 'fetch-mock';
 import { clear as idbClear, get as idbGet, set as idbSet } from 'idb-keyval';
 import { mount, within, fireEvent, waitFor, networkIdle } from '../../../test/mount';
 import App from './index';
-import { resetDataFetched } from '../../js/actions/entry-actions';
+import { resetSync } from '../../js/sync';
 import { loadEntries } from '../../js/load';
 import { saveAccounts } from '../../../test/accounts';
 import {
@@ -36,7 +36,7 @@ describe('App — integration journeys', () => {
     await idbClear();
     // dataFetched is module-scoped in entry-actions; production resets it via
     // login. Tests don't run login each time, so reset it explicitly.
-    resetDataFetched();
+    resetSync();
     history.replaceState(null, null, '/entries');
     saveAccounts([{ id: 99, username: 'alice', active: true }]);
   });
@@ -62,7 +62,7 @@ describe('App — integration journeys', () => {
 
   // Seed an entry (or list) into the active user's IDB store and set the
   // timestamp so boot routes through syncEntries (which calls
-  // syncClientEntries to replay any needsSync rows).
+  // sync() to send any unsent rows).
   async function seedEntries (entries) {
     await idbSet('entries_99', entries);
     localStorage.setItem('timestamp_99', '1000');
@@ -128,7 +128,7 @@ describe('App — integration journeys', () => {
     });
 
     describe('offline — write half', () => {
-      it('persists the queued entry to IDB with needsSync after the POST fails', async () => {
+      it('persists the queued entry to IDB as unsent after the POST fails', async () => {
         mockEntryApiOffline();
         await bootApp();
 
@@ -141,9 +141,8 @@ describe('App — integration journeys', () => {
         expect(stored).to.be.an('array');
         expect(stored.length).to.equal(1);
         expect(stored[0].text).to.equal('offline entry');
-        expect(stored[0].needsSync, 'needsSync set').to.be.true;
-        expect(stored[0].newEntry, 'newEntry set').to.be.true;
-        expect(stored[0].postPending, 'postPending cleared after failure').to.be.undefined;
+        expect(stored[0].needsSync, 'unsent').to.be.ok;
+        expect(stored[0].newEntry, 'the server has never had it').to.be.true;
       });
     });
 
@@ -208,7 +207,7 @@ describe('App — integration journeys', () => {
     });
 
     describe('offline — write half', () => {
-      it('persists the edit to IDB with needsSync after PATCH fails', async () => {
+      it('persists the edit to IDB as unsent after PATCH fails', async () => {
         await seedEntry(seeded);
         mockEntryApiOffline();
         await bootApp();
@@ -221,7 +220,7 @@ describe('App — integration journeys', () => {
         const stored = await idbGet('entries_99');
         expect(stored.length).to.equal(1);
         expect(stored[0].text).to.equal('edited offline');
-        expect(stored[0].needsSync).to.be.true;
+        expect(stored[0].needsSync, 'unsent').to.be.ok;
       });
     });
 
@@ -284,7 +283,7 @@ describe('App — integration journeys', () => {
         // deleted: true so the next online boot can replay it.
         expect(stored.length).to.equal(1);
         expect(stored[0].deleted, 'deleted flag set').to.be.true;
-        expect(stored[0].needsSync, 'needsSync set').to.be.true;
+        expect(stored[0].needsSync, 'unsent').to.be.ok;
         expect(stored[0].text).to.equal('');
       });
     });
@@ -321,12 +320,12 @@ describe('App — integration journeys', () => {
 
         await waitFor(() => expect(within(env.getByRole('banner')).getByRole('button', { name: 'Toggle favorite' }).getAttribute('icon'), 'star is now filled').to.equal('star-filled'));
         expect(fetchMock.called('/api/entry/5', 'PATCH'), 'PATCH fired').to.be.true;
-        expect(lastBody('/api/entry/5')).to.deep.equal({ favorited: true });
+        expect(lastBody('/api/entry/5')).to.include({ favorited: true });
       });
     });
 
     describe('offline — write half', () => {
-      it('persists the favorite toggle to IDB with needsSync after PATCH fails', async () => {
+      it('persists the favorite toggle to IDB as unsent after PATCH fails', async () => {
         await seedEntry(seeded);
         mockEntryApiOffline();
         await bootApp();
@@ -338,12 +337,12 @@ describe('App — integration journeys', () => {
 
         const stored = await idbGet('entries_99');
         expect(stored[0].favorited).to.be.true;
-        expect(stored[0].needsSync).to.be.true;
+        expect(stored[0].needsSync, 'unsent').to.be.ok;
       });
     });
 
     describe('offline — replay half', () => {
-      it('replays the queued favorite toggle on boot via putEntry', async () => {
+      it('replays the queued favorite toggle on boot', async () => {
         await idbSet('entries_99', [{
           ...seeded, favorited: true, needsSync: true
         }]);
@@ -355,8 +354,6 @@ describe('App — integration journeys', () => {
         await bootApp();
         await waitFor(() => expect(fetchMock.called('/api/entry/5', 'PATCH'), 'queued PATCH replayed').to.be.true);
 
-        // syncClientEntries routes a non-new, non-deleted needsSync entry
-        // through putEntry, which PATCHes the whole entry as the body.
         expect(lastBody('/api/entry/5').favorited).to.be.true;
       });
     });

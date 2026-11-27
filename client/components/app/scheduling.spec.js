@@ -4,7 +4,7 @@ import { clear as idbClear } from 'idb-keyval';
 import { mount, fireEvent, nextRender } from '../../../test/mount';
 import { app, viewEntries } from '../../js/app-state';
 import { saveAccounts } from '../../../test/accounts';
-import { resetDataFetched } from '../../js/actions/entry-actions';
+import { resetSync } from '../../js/sync';
 import { mockUnmatchedFail } from '../../../test/api-mocks';
 import App from './index';
 
@@ -27,7 +27,7 @@ describe('App scheduling (one rAF render per tick)', () => {
     mockUnmatchedFail();
     localStorage.clear();
     await idbClear();
-    resetDataFetched();
+    resetSync();
     saveAccounts([{ id: 99, username: 'alice', active: true }]);
     history.replaceState(null, null, '/entries');
     renders = 0;

@@ -42,6 +42,7 @@ export const set = delta => Object.assign(app, delta);
 // list, and saving it would overwrite the cache (/entry/new adds an entry that early). loadAccount releases the hold.
 let holding = app.userId;
 export const releaseSaves = () => { holding = 0; };
+export const isHeld = () => !!holding;
 
 // Back to a freshly computed initial state (logout, expired session, tests).
 // A reset must not persist: assigning the blank `entries` would overwrite the

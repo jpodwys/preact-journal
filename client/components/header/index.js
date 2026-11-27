@@ -2,6 +2,7 @@ import { h } from '../../packages/kyvo/core';
 import { debounced } from '../../packages/kyvo/helpers';
 import Icon from '../icon';
 import { app, viewEntries, selected } from '../../js/app-state';
+import { isNew } from '../../js/sync/record';
 import { filterByText, clearFilters, showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const cancelAndBlur = e => {
@@ -70,13 +71,13 @@ export default (props, ctx) => {
 							<Icon icon="search" onclick={() => setTimeout(() => document.getElementById('fi').focus(), 200)} key="header-search" class="fade-down"/>
 						</a>
 					}
-					{entry && !entry.newEntry && isEntry &&
+					{entry && !isNew(entry) && isEntry &&
 						<Icon icon="delete" key="header-delete" onclick={() => showConfirmDeleteEntryModal({ entry })} class="fade-up" role="button" aria-label="Delete entry"/>
 					}
 					{isEntry && navigator.share &&
 						<Icon icon="share" key="header-share" onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })} class="fade-up" role="button" aria-label="Share entry"/>
 					}
-					{entry && !entry.newEntry && isEntry &&
+					{entry && !isNew(entry) && isEntry &&
 						<Icon icon={favoriteIcon} onclick={() => toggleFavorite({ id: entry.id, favorited: !entry.favorited })} class="fade-up" role="button" aria-label="Toggle favorite"/>
 					}
 				</div>

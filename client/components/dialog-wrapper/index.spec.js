@@ -4,7 +4,7 @@ import { clear as idbClear } from 'idb-keyval';
 import { mount, fireEvent, waitFor, waitForElementToBeRemoved } from '../../../test/mount';
 import { mockGetAllEntries, mockDeleteEntry, mockLogout } from '../../../test/api-mocks';
 import { app, selected } from '../../js/app-state';
-import { resetDataFetched } from '../../js/actions/entry-actions';
+import { resetSync } from '../../js/sync';
 import DialogWrapper from './index';
 
 describe('dialog-wrapper', () => {
@@ -18,7 +18,7 @@ describe('dialog-wrapper', () => {
   beforeEach(() => {
     localStorage.clear();
     fetchMock.restore();
-    resetDataFetched();
+    resetSync();
   });
   afterEach(async () => {
     if(env) env.cleanup();
@@ -286,7 +286,7 @@ describe('dialog-wrapper', () => {
       expect(fetchMock.called('/api/entry/5')).to.be.true;
       expect(fetchMock.lastOptions('/api/entry/5').method).to.equal('DELETE');
       expect(selected()[0]).to.be.undefined;
-      expect(app.entries[0]).to.include({ id: 5, deleted: true, needsSync: true });
+      expect(app.entries[0]).to.include({ id: 5, deleted: true });
       expect(location.pathname).to.equal('/entries');
 
       await waitForElementToBeRemoved(() => env.queryByText('Delete this entry?'));

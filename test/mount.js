@@ -1,5 +1,6 @@
 import { h, render } from '../client/packages/kyvo/core';
 import { app, resetState } from '../client/js/app-state';
+import { resetSync } from '../client/js/sync';
 import { waitFor } from './wait';
 
 export { waitFor, networkIdle, nextRender, sleep } from './wait';
@@ -19,6 +20,7 @@ export const devOnly = (typeof __DEV__ === 'undefined' || __DEV__) ? it : it.ski
 // module singleton, so every mount starts from a clean slate).
 export function mount (vnode, { state = {} } = {}) {
   resetState();
+  resetSync();
   // viewEntries() is derived from entries/view/filter/sort, so a spec that lists the rows to
   // show gives them as `entries` (unless it also gives entries).
   const { viewEntries, entry, entryIndex, ...rest } = state;
