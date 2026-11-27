@@ -54,7 +54,7 @@ describe('precompressed html', () => {
     assert.equal(r.headers['content-type'], 'text/html; charset=utf-8');
     assert.equal(r.headers['content-encoding'], 'br');
     assert.equal(r.headers['vary'], 'Accept-Encoding');
-    assert.match(r.headers['etag'], /^"[\w-]+"$/, 'strong ETag (no W/ prefix)');
+    assert.match(r.headers['etag'], /^"[\w-]{10}"$/, 'short strong ETag (no W/ prefix)');
     assert.equal(r.headers['cache-control'], 'no-cache');
     assert.equal(r.headers['content-security-policy'], CSP);
     assert.equal(Number(r.headers['content-length']), r.body.length);

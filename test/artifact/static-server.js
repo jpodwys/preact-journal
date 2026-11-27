@@ -44,7 +44,7 @@ function assertCspTemplateMatchesServer () {
   const required = [
     `"'self'"`,
     `" 'sha256-" + h + "'"`,
-    `"default-src 'self'; script-src " + scriptSrc + "; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'"`,
+    `"default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'"`,
     `res.header('Content-Security-Policy', CSP)`
   ];
   for(const piece of required) {
@@ -54,7 +54,7 @@ function assertCspTemplateMatchesServer () {
 
 function buildCsp (hashes) {
   const scriptSrc = "'self'" + hashes.map(h => " 'sha256-" + h + "'").join('');
-  return "default-src 'self'; script-src " + scriptSrc + "; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'";
+  return "default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'";
 }
 
 // opts.hashes overrides the artifact's csp-hash.json (mutation proofs only).
@@ -74,7 +74,7 @@ function createServer (distDir, opts = {}) {
     if(ext === '.html') {
       headers['Content-Security-Policy'] = csp;
       headers['Cache-Control'] = 'no-cache';
-      headers['ETag'] = '"' + crypto.createHash('sha1').update(fs.readFileSync(src)).digest('base64url') + '"';
+      headers['ETag'] = '"' + crypto.createHash('sha1').update(fs.readFileSync(src)).digest('base64url').slice(0, 10) + '"';
       const sent = (req.headers['if-none-match'] || '').split(',').map(t => t.trim().replace(/^W\//, ''));
       if(sent.includes(headers['ETag'])) {
         rec.status = 304;

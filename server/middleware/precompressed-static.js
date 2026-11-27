@@ -21,7 +21,7 @@ function etagOf(file, stat, done) {
   if (known && known.size === stat.size && known.mtimeMs === stat.mtimeMs) return done(null, known.etag);
   fs.readFile(file, function (err, buf) {
     if (err) return done(err);
-    var etag = '"' + crypto.createHash('sha1').update(buf).digest('base64url') + '"';
+    var etag = '"' + crypto.createHash('sha1').update(buf).digest('base64url').slice(0, 10) + '"';
     etags[file] = { size: stat.size, mtimeMs: stat.mtimeMs, etag: etag };
     done(null, etag);
   });

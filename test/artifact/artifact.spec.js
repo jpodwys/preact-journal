@@ -12,6 +12,13 @@ const { createServer } = require('./static-server');
 const { openSession, sleep } = require('./driver');
 
 const MUTATE = process.env.ARTIFACT_MUTATE || '';
+// The build shortens class names (gulpfile renameClasses). Selectors go through this, and an unknown name is an error, so an
+// "is absent" assertion cannot pass just because the name changed.
+const cls = name => {
+  const short = JSON.parse(fs.readFileSync(path.join(DIST, 'class-map.json'), 'utf8'))[name];
+  assert.ok(short, 'renamed class ' + name);
+  return short;
+};
 const ENTRIES = [
   { id: 5, date: '2024-01-01', text: 'original entry text' },
   { id: 6, date: '2024-01-02', text: 'second entry text' }
@@ -83,9 +90,12 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
       const hashes = JSON.parse(fs.readFileSync(path.join(DIST, 'csp-hash.json'), 'utf8')).hashes;
       assert.ok(hashes.length >= 1, 'artifact has at least one inline-script hash');
       for(const h of hashes) assert.ok(csp.includes(`'sha256-${h}'`), 'CSP header lacks artifact hash ' + h + ': ' + csp);
-      assert.match(csp, /^default-src 'self'; script-src 'self' 'sha256-[^;]+; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'$/);
-      assert.equal(await s.evaluate(`document.querySelectorAll('.entry-preview').length`), 0);
+      assert.match(csp, /^default-src 'self'; script-src 'self' 'sha256-[^;]+; style-src 'unsafe-inline'; frame-ancestors 'none'$/);
+      assert.equal(await s.evaluate(`document.querySelectorAll('.${cls('entry-preview')}').length`), 0);
       assert.ok(await s.evaluate(`!!document.getElementById('luser') && !!document.getElementById('lpass')`), 'login fields');
+      // Quirks mode matches class names case-insensitively, so short names that differ only in case would share their styles.
+      const shorts = Object.values(JSON.parse(fs.readFileSync(path.join(DIST, 'class-map.json'), 'utf8')));
+      assert.equal(new Set(shorts.map(n => n.toLowerCase())).size, shorts.length, 'short class names are distinct ignoring case');
       await sleep(300); // let late errors surface
       assert.deepEqual(s.unmocked, [], 'no unmocked API calls');
       assert.deepEqual(s.api, [], 'logged-out boot makes no API calls: ' + fmt(s.api));
@@ -131,8 +141,8 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
       // Back on the list, the new row slides in once: it carries fade-right while the browser animates it, and the mark
       // is cleared again after the animation window.
       await s.evaluate(`history.back()`);
-      await s.waitFor(`location.pathname === '/entries' && !!document.querySelector('.entry-preview.fade-right')`, { label: 'new row slides in' });
-      await s.waitFor(`!document.querySelector('.fade-right')`, { label: 'slide-in mark cleared', timeout: 5000 });
+      await s.waitFor(`location.pathname === '/entries' && !!document.querySelector('.${cls('entry-preview')}.${cls('fade-right')}')`, { label: 'new row slides in' });
+      await s.waitFor(`!document.querySelector('.${cls('fade-right')}')`, { label: 'slide-in mark cleared', timeout: 5000 });
       await sleep(300);
       assert.deepEqual(s.unmocked, [], 'no unmocked API calls');
       assertClean(s);
