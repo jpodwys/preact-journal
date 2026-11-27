@@ -1,7 +1,7 @@
 import xhr from '../api';
 import { findObjectIndexById } from '../utils';
 import { get, set as idbSet } from '../idb';
-import exportAllEntries from '../export-entries';
+// import exportAllEntries from '../export-entries';   // export is switched off, see components/dialog-wrapper
 import { app, viewEntries, set, selected, releaseSaves } from '../app-state';
 import { route } from '../route';
 
@@ -204,6 +204,6 @@ export function clearFilters () {
   set({ filter: '', filterText: '' });
 };
 
-export function exportEntries () {
-  exportAllEntries(viewEntries());
-};
+// export function exportEntries () {
+//   exportAllEntries(viewEntries());
+// };

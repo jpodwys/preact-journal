@@ -3,7 +3,7 @@ import Icon from '../icon';
 import { app, selected } from '../../js/app-state';
 import { route } from '../../js/route';
 import { toggleDarkMode } from '../../js/actions/global-actions';
-import { deleteEntry, toggleSort, exportEntries } from '../../js/actions/entry-actions';
+import { deleteEntry, toggleSort /* , exportEntries */ } from '../../js/actions/entry-actions';
 import { logout, switchAccount } from '../../js/actions/user-actions';
 
 const closeDialog = () => { app.dialogMode = ''; };
@@ -37,12 +37,15 @@ export default () => {
             <span>{sort === 'desc' ? 'Oldest' : 'Latest'}</span>
           </li>
         }
+        {/* Export is switched off to save download size (about 190 B). client/js/export-entries is kept.
+          To restore it, uncomment this, its import above, the action in entry-actions, the `download` icon and the specs.
         {notOnEntry &&
           <li onclick={exportEntries}>
             <Icon icon="download"/>
             <span>Export</span>
           </li>
         }
+        */}
         {hasOtherAccount
           ? <li onclick={() => onSwitch(userId)}>
               <Icon icon="people"/>

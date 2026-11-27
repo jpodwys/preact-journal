@@ -16,7 +16,7 @@ import {
   toggleFavorite,
   toggleSort,
   clearFilters,
-  exportEntries
+  // exportEntries   // export is switched off
 } from './entry-actions';
 import {
   mockGetAllEntries,
@@ -908,7 +908,7 @@ describe('entryActions', () => {
     });
   });
 
-  describe('exportEntries', () => {
+  describe.skip('exportEntries', () => {   // export is switched off
     let createObjectURL, revokeObjectURL;
     beforeEach(() => {
       createObjectURL = sinon.stub(window.URL, 'createObjectURL').returns('blob:t');

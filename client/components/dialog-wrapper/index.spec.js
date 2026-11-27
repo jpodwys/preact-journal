@@ -220,7 +220,7 @@ describe('dialog-wrapper', () => {
     });
   });
 
-  describe('menu: export', () => {
+  describe.skip('menu: export', () => {   // export is switched off
     let clock, createObjectURL;
     // Faking setTimeout keeps the deferred anchor.click() (the download) from running.
     beforeEach(() => {
