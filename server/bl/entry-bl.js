@@ -2,6 +2,10 @@ module.exports = function(Entry){
   var self = this;
   const fourOhFour = { status: 400, message: 'Timestamp is required.' };
   const fiveHundred = { status: 500, message: 'There was an error.' };
+  const badId = { status: 400, message: 'Invalid entry id.' };
+  // An id must be digits only. parseInt reads '5e3' as 5 while MySQL reads it as 5000, so anything else
+  // could pass the ownership check as one row and then change another.
+  const toEntryId = id => /^\d+$/.test(id) ? Number(id) : null;
 
   self.getAllEntriesByOwnerId = function({body, query, user}){
     return new Promise(function (resolve, reject){
@@ -53,10 +57,11 @@ module.exports = function(Entry){
 
   self.updateEntry = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      var entryId = parseInt(params.id, 10);
+      var entryId = toEntryId(params.id);
+      if(entryId === null) return reject(badId);
       Entry.getEntryById(entryId).then(function (entry){
         if(!entry || user.id !== entry.ownerId) return reject(fourOhFour);
-        Entry.updateEntry(entryId, body, user.deviceId).then(function (response){
+        Entry.updateEntry(entryId, body, user.deviceId, user.id).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);
@@ -69,10 +74,11 @@ module.exports = function(Entry){
 
   self.deleteEntry = function({body, query, params, user}){
     return new Promise(function (resolve, reject){
-      var entryId = parseInt(params.id, 10);
+      var entryId = toEntryId(params.id);
+      if(entryId === null) return reject(badId);
       Entry.getEntryById(entryId).then(function (entry){
         if(!entry || user.id !== entry.ownerId) return reject(fourOhFour);
-        Entry.deleteEntry(params.id, user.deviceId).then(function (response){
+        Entry.deleteEntry(entryId, user.deviceId, user.id).then(function (response){
           return resolve();
         }, function (err){
           return reject(err);
