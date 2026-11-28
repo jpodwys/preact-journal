@@ -16,8 +16,8 @@ import { listen, debounced } from './helpers.js'   // userland, tree-shakeable
 
 ### `h(type, props, ...children)`
 Hyperscript / JSX factory. Returns `{ type, props: { ...props, children }, key }`.
-`children` is flattened; `null`, `undefined`, `true`, `false` are dropped (`0` and `''` are kept).
-So is any object `h()` did not build: a vnode carries a private symbol, so parsed JSON shaped like a vnode is never
+`children` is flattened; `null`, `undefined`, `true`, `false` become `''`, which holds the child's position (`0` is kept).
+So does any object `h()` did not build: a vnode carries a private symbol, so parsed JSON shaped like a vnode is never
 rendered, whether it is passed as a child or returned by a component. The `innerHTML` and `outerHTML` props are ignored; set trusted
 HTML through a `ref`. Spreading untrusted data into **props** is still unsafe: it can choose `href`, `style` and any
 other prop (see SPREAD-SAFETY.md).
@@ -132,7 +132,7 @@ re-renders and is replaced only when the vnode's own value changes. (Preact 8 co
 Keyed + unkeyed children diff (DOM nodes and instances follow keys), text updated in
 place, SVG subtree via `createElementNS`, `class`, string or object `style`, boolean
 attributes, `value`/`checked` as properties, `on*` events (replaced, never duplicated),
-null/false children as comment placeholders, prop removal between renders. A render that
+null/false children as empty-text placeholders, prop removal between renders. A render that
 throws must not leave the framework wedged (mounts must still drain on the next render)
 and must drop that render's half-queued mounts.
 

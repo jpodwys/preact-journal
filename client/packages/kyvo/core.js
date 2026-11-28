@@ -10,7 +10,9 @@ const V = Symbol();
 
 export function h(type, props, ...children) {
   props = props || {};
-  return { [V]: 1, type, props: { ...props, children: children.flat(Infinity).filter(c => typeof c == 'object' ? c && c[V] : c != null && c !== !!c) }, key: props.key };
+  // Anything that renders nothing becomes '' (an empty text node) rather than being dropped, so that `{cond && <X/>}` keeps
+  // its position and the unkeyed siblings after it still match their previous nodes.
+  return { [V]: 1, type, props: { ...props, children: children.flat(Infinity).map(c => (typeof c == 'object' ? c && c[V] : c != null && c !== !!c) ? c : '') }, key: props.key };
 }
 
 // ---------------------------------------------------------------- scheduling
@@ -184,11 +186,11 @@ function unmount(i) {
   if (i._c) unmount(i._c);
 }
 
-function remove(i, parent, before) {
+function remove(i, before) {
   const dom = rootDom(i);
   if (before == dom) before = dom.nextSibling;
   unmount(i);
-  parent.removeChild(dom);
+  dom.remove(); // a no-op if a contenteditable edit already took the node out
   return before;
 }
 
@@ -216,7 +218,7 @@ function diffInternal(i, vnode, parent, before, svg) {
     }
     return i;
   }
-  if (i) before = remove(i, parent, before);
+  if (i) before = remove(i, before);
   const fresh = createDom(vnode, svg);
   parent.insertBefore(rootDom(fresh), before || null);
   return fresh;
@@ -248,7 +250,7 @@ function diffChildren(i, kids, svg) {
     next.push(r);
     prev = d;
   });
-  for (const o of old.values()) remove(o, dom);
+  for (const o of old.values()) remove(o);
   i._kids = next;
 }
 

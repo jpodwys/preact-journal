@@ -190,6 +190,49 @@ describe('matching children by position and key', () => {
   });
 });
 
+describe('a conditional child holds its position', () => {
+  let mounts;
+  const Field = (props, ctx) => { ctx.mount(() => { mounts++; }); return <input />; };
+  beforeEach(() => { mounts = 0; });
+
+  for (const off of [false, null, undefined, true]) {
+    it(`${off} -> element -> ${off} before a component keeps its node, typed value and focus`, () => {
+      const view = on => <form>{on ? <p>Error</p> : off}<Field /></form>;
+      const host = mount(view(false));
+      const input = host.querySelector('input');
+      input.value = 'typed';
+      input.focus();
+      for (const on of [true, false, true]) {
+        render(view(on), host);
+        expect(host.querySelector('input')).to.equal(input);
+        expect(host.firstChild.textContent).to.equal(on ? 'Error' : '');
+        expect(host.firstChild.lastChild).to.equal(input);
+      }
+      expect([input.value, document.activeElement === input, mounts]).to.deep.equal(['typed', true, 1]);
+    });
+  }
+
+  it('several conditionals toggle independently without disturbing unkeyed siblings', () => {
+    const view = (a, b) => <div>{a && <p>a</p>}<i />{b && <p>b</p>}<i /></div>;
+    const host = mount(view(false, false));
+    const kept = [...host.querySelectorAll('i')];
+    for (const [a, b] of [[true, false], [true, true], [false, true], [false, false]]) {
+      render(view(a, b), host);
+      expect([...host.querySelectorAll('i')]).to.deep.equal(kept);
+      expect(host.textContent).to.equal((a ? 'a' : '') + (b ? 'b' : ''));
+      expect(host.firstChild.childNodes.length).to.equal(4);
+    }
+  });
+
+  it('a placeholder deleted by a contenteditable edit can still be replaced', () => {
+    const view = on => <div contenteditable>{on && <b>x</b>}</div>;
+    const host = mount(view(false));
+    host.firstChild.textContent = 'typed'; // what an edit does: every child node goes, the placeholder included
+    expect(() => render(view(true), host)).to.not.throw();
+    expect(host.firstChild.textContent).to.equal('xtyped');
+  });
+});
+
 describe('moving children', () => {
   it('a focused input in a moved row keeps focus (needs Element.moveBefore)', function () {
     if (!Element.prototype.moveBefore) return this.skip();

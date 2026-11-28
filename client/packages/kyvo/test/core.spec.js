@@ -39,8 +39,8 @@ describe('h()', () => {
   it('flattens nested arrays', () => {
     expect(h('div', null, [1, [2, 3], 4]).props.children).to.deep.equal([1, 2, 3, 4]);
   });
-  it('drops null, undefined, true, false but keeps 0 and empty string', () => {
-    expect(h('p', null, true, false, null, undefined, 'ok', 0, '').props.children).to.deep.equal(['ok', 0, '']);
+  it('turns null, undefined, true, false into empty strings that hold their position; keeps 0', () => {
+    expect(h('p', null, true, false, null, undefined, 'ok', 0, '').props.children).to.deep.equal(['', '', '', '', 'ok', 0, '']);
   });
   it('exposes key on the vnode', () => {
     expect(h('li', { key: 'a' }).key).to.equal('a');

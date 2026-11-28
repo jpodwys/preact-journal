@@ -136,7 +136,7 @@ declare global {
     interface ElementChildrenAttribute { children: {} }
     interface IntrinsicAttributes { key?: Key }
     /**
-     * At runtime `children` is a flat Child[] (h() drops null/false/booleans and flattens), so a component reads
+     * At runtime `children` is a flat Child[] (h() turns null/booleans into '' and flattens), so a component reads
      * it as one; but what JSX may pass is any Children (`{cond && <X/>}`, one child, nested arrays).
      */
     type LibraryManagedAttributes<C, P> = 0 extends 1 & P

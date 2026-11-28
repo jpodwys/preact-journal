@@ -70,7 +70,8 @@ renders are cheap because the diff touches only what changed, but they are not f
 ### `h(type, props, ...children)`
 
 The JSX factory. Returns `{ type, props: { ...props, children }, key }`. `children` is flattened;
-`null`, `undefined`, `true` and `false` are dropped, `0` and `''` are kept.
+`null`, `undefined`, `true` and `false` become `''` (an empty text node), so `{cond && <X/>}` holds its position and the
+siblings after it are left alone. `0` is kept.
 
 ### `render(vnode, hostElement)`
 
@@ -192,7 +193,8 @@ On a *component*, `ref` is an ordinary prop (the framework never calls it), so f
 ### Keys
 
 Children match by `key` (any string or number; `0` is a valid key, `1` and `'1'` are different keys). An unkeyed
-child matches by position. Give list items stable keys.
+child matches by position. Give list items stable keys. Position is counted after arrays are flattened, so a list that
+grows or shrinks shifts the unkeyed siblings after it: key them, or wrap the list in its own element.
 
 ### `listen(ctx, target, event, fn, opts?)` (helpers)
 
