@@ -1,15 +1,16 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import { mount, fireEvent } from '../../../test/mount';
+import { app } from '../../js/app-state';
 import Search from './index';
 
 describe('search', () => {
   let env;
+  beforeEach(() => localStorage.clear());
   afterEach(() => { if(env) env.cleanup(); env = null; });
 
-  function mountSearch (state = {}, actions = {}) {
+  function mountSearch (state = {}) {
     return mount(h(Search, null), {
-      state: Object.assign({ filter: '', filterText: '', viewEntries: [] }, state),
-      actions
+      state: Object.assign({ filter: '', filterText: '', viewEntries: [] }, state)
     });
   }
 
@@ -33,21 +34,18 @@ describe('search', () => {
       expect(env.queryByText('Favorites')).to.be.null;
     });
 
-    it('fires linkstate with filter=favorites when Favorites is clicked', () => {
-      const linkstate = sinon.spy();
-      env = mountSearch({}, { linkstate });
+    it('sets filter=favorites in the store when Favorites is clicked (and re-renders to the zero-state)', async () => {
+      env = mountSearch();
       fireEvent.click(env.getByText('Favorites'));
-      expect(linkstate.calledOnce).to.be.true;
-      expect(linkstate.args[0][1]).to.deep.equal({ key: 'filter', val: 'favorites' });
+      expect(app.filter).to.equal('favorites');
+      // No entries are favorited, so the filtered view is empty.
+      await env.findByText("It's empty in here!");
     });
 
-    it('fires linkstate with filterText=today\'s month-day slice when "On this day" is clicked', () => {
-      const linkstate = sinon.spy();
-      env = mountSearch({}, { linkstate });
+    it('sets filterText to today\'s month-day slice when "On this day" is clicked', () => {
+      env = mountSearch();
       fireEvent.click(env.getByText('On this day'));
-      const payload = linkstate.args[0][1];
-      expect(payload.key).to.equal('filterText');
-      expect(payload.val).to.equal(new Date().toLocaleDateString('en-CA').slice(5));
+      expect(app.filterText).to.equal(new Date().toLocaleDateString('en-CA').slice(5));
     });
   });
 
@@ -56,6 +54,7 @@ describe('search', () => {
       env = mountSearch({ viewEntries: [{ id: 1, date: 'today', text: 'first' }] });
       expect(env.queryByText('Favorites')).to.be.null;
       expect(env.queryByText("It's empty in here!")).to.be.null;
+      expect(env.getByText('first')).to.exist;
       expect(env.host.querySelector('.entry-preview')).to.exist;
     });
   });

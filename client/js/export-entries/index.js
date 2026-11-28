@@ -1,4 +1,4 @@
-import { fire } from '../../components/unifire';
+import { app } from '../app-state';
 
 const anchor = document.createElement('a');
 anchor.download = 'journalize.txt';
@@ -20,5 +20,5 @@ export default function exportEntries(entries) {
   anchor.href = URL.createObjectURL(data);
   setTimeout(() => URL.revokeObjectURL(anchor.href), 4E4); // 40s
   setTimeout(() => anchor.click());
-  fire('linkstate', { key: 'dialogMode' });
+  app.dialogMode = '';
 }

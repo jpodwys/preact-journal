@@ -1,10 +1,10 @@
 /**
  * Adapted from preact-scroll-viewport
- * I added an efficiency improvement that removes the original library's
- * requirement to process the entire virtual list's vdom before rendering.
+ * Renders only the rows near the viewport.
  */
 
-import { h, Component } from 'preact';
+import { h } from '../../packages/kyvo/core';
+import { listen } from '../../packages/kyvo/helpers';
 
 const EVENT_OPTS = {
 	passive: true,
@@ -16,54 +16,35 @@ const EVENT_OPTS = {
 // scroll tick. Tuned for the entries list; not configurable.
 const OVERSCAN = 20;
 
-export default class ScrollViewport extends Component {
-	resized = () => {
-		let height = innerHeight;
-		if (height!==this.state.height) {
-			this.setState({ height });
-		}
+export default ({ items, renderer, rowHeight }, ctx) => {
+	const s = ctx.state({ offset: 0, height: 0 });
+
+	const resized = () => {
+		if (innerHeight !== s.height) s.height = innerHeight;
 	};
 
-	scrolled = () => {
-		let offset = Math.max(0, this.base && -this.base.getBoundingClientRect().top || 0);
-		this.setState({ offset });
+	const scrolled = () => {
+		s.offset = Math.max(0, ctx.el && -ctx.el.getBoundingClientRect().top || 0);
 	};
 
-	componentDidUpdate() {
-		this.resized();
-	}
+	listen(ctx, window, 'resize', resized, EVENT_OPTS);
+	listen(ctx, window, 'scroll', scrolled, EVENT_OPTS);
+	// Refs run before mount callbacks, so ctx.el is set by the time this measures.
+	ctx.mount(() => { resized(); scrolled(); });
 
-	componentDidMount() {
-		this.resized();
-		this.scrolled();
-		addEventListener('resize', this.resized, EVENT_OPTS);
-		addEventListener('scroll', this.scrolled, EVENT_OPTS);
-	}
+	let start = (s.offset / rowHeight)|0;
+	let visibleRowCount = (s.height / rowHeight)|0;
 
-	componentWillUnmount() {
-		removeEventListener('resize', this.resized, EVENT_OPTS);
-		removeEventListener('scroll', this.scrolled, EVENT_OPTS);
-	}
+	start = Math.max(0, start - (start % OVERSCAN));
+	visibleRowCount += OVERSCAN;
 
-	render({ items, renderer, rowHeight, ...props }, { offset=0, height=0 }) {
-		let estimatedHeight = rowHeight * items.length;
-		(props.style || (props.style={})).height = estimatedHeight + 'px';
+	const visible = items.slice(start, start + 1 + visibleRowCount);
 
-		let start = (offset / rowHeight)|0;
-		let visibleRowCount = (height / rowHeight)|0;
-
-		start = Math.max(0, start - (start % OVERSCAN));
-		visibleRowCount += OVERSCAN;
-
-		let end = start + 1 + visibleRowCount;
-		let visible = items.slice(start, end);
-
-		return (
-			<div {...props}>
-				<div class="fade-down" style={{ position: 'relative', top: start*rowHeight }}>
-					{renderer(visible)}
-				</div>
+	return (
+		<div style={{ height: rowHeight * items.length + 'px' }} ref={el => { ctx.el = el; }}>
+			<div class="fade-down" style={{ position: 'relative', top: start*rowHeight + 'px' }}>
+				{renderer(visible)}
 			</div>
-		);
-	}
+		</div>
+	);
 }

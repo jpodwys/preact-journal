@@ -1,92 +1,64 @@
-import { get } from 'idb-keyval';
-import { clearData, getAccounts, saveAccounts } from '../utils';
-import User from '../services/user-service';
-import getInitialState from '../app-state';
-import { route } from '../../components/router';
-import { fire } from '../../components/unifire';
+import { clearData } from '../utils';
+import xhr, { onUnauthorized } from '../api';
+import { app, resetState, loadAccounts } from '../app-state';
+import { route } from '../route';
+import { loadAccount } from './entry-actions';
 
-function login (el, user){
-  User.login(user)
-    .then(({ data }) => loginSuccess(el, data));
+
+export function login (user){
+  xhr('/api/user/login', { method: 'POST', body: user })
+    .then(({ id, username }) => {
+      app.accounts = [...loadAccounts().filter(a => a.id !== id).map(a => ({ ...a, active: false })), { id, username, active: true }];
+      activateAccount(id);
+    });
 };
 
-function activateAccount (el, { id, username }, extra) {
-  fire('resetDataFetched');
-
-  get('entries_' + id).then((entries = []) => {
-    var timestamp = localStorage.getItem('timestamp_' + id) || undefined;
-
-    el.set({
-      userId: String(id),
-      username,
-      entries,
-      timestamp,
-      entry: undefined,
-      entryIndex: -1,
-      filter: '',
-      filterText: '',
-      ...extra
-    }, () => {
-      fire('getEntries');
-      route('/entries', true);
-    });
-  });
+function activateAccount (id, extra) {
+  loadAccount(id, { userId: String(id), entryId: undefined, filter: '', filterText: '', ...extra })
+    .then(() => route('/entries', true));
 }
 
-function loginSuccess (el, { id, username }){
-  var accounts = getAccounts().filter(a => a.id !== id);
-  accounts.forEach(a => { a.active = false; });
-  accounts.push({ id, username, active: true });
-  saveAccounts(accounts);
-  activateAccount(el, { id, username }, { loggedIn: true });
+export function logout (){
+  xhr('/api/user/logout', { method: 'POST' })
+    .then(() => logoutSuccess());
 };
 
-function logout (el){
-  User.logout()
-    .then(() => logoutSuccess(el));
-};
-
-function logoutSuccess (el){
-  var userId = el.state.userId;
-  var accounts = getAccounts().filter(a => String(a.id) !== userId);
-  saveAccounts(accounts);
-  clearData(userId);
-
-  var valid = accounts.filter(a => !a.expired);
-  if(valid.length > 0) {
-    switchAccount(el, String(valid[0].id));
-  } else {
-    clearData();
-    el.set(getInitialState());
+// After an account is removed or expires: switch to the first usable account, or start over at the sign-in route.
+function switchToNext (accounts, wipe){
+  const next = accounts.find(a => !a.expired);
+  if(next) switchAccount(String(next.id));
+  else {
+    if(wipe) clearData();
+    resetState();
     route('/');
   }
 };
 
-function switchAccount (el, userId) {
-  var accounts = getAccounts();
-  var account = accounts.find(a => String(a.id) === String(userId));
-  if(!account) return;
-  accounts.forEach(a => { a.active = a.id === account.id; });
-  saveAccounts(accounts);
-  activateAccount(el, { id: account.id, username: account.username }, { dialogMode: '' });
+function logoutSuccess (){
+  const userId = app.userId;
+  const accounts = loadAccounts().filter(a => String(a.id) !== userId);
+  app.accounts = accounts;
+  clearData(userId);
+  switchToNext(accounts, 1);
 };
 
-function handleExpiredSession (el, userId) {
-  if(!userId || el.state.userId !== userId) return;
+export function switchAccount (userId) {
+  const accounts = loadAccounts(), account = accounts.find(a => String(a.id) === String(userId));
+  if(!account) return;
+  app.accounts = accounts.map(a => ({ ...a, active: a.id === account.id }));
+  activateAccount(account.id, { dialogMode: '' });
+};
 
-  var accounts = getAccounts().map(a =>
+export function handleExpiredSession (userId) {
+  if(!userId || app.userId !== userId) return;
+
+  const accounts = loadAccounts().map(a =>
     String(a.id) === userId ? {...a, expired: true, active: false} : a
   );
-  var remaining = accounts.filter(a => !a.expired);
-  saveAccounts(accounts);
+  app.accounts = accounts;
   clearData(userId);
-
-  if(remaining.length > 0) {
-    switchAccount(el, String(remaining[0].id));
-  } else {
-    el.set(getInitialState());
-    route('/');
-  }
+  switchToNext(accounts);
 };
 
-export default { login, logout, switchAccount, handleExpiredSession };
+// api cannot import this module (this module imports api), so it is handed the handler.
+onUnauthorized(handleExpiredSession);

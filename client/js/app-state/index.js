@@ -1,82 +1,109 @@
-import { get, set } from 'idb-keyval';
-import { sortObjectsByDate, getViewFromPathname, applyFilters, clearData, getAccounts } from '../utils';
-import { fire } from '../../components/unifire';
+import { set as idbSet } from '../idb';
+import { store, watch } from '../../packages/kyvo/core';
+import { getViewFromPathname, applyFilters, clearData } from '../utils';
 
-const filteredViews = ['view', 'sort', 'filter', 'entries', 'filterText'];
-
-const compute = (obj, prop) => {
-  if (filteredViews.includes(prop)) {
-    obj.viewEntries = applyFilters(obj.view, obj.filterText, obj.filter, obj.sort, obj.entries);
+// The one global store. Components import `app` and read it during render; any
+// write re-renders the app on the next frame. Replace values, never mutate them
+// in place (dev builds freeze assigned values so a mutation throws).
+// The 'accounts' localStorage key is written by the watcher below only. It is read at startup, and again before any
+// change to it: another tab may have changed it since, and writing this tab's copy back would lose its accounts.
+export const loadAccounts = () => {
+  try {
+    return JSON.parse(localStorage.getItem('accounts')) || [];
+  } catch(e) {
+    return [];
   }
 };
 
-const observe = (obj, prop, next, prev) => {
-  switch(prop) {
-    case 'view': {
-      obj.dialogMode = '';
-      if(prev === '/search' && next === '/entries'){
-        fire('clearFilters');
-      }
-      break;
-    }
-    case 'entries': {
-      obj.entries = sortObjectsByDate(next);
-      set('entries_' + obj.userId, obj.entries);
-      break;
-    }
-    case 'dark': {
-      localStorage.setItem('dark', !!next);
-      document.body.classList.toggle('dark', !!next);
-      break;
-    }
-    case 'timestamp': localStorage.setItem('timestamp_' + obj.userId, next); break;
-  }
-};
-
-const handler = {
-  set: function(obj, prop, next) {
-    const prev = obj[prop];
-    obj[prop] = next;
-    compute(obj, prop);
-    observe(obj, prop, next, prev);
-    return true;
-  }
-};
-
-export default function getInitialState () {
-  let accounts = getAccounts();
-  let active = accounts.find(a => a.active);
-  let loggedIn = !!active;
-  let userId = active ? String(active.id) : '';
-  let username = active ? active.username : '';
-
-  if(!loggedIn && accounts.length === 0) clearData();
-
-  let state = {
-    loggedIn,
+export const initialState = () => {
+  const accounts = loadAccounts();
+  const active = accounts.find(a => a.active);
+  const userId = active ? String(active.id) : '';
+  if (!userId && accounts.length === 0) clearData();
+  return {
+    accounts,
     userId,
-    username,
     entries: [],
-    viewEntries: [],
-    sort: 'desc',
+    // sort: 'desc',   // sort order is switched off
     filter: '',
     filterText: '',
-    entryIndex: -1,
-    entry: undefined,
+    entryId: undefined,
+    dialogMode: '',
+    fresh: [],
     view: getViewFromPathname(location.pathname),
     dark: localStorage.getItem('dark') === 'true',
     timestamp: userId ? localStorage.getItem('timestamp_' + userId) || undefined : undefined
   };
-
-  if(loggedIn) {
-    get('entries_' + userId).then((entries = []) => {
-      fire('boot', { entries });
-    }).catch();
-  }
-
-  // Now that I'm setting a class to body, I
-  // have to ensure it gets set on load.
-  observe(null, 'dark', state.dark);
-
-  return new Proxy(state, handler);
 };
+
+export const app = store(initialState());
+export const set = delta => Object.assign(app, delta);
+
+// A logged-in app starts with saving held. Until the cached entries have been read, the list in memory is not the whole
+// list, and saving it would overwrite the cache (/entry/new adds an entry that early). loadAccount releases the hold.
+let holding = app.userId;
+export const releaseSaves = () => { holding = 0; };
+
+// Back to a freshly computed initial state (logout, expired session, tests).
+// A reset must not persist: assigning the blank `entries` would overwrite the
+// user's cached entries in IndexedDB.
+let resetting;
+export const resetState = () => {
+  resetting = 1;
+  holding = 0;
+  try { Object.assign(app, initialState()); } finally { resetting = 0; }
+};
+
+// Derived, not stored: there is no field to assign. Memoized on its inputs.
+let inputs = [], view;
+export const viewEntries = () => {
+  const now = [app.view, app.filterText, app.filter, /* app.sort, */ app.entries];
+  if (now.some((v, i) => v !== inputs[i])) {
+    view = applyFilters(...now);
+    if (typeof __DEV__ === 'undefined' || __DEV__) Object.freeze(view);
+    inputs = now;
+  }
+  return view;
+};
+
+// The entry on screen is stored as an id only. It is looked up in `entries`, not in the list being shown, so it stays
+// put when an edit or unfavoriting makes it drop out of a search or the favorites filter. Its position is the one in the
+// list being shown (the arrows step through that; a new entry is only in `entries`).
+export const selected = () => [
+  app.entries.find(e => e.id === app.entryId && !e.deleted),
+  (app.view === '/new' ? app.entries : viewEntries()).findIndex(e => e.id === app.entryId)
+];
+
+// Rows that just appeared slide in once: the mark is cleared 450 ms after it is set AND a list is showing. A new entry is marked on /new,
+// long before the user is back on the list; a second mark restarts the window.
+let freshTimer;
+
+// Computed state plus persistence, in one place so no action can forget either.
+watch(app, (key, next, prev) => {
+  switch (key) {
+    case 'view':
+      app.dialogMode = '';
+      if (prev === '/search' && next === '/entries') Object.assign(app, { filter: '', filterText: '' });
+      // falls through: a list coming into view starts the window
+    case 'fresh':
+      clearTimeout(freshTimer);
+      if (app.fresh.length && (app.view === '/entries' || app.view === '/search')) freshTimer = setTimeout(() => { app.fresh = []; }, 450);
+      break;
+    case 'accounts':
+      if (!resetting) localStorage.setItem('accounts', JSON.stringify(next));
+      break;
+    case 'entries':
+      if (app.userId && !resetting && !holding) idbSet('entries_' + app.userId, next);
+      break;
+    case 'dark':
+      localStorage.setItem('dark', !!next);
+      document.body.classList.toggle('dark', !!next);
+      break;
+    case 'timestamp':
+      if (app.userId && next !== undefined) localStorage.setItem('timestamp_' + app.userId, next);
+      break;
+  }
+});
+
+// The body class must match the stored preference on load.
+document.body.classList.toggle('dark', app.dark);

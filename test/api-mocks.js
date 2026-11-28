@@ -44,3 +44,8 @@ export const mockEntryApiOffline = () =>
   fetchMock.mock(/\/api\/entr/, { throws: new TypeError('Failed to fetch') });
 
 export const lastBody = (url) => JSON.parse(fetchMock.lastOptions(url).body);
+
+// Boot smoke test: any request that no other helper matched answers 503, so a
+// stray network call is both visible (`fetchMock.calls('unmatched')`) and
+// harmless.
+export const mockUnmatchedFail = () => fetchMock.catch(503);

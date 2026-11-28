@@ -1,5 +1,3 @@
-import Global from './global-actions';
-import User from './user-actions';
-import Entry from './entry-actions';
-
-export default {...Global, ...User, ...Entry};
+export * from './entry-actions';
+export * from './user-actions';
+export * from './global-actions';

@@ -1,33 +1,19 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 import Icon from '../icon';
-import { fire } from '../unifire';
+import { showConfirmDeleteEntryModal, toggleFavorite } from '../../js/actions/entry-actions';
 
 const getEntryText = (entry, filterText) => {
-  if(!entry.previewText){
-    return (
-      <div class="second-row">
-        {entry.text}
-      </div>
-    );
-  } else {
-    const preview = entry.previewText;
-    const text = entry.previewText.toLowerCase();
-    const query = filterText.toLowerCase();
-    const start = text.indexOf(query);
-    return (
-      <div class="second-row">
-        {preview.substr(0, start)}
-        <span class="highlight">{preview.substr(start, filterText.length)}</span>
-        {preview.substr(start + query.length)}
-      </div>
-    );
-  }
+  const { previewText: p, text } = entry, start = p && p.toLowerCase().indexOf(filterText.toLowerCase());
+  return (
+    <div class="second-row">
+      {p ? [p.substr(0, start), <span class="highlight">{p.substr(start, filterText.length)}</span>, p.substr(start + filterText.length)] : text}
+    </div>
+  );
 };
 
-export default ({ entry, filterText }) => {
+export default ({ entry, filterText, fresh }) => {
   const favoriteIcon = entry && entry.favorited ? 'star-filled' : 'star-empty';
-  const fadeRight = entry.slideIn ? 'fade-right' : '';
-  if(fadeRight) setTimeout(() => fire('removeSlideInProp'), 450);
+  const fadeRight = fresh ? 'fade-right' : '';
 
   return (
     <div class={`entry-preview ${fadeRight}`}>
@@ -49,15 +35,21 @@ export default ({ entry, filterText }) => {
         <Icon icon="delete"
           class="hide-icon"
           key={entry.id + 'delete'}
-          onclick={() => fire('showConfirmDeleteEntryModal', { entry })}/>
+          role="button"
+          aria-label="Delete entry"
+          onclick={() => showConfirmDeleteEntryModal({ entry })}/>
         {navigator.share && <Icon icon="share"
           class="hide-icon"
           key={entry.id + 'sharre'}
+          role="button"
+          aria-label="Share entry"
           onclick={() => navigator.share({ text: entry.date + ' ' + entry.text })}/>}
         <Icon icon={favoriteIcon}
           class={entry.favorited ? '' : 'hide-icon'}
           key={entry.id + 'favorite'}
-          onclick={() => fire('toggleFavorite', { id: entry.id, favorited: !entry.favorited })}/>
+          role="button"
+          aria-label="Toggle favorite"
+          onclick={() => toggleFavorite({ id: entry.id, favorited: !entry.favorited })}/>
       </span>
     </div>
   );

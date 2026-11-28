@@ -30,7 +30,12 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '50kb' }));
 app.use(bodyParser.json({ limit: '50kb' }));
 app.use(cookieParser());
 app.use(jwtPrser);
-app.use(express.static('dist', { maxAge: '0h' }));
+// Everything revalidates on each request except the icons, which never change under their names.
+// Each revalidation costs a full set of response headers (about 900 B on Heroku) for a 304.
+app.use(express.static('dist', {
+  maxAge: '0h',
+  setHeaders: (res, file) => { if(/\.(png|webp|ico)$/.test(file)) res.setHeader('Cache-Control', 'public, max-age=2592000'); }
+}));
 require('./server/middleware/app-middleware')(app);
 require('./server/routes')(app);
 

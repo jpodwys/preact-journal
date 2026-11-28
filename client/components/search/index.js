@@ -1,18 +1,19 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
+import { app, viewEntries } from '../../js/app-state';
 import Entries from '../entries';
 import Icon from '../icon';
-import { fire } from '../unifire';
 
-export default ({ filter, filterText, viewEntries = [] }) => {
-  if(!viewEntries.length){
+export default () => {
+  const { filter, filterText } = app;
+  if(!viewEntries().length){
     if(!filter && !filterText){
       return (
         <ul class="menu fade-up dark-fill entry-text">
-          <li onclick={() => fire('linkstate', { key: 'filter', val: 'favorites' })}>
+          <li onclick={() => { app.filter = 'favorites'; }}>
             <Icon icon="star-filled"/>
             <span>Favorites</span>
           </li>
-          <li onclick={() => fire('linkstate', { key: 'filterText', val: new Date().toLocaleDateString('en-CA').slice(5) })}>
+          <li onclick={() => { app.filterText = new Date().toLocaleDateString('en-CA').slice(5); }}>
             <Icon icon="calendar"/>
             <span>On this day</span>
           </li>
@@ -25,9 +26,5 @@ export default ({ filter, filterText, viewEntries = [] }) => {
     }
   }
 
-  return (
-    <Entries
-      viewEntries={viewEntries}
-      filterText={filterText}/>
-  );
+  return <Entries />;
 };

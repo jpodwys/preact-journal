@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h } from '../../packages/kyvo/core';
 
 import Router from '../router';
 import Header from '../header';
@@ -7,22 +7,24 @@ import Entries from '../entries';
 import Search from '../search';
 import Entry from '../entry';
 import DialogWrapper from '../dialog-wrapper';
-import { fire } from '../unifire';
+import { handleRouteChange } from '../../js/actions/global-actions';
+import shortcuts from '../../js/shortcuts';
 
-export default (props) => {
+export default (props, ctx) => {
+  shortcuts(ctx);
   return (
     <div>
-      <Header {...props}/>
+      <Header />
       <main>
-        <Router onChange={(url) => fire('handleRouteChange', url)}>
+        <Router onChange={handleRouteChange}>
           <Login path="/"/>
           <Login path="/switch" cancelable/>
-          <Entries {...props} path="/entries"/>
-          <Search {...props} path="/search"/>
-          <Entry {...props} path="/entry/:id"/>
+          <Entries path="/entries"/>
+          <Search path="/search"/>
+          <Entry path="/entry/:id"/>
         </Router>
       </main>
-      <DialogWrapper {...props}/>
+      <DialogWrapper />
     </div>
   );
 };
