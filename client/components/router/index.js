@@ -30,7 +30,7 @@ function Router(props, ctx) {
     notify(location.pathname);
     return () => onRoute();
   });
-  return props.children.find(c => matches(c.props.path, location.pathname));
+  return props.children.find(c => c && matches(c.props.path, location.pathname));
 }
 
 export { Router, route };

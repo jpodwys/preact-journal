@@ -72,7 +72,8 @@ renders are cheap because the diff touches only what changed, but they are not f
 
 The JSX factory. Returns `{ type, props: { ...props, children }, key }`. `children` is flattened;
 `null`, `undefined`, `true` and `false` become `''` (an empty text node), so `{cond && <X/>}` holds its position and the
-siblings after it are left alone. `0` is kept.
+siblings after it are left alone. `0` is kept. A component that reads its children's props has to skip those slots, and
+should skip rather than filter them out, or the later children shift: `props.children.map(c => c && <li>{c}</li>)`.
 
 ### `render(vnode, hostElement)`
 
@@ -164,14 +165,15 @@ children's refs already set.
 ### Refs
 
 `ref={el => ...}` on an element. Called after commit (so the element is attached and `el.focus()` works) with the
-element when it is created, and with `null` when it is removed. All refs of a commit run before any `ctx.mount` callback. If the callback's identity changes between renders,
-the old one gets `null` and the new one gets the element, so an inline arrow re-fires every render. For
-create-only behavior (focus, one-time measurement) use a module-level function or one stored on `ctx`:
+element when it is created, and with `null` when it is removed. All refs of a commit run before any `ctx.mount` callback.
+It does **not** run again on later renders, even though an inline arrow is a new function each time, so inline is fine:
 
 ```jsx
-const focusEl = el => { if (el) el.focus(); };       // module level: runs once per element
-<input ref={focusEl} />
+<input ref={el => { ctx.input = el; }} />            // once per element
 ```
+
+Swapping one ref function for another on the same element does nothing; give the element a new `key` to start over.
+(A ref added to, or taken off, an element that is already there does run.)
 
 On a *component*, `ref` is an ordinary prop (the framework never calls it), so forwarding is free:
 `const Field = props => <input ref={props.ref} />`.
@@ -326,6 +328,7 @@ that, so re-renders never touch the text the user is typing; key the editable el
 | `ctx.mount`/`listen` are registered by the first render only; do not call them conditionally | A late registration is dropped | Dev: throws when a later render registers more than the first did; not a same-count swap |
 | One unkeyed `ctx.state` per component; extra slots need a key | The second call throws | Dev only |
 | Re-run mount-time work by keying the component | Stale closure (shows the old id) | No |
+| In a handler, recompute from state; do not use a value computed during render | It can be a keystroke behind: two events can arrive before the next frame. Make it a function (`const errors = () => check(s)`) and call it where needed | No |
 | Numeric style values need units | The browser ignores `top: 40` | No |
 | A component returns one vnode; no fragments | Throws (a cryptic `reading 'ref'` error for arrays) | At render |
 

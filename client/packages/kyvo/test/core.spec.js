@@ -193,16 +193,25 @@ describe('render(): renderer contract', () => {
     expect(focused).to.equal(true);
   });
 
-  it('runs callback refs: element on create, null on removal, swap on identity change', () => {
+  it('runs callback refs with the element on create and null on removal, and not on later renders', () => {
     const log = [];
-    const r1 = el => log.push(['r1', el && el.tagName]);
-    const r2 = el => log.push(['r2', el && el.tagName]);
-    const host = mount(<div ref={r1} />);
-    expect(log).to.deep.equal([['r1', 'DIV']]);
-    render(<div ref={r2} />, host);
-    expect(log.slice(1)).to.deep.equal([['r1', null], ['r2', 'DIV']]);
+    // A new function on every render, as an inline arrow is.
+    const view = n => <div ref={el => log.push([n, el && el.tagName])} />;
+    const host = mount(view(1));
+    render(view(2), host);
+    render(view(3), host);
+    expect(log).to.deep.equal([[1, 'DIV']]);
     render(null, host);
-    expect(log[log.length - 1]).to.deep.equal(['r2', null]);
+    expect(log).to.deep.equal([[1, 'DIV'], [3, null]]);     // removal calls the ref of the last render
+  });
+
+  it('runs a ref added to an existing element, and nulls one taken off it', () => {
+    const log = [];
+    const ref = el => log.push(el && el.tagName);
+    const host = mount(<div />);
+    render(<div ref={ref} />, host);
+    render(<div />, host);
+    expect(log).to.deep.equal(['DIV', null]);
   });
 });
 

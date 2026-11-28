@@ -116,10 +116,9 @@ private state on it with their own `Symbol`.
 
 ### Refs
 `ref={el => ...}` callback refs only. Called **after commit** (before any mount callback, so the
-element is attached and `el.focus()` works) with the element after it
-is created; called with `null` when it is removed; if the callback identity changes
-between renders, the old one gets `null` and the new one gets the element. Use a
-module-level (stable) ref function for create-only behavior such as focusing.
+element is attached and `el.focus()` works) with the element after it is created; called with `null`
+when it is removed (the last render's function). A changed function on an existing element is **not**
+called. A ref added to or removed from an existing element is called with the element or `null`.
 
 ### The virtual-DOM contract
 The DOM is touched only when the **virtual** state changes: text and attributes (including

@@ -212,7 +212,8 @@ function diffInternal(i, vnode, parent, before, svg) {
       i._c = diffInternal(i._c, run(i), dom.parentNode, dom.nextSibling, svg);
     } else {
       const s = svg || vnode.type == 'svg', o = old.props.ref, n = vnode.props.ref;
-      if (o !== n) { if (o) o(null); if (n) refQueue.push(() => n(i._dom)); }
+      // A ref runs for the element's creation and removal, not because the function changed (an inline one always does).
+      if (!o !== !n) { if (o) o(null); else refQueue.push(() => n(i._dom)); }
       diffAttrs(i._dom, vnode.props, old.props, s);
       diffChildren(i, vnode.props.children, s);
       diffAttrs(i._dom, vnode.props, old.props, s, 1);

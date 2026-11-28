@@ -35,6 +35,12 @@ describe('Router', () => {
     await nextRender();
   }
 
+  it('skips a conditional route that is off', () => {
+    history.replaceState(null, '', '/entries');
+    env = mount(h(Router, null, false && h(Home, { path: '/search' }), h(Entries, { path: '/entries' })));
+    expect(env.host.textContent).to.equal('ENTRIES-ROUTE');
+  });
+
   describe('path matching', () => {
     it('renders the child whose path matches location.pathname', () => {
       env = mountRouter('/entries');

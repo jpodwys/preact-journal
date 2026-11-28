@@ -284,6 +284,17 @@ describe('gallery', () => {
     expect([$('input').value, text('.greeting')]).to.deep.equal(['', 'Who are you?']);
   });
 
+  it('tabs: a conditional panel in the middle does not disturb its neighbours', async () => {
+    await go('tabs');
+    labelled('Nickname').value = 'Rob';
+    await click('Help');
+    await click('Shipping');
+    $('input[type=checkbox]').click();                 // adds the Admin panel between the two
+    await frame();
+    expect(labelled('Nickname').value).to.equal('Rob');
+    expect(texts('.section .body')).to.deep.equal(['Ships in two days.']);
+  });
+
   it('tabs: panels keep what was typed, sections open, and the conditional tab comes and goes', async () => {
     await go('tabs');
     labelled('Nickname').value = 'Rob';

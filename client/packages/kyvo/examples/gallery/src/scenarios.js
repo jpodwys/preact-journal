@@ -140,7 +140,7 @@ export const scenarios = [
   {
     stage: 'Lifecycle', id: 'modal', title: 'Modal', teaches: 'listen, ref, conditional rendering', Demo: Modal, files: [file('modal.js', modalSource)],
     about: 'The Escape listener exists only while the modal does. A ref receives the element once it is on the page.',
-    footgun: 'A ref written inline is a new function each render, so it runs every render. Define it outside the component.'
+    footgun: 'A ref runs when its element is created, not on later renders. To run it again, such as to refocus, give the element a new key.'
   },
   {
     stage: 'Lifecycle', id: 'profile', title: 'Profile by id', teaches: 'key, loading and errors', Demo: Profile, files: [file('profile.js', profileSource)],
@@ -160,7 +160,7 @@ export const scenarios = [
   {
     stage: 'Building blocks', id: 'tabs', title: 'Tabs and accordion', teaches: 'reusable components', Demo: Tabs, files: [file('tabs.js', tabsSource)],
     about: 'Tabs reads the title of each child, and each accordion section keeps its own state. Neither knows what it contains.',
-    footgun: 'A conditional child that is off arrives in props.children as an empty string. Skip it before reading child.props.'
+    footgun: 'A conditional child that is off arrives in props.children as an empty string. Skip it in place; filtering it out shifts the later children and loses their state.'
   },
   {
     stage: 'Building blocks', id: 'signup', title: 'Sign-up form', teaches: 'validation, async submit', Demo: Signup, files: [file('signup.js', signupSource)],

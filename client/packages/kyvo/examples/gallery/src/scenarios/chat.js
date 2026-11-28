@@ -18,9 +18,6 @@ const add = (room, text) => { chat.messages = { ...chat.messages, [room]: [...ch
 
 function Room(props, ctx) {
   const messages = chat.messages[props.room];
-  // Made once, so the ref runs only when the element appears or goes.
-  ctx.list ||= el => { ctx.element = el; };
-
   // One connection per room. Changing room closes the old one first.
   effect(ctx, () => {
     const room = props.room;
@@ -42,7 +39,7 @@ function Room(props, ctx) {
 
   return (
     <div>
-      <ul class="messages" ref={ctx.list}>
+      <ul class="messages" ref={el => { ctx.element = el; }}>
         {messages.map(text => <li>{text}</li>)}
       </ul>
       <form onsubmit={send}>
