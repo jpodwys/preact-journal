@@ -204,7 +204,8 @@ function diffInternal(i, vnode, parent, before, svg) {
       i._vnode = vnode;
       return i;
     }
-  } else if (old && old.type === vnode.type) {
+    // The key is compared here too: a component's result and the root have no parent list to match keys for them.
+  } else if (old && old.type === vnode.type && Object.is(old.key ?? null, vnode.key ?? null)) {
     i._vnode = vnode;
     if (typeof vnode.type == 'function') {
       const dom = rootDom(i);

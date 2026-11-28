@@ -233,6 +233,76 @@ describe('a conditional child holds its position', () => {
   });
 });
 
+describe('a changed key replaces what is there, with or without an element around it', () => {
+  let log;
+  const Item = (props, ctx) => {
+    const s = ctx.state({ n: 0 });
+    ctx.mount(() => { log.push('+' + props.id); const id = props.id; return () => log.push('-' + id); });
+    return <button onclick={() => s.n++}>{props.id}:{s.n}</button>;
+  };
+  const Direct = ({ id }) => <Item key={id} id={id} />;
+  beforeEach(() => { log = []; });
+
+  const click = async host => { host.querySelector('button').click(); await frame(); };
+  const check = async view => {
+    const host = mount(view(1));
+    await click(host);
+    const first = host.querySelector('button');
+    render(view(1), host);                       // same key: same instance
+    expect(host.querySelector('button')).to.equal(first);
+    expect(first.textContent).to.equal('1:1');
+    render(view(2), host);                       // new key: cleanup, fresh state, new node
+    expect(host.querySelector('button')).to.not.equal(first);
+    expect(host.textContent).to.equal('2:0');
+    expect(log).to.deep.equal(['+1', '-1', '+2']);
+  };
+
+  it('a keyed component returned by a component', () => check(id => <Direct id={id} />));
+  it('through a chain of components', () => {
+    const Outer = ({ id }) => <Direct id={id} />;
+    return check(id => <Outer id={id} />);
+  });
+  it('a keyed component passed straight to render()', () => check(id => <Item key={id} id={id} />));
+
+  it('a keyed element returned by a component, or passed to render()', () => {
+    const P = ({ id }) => <p key={id} />;
+    for (const view of [id => <P id={id} />, id => <p key={id} />]) {
+      const host = mount(view(1));
+      const first = host.firstChild;
+      render(view(1), host);
+      expect(host.firstChild).to.equal(first);
+      render(view(2), host);
+      expect(host.firstChild).to.not.equal(first);
+      expect(host.childNodes.length).to.equal(1);
+    }
+  });
+
+  it('the replacement goes where the old node was', () => {
+    const view = id => <div><i /><Direct id={id} /><b /></div>;
+    const host = mount(view(1));
+    render(view(2), host);
+    expect([...host.firstChild.childNodes].map(n => n.nodeName)).to.deep.equal(['I', 'BUTTON', 'B']);
+  });
+
+  it('no key, a missing key and a null key all keep the instance', () => {
+    const P = props => <Item {...props.k} id="x" />;
+    const host = mount(<P k={{}} />);
+    const first = host.firstChild;
+    for (const k of [{}, { key: null }, { key: undefined }, {}]) {
+      render(<P k={k} />, host);
+      expect(host.firstChild).to.equal(first);
+    }
+    expect(log).to.deep.equal(['+x']);
+  });
+
+  it('a NaN key does not replace on every render', () => {
+    const host = mount(<Direct id={NaN} />);
+    const first = host.firstChild;
+    render(<Direct id={NaN} />, host);
+    expect(host.firstChild).to.equal(first);
+  });
+});
+
 describe('moving children', () => {
   it('a focused input in a moved row keeps focus (needs Element.moveBefore)', function () {
     if (!Element.prototype.moveBefore) return this.skip();

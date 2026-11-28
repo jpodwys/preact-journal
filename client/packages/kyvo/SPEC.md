@@ -141,6 +141,8 @@ Details of the renderer (each is covered by `test/renderer.spec.js`; the reasoni
   new inline function on every render is a property write, not a remove + add. A handler set to `null` is a no-op.
 - **Style objects** are diffed per key (changed keys written, removed keys cleared); a string, a missing style, or a switch
   between string and object starts from scratch. `--custom-properties` go through `setProperty`.
+- **A changed key replaces** the node or instance, wherever it is: among an element's children, as a component's result, or
+  at the root. Type and key must both match to keep it (`null` and `undefined` are both "no key"; keys compare with `Object.is`).
 - **Children** match their previous child by key (an unkeyed child's key is its position). A node that was just inserted in place is
   not inserted again. Repositioning uses `moveBefore` when the browser has it (focus, selection and CSS animations survive), else
   `insertBefore`. Dev builds throw on a duplicate key among one element's children (it would otherwise render an extra node).

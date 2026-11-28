@@ -196,6 +196,9 @@ Children match by `key` (any string or number; `0` is a valid key, `1` and `'1'`
 child matches by position. Give list items stable keys. Position is counted after arrays are flattened, so a list that
 grows or shrinks shifts the unkeyed siblings after it: key them, or wrap the list in its own element.
 
+A changed `key` always replaces: the old instance's cleanups run and a new one starts. That holds for a list item, for a
+component's own result (`return <Detail key={id}/>`) and for the root. A missing, `null` and `undefined` key are the same.
+
 ### `listen(ctx, target, event, fn, opts?)` (helpers)
 
 Adds `fn` as a listener on mount and removes it on unmount (`opts` goes to both calls, e.g. `{ passive: true, capture: true }`).
