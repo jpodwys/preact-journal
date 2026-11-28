@@ -454,7 +454,7 @@ read non-store data `Component.fresh = 1`, and change the handful of tests that 
 - `test/`: 121 framework specs (including a seeded keyed-diff fuzz) plus the build, karma config and size script that run them.
 - `types-test/`: the type tests (`positive.tsx`, `negative.tsx`, an editor-behavior check and a seeded-mistakes run over the journal app).
 - `examples/tasks/`: a second, different app on kyvo (26 specs).
-- `examples/gallery/`: eleven scenarios from a counter to autosaving notes, each with its explanation, live demo and source.
+- `examples/gallery/`: twenty-eight scenarios from a first component to small apps, each with its explanation, live demo and source.
 - `examples/dashboard/`: a live stock dashboard in four sizes, used to find the performance limits (with a smoke test and a measurement script).
 - `examples/splitting/`: route-based code splitting with `lazy()`, lazily loaded store slices, and a real-browser check of which files are fetched (14 + 12 specs, plus a break-it-on-purpose check).
 - The journal app in `client/` is the main consumer, with the app's own test infrastructure in `test/` at the repo root.

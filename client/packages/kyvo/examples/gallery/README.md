@@ -1,12 +1,13 @@
 # Gallery: kyvo by example
 
-Eleven scenarios in order of difficulty, each with an explanation, a thing to watch out for, the running demo and the code
+Twenty-eight scenarios in eight stages, from a first component to two small apps, each with an explanation, a thing to watch out for, the running demo and the code
 that runs it.
 
     node build.js app && open index.html     # PROD=1 for a minified build
     npm run test:gallery                     # from the repo root
 
-Each scenario is one file in `src/scenarios/`. `src/scenarios.js` imports it twice, as a module and as text
-(`?source`), so the Code tab cannot drift from the demo. To add one: write the file, add its entry there, add a spec.
+Most scenarios are one file in `src/scenarios/`; `mail/` and `kanban/` are folders, and their Code tab has a file picker.
+`src/scenarios.js` imports each file twice, as a module and as text (`?source`), so the Code tab cannot drift from the
+demo. To add one: write the file, add its entry there (with its stage), add a spec.
 
-Lazy loading is left to `../splitting/` and large lists to `../dashboard/`.
+Real code splitting is shown in `../splitting/` (the gallery builds one bundle) and large lists in `../dashboard/`.

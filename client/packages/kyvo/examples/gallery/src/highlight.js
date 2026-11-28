@@ -1,7 +1,7 @@
 import { h } from 'kyvo/core';
 
 // A small highlighter for the gallery's own scenarios: JavaScript and JSX, by pattern rather than by parsing. It only
-// has to be right for the files in scenarios/. The pieces always add up to exactly the source text.
+// has to be right for the files in scenarios/ (avoid apostrophes in on-screen text there). The pieces always add up to exactly the source text.
 const PATTERNS = [
   ['comment', /\{\/\*[\s\S]*?\*\/\}|\/\*[\s\S]*?\*\/|\/\/.*/],
   ['string', /'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/],
