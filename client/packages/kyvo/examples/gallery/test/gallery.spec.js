@@ -164,17 +164,44 @@ describe('gallery', () => {
     expect($('[role=dialog]')).to.equal(null);
   });
 
-  it('profile: loads, ignores a late answer, and shows an error', async () => {
+  const card = label => demo().querySelector(`section[aria-label="${label}"] .card`);
+  const name = label => card(label).querySelector('h3').textContent;
+
+  it('profile: without a key the old user and message stay, with one the card starts over', async () => {
     await go('profile');
-    expect($('.result').textContent).to.equal('Loading…');
+    await until(() => expect([name('Without a key'), name('With a key')]).to.deep.equal(['Ada', 'Ada']));
+    for (const label of ['Without a key', 'With a key']) await type(card(label).querySelector('input'), 'hi Ada');
     await click('User 2');
-    await until(() => expect($('.result').textContent).to.equal('Grace'));
+    expect(name('With a key')).to.equal('Loading…');
+    expect(card('With a key').querySelector('input').value).to.equal('');
+    await until(() => expect(name('With a key')).to.equal('Grace'));
+    expect(name('Without a key')).to.equal('Ada');
+    expect(card('Without a key').querySelector('input').value).to.equal('hi Ada');
+  });
+
+  it('profile: shows an error, and ignores the answer for a card that is gone', async () => {
+    await go('profile');
     await click('User 3');
-    await until(() => expect($('[role=alert]').textContent).to.equal('No such user'));
+    await until(() => expect(card('With a key').querySelector('[role=alert]').textContent).to.equal('No such user'));
     await click('User 1');
     await click('User 2');
     await sleep(500);
-    expect($('.result').textContent).to.equal('Grace');
+    expect(name('With a key')).to.equal('Grace');
+  });
+
+  it('metronome: a new speed replaces the timer and keeps the count', async () => {
+    await go('profile');                       // start from elsewhere, so the timer below is created under the fake clock
+    clock = sinon.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
+    await go('metronome');
+    clock.tick(2000);
+    await frame();
+    expect($('.total').textContent).to.equal('2 beats');
+    await click('Faster');
+    clock.tick(1000);
+    await frame();
+    expect($('.total').textContent).to.equal('4 beats');
+    await go('counter');
+    expect(clock.countTimers ? clock.countTimers() : Object.keys(clock.timers || {}).length).to.equal(0);
   });
 
   it('notes: switching at once keeps the typing and saves it to the right note', async () => {

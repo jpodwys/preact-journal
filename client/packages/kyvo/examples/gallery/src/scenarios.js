@@ -19,6 +19,8 @@ import Profile from './scenarios/profile.js';
 import profileSource from './scenarios/profile.js?source';
 import Notes from './scenarios/notes.js';
 import notesSource from './scenarios/notes.js?source';
+import Metronome from './scenarios/metronome.js';
+import metronomeSource from './scenarios/metronome.js?source';
 
 export const scenarios = [
   {
@@ -62,9 +64,14 @@ export const scenarios = [
     footgun: 'A ref written inline is a new function each render, so it runs every render. Define it outside the component.'
   },
   {
-    id: 'profile', title: 'Profile by id', teaches: 'effect, loading and errors', Demo: Profile, source: profileSource,
-    about: 'effect restarts work when a listed value changes, and cleans up the previous run first. The list says only when to restart.',
-    footgun: 'A value that should restart the work but is missing from the list fails silently.'
+    id: 'profile', title: 'Profile by id', teaches: 'key, loading and errors', Demo: Profile, source: profileSource,
+    about: 'Write a message on both cards, then pick another user. The card without a key keeps the old name and your message. The keyed card starts over and loads the new user.',
+    footgun: 'Use the keyed form. Without a key nothing warns you: the card quietly goes on showing the first user.'
+  },
+  {
+    id: 'metronome', title: 'Metronome', teaches: 'effect', Demo: Metronome, source: metronomeSource,
+    about: 'effect restarts one piece of work when a listed value changes, while the component and its state stay. Change the speed: the timer is replaced and the count carries on. A key would reset the count.',
+    footgun: 'A value that should restart the work but is missing from the list fails silently. With an empty list, the speed would never change.'
   },
   {
     id: 'notes', title: 'Autosaving notes', teaches: 'keyed debounced, key', Demo: Notes, source: notesSource,

@@ -38,5 +38,8 @@ button[aria-pressed=true] { background: var(--soft); font-weight: 600; }
 .demo label { display: block; margin-bottom: 8px; }
 .demo select, .demo label input:not([type=checkbox]):not([type=radio]) { margin-left: 8px; }
 textarea { width: 100%; min-height: 90px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.card, .modal { border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.card input { width: 100%; }
 .modal { border: 1px solid var(--line); border-radius: 8px; padding: 12px; box-shadow: 0 8px 24px rgb(0 0 0 / .25); max-width: 320px; }
 @media (max-width: 700px) { .layout { grid-template-columns: 1fr; } nav { border-right: 0; border-bottom: 1px solid var(--line); } main { padding: 16px; } }

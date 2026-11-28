@@ -1,6 +1,6 @@
 # Gallery: kyvo by example
 
-Ten scenarios in order of difficulty, each with an explanation, a thing to watch out for, the running demo and the code
+Eleven scenarios in order of difficulty, each with an explanation, a thing to watch out for, the running demo and the code
 that runs it.
 
     node build.js app && open index.html     # PROD=1 for a minified build
