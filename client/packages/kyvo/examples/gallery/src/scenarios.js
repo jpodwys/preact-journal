@@ -70,42 +70,40 @@ export const scenarios = [
   {
     stage: 'Basics', id: 'hello', title: 'Hello', teaches: 'components, JSX', Demo: Hello, files: [file('hello.js', helloSource)],
     about: 'A component is a plain function that returns what to show. Braces drop a JavaScript value into the markup.',
-    footgun: 'A component returns one element. To show siblings, wrap them in one; returning an array throws.'
+    tip: 'A component returns one element. To show siblings, wrap them in one; returning an array throws.'
   },
   {
     stage: 'Basics', id: 'props', title: 'Props', teaches: 'passing data down', Demo: Props, files: [file('props.js', propsSource)],
     about: 'A parent passes values like attributes, and the component receives them in props. Defaults are ordinary JavaScript.',
-    footgun: 'times="2" passes the string "2", not the number. Use braces for anything that is not a string.'
+    tip: 'times="2" passes the string "2", not the number. Use braces for anything that is not a string.'
   },
   {
     stage: 'Basics', id: 'children', title: 'Children', teaches: 'composition', Demo: Children, files: [file('children.js', childrenSource)],
-    about: 'A component can wrap whatever is put between its tags, which is how layout pieces are built.',
-    footgun: 'props.children is always an array, even for a single child.'
+    about: 'A component can wrap whatever is put between its tags, which is how layout pieces are built.'
   },
   {
     stage: 'Basics', id: 'lists', title: 'Lists', teaches: 'map, key', Demo: Lists, files: [file('lists.js', listsSource)],
-    about: 'There is no loop syntax: build the elements with map.',
-    footgun: 'Give each item a key that is unique among its siblings. A development build throws on a duplicate.'
+    about: 'There is no loop syntax: build the elements with map.'
   },
   {
     stage: 'State', id: 'counter', title: 'Counter', teaches: 'ctx.state', Demo: Counter, files: [file('counter.js', counterSource)],
     about: 'ctx.state gives a component an object that survives renders. Assign to a field and the app re-renders. There is no setter to call.',
-    footgun: 'The object is created on the first render only. Changing the initial value you pass later does nothing.'
+    tip: 'The object is created on the first render only. Changing the initial value you pass later does nothing.'
   },
   {
     stage: 'State', id: 'events', title: 'Events', teaches: 'handlers', Demo: Events, files: [file('events.js', eventsSource)],
     about: 'Attributes starting with "on" are event handlers, and they receive the browser event itself.',
-    footgun: 'onclick={save()} calls save during every render. Write onclick={save} or onclick={() => save()}.'
+    tip: 'onclick={save()} calls save during every render. Write onclick={save} or onclick={() => save()}.'
   },
   {
     stage: 'State', id: 'conditional', title: 'Show and hide', teaches: 'conditional rendering', Demo: Conditional, files: [file('conditional.js', conditionalSource)],
     about: 'Use a ternary to pick between two things, and && to show something or nothing.',
-    footgun: 'With a number on the left, as in count && ..., a count of 0 is shown as "0". Compare first: count > 0 && ...'
+    tip: 'With a number on the left, as in count && ..., a count of 0 is shown as "0". Compare first: count > 0 && ...'
   },
   {
     stage: 'State', id: 'text-input', title: 'Text input', teaches: 'value, oninput', Demo: TextInput, files: [file('text-input.js', textInputSource)],
     about: 'State holds the text, the input shows it, and each keystroke writes it back.',
-    footgun: 'Use oninput for every keystroke. onchange is the browser event, which fires when the field is committed.'
+    tip: 'Use oninput for every keystroke. onchange is the browser event, which fires when the field is committed.'
   },
   {
     stage: 'State', id: 'cart', title: 'Shared cart', teaches: 'store', Demo: Cart, files: [file('cart.js', cartSource)],
@@ -125,12 +123,12 @@ export const scenarios = [
   {
     stage: 'Forms and data', id: 'search', title: 'Search a list', teaches: 'derived data, debounced', Demo: Search, files: [file('search.js', searchSource)],
     about: 'The matching names are computed during render. debounced delays the update until typing pauses.',
-    footgun: 'A second debounced in one component needs its own key as the fourth argument.'
+    tip: 'A second debounced in one component needs its own key as the fourth argument. A development build throws if you forget.'
   },
   {
     stage: 'Forms and data', id: 'preferences', title: 'Saved preferences', teaches: 'watch', Demo: Preferences, files: [file('preferences.js', preferencesSource)],
     about: 'watch runs a function after each changed write to a store. It suits persistence.',
-    footgun: 'Calling watch in a component body adds another listener on every render. It cannot be removed.'
+    footgun: 'A watch cannot be removed, so call it once, outside any component. A development build throws if one is called during a render.'
   },
   {
     stage: 'Lifecycle', id: 'stopwatch', title: 'Stopwatch', teaches: 'ctx.mount, live props', Demo: Stopwatch, files: [file('stopwatch.js', stopwatchSource)],
@@ -140,7 +138,7 @@ export const scenarios = [
   {
     stage: 'Lifecycle', id: 'modal', title: 'Modal', teaches: 'listen, ref, conditional rendering', Demo: Modal, files: [file('modal.js', modalSource)],
     about: 'The Escape listener exists only while the modal does. A ref receives the element once it is on the page.',
-    footgun: 'A ref runs when its element is created, not on later renders. To run it again, such as to refocus, give the element a new key.'
+    tip: 'A ref runs when its element is created, not on later renders. To run it again, such as to refocus, give the element a new key.'
   },
   {
     stage: 'Lifecycle', id: 'profile', title: 'Profile by id', teaches: 'key, loading and errors', Demo: Profile, files: [file('profile.js', profileSource)],
@@ -165,32 +163,31 @@ export const scenarios = [
   {
     stage: 'Building blocks', id: 'signup', title: 'Sign-up form', teaches: 'validation, async submit', Demo: Signup, files: [file('signup.js', signupSource)],
     about: 'Errors are computed from the fields on each render. While the request runs the button is disabled, so it cannot be sent twice.',
-    footgun: 'After an await, the component may have been removed. Writing to its state then does nothing, so do not rely on it for work that must happen.'
+    tip: 'After an await, the component may have been removed. Writing to its state then does nothing, so do not rely on it for work that must happen.'
   },
   {
     stage: 'Building blocks', id: 'table', title: 'Data table', teaches: 'derived data', Demo: Table, files: [file('table.js', tableSource)],
     about: 'Only the search text, sort, page and selection are stored. The visible rows are worked out from those on every render.',
-    footgun: 'Clamp what you store against what you derive. A filter can leave the stored page past the last one.'
+    tip: 'Clamp what you store against what you derive. A filter can leave the stored page past the last one.'
   },
   {
     stage: 'Interaction and time', id: 'undo', title: 'Undo and redo', teaches: 'history, listen', Demo: Undo, files: [file('undo.js', undoSource)],
     about: 'Because values are replaced and never changed, the history is simply the old values. Paint, then undo with the buttons or Ctrl/Cmd+Z.',
-    footgun: 'This only works if nothing mutates an old array. One push or index assignment would rewrite history.'
+    tip: 'This only works if nothing mutates an old array. One push or index assignment would rewrite history.'
   },
   {
     stage: 'Interaction and time', id: 'reorder', title: 'Drag to reorder', teaches: 'keys, drag events', Demo: Reorder, files: [file('reorder.js', reorderSource)],
-    about: 'Type a note in a row, then drag it or use the arrows. The row moves with its note, because the key identifies it.',
-    footgun: 'Without keys the text typed in a row would stay at its position while the titles moved.'
+    about: 'Type a note in a row, then drag it or use the arrows. The row moves with its note, because the key identifies it.'
   },
   {
     stage: 'Interaction and time', id: 'chart', title: 'Live chart', teaches: 'effect, SVG', Demo: Chart, files: [file('chart.js', chartSource)],
     about: 'effect restarts the data timer when you change feed or pause, while the points already drawn stay.',
-    footgun: 'The timer callback reads s.values each time. A copy taken when the effect started would lose every point added since.'
+    tip: 'The timer callback reads s.values each time. A copy taken when the effect started would lose every point added since.'
   },
   {
     stage: 'Async and sync', id: 'favorites', title: 'Optimistic favorites', teaches: 'async actions, rollback', Demo: Favorites, files: [file('favorites.js', favoritesSource)],
     about: 'A star changes at once and is saved afterwards. Turn on failing saves to watch it roll back.',
-    footgun: 'Roll back to what the server confirmed, not to a value read before the await, and ignore failures that a newer click has replaced.'
+    tip: 'Roll back to what the server confirmed, not to a value read before the await, and ignore failures that a newer click has replaced.'
   },
   {
     stage: 'Async and sync', id: 'chat', title: 'Chat rooms', teaches: 'effect, drafts, autoscroll', Demo: Chat, files: [file('chat.js', chatSource)],
@@ -200,11 +197,10 @@ export const scenarios = [
   {
     stage: 'Whole apps', id: 'mail', title: 'Mail reader', teaches: 'routing, shared store, shortcuts', Demo: Mail, files: [file('index.js', mailIndexSource), file('store.js', mailStoreSource), file('list.js', mailListSource), file('message.js', mailMessageSource)],
     about: 'The open message is in the address, so Back works. The code is split into a store, a list and a message view.',
-    footgun: 'The key on the message view empties the reply box when you move on. Put drafts in the store if they should survive.'
+    tip: 'The key on the message view empties the reply box when you move on. Put drafts in the store if they should survive.'
   },
   {
     stage: 'Whole apps', id: 'kanban', title: 'Kanban board', teaches: 'everything together', Demo: Kanban, files: [file('index.js', kanbanIndexSource), file('store.js', kanbanStoreSource), file('column.js', kanbanColumnSource), file('editor.js', kanbanEditorSource), file('settings.js', kanbanSettingsSource)],
-    about: 'A store with saved state, keyed columns and cards, dragging, an edit dialog, debounced search and a lazily loaded panel.',
-    footgun: 'The editor copies the title when it opens. Its key is what makes it copy again for another card.'
+    about: 'A store with saved state, keyed columns and cards, dragging, an edit dialog, debounced search and a lazily loaded panel.'
   }
 ];

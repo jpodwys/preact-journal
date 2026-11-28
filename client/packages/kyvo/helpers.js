@@ -20,6 +20,11 @@ const K = Symbol();
 const run = s => { const a = s.a; s.a = 0; if (a) s.f(...a); };
 
 export function debounced(ctx, fn, ms, key = '') {
+  if (typeof __DEV__ === 'undefined' || __DEV__) {
+    // A state slot per key, only because ctx.state notices one being claimed twice in a render.
+    try { ctx.state({}, 'debounced ' + key); }
+    catch (e) { throw new Error(`debounced: used twice with the key "${key}" in one component, so the second would take over the first; give each its own key`); }
+  }
   const m = ctx[K] ||= {};
   const s = m[key] || (m[key] = { g: (...a) => { s.a = a; clearTimeout(s.t); s.t = setTimeout(() => run(s), ms); } });
   s.f = fn;

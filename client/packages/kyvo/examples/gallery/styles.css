@@ -15,6 +15,7 @@ nav a:hover, nav a[aria-current] { background: var(--soft); }
 nav a[aria-current] { font-weight: 600; }
 main { padding: 24px 32px; max-width: 860px; }
 h1 { margin-top: 0; }
+.tip { opacity: .75; font-size: 14px; }
 .footgun { border-left: 3px solid #d97706; padding: 6px 12px; background: var(--soft); }
 [role=tablist] { display: flex; gap: 4px; margin-top: 20px; }
 [role=tab] { border-radius: 6px 6px 0 0; border-bottom: 0; }

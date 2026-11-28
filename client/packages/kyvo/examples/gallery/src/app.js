@@ -37,7 +37,8 @@ const Page = ({ scenario }) => {
     <article>
       <h1>{scenario.title}</h1>
       <p>{scenario.about}</p>
-      <p class="footgun"><strong>Watch out:</strong> {scenario.footgun}</p>
+      {scenario.footgun && <p class="footgun"><strong>Watch out:</strong> {scenario.footgun}</p>}
+      {scenario.tip && <p class="tip"><strong>Tip:</strong> {scenario.tip}</p>}
       <div role="tablist"><Tab name="demo" label="Demo" /><Tab name="code" label="Code" /></div>
       <section class="demo" aria-label="Demo" hidden={nav.tab !== 'demo'}><Demo /></section>
       <section aria-label="Code" hidden={nav.tab !== 'code'}><Code files={scenario.files} /></section>

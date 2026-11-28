@@ -60,7 +60,10 @@ export function store(obj, notify) {
   });
 }
 
-export const watch = (px, fn) => { px[W] = fn; };
+export const watch = (px, fn) => {
+  if ((typeof __DEV__ === 'undefined' || __DEV__) && rendering) throw new Error('watch: called during a render, which adds another listener every time; call it outside components');
+  px[W] = fn;
+};
 
 function freeze(v) {
   if (v && typeof v == 'object' && !Object.isFrozen(v) && (Array.isArray(v) || Object.getPrototypeOf(v) == Object.prototype)) {
@@ -82,6 +85,11 @@ const proto = {
       u.add(key);
     }
     const s = this._s || (this._s = {});
+    if ((typeof __DEV__ === 'undefined' || __DEV__) && !s[key] && typeof init == 'function') {
+      // An initializer runs once, so watch() is fine inside it: it does not count as being called during a render.
+      const make = init, was = rendering;
+      init = () => { rendering = 0; try { return make(); } finally { rendering = was; } };
+    }
     return s[key] || (s[key] = store(typeof init == 'function' ? init() : init, () => this._r || schedule()));
   },
   mount(fn) {

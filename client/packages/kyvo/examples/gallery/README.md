@@ -1,6 +1,6 @@
 # Gallery: kyvo by example
 
-Twenty-eight scenarios in eight stages, from a first component to two small apps, each with an explanation, a thing to watch out for, the running demo and the code
+Twenty-eight scenarios in eight stages, from a first component to two small apps, each with an explanation, where useful a warning or a tip, the running demo and the code
 that runs it.
 
     node build.js app && open index.html     # PROD=1 for a minified build

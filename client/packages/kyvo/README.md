@@ -23,6 +23,8 @@ const Counter = (props, ctx) => {
 render(<Counter label="Clicks" />, document.body);
 ```
 
+Coming from React? Read [DIFFERENCES-FROM-REACT.md](DIFFERENCES-FROM-REACT.md) first.
+
 [SPEC.md](SPEC.md) is the normative contract (every edge case); this README is the guide. For a worked
 example see the journal app in `client/`, and for a second, different app see `examples/tasks/`.
 
@@ -108,7 +110,8 @@ watch(app, (key, next) => {
 });
 ```
 
-A listener may write to the store; the loop ends when a write is unchanged. There is no unsubscribe.
+A listener may write to the store; the loop ends when a write is unchanged. There is no unsubscribe, so call `watch`
+once, outside components: a development build throws if it is called during a render.
 
 ### Components
 
@@ -251,6 +254,8 @@ The timer lives on `ctx` (non-reactive: firing it never renders by itself). A se
 const search = debounced(ctx, e => setQuery(e.target.value), 100);
 <input oninput={search} />
 ```
+
+A second use with the same key in one render throws in a development build.
 
 **A pending call is never lost:** if the component unmounts, it runs once, immediately, with the latest arguments. That is what
 makes it safe for saves: an edit made just before navigating away still gets saved. Each `key` has its own timer and pending call

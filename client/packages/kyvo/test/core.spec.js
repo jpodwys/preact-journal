@@ -350,6 +350,41 @@ describe('watch()', () => {
     expect(log).to.deep.equal([50, 10]);
   });
 
+  it('dev: throws when called during a render, which would add a listener every time', function () {
+    if (!(typeof __DEV__ === 'undefined' || __DEV__)) this.skip();
+    const s = store({ a: 1 });
+    const C = () => { watch(s, () => {}); return <p />; };
+    expect(() => render(<C />, document.createElement('div'))).to.throw(/during a render/);
+  });
+
+  it('may be called from a ctx.state initializer, which runs once, and still throws in the body after it', () => {
+    let hits = 0, made;
+    const C = (props, ctx) => {
+      ctx.state(() => { made = store({ a: 1 }); watch(made, () => hits++); return {}; });
+      return <p />;
+    };
+    const host = document.createElement('div');
+    render(<C />, host);
+    render(<C />, host);
+    made.a = 2;
+    expect(hits).to.equal(1);
+    render(null, host);
+    if (!(typeof __DEV__ === 'undefined' || __DEV__)) return;
+    const D = (props, ctx) => { ctx.state(() => ({})); watch(store({}), () => {}); return <p />; };
+    expect(() => render(<D />, document.createElement('div'))).to.throw(/during a render/);
+  });
+
+  it('may be called from ctx.mount', () => {
+    const s = store({ a: 1 });
+    let hits = 0;
+    const C = (props, ctx) => { ctx.mount(() => { watch(s, () => hits++); }); return <p />; };
+    const host = document.createElement('div');
+    render(<C />, host);
+    s.a = 2;
+    expect(hits).to.equal(1);
+    render(null, host);
+  });
+
   it('is per store', () => {
     const a = store({ x: 0 }), b = store({ x: 0 });
     let hits = 0;

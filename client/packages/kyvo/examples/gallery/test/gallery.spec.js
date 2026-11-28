@@ -38,13 +38,14 @@ describe('gallery', () => {
     await frame();
   });
 
-  it('links every scenario, and each page shows its demo, its footgun and exactly its source', async function () {
+  it('links every scenario, and each page shows its demo, its notes and exactly its source', async function () {
     this.timeout(30000);
     expect(host.querySelectorAll('nav a').length).to.equal(scenarios.length);
     for (const s of scenarios) {
       await go(s.id);
       expect(host.querySelector('h1').textContent, s.id).to.equal(s.title);
-      expect(host.querySelector('.footgun').textContent).to.include(s.footgun);
+      expect(host.querySelector('.footgun')?.textContent, s.id).to.equal(s.footgun && 'Watch out: ' + s.footgun);
+      expect(host.querySelector('.tip')?.textContent, s.id).to.equal(s.tip && 'Tip: ' + s.tip);
       expect(demo().children.length, s.id).to.be.above(0);
       expect(host.querySelector('pre').textContent).to.equal(s.files[0].source);
       expect(s.files[0].source).to.include("from 'kyvo/core'");

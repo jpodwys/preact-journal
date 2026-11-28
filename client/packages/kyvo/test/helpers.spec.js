@@ -145,6 +145,21 @@ describe('debounced()', () => {
   });
 });
 
+describe('debounced(): one name per component', () => {
+  const devOnlyIt = (typeof __DEV__ === 'undefined' || __DEV__) ? it : it.skip;
+
+  devOnlyIt('dev: throws when two share a key, since the second would silently take over the first', () => {
+    const C = (props, ctx) => { debounced(ctx, () => {}, 10); debounced(ctx, () => {}, 10); return <p />; };
+    expect(() => mount(<C />)).to.throw(/debounced: .*key/);
+  });
+
+  it('allows separate keys, the same key on a later render, and a key that changes', () => {
+    const C = (props, ctx) => { debounced(ctx, () => {}, 10, props.id); debounced(ctx, () => {}, 10, 'other'); return <p />; };
+    const host = mount(<C id="a" />);
+    expect(() => { render(<C id="a" />, host); render(<C id="b" />, host); render(<C id="a" />, host); }).to.not.throw();
+  });
+});
+
 describe('debounced(): unmounting', () => {
   it('does nothing on unmount when nothing is pending', () => {
     const calls = [];
