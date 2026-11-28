@@ -19,8 +19,9 @@
     "test:server": "node --test test/server/*.spec.js",
     "test:artifact": "node test/run-artifact.js",
     "test:kyvo": "cd client/packages/kyvo/test && node build.js && karma start karma.conf.js && PROD=1 node build.js && karma start karma.conf.js && PROD=1 MANGLE=1 node build.js && karma start karma.conf.js",
-    "test:examples": "cd client/packages/kyvo/examples/tasks && node build.js test && karma start karma.conf.js && PROD=1 node build.js test && karma start karma.conf.js && npm run test:splitting",
+    "test:examples": "cd client/packages/kyvo/examples/tasks && node build.js test && karma start karma.conf.js && PROD=1 node build.js test && karma start karma.conf.js && npm run test:splitting && npm run test:dashboard",
     "test:splitting": "cd client/packages/kyvo/examples/splitting && node build.js test && karma start karma.conf.js && PROD=1 node build.js test && karma start karma.conf.js && node --test --test-force-exit --test-timeout=120000 test/split.spec.js && node test/mutation-check.js",
+    "test:dashboard": "cd client/packages/kyvo/examples/dashboard && node --test --test-force-exit --test-timeout=60000 test/smoke.spec.js",
     "test:types": "node client/packages/kyvo/types-test/run.js",
     "test:all": "npm test && npm run test:prod && npm run test:boot && npm run test:boot-prod && npm run test:server && npm run test:artifact && npm run test:kyvo && npm run test:examples"
   },

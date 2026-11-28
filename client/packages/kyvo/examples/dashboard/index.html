@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>kyvo dashboard</title>
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+<div id="controls"></div>
+<div id="app"></div>
+<script src="instrument.js"></script>
+<script src="dist/app.js"></script>
+<script>
+// Everything is in the URL, e.g.  index.html?iter=3&N=5000&rate=2000&applyMs=100
+(() => {
+  const q = new URLSearchParams(location.search);
+  const iter = +(q.get('iter') || 3), scroll = +(q.get('scroll') || 0);
+  const defaults = { 1: { N: 40, rate: 200, applyMs: -1 }, 2: { N: 1000, rate: 2000, applyMs: 100 }, 3: { N: 5000, rate: 5000, applyMs: 100 }, 4: { N: 25000, rate: 20000, applyMs: 100 } }[iter];
+  const opts = { ...defaults };
+  for (const k of ['N', 'rate', 'applyMs', 'sortMs', 'pinned', 'tiles', 'charts', 'tapeRows', 'gridH', 'stats', 'market', 'sectors', 'movers', 'book']) if (q.has(k)) opts[k] = +q.get(k);
+  for (const k of ['strategy', 'sortKey']) if (q.has(k)) opts[k] = q.get(k);
+
+  const link = n => `<a href="?iter=${n}" class="${n === iter ? 'on' : ''}">${['1 Board', '2 Market', '3 Dashboard', '4 Terminal'][n - 1]}</a>`;
+  const select = (k, label, choices, cur) => `<label>${label}<select data-k="${k}">` +
+    choices.map(([v, t]) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${t}</option>`).join('') + '</select></label>';
+  const controls = document.getElementById('controls');
+  controls.innerHTML =
+    '<span class="brand">KYVO · DASHBOARD</span><span class="seg">' + [1, 2, 3, 4].map(link).join('') + '</span>' +
+    select('N', 'symbols', [40, 200, 1000, 5000, 10000, 25000, 50000, 100000].map(v => [v, v.toLocaleString()]), opts.N) +
+    select('rate', 'ticks/s', [10, 200, 1000, 2000, 5000, 10000, 20000, 50000, 100000].map(v => [v, v.toLocaleString()]), opts.rate) +
+    select('applyMs', 'ingest', [[0, 'every tick'], [-1, 'every message'], [50, 'every 50 ms'], [100, 'every 100 ms'], [250, 'every 250 ms'], [1000, 'every 1 s']], opts.applyMs) +
+    select('strategy', 'store', [['copy', 'copy array'], ['mut', 'mutable + rev']], opts.strategy || 'copy') +
+    select('sortMs', 'resort', [[0, 'every update'], [250, 'every 250 ms'], [1000, 'every 1 s']], opts.sortMs || 0) +
+    select('scroll', 'auto-scroll', [[0, 'off'], [4, 'slow'], [24, 'fast'], [120, 'fling']], scroll);
+  controls.onchange = e => { const u = new URL(location.href); u.searchParams.set(e.target.dataset.k, e.target.value); location.href = u; };
+
+  window.__start[iter](opts);
+  window.__hud();
+  document.getElementById('hud-mode').textContent = `iteration ${iter}`;
+  if (scroll) window.__scrollDrive(scroll);
+})();
+</script>
+</body>
+</html>
