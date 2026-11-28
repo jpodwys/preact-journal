@@ -20,7 +20,7 @@ Hyperscript / JSX factory. Returns `{ type, props: { ...props, children }, key }
 So is any object `h()` did not build: a vnode carries a private symbol, so parsed JSON shaped like a vnode is never
 rendered, whether it is passed as a child or returned by a component. The `innerHTML` and `outerHTML` props are ignored; set trusted
 HTML through a `ref`. Spreading untrusted data into **props** is still unsafe: it can choose `href`, `style` and any
-other prop.
+other prop (see SPREAD-SAFETY.md).
 
 ### `render(vnode, hostElement)`
 Diffs `vnode` into `hostElement` (first call mounts, later calls diff). It also records

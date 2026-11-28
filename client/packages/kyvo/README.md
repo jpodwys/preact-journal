@@ -182,7 +182,7 @@ On a *component*, `ref` is an ordinary prop (the framework never calls it), so f
   otherwise an attribute (`class`, `aria-*`, `contenteditable`, SVG attributes). `null`/`false` removes the attribute.
 - `innerHTML` and `outerHTML` are ignored, so data spread into props cannot create markup. To set HTML you trust, use a
   `ref`. Spreading untrusted data is still unsafe (it can choose `href`, `style` and any other prop): pass the fields
-  you want by name.
+  you want by name. [SPREAD-SAFETY.md](SPREAD-SAFETY.md) has the gaps and a proposal.
 - `style` is a string or an object. Object values are used as-is, so numbers need units (`top: '40px'`, not `top: 40`).
 - SVG subtrees are created in the SVG namespace automatically.
 - **Text and attributes are compared with the previous vnode, never the live DOM.** Text a user typed into a
