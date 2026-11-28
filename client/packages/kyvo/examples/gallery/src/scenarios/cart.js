@@ -10,6 +10,9 @@ const cart = store({ items: [] });
 const add = id => { cart.items = [...cart.items, id]; };
 const remove = index => { cart.items = cart.items.filter((_, i) => i !== index); };
 
+// Derived data sits beside the actions. It is worked out when asked for, never stored, so it cannot go stale.
+const total = () => cart.items.reduce((sum, id) => sum + find(id).price, 0);
+
 const Badge = () => <h3>Cart ({cart.items.length})</h3>;
 
 const Products = () => (
@@ -27,7 +30,7 @@ const Items = () => (
         <li>{find(id).name} <button onclick={() => remove(i)}>Remove</button></li>
       ))}
     </ul>
-    <p class="total">Total: ${cart.items.reduce((sum, id) => sum + find(id).price, 0)}</p>
+    <p class="total">Total: ${total()}</p>
   </div>
 );
 

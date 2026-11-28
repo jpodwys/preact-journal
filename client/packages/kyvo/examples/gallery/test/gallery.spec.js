@@ -72,10 +72,12 @@ describe('gallery', () => {
     await click('Clicked 0 times');
     const element = $('button');
     await click('Code', host);
-    expect(demo().hidden).to.equal(true);
-    expect(host.querySelector('pre').hidden).to.equal(false);
+    const code = host.querySelector('section[aria-label="Code"]');
+    expect(demo().classList.contains('away')).to.equal(true);
+    expect(code.classList.contains('away')).to.equal(false);
     await click('Demo', host);
-    expect(demo().hidden).to.equal(false);
+    expect(demo().classList.contains('away')).to.equal(false);
+    expect(code.classList.contains('away')).to.equal(true);
     expect($('button')).to.equal(element);
     expect(element.textContent).to.equal('Clicked 1 times');
   });

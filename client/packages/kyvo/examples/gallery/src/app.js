@@ -30,7 +30,8 @@ const Code = ({ files }) => {
   );
 };
 
-// Both panels stay on the page, one hidden, so switching tabs does not reset the demo.
+// Both panels are always on the page, so nothing resets the demo. A wide screen shows them side by side; a narrow one
+// shows the tabs and hides the panel marked `away` (styles.css decides, so resizing needs no script).
 const Page = ({ scenario }) => {
   const { Demo } = scenario;
   return (
@@ -40,8 +41,10 @@ const Page = ({ scenario }) => {
       {scenario.footgun && <p class="footgun"><strong>Watch out:</strong> {scenario.footgun}</p>}
       {scenario.tip && <p class="tip"><strong>Tip:</strong> {scenario.tip}</p>}
       <div role="tablist"><Tab name="demo" label="Demo" /><Tab name="code" label="Code" /></div>
-      <section class="demo" aria-label="Demo" hidden={nav.tab !== 'demo'}><Demo /></section>
-      <section aria-label="Code" hidden={nav.tab !== 'code'}><Code files={scenario.files} /></section>
+      <div class="panes">
+        <section class={nav.tab === 'demo' ? 'demo' : 'demo away'} aria-label="Demo"><Demo /></section>
+        <section class={nav.tab === 'code' ? 'source' : 'source away'} aria-label="Code"><Code files={scenario.files} /></section>
+      </div>
     </article>
   );
 };

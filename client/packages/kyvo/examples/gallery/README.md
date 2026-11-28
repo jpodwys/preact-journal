@@ -3,6 +3,8 @@
 Twenty-eight scenarios in eight stages, from a first component to two small apps, each with an explanation, where useful a warning or a tip, the running demo and the code
 that runs it.
 
+Wide screens (1200px and up) show the demo and the code side by side; narrower ones switch between them with tabs.
+
     node build.js app && open index.html     # PROD=1 for a minified build
     npm run test:gallery                     # from the repo root
 

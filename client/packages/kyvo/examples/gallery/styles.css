@@ -13,7 +13,8 @@ nav a::before { content: counter(s) ". "; opacity: .5; }
 nav a small { display: block; opacity: .6; font-size: 12px; padding-left: 22px; }
 nav a:hover, nav a[aria-current] { background: var(--soft); }
 nav a[aria-current] { font-weight: 600; }
-main { padding: 24px 32px; max-width: 860px; }
+main { padding: 24px 32px; min-width: 0; }
+article > p { max-width: 75ch; }
 h1 { margin-top: 0; }
 .tip { opacity: .75; font-size: 14px; }
 .footgun { border-left: 3px solid #d97706; padding: 6px 12px; background: var(--soft); }
@@ -21,6 +22,20 @@ h1 { margin-top: 0; }
 [role=tab] { border-radius: 6px 6px 0 0; border-bottom: 0; }
 [role=tab][aria-selected=true] { background: var(--soft); font-weight: 600; }
 .demo, .code { margin: 0; border: 1px solid var(--line); border-radius: 0 8px 8px 8px; padding: 16px; }
+.panes > section { min-width: 0; }
+
+/* One panel at a time, chosen by the tabs... */
+@media (max-width: 1199px) {
+  article { max-width: 860px; }
+  .away { display: none; }
+}
+/* ...or, with room for both, side by side. The demo stays in view while you read down the code. */
+@media (min-width: 1200px) {
+  [role=tablist] { display: none; }
+  .panes { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; margin-top: 20px; }
+  .demo, .code { border-radius: 8px; }
+  .demo { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+}
 .code { background: var(--soft); }
 .files { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
 pre { margin: 0; overflow: auto; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size: 2; }
