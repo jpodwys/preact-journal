@@ -10,7 +10,8 @@ const focusIfNew = el => { if(el && app.view === '/new') el.focus(); };
 
 // Everything is read when the input happens, not when the save runs: by then the screen may show another entry (so
 // not the DOM), and a new entry may have its server id (so the entry itself is looked up again).
-const slowUpsert = ({ entry, property, date, text }) => {
+const slowUpsert = ({ pending, id, entry, property, date, text }) => {
+  delete pending[id];
   const current = app.entries.find(e => e.id === entry.id || e.clientId === entry.id);
   if(!current || current.deleted) return;
   if(current.newEntry) return createEntry({ entry: { ...current, date, text } });
@@ -26,13 +27,19 @@ export default (props, ctx) => {
   // Local copy of the text: seeded when the entry changes and otherwise left
   // alone, so re-renders never touch what the user is typing.
   const s = ctx.state({ id: 0, date: '', text: '' });
+  // What is typed but not yet saved, by editor id. Coming back to an entry before its save runs, this is newer than the store.
+  const pending = ctx.pending ||= {};
   // `s.id` is the id the editor was built for. A new entry getting its server id is not a change of entry: the id
   // stays, so the editor (caret, typing) is not rebuilt.
-  if(entry && s.id !== entry.id && s.id !== entry.clientId) Object.assign(s, { id: entry.id, date: entry.date, text: entry.text });
+  if(entry && s.id !== entry.id && s.id !== entry.clientId) {
+    // A new entry may have been typed in under its client id.
+    const { date, text } = pending[entry.id] || pending[entry.clientId] || entry;
+    Object.assign(s, { id: entry.id, date, text });
+  }
   // One debounce per entry: switching entries never replaces another entry's pending save,
   // and leaving the screen runs whatever is pending (debounced never drops a call).
   const upsert = debounced(ctx, slowUpsert, 500, String(s.id));
-  const onInput = e => upsert({ entry, property: e.target.id === 'ed' ? 'date' : 'text', date: read('ed'), text: read('et') });
+  const onInput = e => upsert(pending[s.id] = { pending, id: s.id, entry, property: e.target.id === 'ed' ? 'date' : 'text', date: read('ed'), text: read('et') });
   if(!entry) return <h2 class="center-text fade-up">Looks like that doesn't exist!</h2>
   return (
     <div class="fade-up">

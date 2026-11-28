@@ -485,6 +485,71 @@ describe('entry', () => {
       expect(lastBody('/api/entry/2')).to.deep.equal({ text: 'two edited' });
     });
 
+    describe('coming back to an entry before its save has run', () => {
+      const items = [{ id: 1, date: '2024-01-02', text: 'one' }, { id: 2, date: '2024-01-01', text: 'two' }];
+      const goTo = async (id, text) => {
+        app.entryId = id;
+        await waitFor(() => expect($et().textContent).to.equal(text));
+        await nextRender();
+      };
+      const open = () => {
+        mockUpdateEntry(1);
+        env = mountEntry({ entry: items[0], entries: items, viewEntries: items, entryIndex: 0 });
+      };
+      const enter = (el, text) => { type(el, text); fireEvent.input(el); };
+      // Typing at the end of whatever the editor shows, as a user does.
+      const append = (el, more) => enter(el, el.textContent + more);
+
+      for(const [property, $el, before] of [['text', $et, 'one'], ['date', $ed, '2024-01-02']]) {
+        it(`shows the typed ${property}, and typing on keeps it`, async () => {
+          open();
+          enter($el(), before + ' edited');
+          app.entryId = 2;
+          await waitFor(() => expect($et().textContent).to.equal('two'));
+          app.entryId = 1;
+          await waitFor(() => expect($ed().textContent).to.not.equal(items[1].date));
+          expect($el().textContent).to.equal(before + ' edited');
+
+          append($el(), ' more');
+          clock.tick(500);
+          expect(fetchMock.calls('/api/entry/1').length).to.equal(1);
+          expect(lastBody('/api/entry/1')).to.deep.equal({ [property]: before + ' edited more' });
+          expect(app.entries[0][property]).to.equal(before + ' edited more');
+        });
+      }
+
+      it('shows the stored text once the pending save has run', async () => {
+        open();
+        enter($et(), 'one edited');
+        clock.tick(500);
+        await goTo(2, 'two');
+        app.entries = app.entries.map(e => e.id === 1 ? { ...e, text: 'synced from elsewhere' } : e);
+        await goTo(1, 'synced from elsewhere');
+      });
+
+      it('keeps what was typed when a new entry got its server id while away', async () => {
+        let answer;
+        fetchMock.post('/api/entry', new Promise(r => { answer = r; }));
+        mockUpdateEntry(77);
+        const fresh = { id: 1000, date: '2024-12-25', text: '', newEntry: true, needsSync: true };
+        env = mountEntry({ entry: fresh, entries: [fresh, items[1]] });
+        enter($et(), 'Hello');
+        clock.tick(500);                       // the POST goes out and is held
+        append($et(), ' world');               // not yet saved
+        await goTo(2, 'two');
+        answer({ id: 77 });
+        await waitFor(() => expect(app.entries[0].id).to.equal(77));
+        app.entryId = 77;
+        await waitFor(() => expect($ed().textContent).to.equal('2024-12-25'));
+        expect($et().textContent).to.equal('Hello world');
+
+        append($et(), ' again');
+        clock.tick(500);
+        expect(lastBody('/api/entry/77')).to.deep.equal({ text: 'Hello world again' });
+        expect(app.entries[0].text).to.equal('Hello world again');
+      });
+    });
+
     it('a save still pending when navigating to another entry goes to the entry that was edited', async () => {
       mockUpdateEntry(1);
       mockUpdateEntry(2);
