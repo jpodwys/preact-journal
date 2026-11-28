@@ -45,7 +45,8 @@ the most recent `render()` call wins.
 ### `watch(store, (key, next, prev) => void)`
 Registers a write listener (persistence, `localStorage`, body classes). Runs once per
 changed write, in registration order, synchronously. A listener may write to the store
-(re-entrancy ends when a write is unchanged). No unsubscribe (not needed yet).
+(re-entrancy ends when a write is unchanged). Returns an unsubscribe that removes that registration only. A listener
+added or removed during a notification takes effect from the next write.
 
 ### `update` scheduling
 - `update()` is internal (not exported; export only if a real need appears).
@@ -179,7 +180,7 @@ before the `await`. Multi-account stale-response guards stay app-level (carry `u
 Attributes that are read-only DOM properties (`list`, `form`, ...; assigning them throws), 
 Fragments, portals, context, suspense/hydration, error boundaries, synthetic events,
 `className`/`htmlFor` aliases, object refs, `memo`/`shouldUpdate` (see MEMO.md for how to add it), deep reactivity,
-read tracking, an exported `update()` (until needed), unsubscribe from `watch`.
+read tracking, an exported `update()` (until needed).
 
 ## OPEN
 - Whether `listen` should call the first-render `fn` or the latest (currently first).

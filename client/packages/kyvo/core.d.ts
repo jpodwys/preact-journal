@@ -69,9 +69,9 @@ export function render(vnode: VNode | null, host: Element): void;
 export function store<T extends object>(init: T): Store<T>;
 
 /** `watch(store, (key, next, prev) => ...)`: checking `key` narrows `next` and `prev`. Listeners may take fewer parameters. */
-export function watch<S extends object>(store: S, fn: (...change: Change<S>) => void): void;
-export function watch<S extends object>(store: S, fn: (...change: Change2<S>) => void): void;
-export function watch<S extends object>(store: S, fn: (key: keyof S) => void): void;
+export function watch<S extends object>(store: S, fn: (...change: Change<S>) => void): () => void;
+export function watch<S extends object>(store: S, fn: (...change: Change2<S>) => void): () => void;
+export function watch<S extends object>(store: S, fn: (key: keyof S) => void): () => void;
 
 // ---- JSX -------------------------------------------------------------------------------------
 

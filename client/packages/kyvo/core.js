@@ -44,7 +44,7 @@ export function store(obj, notify) {
   let fns;
   return new Proxy(obj, {
     set(t, k, v) {
-      if (k === W) { (fns || (fns = [])).push(v); return true; }
+      if (k === W) { fns = v(fns || []); return true; }
       const prev = t[k];
       if (Object.is(prev, v)) return true;
       if (typeof __DEV__ === 'undefined' || __DEV__) freeze(v);
@@ -60,7 +60,13 @@ export function store(obj, notify) {
   });
 }
 
-export const watch = (px, fn) => { px[W] = fn; };
+// Returns an unsubscribe. The list is replaced, never edited, so a notification in progress is not disturbed; the wrapper
+// makes each registration its own, even when one function is registered twice.
+export const watch = (px, fn) => {
+  const l = (k, v, prev) => fn(k, v, prev);
+  px[W] = fns => fns.concat(l);
+  return () => { px[W] = fns => fns.filter(f => f !== l); };
+};
 
 function freeze(v) {
   if (v && typeof v == 'object' && !Object.isFrozen(v) && (Array.isArray(v) || Object.getPrototypeOf(v) == Object.prototype)) {

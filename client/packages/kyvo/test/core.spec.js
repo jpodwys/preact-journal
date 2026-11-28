@@ -341,6 +341,47 @@ describe('watch()', () => {
     expect(log).to.deep.equal([50, 10]);
   });
 
+  it('returns an unsubscribe that removes only its own registration, however often it is called', () => {
+    const s = store({ x: 0 });
+    let hits = 0;
+    const fn = () => hits++;
+    const first = watch(s, fn);
+    watch(s, fn);
+    first();
+    first();
+    s.x = 1;
+    expect(hits).to.equal(1);
+  });
+
+  it('unsubscribing during a notification does not skip the other listeners', () => {
+    const s = store({ x: 0 });
+    const log = [];
+    const stop = watch(s, () => { log.push('a'); stop(); });
+    watch(s, () => log.push('b'));
+    s.x = 1;
+    s.x = 2;
+    expect(log).to.deep.equal(['a', 'b', 'b']);
+  });
+
+  it('returned from ctx.mount, stops watching when the component unmounts (global and local stores)', () => {
+    const g = store({ x: 0 });
+    let hits = 0, local;
+    const C = (props, ctx) => {
+      local = ctx.state({ y: 0 });
+      ctx.mount(() => watch(g, () => hits++));
+      ctx.mount(() => watch(local, () => hits++));
+      return <p />;
+    };
+    const host = document.createElement('div');
+    render(<C />, host);
+    g.x = 1;
+    local.y = 1;
+    render(null, host);
+    g.x = 2;
+    local.y = 2;
+    expect(hits).to.equal(2);
+  });
+
   it('is per store', () => {
     const a = store({ x: 0 }), b = store({ x: 0 });
     let hits = 0;

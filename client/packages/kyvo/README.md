@@ -106,7 +106,15 @@ watch(app, (key, next) => {
 });
 ```
 
-A listener may write to the store; the loop ends when a write is unchanged. There is no unsubscribe.
+A listener may write to the store; the loop ends when a write is unchanged.
+
+`watch` returns an unsubscribe function, so a component stops watching when it unmounts by returning it from
+`ctx.mount`. Register there, not in the component body, which would add a listener on every render. A listener added or
+removed during a notification takes effect from the next write.
+
+```jsx
+ctx.mount(() => watch(app, key => { if (key === 'entryId') save.flush(); }));
+```
 
 ### Components
 
@@ -398,7 +406,7 @@ Mount into a detached `div`, drive it with real events, and assert on the DOM, t
 
 On purpose, in the spirit of "ignore problems we don't have": fragments and array returns, portals, context, suspense/hydration,
 error boundaries, synthetic events, `className`/`htmlFor` aliases, object refs, deep reactivity, read tracking,
-effect dependency arrays, an unsubscribe for `watch`, an exported `update()`, and attributes that are read-only DOM properties (`list`,
+effect dependency arrays, an exported `update()`, and attributes that are read-only DOM properties (`list`,
 `form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back (and [OPT-IN-FEATURES.md](OPT-IN-FEATURES.md) is a design for core-level features, `memo` among them, that would cost nothing unless an app turns them on), and
 [RENDER-IDEAS.md](RENDER-IDEAS.md) records the other render optimizations we built or considered. There is no
 server rendering story.
