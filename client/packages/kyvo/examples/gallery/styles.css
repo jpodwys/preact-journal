@@ -21,9 +21,9 @@ h1 { margin-top: 0; }
 pre { overflow: auto; background: var(--soft); font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size: 2; }
 
 /* Code colours: light, then dark. */
-:root { --comment: #6a737d; --string: #0a6b3d; --keyword: #a626a4; --literal: #986801; --call: #2f5fd0; --tag: #c0362c; --attr: #8a5a00; }
+:root { --comment: #22803a; --string: #a3470d; --keyword: #a626a4; --literal: #986801; --call: #2f5fd0; --tag: #c0362c; --attr: #8a5a00; }
 @media (prefers-color-scheme: dark) {
-  :root { --comment: #7f8c98; --string: #98c379; --keyword: #c678dd; --literal: #d19a66; --call: #61afef; --tag: #e06c75; --attr: #e5c07b; }
+  :root { --comment: #7bbf6a; --string: #ce9178; --keyword: #c678dd; --literal: #d19a66; --call: #61afef; --tag: #e06c75; --attr: #e5c07b; }
 }
 .tok-comment { color: var(--comment); font-style: italic; }
 .tok-string { color: var(--string); }
