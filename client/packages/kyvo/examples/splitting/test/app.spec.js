@@ -1,7 +1,7 @@
 const { expect } = window.chai;
 import { h } from '../../../core.js';
 import { App, routes } from '../src/components.js';
-import { nav, match } from '../src/router.js';
+import { nav, match, Routes } from '../src/router.js';
 import { slice, resetAll, shell } from '../src/session.js';
 import { notes } from '../src/slices/notes.js';
 import { mount, settle, fire, get, query, all } from './harness.js';
@@ -21,6 +21,26 @@ describe('router', () => {
     expect(match('/notes', '/stats')).to.equal(null);
     expect(match('/notes/:id', '/notes')).to.equal(null);
     expect(match('/notes', '/notes/7')).to.equal(null);
+  });
+});
+
+describe('Routes', () => {
+  let env;
+  afterEach(async () => { env.cleanup(); await go('/'); });
+
+  it('remounts the page when a param changes, and not while it stays the same', async () => {
+    const log = [];
+    const Page = ({ params }, ctx) => {
+      const s = ctx.state({ first: params.id });
+      ctx.mount(() => { log.push('mount ' + s.first); return () => log.push('unmount ' + s.first); });
+      return <p>{s.first}</p>;
+    };
+    await go('/x/1');
+    env = mount(<Routes routes={[['/x/:id', Page]]} notFound={Page} />);
+    await go('/x/1');
+    await go('/x/2');
+    expect(log).to.deep.equal(['mount 1', 'unmount 1', 'mount 2']);
+    expect(env.host.textContent).to.equal('2');
   });
 });
 

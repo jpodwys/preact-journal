@@ -9,7 +9,7 @@ Escape listener exists only while open, and a data fetch that must be cancelled 
     node size.js                                                                     # production size
     node build.js app   # then open index.html
 
-193 lines of app code (`src/`), 26 specs (`test/`). Idioms it settled on, instead of effect dependency arrays:
-**conditional rendering** (a `Ticker` or `Confirm` component that exists only while needed; its `ctx.mount`
-starts and its cleanup stops the work) and **keyed remount** (`<Detail key={id}/>`; a new id is a new instance whose
+187 lines of app code (`src/`), 26 specs (`test/`). Idioms it uses: **`effect()`** (a row's interval
+restarts and stops with its `running` flag), **conditional rendering** (a `Confirm` component that exists only while
+needed) and **keyed remount** (`<Detail key={id}/>`; a new id is a new instance whose
 `mount` fetches and whose cleanup cancels the stale response).

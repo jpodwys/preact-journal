@@ -1,5 +1,5 @@
 import { h } from '../../../core.js';
-import { listen, debounced } from '../../../helpers.js';
+import { listen, debounced, effect } from '../../../helpers.js';
 import { tasks, visible } from './store.js';
 import { api } from './api.js';
 import {
@@ -14,18 +14,14 @@ const focusEl = el => { if (el) el.focus(); };
 
 const Badge = ({ done }) => <span class="badge">{done ? 'done' : 'open'}</span>;
 
-// Renders nothing; ticks while mounted. Mount it conditionally: no effect dependencies needed.
-const Ticker = (props, ctx) => {
-  ctx.mount(() => {
-    const t = setInterval(() => props.onTick(), 1000);
-    return () => clearInterval(t);
-  });
-  return null;
-};
-
 function TaskRow({ task, index, last, ids }, ctx) {
   const s = ctx.state({ editing: false, draft: '', running: false });
   const running = s.running && task.secs > 0;
+  effect(ctx, () => {
+    if (!running) return;
+    const t = setInterval(() => tickTask(task.id), 1000);
+    return () => clearInterval(t);
+  }, [running]);
   const save = () => {
     const title = s.draft.trim();
     if (title) renameTask(task.id, title);
@@ -46,7 +42,6 @@ function TaskRow({ task, index, last, ids }, ctx) {
       {!s.editing && <button onclick={() => Object.assign(s, { editing: true, draft: task.title })}>Edit {task.title}</button>}
       <span class="clock">{fmt(task.secs)}</span>
       <button onclick={() => { s.running = !running; }}>{running ? 'Pause' : 'Start'} {task.title}</button>
-      {running && <Ticker onTick={() => tickTask(task.id)} />}
       <button disabled={index === 0} onclick={() => moveTask(task.id, -1, ids)}>Up {task.title}</button>
       <button disabled={last} onclick={() => moveTask(task.id, 1, ids)}>Down {task.title}</button>
       <button onclick={() => askDelete(task.id)}>Delete {task.title}</button>

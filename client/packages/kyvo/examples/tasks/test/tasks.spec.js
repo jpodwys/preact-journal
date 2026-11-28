@@ -261,21 +261,23 @@ describe('Tasks example app', () => {
     });
   });
 
-  describe('timer (a conditionally mounted interval)', () => {
+  describe('timer (an interval that runs while the row does)', () => {
+    // effect() starts and stops the interval in a microtask after the render that saw the change.
+    const toggle = async button => { fire.click(button); await Promise.resolve(); };
     const fake = () => { clock = sinon.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] }); };
 
     it('counts down while running, stops on Pause, resumes on Start', async () => {
       fake();
       const host = boot();
-      fire.click(get(host, 'button', 'Start alpha'));
+      await toggle(get(host, 'button', 'Start alpha'));
       clock.tick(3000);
       await settle();
       expect(tasks.items[0].secs).to.equal(1497);
-      fire.click(get(host, 'button', 'Pause alpha'));
+      await toggle(get(host, 'button', 'Pause alpha'));
       clock.tick(5000);
       await settle();
       expect(tasks.items[0].secs).to.equal(1497);
-      fire.click(get(host, 'button', 'Start alpha'));
+      await toggle(get(host, 'button', 'Start alpha'));
       clock.tick(1000);
       expect(tasks.items[0].secs).to.equal(1496);
       await settle();
@@ -285,7 +287,7 @@ describe('Tasks example app', () => {
     it('shows mm:ss and stops at zero', async () => {
       fake();
       const host = boot([T(1, 'alpha', { secs: 3 })]);
-      fire.click(get(host, 'button', 'Start alpha'));
+      await toggle(get(host, 'button', 'Start alpha'));
       clock.tick(10000);
       await settle();
       expect(tasks.items[0].secs).to.equal(0);
@@ -296,7 +298,7 @@ describe('Tasks example app', () => {
     it('deleting a running task clears its interval (nothing ticks afterwards)', async () => {
       fake();
       const host = boot();
-      fire.click(get(host, 'button', 'Start alpha'));
+      await toggle(get(host, 'button', 'Start alpha'));
       fire.click(get(host, 'button', 'Delete alpha'));
       fire.click(get(host, 'button', 'Confirm'));
       await settle();
@@ -307,8 +309,8 @@ describe('Tasks example app', () => {
     it('two rows can run at once, independently', async () => {
       fake();
       const host = boot();
-      fire.click(get(host, 'button', 'Start alpha'));
-      fire.click(get(host, 'button', 'Start beta'));
+      await toggle(get(host, 'button', 'Start alpha'));
+      await toggle(get(host, 'button', 'Start beta'));
       clock.tick(2000);
       await settle();
       expect(tasks.items.map(t => t.secs)).to.deep.equal([1498, 1498, 1500]);
