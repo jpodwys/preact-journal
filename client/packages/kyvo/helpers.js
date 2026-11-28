@@ -27,6 +27,31 @@ export function debounced(ctx, fn, ms, key = '') {
   return s.g;
 }
 
+// Runs `fn` after the first commit, and again when a value in `deps` changes (Object.is), calling the function `fn`
+// returned before each rerun and on unmount. `deps` says only when to restart: props.x and store reads are current
+// anyway. A second effect in one component needs a `key`. Built on ctx.mount, so call it on every render.
+export function effect(ctx, fn, deps, key = '') {
+  // A state slot only for its per-instance identity (and the dev error for a name used twice); nothing is written to it.
+  const s = ctx.state(() => ({ e: {} }), 'effect ' + key).e;
+  const run = () => {
+    if (!s.due || s.dead) return;
+    const undo = s.undo;
+    s.due = s.undo = 0;
+    if (undo) undo();
+    const next = s.fn();
+    if (typeof next == 'function') s.undo = next;
+  };
+  const old = s.deps;
+  s.fn = fn;
+  if (!old || old.length != deps.length || deps.some((d, i) => !Object.is(d, old[i]))) {
+    s.deps = deps;
+    s.due = 1;
+    // A later render has no commit hook: a microtask runs once the (synchronous) render has finished.
+    if (old) queueMicrotask(run);
+  }
+  ctx.mount(() => { run(); return () => { s.dead = 1; if (s.undo) s.undo(); }; });
+}
+
 // A component whose code arrives on first render. `load` returns a promise of the component, or of a module whose
 // default export is it: `lazy(() => import('./stats.js'))`. The bundler turns that `import()` into a separate file
 // (esbuild `splitting`), so this is how a route's code is kept out of the first download.

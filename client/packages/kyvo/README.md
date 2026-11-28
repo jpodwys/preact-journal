@@ -2,8 +2,9 @@
 
 A tiny UI framework (about 1.8 KB brotli) built on one idea: **brute force**. Any write to a store
 schedules one re-render of the whole tree from the root on the next animation frame, and a small keyed
-vdom diff keeps that cheap. There are no subscriptions, no hooks, no dependency arrays, no context, and no
-per-component scheduling, because nothing needs to know *what* changed.
+vdom diff keeps that cheap. There are no subscriptions, no hooks, no context, and no per-component scheduling,
+because nothing you display needs to know *what* changed. Only work that must restart does, and
+[`effect`](#effectctx-fn-deps-key-helpers) asks you to say when.
 
 ```jsx
 import { h, render, store } from './ui/core';
@@ -219,6 +220,26 @@ it renders `Failed` with `{ error, retry }`; `retry()` tries again, and a failur
 starts the load early (on hover, say) and returns the promise. The type of a lazy component is exactly the type of the one it loads.
 Costs about 160 B brotli in a bundle that uses it, nothing in one that does not.
 
+### `effect(ctx, fn, deps, key?)` (helpers)
+
+Runs `fn` after the first render commits, and again whenever a value in `deps` changes (`Object.is`). A function that
+`fn` returns runs before the next run and on unmount. Use it for work that must restart: a socket, a subscription, a fetch.
+
+```jsx
+effect(ctx, () => {
+  const socket = open(props.roomId);
+  socket.on('message', m => props.onMessage(m));   // current without being listed
+  return () => socket.close();
+}, [props.roomId, app.userId]);
+```
+
+`deps` means only "restart when these change". `props.x` and store reads are always current, so a value you merely use
+does not belong in it; a value that should restart the work and is missing fails silently. A destructured name is the
+value from the last run's render. `[]` runs once. A later run happens in a microtask after the render, so the screen
+already shows the new values. A second effect in one component passes a `key` (dev builds throw otherwise). Like
+`listen`, call it on every render, never inside an `if`. For state copied from props, the `if` under
+[Patterns](#patterns) is still better: an effect runs after the old value has been drawn.
+
 ### `debounced(ctx, fn, ms, key?)` (helpers)
 
 Returns a stable trigger that debounces calls to the **latest** `fn`, passing it the most recent call's arguments.
@@ -247,7 +268,7 @@ const s = ctx.state({ id: undefined, text: '' });
 if (s.id !== props.entry.id) Object.assign(s, { id: props.entry.id, text: props.entry.text });
 ```
 
-**Run work only while something exists** (replaces effects with dependency arrays): render a small component only
+**Run work only while something exists**: render a small component only
 while the work should run; its `ctx.mount` starts it and the cleanup stops it.
 
 ```jsx
@@ -255,7 +276,7 @@ while the work should run; its `ctx.mount` starts it and the cleanup stops it.
 {modal && <Confirm id={modal.id} />}                // Confirm's `listen` exists only while the dialog is open
 ```
 
-**Re-run work when an id changes** (replaces effects keyed on a dependency): key the component by that id. A new key
+**Reset a whole component when an id changes** (to restart one piece of work, use `effect`): key the component by that id. A new key
 is a new instance, so its `mount` runs again and the old instance's cleanup cancels stale work (this also fixes
 races for free).
 
@@ -398,7 +419,7 @@ Mount into a detached `div`, drive it with real events, and assert on the DOM, t
 
 On purpose, in the spirit of "ignore problems we don't have": fragments and array returns, portals, context, suspense/hydration,
 error boundaries, synthetic events, `className`/`htmlFor` aliases, object refs, deep reactivity, read tracking,
-effect dependency arrays, an unsubscribe for `watch`, an exported `update()`, and attributes that are read-only DOM properties (`list`,
+an unsubscribe for `watch`, an exported `update()`, and attributes that are read-only DOM properties (`list`,
 `form`). `memo` was built, measured, and removed; [MEMO.md](MEMO.md) is the recipe to add it back (and [OPT-IN-FEATURES.md](OPT-IN-FEATURES.md) is a design for core-level features, `memo` among them, that would cost nothing unless an app turns them on), and
 [RENDER-IDEAS.md](RENDER-IDEAS.md) records the other render optimizations we built or considered. There is no
 server rendering story.

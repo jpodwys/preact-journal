@@ -1,7 +1,8 @@
 const { expect } = window.chai; // karma-chai global: a mangled bundle must not rewrite chai itself
 import { h, render } from '../core.js';
-import { listen, debounced, lazy } from '../helpers.js';
+import { listen, debounced, lazy, effect } from '../helpers.js';
 import { mount, frame } from './core.spec.js';
+import { store } from '../core.js';
 
 const wait = ms => new Promise(r => setTimeout(r, ms));
 
@@ -329,5 +330,127 @@ describe('lazy()', () => {
     d.res({ default: Page });
     await frame();
     expect(kept.querySelector('section').dataset.id).to.equal('kept');
+  });
+});
+
+const devOnly = (typeof __DEV__ === 'undefined' || __DEV__) ? it : it.skip;
+const tick = () => new Promise(r => queueMicrotask(r));
+
+describe('effect()', () => {
+  let log;
+  beforeEach(() => { log = []; });
+  const C = (props, ctx) => {
+    effect(ctx, () => {
+      const id = props.id;
+      log.push('run ' + id);
+      return () => log.push('undo ' + id);
+    }, [props.id]);
+    return <p>{props.id}</p>;
+  };
+
+  it('runs after commit, with the element attached', () => {
+    let seen;
+    const E = (props, ctx) => {
+      effect(ctx, () => { seen = ctx.el && ctx.el.isConnected; }, []);
+      return <p ref={el => { ctx.el = el; }} />;
+    };
+    mount(<E />);
+    expect(seen).to.equal(true);
+  });
+
+  it('does not rerun while the deps are the same', async () => {
+    const host = mount(<C id={1} />);
+    render(<C id={1} />, host);
+    await tick();
+    expect(log).to.deep.equal(['run 1']);
+  });
+
+  it('cleans up, then reruns, after the DOM shows the new value', async () => {
+    const E = (props, ctx) => {
+      effect(ctx, () => { log.push('dom ' + document.querySelector('#e').textContent); return () => log.push('undo'); }, [props.id]);
+      return <p id="e">{props.id}</p>;
+    };
+    const host = mount(<E id={1} />);
+    render(<E id={2} />, host);
+    expect(log).to.deep.equal(['dom 1']);
+    await tick();
+    expect(log).to.deep.equal(['dom 1', 'undo', 'dom 2']);
+  });
+
+  it('runs once for several changes before it gets to run, with the latest values', async () => {
+    const host = mount(<C id={1} />);
+    render(<C id={2} />, host);
+    render(<C id={3} />, host);
+    await tick();
+    expect(log).to.deep.equal(['run 1', 'undo 1', 'run 3']);
+  });
+
+  it('cleans up on unmount, and a rerun still waiting never happens', async () => {
+    const host = mount(<C id={1} />);
+    render(<C id={2} />, host);
+    render(null, host);
+    await tick();
+    expect(log).to.deep.equal(['run 1', 'undo 1']);
+  });
+
+  it('[] runs once; NaN deps count as unchanged; a different length counts as changed', async () => {
+    const E = (props, ctx) => {
+      effect(ctx, () => { log.push('once'); }, []);
+      effect(ctx, () => { log.push('list ' + props.list.length); }, props.list, 'list');
+      return <p />;
+    };
+    const host = mount(<E list={[NaN]} />);
+    render(<E list={[NaN]} />, host);
+    await tick();
+    render(<E list={[NaN, 1]} />, host);
+    await tick();
+    expect(log).to.deep.equal(['once', 'list 1', 'list 2']);
+  });
+
+  it('follows store values as well as props, on the scheduled render', async () => {
+    const s = store({ user: 'a', other: 0 });
+    const E = (props, ctx) => {
+      effect(ctx, () => { log.push(s.user); }, [s.user]);
+      return <p />;
+    };
+    mount(<E />);
+    s.other = 1;
+    await frame();
+    s.user = 'b';
+    await frame();
+    expect(log).to.deep.equal(['a', 'b']);
+  });
+
+  it('ignores a returned value that is not a function', async () => {
+    const E = (props, ctx) => { effect(ctx, async () => {}, [props.id]); return <p />; };
+    const host = mount(<E id={1} />);
+    render(<E id={2} />, host);
+    await tick();
+    expect(() => render(null, host)).to.not.throw();
+  });
+
+  it('does not call a cleanup twice when the rerun throws', async () => {
+    const errors = [], prev = window.onerror;
+    window.onerror = m => { errors.push(m); return true; };
+    const E = (props, ctx) => {
+      effect(ctx, () => { if (props.id > 1) throw new Error('boom'); return () => log.push('undo'); }, [props.id]);
+      return <p />;
+    };
+    const host = mount(<E id={1} />);
+    render(<E id={2} />, host);
+    await new Promise(r => setTimeout(r, 30));
+    window.onerror = prev;
+    render(null, host);
+    expect(log).to.deep.equal(['undo']);
+    expect(errors.length).to.equal(1);
+  });
+
+  devOnly('throws when two effects share a name, which would silently overwrite each other', () => {
+    const E = (props, ctx) => {
+      effect(ctx, () => {}, [1]);
+      effect(ctx, () => {}, [2]);
+      return <p />;
+    };
+    expect(() => mount(<E />)).to.throw(/slot already used/);
   });
 });

@@ -1,7 +1,7 @@
 // Each line marked @ts-expect-error MUST be a type error. If one compiles, tsc reports "Unused
 // '@ts-expect-error' directive", so this file fails when a type stops catching its mistake.
 import { h, store, watch, Ctx, Component, WithChildren } from '../core';
-import { listen, debounced, lazy } from '../helpers';
+import { listen, debounced, lazy, effect } from '../helpers';
 
 interface Entry { id: number; text: string; tags: string[] }
 const app = store({ view: '/entries', dark: false, entries: [] as Entry[], user: null as { name: string } | null });
@@ -58,6 +58,10 @@ const C = (props: {}, ctx: Ctx) => {
   listen(ctx, window, 'resizee', () => {});
   // @ts-expect-error `key` does not exist on a click event
   listen(ctx, document.body, 'click', e => e.key);
+  // @ts-expect-error effect needs its deps
+  effect(ctx, () => {});
+  // @ts-expect-error effect wants a function
+  effect(ctx, 5, []);
   // @ts-expect-error debounced wants a function
   debounced(ctx, 5, 100);
   // @ts-expect-error debounced's trigger takes the arguments of fn

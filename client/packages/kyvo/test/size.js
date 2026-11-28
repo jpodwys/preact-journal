@@ -18,3 +18,4 @@ measure('kyvo core (h, render, store, watch)', CORE);
 measure('kyvo core + helpers', ALL);
 measure('kyvo core + helpers, mangled _', ALL, { mangleProps: /^_/ });
 measure('kyvo core + lazy()', `import { h, render, store, watch } from './core.js'; import { lazy } from './helpers.js'; ${keep} [h, render, store, watch, lazy];`);
+measure('kyvo core + effect()', `import { h, render, store, watch } from './core.js'; import { effect } from './helpers.js'; ${keep} [h, render, store, watch, effect];`);

@@ -1,6 +1,6 @@
 // Everything here is valid usage and must compile with NO errors.
 import { h, render, store, watch, Ctx, Component, WithChildren, Child, VNode } from '../core';
-import { listen, debounced, lazy, LazyFailure } from '../helpers';
+import { listen, debounced, lazy, effect, LazyFailure } from '../helpers';
 
 interface Entry { id: number; text: string; tags: string[]; favorited?: boolean }
 
@@ -50,6 +50,8 @@ const Stateful = ({ id }: { id: number }, ctx: Ctx) => {
   listen(ctx, document.body, 'click', e => { const x: number = e.clientX; void x; });
   listen(ctx, new EventTarget(), 'custom', e => { const t: string = e.type; void t; });
   const search = debounced(ctx, (q: string, n: number) => { void q; void n; }, 100);
+  effect(ctx, () => () => {}, [app.view]);
+  effect(ctx, () => { void app.view; }, [], 'second');
   search('a', 1);
   const onInput = debounced(ctx, (e: Event) => { void e; }, 50, 'second');
   return (

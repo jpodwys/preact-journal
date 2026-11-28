@@ -16,6 +16,12 @@ export function listen<T extends EventTarget>(ctx: Ctx, target: T, event: T exte
  */
 export function debounced<A extends any[]>(ctx: Ctx, fn: (...args: A) => void, ms: number, key?: string): (...args: A) => void;
 
+/**
+ * Runs `fn` after the first commit and again when a value in `deps` changes; a returned function runs before each rerun
+ * and on unmount. `deps` says only when to restart. A second effect in one component needs a `key`.
+ */
+export function effect(ctx: Ctx, fn: () => unknown, deps: readonly unknown[], key?: string): void;
+
 /** What `lazy` hands its `Failed` component. */
 export interface LazyFailure { error: unknown; retry(): void }
 

@@ -160,6 +160,11 @@ Details of the renderer (each is covered by `test/renderer.spec.js`; the reasoni
   causes a render by itself). Each `key` (a second use in one component needs one; a changing key such as an
   id works too) has its own timer and pending call. **A pending call is never lost:** on unmount it runs once,
   immediately, with the latest arguments. There is no public flush or cancel.
+- `effect(ctx, fn, deps, key?)`: runs `fn` after the first commit and again, in a microtask after the render that saw it,
+  when `deps` differs in length or in any `Object.is` comparison. The function `fn` returned runs first, and on unmount;
+  a run still pending at unmount is dropped. Several changes before it runs make one run, with the latest `fn`. Each
+  effect in a component needs its own `key` (the unkeyed one is a key too). It follows the `ctx.mount` rule: call it
+  unconditionally.
 - `lazy(load, Loading?, Failed?)`: returns a component whose code arrives on first render. `load` returns a promise of the
   component or of a module whose default export it is (`() => import('./stats.js')`; the bundler cuts the `import()` into its own
   file). The load runs once, however many instances there are. While it runs the component renders `Loading` (nothing if
