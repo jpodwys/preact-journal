@@ -90,7 +90,7 @@ describe('built artifact (real build, real CSP header, real sw.js)', { concurren
       const hashes = JSON.parse(fs.readFileSync(path.join(DIST, 'csp-hash.json'), 'utf8')).hashes;
       assert.ok(hashes.length >= 1, 'artifact has at least one inline-script hash');
       for(const h of hashes) assert.ok(csp.includes(`'sha256-${h}'`), 'CSP header lacks artifact hash ' + h + ': ' + csp);
-      assert.match(csp, /^default-src 'self'; script-src 'self' 'sha256-[^;]+; style-src 'unsafe-inline'; frame-ancestors 'none'$/);
+      assert.match(csp, /^default-src 'self'; script-src 'self' 'sha256-[^;]+; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'$/);
       assert.equal(await s.evaluate(`document.querySelectorAll('.${cls('entry-preview')}').length`), 0);
       assert.ok(await s.evaluate(`!!document.getElementById('luser') && !!document.getElementById('lpass')`), 'login fields');
       // Quirks mode matches class names case-insensitively, so short names that differ only in case would share their styles.

@@ -398,3 +398,31 @@ describe('objects h() did not build', () => {
     expect(host.innerHTML).to.equal('<p><i>0<b>x</b></i>0</p>');
   });
 });
+
+describe('markup props', () => {
+  // What a server could send where the app spreads an object into props.
+  const hostile = () => JSON.parse('{"innerHTML":"<b>forged</b>","outerHTML":"<b>forged</b>","title":"t"}');
+
+  it('innerHTML and outerHTML are ignored when an element is created', () => {
+    const host = mount(<p><div {...hostile()}>real</div></p>);
+    expect(host.innerHTML).to.equal('<p><div title="t">real</div></p>');
+  });
+
+  it('are ignored when added or removed on a later render', () => {
+    const host = mount(<p><div>real</div></p>);
+    const div = host.querySelector('div');
+    render(<p><div {...hostile()}>real</div></p>, host);
+    expect(host.innerHTML).to.equal('<p><div title="t">real</div></p>');
+    render(<p><div>real</div></p>, host);
+    expect(host.querySelector('div')).to.equal(div);
+    expect(div.textContent).to.equal('real');
+  });
+
+  it('are not set as attributes inside svg', () => {
+    const host = mount(<svg {...hostile()} />);
+    const svg = host.querySelector('svg');
+    expect(svg.hasAttribute('innerHTML')).to.equal(false);
+    expect(svg.hasAttribute('outerHTML')).to.equal(false);
+    expect(svg.children.length).to.equal(0);
+  });
+});

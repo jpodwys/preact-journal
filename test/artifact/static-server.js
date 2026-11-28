@@ -44,7 +44,7 @@ function assertCspTemplateMatchesServer () {
   const required = [
     `"'self'"`,
     `" 'sha256-" + h + "'"`,
-    `"default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'"`,
+    `"default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'"`,
     `res.header('Content-Security-Policy', CSP)`
   ];
   for(const piece of required) {
@@ -54,7 +54,7 @@ function assertCspTemplateMatchesServer () {
 
 function buildCsp (hashes) {
   const scriptSrc = "'self'" + hashes.map(h => " 'sha256-" + h + "'").join('');
-  return "default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'";
+  return "default-src 'self'; script-src " + scriptSrc + "; style-src 'unsafe-inline'; frame-ancestors 'none'; form-action 'self'";
 }
 
 // opts.hashes overrides the artifact's csp-hash.json (mutation proofs only).

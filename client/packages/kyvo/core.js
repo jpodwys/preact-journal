@@ -112,7 +112,8 @@ function setAttr(dom, name, value, old, svg) {
     const l = dom._l ||= {};
     if (!(e in l)) dom.addEventListener(e, ev => l[e] && l[e](ev));
     l[e] = value;
-  } else if (name != 'children' && name != 'key' && name != 'ref') {
+  } else if (name != 'children' && name != 'key' && name != 'ref' && name != 'innerHTML' && name != 'outerHTML') {
+    // innerHTML and outerHTML are skipped so that data spread into props cannot create markup. Set trusted HTML through a ref.
     // Property when the element has one (value, checked, disabled, href, ...), else attribute.
     const gone = value == null || value === false;
     if (!svg && name in dom && name != 'list' && name != 'form') dom[name] = gone ? '' : value;

@@ -87,7 +87,7 @@ type WritableKeys<T> = { [K in keyof T]-?: IfEquals<{ [Q in K]: T[K] }, { -reado
 type Settable<T> = {
   // Index signatures (HTMLFormElement has `[name: string]: any`) must not leak in and make every attribute `any`.
   [K in WritableKeys<T> as string extends K ? never : number extends K ? never
-    : K extends `on${string}` | 'style' | 'children' | 'classList' ? never
+    : K extends `on${string}` | 'style' | 'children' | 'classList' | 'innerHTML' | 'outerHTML' ? never
     : T[K] extends (...args: any[]) => any ? never : K]?: T[K] | null;
 };
 
