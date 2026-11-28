@@ -7,3 +7,5 @@ examples/tasks/test/bundle.spec.js
 examples/splitting/dist/
 examples/splitting/test/bundle.spec.js
 examples/dashboard/dist/
+examples/gallery/dist/
+examples/gallery/test/bundle.spec.js
