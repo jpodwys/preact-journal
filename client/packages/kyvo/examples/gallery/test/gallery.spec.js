@@ -52,6 +52,19 @@ describe('gallery', () => {
     }
   });
 
+  it('colours comments, strings, keywords and tags without changing the text', async () => {
+    await go('stopwatch');
+    const code = host.querySelector('pre code');
+    const kinds = kind => Array.from(code.querySelectorAll('.tok-' + kind), el => el.textContent);
+    expect(kinds('comment')).to.include('// Read props.step here. A destructured `step` would keep its first value forever.');
+    expect(kinds('comment')).to.include('{/* The timer exists exactly as long as the component does. */}');
+    expect(kinds('string')).to.include("'kyvo/core'");
+    expect(kinds('keyword')).to.include.members(['import', 'from', 'const', 'return', 'export', 'default']);
+    expect(kinds('tag')).to.include.members(['<div', '</div', '<Ticker', '/>']);
+    expect(kinds('attr')).to.include.members(['class', 'onclick', 'step']);
+    expect(code.textContent).to.equal(scenarios.find(s => s.id === 'stopwatch').source);
+  });
+
   it('keeps the demo state while the Code tab is open', async () => {
     await click('Clicked 0 times');
     const element = $('button');

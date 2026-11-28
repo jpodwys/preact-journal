@@ -1,5 +1,6 @@
 import { h, store } from 'kyvo/core';
 import { scenarios } from './scenarios.js';
+import { highlight } from './highlight.js';
 
 // Hash routing: #/<scenario id>. The tab is not part of the address and goes back to the demo on each new page.
 const fromHash = () => (scenarios.find(s => '#/' + s.id === location.hash) || scenarios[0]).id;
@@ -24,7 +25,7 @@ const Page = ({ scenario }) => {
       <p class="footgun"><strong>Watch out:</strong> {scenario.footgun}</p>
       <div role="tablist"><Tab name="demo" label="Demo" /><Tab name="code" label="Code" /></div>
       <section class="demo" aria-label="Demo" hidden={nav.tab !== 'demo'}><Demo /></section>
-      <pre aria-label="Code" hidden={nav.tab !== 'code'}><code>{scenario.source}</code></pre>
+      <pre aria-label="Code" hidden={nav.tab !== 'code'}><code>{highlight(scenario.source)}</code></pre>
     </article>
   );
 };

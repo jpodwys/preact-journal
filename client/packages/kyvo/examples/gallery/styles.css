@@ -18,7 +18,20 @@ h1 { margin-top: 0; }
 [role=tab] { border-radius: 6px 6px 0 0; border-bottom: 0; }
 [role=tab][aria-selected=true] { background: var(--soft); font-weight: 600; }
 .demo, pre { margin: 0; border: 1px solid var(--line); border-radius: 0 8px 8px 8px; padding: 16px; }
-pre { overflow: auto; background: var(--soft); font: 13px/1.55 ui-monospace, monospace; tab-size: 2; }
+pre { overflow: auto; background: var(--soft); font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; tab-size: 2; }
+
+/* Code colours: light, then dark. */
+:root { --comment: #6a737d; --string: #0a6b3d; --keyword: #a626a4; --literal: #986801; --call: #2f5fd0; --tag: #c0362c; --attr: #8a5a00; }
+@media (prefers-color-scheme: dark) {
+  :root { --comment: #7f8c98; --string: #98c379; --keyword: #c678dd; --literal: #d19a66; --call: #61afef; --tag: #e06c75; --attr: #e5c07b; }
+}
+.tok-comment { color: var(--comment); font-style: italic; }
+.tok-string { color: var(--string); }
+.tok-keyword { color: var(--keyword); }
+.tok-literal { color: var(--literal); }
+.tok-call { color: var(--call); }
+.tok-tag { color: var(--tag); }
+.tok-attr { color: var(--attr); }
 button, input, select, textarea { font: inherit; }
 button { margin: 0 6px 6px 0; padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; cursor: pointer; }
 button[aria-pressed=true] { background: var(--soft); font-weight: 600; }
