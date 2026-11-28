@@ -70,7 +70,7 @@ export const scenarios = [
   {
     stage: 'Basics', id: 'hello', title: 'Hello', teaches: 'components, JSX', Demo: Hello, files: [file('hello.js', helloSource)],
     about: 'A component is a plain function that returns what to show. Braces drop a JavaScript value into the markup.',
-    tip: 'A component returns one element. To show siblings, wrap them in one; returning an array throws.'
+    tip: 'To show two elements side by side, wrap them in one. Returning an array from a component throws.'
   },
   {
     stage: 'Basics', id: 'props', title: 'Props', teaches: 'passing data down', Demo: Props, files: [file('props.js', propsSource)],
@@ -88,92 +88,90 @@ export const scenarios = [
   {
     stage: 'State', id: 'counter', title: 'Counter', teaches: 'ctx.state', Demo: Counter, files: [file('counter.js', counterSource)],
     about: 'ctx.state gives a component an object that survives renders. Assign to a field and the app re-renders. There is no setter to call.',
-    tip: 'The object is created on the first render only. Changing the initial value you pass later does nothing.'
+    tip: 'The initial object is used on the first render only. Passing a different one later changes nothing.'
   },
   {
     stage: 'State', id: 'events', title: 'Events', teaches: 'handlers', Demo: Events, files: [file('events.js', eventsSource)],
     about: 'Attributes starting with "on" are event handlers, and they receive the browser event itself.',
-    tip: 'onclick={save()} calls save during every render. Write onclick={save} or onclick={() => save()}.'
+    tip: 'onclick={save()} calls save during every render, not on click. Write onclick={save} or onclick={() => save()}.'
   },
   {
     stage: 'State', id: 'conditional', title: 'Show and hide', teaches: 'conditional rendering', Demo: Conditional, files: [file('conditional.js', conditionalSource)],
     about: 'Use a ternary to pick between two things, and && to show something or nothing.',
-    tip: 'With a number on the left, as in count && ..., a count of 0 is shown as "0". Compare first: count > 0 && ...'
+    tip: 'In count && ..., a count of 0 puts "0" on the page. Write count > 0 && ... instead.'
   },
   {
     stage: 'State', id: 'text-input', title: 'Text input', teaches: 'value, oninput', Demo: TextInput, files: [file('text-input.js', textInputSource)],
     about: 'State holds the text, the input shows it, and each keystroke writes it back.',
-    tip: 'Use oninput for every keystroke. onchange is the browser event, which fires when the field is committed.'
+    tip: 'Use oninput to follow every keystroke. onchange waits until the field is committed, for example when it loses focus.'
   },
   {
     stage: 'State', id: 'cart', title: 'Shared cart', teaches: 'store', Demo: Cart, files: [file('cart.js', cartSource)],
     about: 'A store is shared state. Any component reads it by name, and any write re-renders everything, so nothing needs to subscribe.',
-    footgun: 'Replace values instead of changing them. cart.items.push(id) is not detected. A development build throws, but only once the array has been assigned through the store.'
+    tip: 'Replace the array, as add and remove do. After cart.items.push(id) the screen does not update.'
   },
   {
     stage: 'State', id: 'todos', title: 'Todo list', teaches: 'keys, per-row state', Demo: Todos, files: [file('todos.js', todosSource)],
     about: 'Each row keeps its own editing flag. Start editing a row, then move another to the top: the flag stays with its todo because of the key.',
-    footgun: 'Without a key, rows are matched by position, so row state moves to a different todo when the list changes.'
+    tip: 'Without the key on each row, pressing To top while a row is being edited would leave the edit box on a different todo.'
   },
   {
     stage: 'Forms and data', id: 'settings', title: 'Settings form', teaches: 'form controls, styles', Demo: Settings, files: [file('settings.js', settingsSource)],
     about: 'Bind each control by setting its value or checked, and storing what the event reports.',
-    footgun: 'kyvo compares with the last value it rendered, not with the page. If your handler rejects input, the control still shows it.'
+    footgun: 'If a handler rejects or ignores what was typed, so the stored value does not change, the control goes on showing the typed text.'
   },
   {
     stage: 'Forms and data', id: 'search', title: 'Search a list', teaches: 'derived data, debounced', Demo: Search, files: [file('search.js', searchSource)],
     about: 'The matching names are computed during render. debounced delays the update until typing pauses.',
-    tip: 'A second debounced in one component needs its own key as the fourth argument. A development build throws if you forget.'
+    tip: 'A second debounced in the same component needs its own key as the fourth argument. A development build throws without one.'
   },
   {
     stage: 'Forms and data', id: 'preferences', title: 'Saved preferences', teaches: 'watch', Demo: Preferences, files: [file('preferences.js', preferencesSource)],
     about: 'watch runs a function after each changed write to a store. It suits persistence.',
-    footgun: 'A watch cannot be removed, so call it once, outside any component. A development build throws if one is called during a render.'
+    tip: 'Call watch once, outside components. It cannot be removed, and a development build throws if it is called during a render.'
   },
   {
     stage: 'Lifecycle', id: 'stopwatch', title: 'Stopwatch', teaches: 'ctx.mount, live props', Demo: Stopwatch, files: [file('stopwatch.js', stopwatchSource)],
     about: 'ctx.mount starts work once and cleans it up on removal. Change the step while it runs: the timer picks it up without restarting.',
-    footgun: 'In callbacks that outlive a render, read props.step. A destructured step is stale.'
+    footgun: 'If the timer used a destructured step, it would keep adding the first value after you change it, with no error. Read props.step.'
   },
   {
     stage: 'Lifecycle', id: 'modal', title: 'Modal', teaches: 'listen, ref, conditional rendering', Demo: Modal, files: [file('modal.js', modalSource)],
     about: 'The Escape listener exists only while the modal does. A ref receives the element once it is on the page.',
-    tip: 'A ref runs when its element is created, not on later renders. To run it again, such as to refocus, give the element a new key.'
+    tip: 'A ref runs when its element is created, not on later renders. To focus again while the element stays, call focus() yourself.'
   },
   {
     stage: 'Lifecycle', id: 'profile', title: 'Profile by id', teaches: 'key, loading and errors', Demo: Profile, files: [file('profile.js', profileSource)],
-    about: 'Write a message on both cards, then pick another user. The card without a key keeps the old name and your message. The keyed card starts over and loads the new user.',
-    footgun: 'Use the keyed form. Without a key nothing warns you: the card quietly goes on showing the first user.'
+    about: 'Write a message on both cards, then pick another user. The card without a key keeps the old name and your message. The keyed card starts over and loads the new user.'
   },
   {
     stage: 'Lifecycle', id: 'metronome', title: 'Metronome', teaches: 'effect', Demo: Metronome, files: [file('metronome.js', metronomeSource)],
     about: 'effect restarts one piece of work when a listed value changes, while the component and its state stay. Change the speed: the timer is replaced and the count carries on. A key would reset the count.',
-    footgun: 'A value that should restart the work but is missing from the list fails silently. With an empty list, the speed would never change.'
+    tip: 'With an empty list instead of [s.ms], pressing Faster would change the number shown but not the speed of the timer.'
   },
   {
     stage: 'Lifecycle', id: 'notes', title: 'Autosaving notes', teaches: 'keyed debounced, key', Demo: Notes, files: [file('notes.js', notesSource)],
     about: 'Type, then switch notes at once. The pending save still reaches the note you typed in.',
-    footgun: 'Keep what the user typed somewhere that updates immediately. If only the debounced save stores it, switching back shows old text.'
+    tip: "Store what's typed right away and delay only the save. Otherwise, switching notes and back before the save runs shows the old text."
   },
   {
     stage: 'Building blocks', id: 'tabs', title: 'Tabs and accordion', teaches: 'reusable components', Demo: Tabs, files: [file('tabs.js', tabsSource)],
     about: 'Tabs reads the title of each child, and each accordion section keeps its own state. Neither knows what it contains.',
-    footgun: 'A conditional child that is off arrives in props.children as an empty string. Skip it in place; filtering it out shifts the later children and loses their state.'
+    footgun: 'If you filter the empty slot out of props.children, a panel switched on in the middle shifts the later ones, and open sections or typed text in them are lost.'
   },
   {
     stage: 'Building blocks', id: 'signup', title: 'Sign-up form', teaches: 'validation, async submit', Demo: Signup, files: [file('signup.js', signupSource)],
     about: 'Errors are computed from the fields on each render. While the request runs the button is disabled, so it cannot be sent twice.',
-    tip: 'After an await, the component may have been removed. Writing to its state then does nothing, so do not rely on it for work that must happen.'
+    tip: 'If the component is removed while a request is running, later writes to its state do nothing. Put work that must still happen in a store.'
   },
   {
     stage: 'Building blocks', id: 'table', title: 'Data table', teaches: 'derived data', Demo: Table, files: [file('table.js', tableSource)],
     about: 'Only the search text, sort, page and selection are stored. The visible rows are worked out from those on every render.',
-    tip: 'Clamp what you store against what you derive. A filter can leave the stored page past the last one.'
+    tip: 'Clamp the stored page to the number of pages. Otherwise, filtering while on a later page can leave you on an empty one.'
   },
   {
     stage: 'Interaction and time', id: 'undo', title: 'Undo and redo', teaches: 'history, listen', Demo: Undo, files: [file('undo.js', undoSource)],
-    about: 'Because values are replaced and never changed, the history is simply the old values. Paint, then undo with the buttons or Ctrl/Cmd+Z.',
-    tip: 'This only works if nothing mutates an old array. One push or index assignment would rewrite history.'
+    about: 'Because values are replaced and never changed, the history is simply the old values. Paint, then undo with the buttons or Ctrl/Cmd+Z.'
   },
   {
     stage: 'Interaction and time', id: 'reorder', title: 'Drag to reorder', teaches: 'keys, drag events', Demo: Reorder, files: [file('reorder.js', reorderSource)],
@@ -182,22 +180,21 @@ export const scenarios = [
   {
     stage: 'Interaction and time', id: 'chart', title: 'Live chart', teaches: 'effect, SVG', Demo: Chart, files: [file('chart.js', chartSource)],
     about: 'effect restarts the data timer when you change feed or pause, while the points already drawn stay.',
-    tip: 'The timer callback reads s.values each time. A copy taken when the effect started would lose every point added since.'
+    tip: 'The timer reads s.values on every tick. A copy taken when the effect started would drop the points added since.'
   },
   {
     stage: 'Async and sync', id: 'favorites', title: 'Optimistic favorites', teaches: 'async actions, rollback', Demo: Favorites, files: [file('favorites.js', favoritesSource)],
     about: 'A star changes at once and is saved afterwards. Turn on failing saves to watch it roll back.',
-    tip: 'Roll back to what the server confirmed, not to a value read before the await, and ignore failures that a newer click has replaced.'
+    tip: 'After a failed save, roll back to what the server last confirmed. A value read before the await may be out of date by then.'
   },
   {
     stage: 'Async and sync', id: 'chat', title: 'Chat rooms', teaches: 'effect, drafts, autoscroll', Demo: Chat, files: [file('chat.js', chatSource)],
-    about: 'One effect keeps a connection per room and another scrolls to new messages. Each room keeps its own unsent draft.',
-    footgun: 'Capture the room in the effect. A late message handled by reading props.room would be filed under the room you moved to.'
+    about: 'One effect keeps a connection per room and another scrolls to new messages. Each room keeps its own unsent draft.'
   },
   {
     stage: 'Whole apps', id: 'mail', title: 'Mail reader', teaches: 'routing, shared store, shortcuts', Demo: Mail, files: [file('index.js', mailIndexSource), file('store.js', mailStoreSource), file('list.js', mailListSource), file('message.js', mailMessageSource)],
     about: 'The open message is in the address, so Back works. The code is split into a store, a list and a message view.',
-    tip: 'The key on the message view empties the reply box when you move on. Put drafts in the store if they should survive.'
+    tip: 'Opening another message empties the reply box, because the view is keyed. Keep drafts in the store if they should survive.'
   },
   {
     stage: 'Whole apps', id: 'kanban', title: 'Kanban board', teaches: 'everything together', Demo: Kanban, files: [file('index.js', kanbanIndexSource), file('store.js', kanbanStoreSource), file('column.js', kanbanColumnSource), file('editor.js', kanbanEditorSource), file('settings.js', kanbanSettingsSource)],
