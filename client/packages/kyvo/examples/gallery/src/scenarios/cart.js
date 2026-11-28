@@ -26,6 +26,8 @@ const Products = () => (
 const Items = () => (
   <div>
     <ul>
+      {/* No key needed: a row is only text and a button, so it does not matter if kyvo reuses it for another line.
+          Rows with their own state or inputs do need one (see Todo list). */}
       {cart.items.map((id, i) => (
         <li>{find(id).name} <button onclick={() => remove(i)}>Remove</button></li>
       ))}
